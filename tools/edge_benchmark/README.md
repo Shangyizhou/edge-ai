@@ -281,3 +281,17 @@ python3 -m unittest discover -s tools/edge_benchmark -p 'test_*.py'
 新计划需指定设备、素材清单、候选identity和adapter、两个强度的fixture_ids和总预算。每条候选保留框架/后端/精度/线程声明；模型来源、文件及SDK身份由manifest固定。路径是设备实例配置，移机时更新外部资产路径，并保留输入hash和协议条件；不往Git提交音频、模型或SDK。
 
 旧suite不带evaluation时沿用原执行/报告入口。新版只读export将其标为legacy；协议、阶段或MemTotal等缺失信息不会从新环境回填。历史面板可查阅，不自动当作新版受控对照。动态库映射和provider结合检查实际运行路径，CPU也可能因SDK依赖映射RKNN库。
+
+## ASR PTQ探索工具
+
+`asr_ptq.py` 在独立外部转换环境运行，分别捕获真实流式状态校准及转换单个组件。需要固定的浮点ONNX、ORT、kaldi-native-fbank和对应版本RKNN Toolkit；依赖不由脚本安装。
+
+```sh
+python asr_ptq.py capture --model /absolute/float-onnx --output /absolute/new-calibration --fixtures /absolute/fixtures.json --fixture-ids official0 command --max-samples 16 --chunks-per-fixture 8
+python asr_ptq.py build --model /absolute/float-onnx --component joiner --output /absolute/new-float
+python asr_ptq.py build --model /absolute/float-onnx --component joiner --output /absolute/new-int8 --int8 --calibration /absolute/new-calibration
+```
+
+在tools/edge_benchmark目录运行示例，或使用脚本绝对路径。输出目录须新建；保留控制组、量化候选及原始状态类型。捕获仅覆盖指定少量块/帧，不能当作充分校准；现有实现针对旧Zipformer固定导出契约，并非通用ASR量化器。构建成功后仍需审核实际层精度、运行库、流式状态接口和质量，再进行性能复测。CPU动态INT8与RKNN静态W8A8不能仅按名称归入受控对照。
+
+`native/asr_stream/rknn_component_probe.cpp` 为独立组件诊断，使用外置官方`rknn_api.h`和私有runtime编译；`--perf`显式启用层报告。零输入仅验证执行与精度，不评价识别质量或吞吐。runtime2.5.0在本设备出现profiling及完整ASR崩溃，详见[本次尝试](../../studies/voice-interaction/experiments/rk3566/2026-10-21-asr-int8-ptq/results.md)，不要自动替换已验证运行库。

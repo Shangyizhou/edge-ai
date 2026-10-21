@@ -1,0 +1,18 @@
+Breakpoint 1 (rknn_init) pending.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+rknn_init_flags=0
+rknn_init_flags=0
+rknn_init_flags=0
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000007ff756d2bc in ?? () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.5.0/librknnrt.so
+#0  0x0000007ff756d2bc in ?? () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.5.0/librknnrt.so
+#1  0x0000007ff736ee48 in ?? () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.5.0/librknnrt.so
+#2  0x0000007ff737880c in ?? () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.5.0/librknnrt.so
+#3  0x0000007ff7118aa0 in rknn_run () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.5.0/librknnrt.so
+#4  0x0000007ff7d4f630 in sherpa_onnx::OnlineZipformerTransducerModelRknn::Impl::RunEncoder(std::vector<float, std::allocator<float> >, std::vector<std::vector<unsigned char, std::allocator<unsigned char> >, std::allocator<std::vector<unsigned char, std::allocator<unsigned char> > > >) () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/lib/libsherpa-onnx-c-api.so
+#5  0x0000007ff7d126e4 in sherpa_onnx::OnlineRecognizerTransducerRknnImpl::DecodeStreams(sherpa_onnx::OnlineStream**, int) const () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/lib/libsherpa-onnx-c-api.so
+#6  0x0000007ff7c4686c in SherpaOnnxDecodeOnlineStream () from /home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/lib/libsherpa-onnx-c-api.so
+#7  0x0000005555554af8 in decode(SherpaOnnxOnlineRecognizer const*, SherpaOnnxOnlineStream const*) ()
+#8  0x0000005555552ca4 in main ()

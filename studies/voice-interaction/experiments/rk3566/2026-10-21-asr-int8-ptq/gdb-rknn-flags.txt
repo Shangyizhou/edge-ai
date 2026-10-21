@@ -1,0 +1,10 @@
+set pagination off
+set breakpoint pending on
+break rknn_init
+commands
+silent
+printf "rknn_init_flags=%lu\n", $x3
+continue
+end
+run
+bt 10

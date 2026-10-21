@@ -6,6 +6,7 @@
 
 | 实验 | 解决的问题 | 结果入口 |
 | --- | --- | --- |
+| 2026-10-21-asr-int8-ptq | 同源PTQ能否构建、上板和保持识别输出；部分成功、质量未通过 | [结论](2026-10-21-asr-int8-ptq/results.md) · [静态页](2026-10-21-asr-int8-ptq/report.html) |
 | 2026-10-21-asr-lite-v1 | 统一SOP、6条小输入、CPU/NPU资源及三轮吞吐/实时复测 | [结论](2026-10-21-asr-lite-v1/results.md) · [新协议图表](2026-10-21-asr-lite-v1/evaluation/report.html) |
 | 2026-10-21-baseline | ASR/TTS/Qwen路线、线程、量化与共存对照 | [结论](2026-10-21-baseline/results.md) · [图表](2026-10-21-baseline/report.html) |
 | 2026-10-21-streaming-asr | 常驻模型、实时供音、端点扫描和YOLO共跑 | [结论](2026-10-21-streaming-asr/results.md) · [图表](2026-10-21-streaming-asr/report.html) |

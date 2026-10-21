@@ -1,0 +1,52 @@
+I rknn-toolkit2 version: 2.5.0
+I Loading :   0%|                                                             | 0/2 [00:00<?, ?it/s]I Loading : 100%|█████████████████████████████████████████████████████| 2/2 [00:00<00:00, 99.26it/s]
+[1;33mW[0m [1;33mload_onnx: The config.mean_values is None, zeros will be set for input 0![0m
+[1;33mW[0m [1;33mload_onnx: The config.std_values is None, ones will be set for input 0![0m
+[1;33mW[0m [1;33mload_onnx: The config.mean_values is None, zeros will be set for input 1![0m
+[1;33mW[0m [1;33mload_onnx: The config.std_values is None, ones will be set for input 1![0m
+D base_optimize ...
+D base_optimize done.
+D 
+D fold_constant ...
+D fold_constant done.
+D 
+D correct_ops ...
+D correct_ops done.
+D 
+D fuse_ops ...
+D fuse_ops results:
+D     unsqueeze_to_4d_add: remove node = [], add node = ['encoder_out_rs', 'decoder_out_rs', '/Add_output_0-rs']
+D     unsqueeze_to_4d_tanh: remove node = [], add node = ['/Add_output_0_rs', '/Tanh_output_0-rs']
+D     convert_gemm_by_exmatmul: remove node = ['/output_linear/Gemm'], add node = ['/Tanh_output_0_tp', '/Tanh_output_0_tp_rs', '/output_linear/Gemm#1', 'logit_mm_tp', 'logit_mm_tp_rs']
+D     unsqueeze_to_4d_transpose: remove node = [], add node = ['/Tanh_output_0_rs', '/Tanh_output_0_tp-rs']
+D     bypass_two_reshape: remove node = ['/Add_output_0_rs', '/Add_output_0-rs', '/Tanh_output_0_rs', '/Tanh_output_0-rs']
+D     fuse_transpose_reshape: remove node = ['/Tanh_output_0_tp', 'logit_mm_tp']
+D     bypass_two_reshape: remove node = ['/Tanh_output_0_tp_rs', '/Tanh_output_0_tp-rs']
+D     convert_exmatmul_to_conv: remove node = ['/output_linear/Gemm#1'], add node = ['/output_linear/Gemm#2']
+D     fold_constant ...
+D     fold_constant done.
+D fuse_ops done.
+D 
+D sparse_weight ...
+D sparse_weight done.
+D 
+I Quantize calibration include 16 samples.
+I GraphPreparing :   0%|                                                      | 0/6 [00:00<?, ?it/s]I GraphPreparing : 100%|█████████████████████████████████████████████| 6/6 [00:00<00:00, 586.27it/s]
+I Quantizating :   0%|                                                        | 0/6 [00:00<?, ?it/s]I Quantizating :  33%|████████████████                                | 2/6 [00:00<00:00, 18.32it/s]I Quantizating :  83%|████████████████████████████████████████        | 5/6 [00:05<00:01,  1.20s/it]I Quantizating : 100%|████████████████████████████████████████████████| 6/6 [00:05<00:00,  1.12it/s]
+D 
+D quant_optimizer ...
+D quant_optimizer results:
+D     adjust_tanh_sigmoid: ['/Tanh']
+D quant_optimizer done.
+D 
+[1;33mW[0m [1;33mbuild: The default input dtype of 'encoder_out' is changed from 'float32' to 'int8' in rknn model for performance!
+                       Please take care of this change when deploy rknn model with Runtime API![0m
+[1;33mW[0m [1;33mbuild: The default input dtype of 'decoder_out' is changed from 'float32' to 'int8' in rknn model for performance!
+                       Please take care of this change when deploy rknn model with Runtime API![0m
+[1;33mW[0m [1;33mbuild: The default output dtype of 'logit' is changed from 'float32' to 'int8' in rknn model for performance!
+                      Please take care of this change when deploy rknn model with Runtime API![0m
+[1;33mW[0m [1;33mSet temperate env rknn_compute_order=WidthFirst[0m
+I rknn building ...
+E RKNN: [08:55:23.836] Unkown op target: 0
+[1;33mW[0m [1;33mRestore temperate env rknn_compute_order=[0m
+I rknn building done.
