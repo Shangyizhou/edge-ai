@@ -1,5 +1,7 @@
 # 机器人本地语音：现在怎么选，下一步做什么
 
+更直观的阅读入口：[研究看板](https://shangyizhou.github.io/edge-ai/) · [资源图表](https://shangyizhou.github.io/edge-ai/models.html) · [研究进度](https://shangyizhou.github.io/edge-ai/process.html)。
+
 更新：2026-10-21。目标设备：Orange Pi 3B / RK3566 / 标称4GB内存。
 
 我们要让机器人在本地完成“听懂 → 思考 → 说话”，同时为视觉检测留出资源。**ASR节点已接入验证，完整语音交互尚未验收。**

@@ -1,5 +1,7 @@
 # edge-ai
 
+**网页入口：[Edge AI 研究台](https://shangyizhou.github.io/edge-ai/)** · 建议、资源图表、研究进度与可检索证据。[网站维护与本地预览](tools/research_site/README.md)。
+
 端侧模型的调研、部署与性能测试记录。按研究主题查阅，每个主题集中保存调研依据、设备部署方法和实验结果。
 
 | 研究主题 | 做了什么 | 阅读入口 |
