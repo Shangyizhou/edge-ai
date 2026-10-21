@@ -96,9 +96,9 @@ samples and permits the next case. Programming errors remain visible in logs.
   Repeated final candidates and realistic coexistence are separate suites.
 
 Research, scope decisions and delivery tracking:
-[deployment](../../deployments/rk3566/README.md),
-[research](../../docs/research/rk3566/research-speech.md) and
-[results](../../reports/rk3566/2026-10-21/results.md).
+[deployment](../../studies/voice-interaction/platforms/rk3566/deployment.md),
+[research](../../studies/voice-interaction/research/speech.md) and
+[results](../../studies/voice-interaction/experiments/rk3566/2026-10-21-baseline/results.md).
 
 ## Focused reruns and combined report
 
@@ -249,11 +249,11 @@ contains `fixtures` entries with `id`, `path`, `energy_end_s` and provenance;
 freeze it with WAV hashes. WAVs, headers, libraries and binaries stay outside Git.
 The report distinguishes compute RTF from paced wall time and reports missing
 endpoints explicitly. Energy anchors are not human EOS labels. See
-[method](../../docs/research/rk3566/research-streaming-asr-method.md) and
-[measured results](../../reports/rk3566/2026-10-21-asr-streaming/results.md).
+[method](../../studies/voice-interaction/research/streaming-asr-method.md) and
+[measured results](../../studies/voice-interaction/experiments/rk3566/2026-10-21-streaming-asr/results.md).
 
 Production ROS ASR integration is recorded separately in
-[ROS node validation](../../reports/rk3566/2026-10-21-asr-ros/results.md).
+[ROS node validation](../../studies/voice-interaction/experiments/rk3566/2026-10-21-ros-asr/results.md).
 That replay uses the actual robot_inference node and ROS audio/control contracts;
 its event-reception latency includes DDS delivery, unlike the direct C API probe.
 Native compute RTF and resource peaks were not collected in that integration run.
