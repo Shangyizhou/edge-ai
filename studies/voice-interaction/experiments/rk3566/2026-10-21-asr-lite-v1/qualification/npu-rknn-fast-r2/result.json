@@ -1,0 +1,6294 @@
+{
+  "id": "npu-rknn-fast-r2",
+  "config": {
+    "timeout": 100,
+    "binary": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/asr-stream/asr_stream_probe",
+    "env": {
+      "LD_LIBRARY_PATH": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0:/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/lib"
+    },
+    "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+    "provider": "rknn",
+    "threads": 1,
+    "id": "npu-rknn-fast-r2",
+    "kind": "streaming_asr",
+    "fixtures": "/home/orangepi/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/fixtures.json",
+    "fixture_ids": [
+      "official0",
+      "command",
+      "command-pause080",
+      "fleurs-1805-1",
+      "fleurs-1965-2",
+      "silence1"
+    ],
+    "realtime": false,
+    "chunk_ms": 100,
+    "tail_seconds": 3.2,
+    "idle_seconds": 3,
+    "endpoint_silence": 1.2,
+    "evaluation": {
+      "task": "asr",
+      "protocol_id": "edge-asr-lite-v1",
+      "tier": "qualification",
+      "round": 2,
+      "device_id": "orange-pi-3b-rk3566-local",
+      "candidate": {
+        "id": "npu-rknn",
+        "model": "rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+        "framework": "sherpa-onnx 1.13.8 / RKNN runtime 2.2.0",
+        "backend": "rknn",
+        "precision": "fp16-rknn"
+      },
+      "comparison_type": "deployment",
+      "comparison_group": "zipformer-small-bilingual-existing-assets",
+      "preprocessing": "mono16k-pcm16-v1",
+      "output_normalization": "nfkc-casefold-no-punctuation-space-v1"
+    },
+    "requested_timeout_seconds": 100,
+    "budget_limited": false
+  },
+  "command": [
+    "/usr/bin/python3",
+    "tools/edge_benchmark/workers.py",
+    "/home/orangepi/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/qualification/npu-rknn-fast-r2/config.json",
+    "/home/orangepi/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/qualification/npu-rknn-fast-r2"
+  ],
+  "status": "ok",
+  "returncode": 0,
+  "wall_seconds": 19.623179908001475,
+  "peak_rss_mib": 222.390625,
+  "peak_pss_mib": 215.6259765625,
+  "peak_swap_mib": 0.0,
+  "cpu_seconds": 11.53,
+  "peak_threads": 2,
+  "min_host_available_mib": 1701.8671875,
+  "events": [
+    {
+      "event": "phase",
+      "name": "loading",
+      "state": "start",
+      "monotonic_seconds": 22767.772403351
+    },
+    {
+      "event": "phase",
+      "name": "loading",
+      "state": "end",
+      "monotonic_seconds": 22768.601174114
+    },
+    {
+      "event": "phase",
+      "name": "first_request",
+      "state": "start",
+      "monotonic_seconds": 22768.601297196
+    },
+    {
+      "event": "phase",
+      "name": "first_request",
+      "state": "end",
+      "monotonic_seconds": 22769.141177458
+    },
+    {
+      "event": "phase",
+      "name": "warmup",
+      "state": "start",
+      "monotonic_seconds": 22769.14129704
+    },
+    {
+      "event": "phase",
+      "name": "warmup",
+      "state": "end",
+      "monotonic_seconds": 22769.674222597
+    },
+    {
+      "event": "loaded",
+      "load_seconds": 0.8285980979999295,
+      "warmup_seconds": 0.5330241390001902,
+      "model_creations": 1,
+      "provider": "rknn"
+    },
+    {
+      "event": "phase",
+      "name": "idle",
+      "state": "start",
+      "monotonic_seconds": 22769.67438272
+    },
+    {
+      "event": "phase",
+      "name": "idle",
+      "state": "end",
+      "monotonic_seconds": 22772.674622925
+    },
+    {
+      "event": "phase",
+      "name": "inference",
+      "state": "start",
+      "monotonic_seconds": 22772.675125169
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.1,
+      "processing_seconds": 0.001096362000680529,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.682013667
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.2,
+      "processing_seconds": 0.0007857409982534591,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.682921614
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.3,
+      "processing_seconds": 0.0007046579994494095,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.683722812
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.4,
+      "processing_seconds": 0.0007912820001365617,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.684582343
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.5,
+      "processing_seconds": 0.0007376159992418252,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.685426999
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.6,
+      "processing_seconds": 0.0007685320015298203,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.686283322
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.7,
+      "processing_seconds": 0.0006950330025574658,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.687054187
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.8,
+      "processing_seconds": 0.1741934220008261,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22772.861308859
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 0.9,
+      "processing_seconds": 0.0007011579982645344,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.862120558
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1,
+      "processing_seconds": 0.0006495340021501761,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.862808883
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.1,
+      "processing_seconds": 0.0006515759996545967,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.863493416
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.2,
+      "processing_seconds": 0.0006474920010077767,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.864172407
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.3,
+      "processing_seconds": 0.0006947419969947077,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22772.864898357
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.4,
+      "processing_seconds": 0.1801316829987627,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22773.045067664
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 1.4,
+      "wall_seconds": 0.364151234000019,
+      "transcript": "昨天"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.5,
+      "processing_seconds": 0.0007148660006350838,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.045900653
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.6,
+      "processing_seconds": 0.0006638260019826703,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.046604145
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.7,
+      "processing_seconds": 0.0006623660010518506,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.047367718
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.8,
+      "processing_seconds": 0.0007256579992827028,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.048124876
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 1.9,
+      "processing_seconds": 0.0006620749991270714,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.048830992
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2,
+      "processing_seconds": 0.0006588659998669755,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.049522233
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.1,
+      "processing_seconds": 0.1704723849979928,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22773.22002641
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 2.1,
+      "wall_seconds": 0.539109979999921,
+      "transcript": "昨天是"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.2,
+      "processing_seconds": 0.0007218659993668552,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.220874275
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.3,
+      "processing_seconds": 0.000739073999284301,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.221653598
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.4,
+      "processing_seconds": 0.0006705340019834694,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.22236409
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.5,
+      "processing_seconds": 0.0006912410026416183,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.223087122
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.6,
+      "processing_seconds": 0.0007122410024749115,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.223857696
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.7,
+      "processing_seconds": 0.1902576400025282,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22773.41418971
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 2.7,
+      "wall_seconds": 0.7332732800023223,
+      "transcript": "昨天是 MONDAY"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.8,
+      "processing_seconds": 0.0007691160026297439,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.415078408
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 2.9,
+      "processing_seconds": 0.0006886159972054884,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.415814857
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3,
+      "processing_seconds": 0.0006941579995327629,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.416541681
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.1,
+      "processing_seconds": 0.0006912409990036394,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.417276672
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.2,
+      "processing_seconds": 0.0007271159993251786,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.418036163
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.3,
+      "processing_seconds": 0.1465215999996872,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22773.564609095
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.4,
+      "processing_seconds": 0.0007361579991993494,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.565450543
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.5,
+      "processing_seconds": 0.000686866002070019,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.566177075
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.6,
+      "processing_seconds": 0.0007250739981827792,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.567058481
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.7,
+      "processing_seconds": 0.0007440320005116519,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.567839263
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.8,
+      "processing_seconds": 0.0006874499995319638,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.568567254
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 3.9,
+      "processing_seconds": 0.0006915330013725907,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.569290287
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4,
+      "processing_seconds": 0.1521827789983945,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22773.721509524
+    },
+    {
+      "event": "endpoint",
+      "utterance": 0,
+      "audio_cursor": 4,
+      "wall_seconds": 1.040593093999632,
+      "transcript": "昨天是 MONDAY"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.1,
+      "processing_seconds": 0.0007023239995760377,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.72234193
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.2,
+      "processing_seconds": 0.0006486580023192801,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.723027338
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.3,
+      "processing_seconds": 0.000646909000352025,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.723707497
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.4,
+      "processing_seconds": 0.0006477839997387491,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.72438678
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.5,
+      "processing_seconds": 0.0006507000034616794,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.72513927
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.6,
+      "processing_seconds": 0.1590205280008377,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22773.884198298
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 4.6,
+      "wall_seconds": 1.203281868001795,
+      "transcript": "TODAY"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.7,
+      "processing_seconds": 0.0007813649972376879,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.885096328
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.8,
+      "processing_seconds": 0.0006714080009260215,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.885824611
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 4.9,
+      "processing_seconds": 0.0006647000009252224,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.886523727
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5,
+      "processing_seconds": 0.0006638250015384983,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.88722051
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.1,
+      "processing_seconds": 0.0006979500030865893,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.887952001
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.2,
+      "processing_seconds": 0.00066440800219425,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22773.888655784
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.3,
+      "processing_seconds": 0.1550959100022737,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.043783485
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.4,
+      "processing_seconds": 0.0008668219998071436,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.044775139
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.5,
+      "processing_seconds": 0.000741699001082452,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.045711086
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.6,
+      "processing_seconds": 0.0006769499996153172,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.046448702
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.7,
+      "processing_seconds": 0.0007157410000218078,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.047198568
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.8,
+      "processing_seconds": 0.0008041149994824082,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.04807939
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 5.9,
+      "processing_seconds": 0.1587370320012269,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.206927837
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 5.9,
+      "wall_seconds": 1.526011407000624,
+      "transcript": "TODAY IS李八"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6,
+      "processing_seconds": 0.0007629909996467177,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.207809826
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.1,
+      "processing_seconds": 0.0006889079995744396,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.208550066
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.2,
+      "processing_seconds": 0.0006789919971197378,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.209262308
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.3,
+      "processing_seconds": 0.0007104910000634845,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.210005173
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.4,
+      "processing_seconds": 0.0006830749989603646,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.210721498
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.5,
+      "processing_seconds": 0.1541229219983506,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.364881461
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 6.5,
+      "wall_seconds": 1.683965030999389,
+      "transcript": "TODAY IS李八二"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.6,
+      "processing_seconds": 0.0007904070007498376,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.365802533
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.7,
+      "processing_seconds": 0.0007116580018191598,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.366584773
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.8,
+      "processing_seconds": 0.0006964909989619628,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.36733143
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 6.9,
+      "processing_seconds": 0.0009327389998361468,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.368310252
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7,
+      "processing_seconds": 0.0007262409999384545,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.369133908
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.1,
+      "processing_seconds": 0.000706699000147637,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.36990944
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.2,
+      "processing_seconds": 0.1544207099977939,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.524386733
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 7.2,
+      "wall_seconds": 1.843470302999776,
+      "transcript": "TODAY IS李八二 TODAY"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.3,
+      "processing_seconds": 0.000758324000344146,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.525310721
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.4,
+      "processing_seconds": 0.0007029080006759614,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.526141086
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.5,
+      "processing_seconds": 0.0006894920006743632,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.526865577
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.6,
+      "processing_seconds": 0.0006894910002301913,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.527587151
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.7,
+      "processing_seconds": 0.000747532001696527,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.528366766
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.8,
+      "processing_seconds": 0.1484235339994484,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.676829383
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 7.8,
+      "wall_seconds": 1.995912952999788,
+      "transcript": "TODAY IS李八二 TODAY AFTER"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 7.9,
+      "processing_seconds": 0.0007521990009990986,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.677701456
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8,
+      "processing_seconds": 0.0007040750024316367,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.678502946
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.1,
+      "processing_seconds": 0.0006964910025999416,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.679233562
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.2,
+      "processing_seconds": 0.0006961999970371835,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.679963303
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.3,
+      "processing_seconds": 0.0006944490014575422,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.680689252
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.4,
+      "processing_seconds": 0.0007276989999809302,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.681448451
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.5,
+      "processing_seconds": 0.1562176450024708,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.837702846
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 8.5,
+      "wall_seconds": 2.156786416002433,
+      "transcript": "TODAY IS李八二 TODAY AFTER TOMORROW"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.6,
+      "processing_seconds": 0.0007714490020589437,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.838626835
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.7,
+      "processing_seconds": 0.0007122410024749115,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.839385159
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.8,
+      "processing_seconds": 0.0007078659982653335,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.840125983
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 8.9,
+      "processing_seconds": 0.0007072829976095818,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.840865641
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9,
+      "processing_seconds": 0.0007659069997316692,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.841664214
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.1,
+      "processing_seconds": 0.1561330639997323,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22774.997843069
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.2,
+      "processing_seconds": 0.0007635740003024694,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.998714266
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.3,
+      "processing_seconds": 0.0007169079981395043,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22774.999548131
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.4,
+      "processing_seconds": 0.0007139920016925316,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.000294497
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.5,
+      "processing_seconds": 0.0007113669998943806,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.001037946
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.6,
+      "processing_seconds": 0.0007212830023490824,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.001871519
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.7,
+      "processing_seconds": 0.157187425000302,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22775.159093652
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 9.7,
+      "wall_seconds": 2.47817722200125,
+      "transcript": "TODAY IS李八二 TODAY AFTER TOMORROW是星"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.8,
+      "processing_seconds": 0.000768239999160869,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.159985849
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 9.9,
+      "processing_seconds": 0.0007212829987111036,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.160746798
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10,
+      "processing_seconds": 0.0007670740014873445,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.161546247
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.1,
+      "processing_seconds": 0.0007169079981395043,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.162301946
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.2,
+      "processing_seconds": 0.0007142829999793321,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.163049478
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.3,
+      "processing_seconds": 0.0007125330012058839,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.163794969
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.4,
+      "processing_seconds": 0.1559032330005721,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22775.319732326
+    },
+    {
+      "event": "partial",
+      "utterance": 0,
+      "audio_cursor": 10.4,
+      "wall_seconds": 2.638815895999869,
+      "transcript": "TODAY IS李八二 TODAY AFTER TOMORROW是星期三"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.5,
+      "processing_seconds": 0.0007787399990775157,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.320635898
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.6,
+      "processing_seconds": 0.0008032400000956841,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.321479971
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.7,
+      "processing_seconds": 0.0007256570024765097,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.322249378
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.8,
+      "processing_seconds": 0.0007224490000226069,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.323005369
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 10.9,
+      "processing_seconds": 0.0007209909999801312,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.323759026
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11,
+      "processing_seconds": 0.1507177559979027,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22775.474510907
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.1,
+      "processing_seconds": 0.0007976980014063884,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.475499061
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.2,
+      "processing_seconds": 0.0007309069987968542,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.476275176
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.3,
+      "processing_seconds": 0.0007227410023915581,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.477034667
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.4,
+      "processing_seconds": 0.0007641569973202422,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.477831782
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.5,
+      "processing_seconds": 0.0007276999967871234,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.478599148
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.6,
+      "processing_seconds": 0.0007227409987535793,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.479354263
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.7,
+      "processing_seconds": 0.1525820660026511,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22775.631970162
+    },
+    {
+      "event": "endpoint",
+      "utterance": 0,
+      "audio_cursor": 11.7,
+      "wall_seconds": 2.951053732002038,
+      "transcript": "TODAY IS李八二 TODAY AFTER TOMORROW是星期三"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.8,
+      "processing_seconds": 0.0007136989988794085,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.632825318
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 11.9,
+      "processing_seconds": 0.0006585749979421962,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.633532309
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12,
+      "processing_seconds": 0.0006556580010510515,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.634222967
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.1,
+      "processing_seconds": 0.0007256570024765097,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.634981291
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.2,
+      "processing_seconds": 0.0006568250028067268,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.635683616
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.3,
+      "processing_seconds": 0.1531627670010494,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22775.788880216
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.4,
+      "processing_seconds": 0.0006991160007601138,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.789686664
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.5,
+      "processing_seconds": 0.0006524500022351276,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.790379072
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.6,
+      "processing_seconds": 0.0006961990002309904,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.791106188
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.7,
+      "processing_seconds": 0.0006518670015793759,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.791798013
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.8,
+      "processing_seconds": 0.0006498250004369766,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.792479921
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 12.9,
+      "processing_seconds": 0.1501810949994251,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22775.942693391
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 13,
+      "processing_seconds": 0.00074986599793192,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.943552339
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 13.1,
+      "processing_seconds": 0.0007825319989933632,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.944498786
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 13.2,
+      "processing_seconds": 0.0007058240007609129,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.945279859
+    },
+    {
+      "event": "asr_block",
+      "utterance": 0,
+      "audio_cursor": 13.253125,
+      "processing_seconds": 0.0003631210020103026,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.945708021
+    },
+    {
+      "event": "sample",
+      "index": 0,
+      "input": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/official0.wav",
+      "seconds": 3.256620063031733,
+      "rtf": 0.3239410693721338,
+      "audio_seconds": 10.053125,
+      "supplied_audio_seconds": 13.253125,
+      "rtf_supplied": 0.2457246923296756,
+      "realtime": false,
+      "first_partial_seconds": 0.364151234000019,
+      "energy_end_seconds": 9.8,
+      "last_partial_seconds": 2.638815895999869,
+      "endpoint_after_energy_seconds": -1,
+      "endpoint_count": 2,
+      "early_endpoint_count": 1,
+      "eof_residual": "",
+      "transcript": "昨天是 MONDAYTODAY IS李八二 TODAY AFTER TOMORROW是星期三",
+      "start_monotonic": 22772.68091643,
+      "end_monotonic": 22775.945905477
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.1,
+      "processing_seconds": 0.0007309069987968542,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.950977205
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.2,
+      "processing_seconds": 0.0007078659982653335,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.951879319
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.3,
+      "processing_seconds": 0.0006833660008851439,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.952653101
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.4,
+      "processing_seconds": 0.0006749079984729178,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.953388092
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.5,
+      "processing_seconds": 0.0006606170027225744,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.954100333
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.6,
+      "processing_seconds": 0.0007454910009982996,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.954885199
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.7,
+      "processing_seconds": 0.0006556579974130727,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22775.955594523
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.8,
+      "processing_seconds": 0.1496972269997059,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22776.105327916
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 0.9,
+      "processing_seconds": 0.0007434489998559002,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.106179572
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1,
+      "processing_seconds": 0.0008977390025393106,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.107157227
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.1,
+      "processing_seconds": 0.0007749489996058401,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.108030466
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.2,
+      "processing_seconds": 0.0006620749991270714,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.108788206
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.3,
+      "processing_seconds": 0.0006553670027642511,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.10947799
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.4,
+      "processing_seconds": 0.1498308080008428,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22776.259340297
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.5,
+      "processing_seconds": 0.0007061159994918853,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.260230161
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.6,
+      "processing_seconds": 0.0006533250016218517,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.260921694
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.7,
+      "processing_seconds": 0.000718366998626152,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.261672144
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.8,
+      "processing_seconds": 0.0006486580023192801,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.262359593
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 1.9,
+      "processing_seconds": 0.0006536159999086522,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.263045001
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2,
+      "processing_seconds": 0.0006457420022343285,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.263722535
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.1,
+      "processing_seconds": 0.1594903969998995,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22776.423244431
+    },
+    {
+      "event": "partial",
+      "utterance": 1,
+      "audio_cursor": 2.1,
+      "wall_seconds": 0.4729993000000832,
+      "transcript": "机器人"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.2,
+      "processing_seconds": 0.0007212829987111036,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.424078296
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.3,
+      "processing_seconds": 0.0007408239980577491,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.424855578
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.4,
+      "processing_seconds": 0.0006702419996145181,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.425567819
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.5,
+      "processing_seconds": 0.0007139909976103809,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.426314185
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.6,
+      "processing_seconds": 0.0006670330003544223,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.427017676
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.7,
+      "processing_seconds": 0.1491585249968921,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22776.576207992
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.8,
+      "processing_seconds": 0.0007151569989218842,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.57703369
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 2.9,
+      "processing_seconds": 0.0007405320029647555,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.577809514
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3,
+      "processing_seconds": 0.0006749080021108966,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.578524672
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.1,
+      "processing_seconds": 0.000669367000227794,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.579224955
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.2,
+      "processing_seconds": 0.000666741998429643,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.579922613
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.3,
+      "processing_seconds": 0.1556340280003496,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22776.735588141
+    },
+    {
+      "event": "partial",
+      "utterance": 1,
+      "audio_cursor": 3.3,
+      "wall_seconds": 0.7853430100003607,
+      "transcript": "机器人请让底"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.4,
+      "processing_seconds": 0.0007454900005541276,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.736530212
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.5,
+      "processing_seconds": 0.0006906589987920597,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.737260537
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.6,
+      "processing_seconds": 0.0007437410022248514,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.73803811
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.7,
+      "processing_seconds": 0.0006854079983895645,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.738761726
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.8,
+      "processing_seconds": 0.0006871580008009914,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.739481259
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 3.9,
+      "processing_seconds": 0.001140693999332143,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.740658703
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4,
+      "processing_seconds": 0.1608623799984343,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22776.901623748
+    },
+    {
+      "event": "partial",
+      "utterance": 1,
+      "audio_cursor": 4,
+      "wall_seconds": 0.9513786169991363,
+      "transcript": "机器人请让底盘上前移"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.1,
+      "processing_seconds": 0.0007548239991592709,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.902502529
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.2,
+      "processing_seconds": 0.0007209909999801312,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.903264061
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.3,
+      "processing_seconds": 0.0007276989999809302,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.904054176
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.4,
+      "processing_seconds": 0.0007527819980168715,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.904853916
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.5,
+      "processing_seconds": 0.0006988240020291414,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22776.905600865
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.6,
+      "processing_seconds": 0.1637778429976606,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22777.06941225
+    },
+    {
+      "event": "partial",
+      "utterance": 1,
+      "audio_cursor": 4.6,
+      "wall_seconds": 1.11916711899903,
+      "transcript": "机器人请让底盘上前移动二十厘米"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.7,
+      "processing_seconds": 0.0008385309993172996,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.070382905
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.8,
+      "processing_seconds": 0.0009417799992661458,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.071408975
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 4.9,
+      "processing_seconds": 0.0007758239989925642,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.072293006
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5,
+      "processing_seconds": 0.0007752409983368125,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.073138246
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.1,
+      "processing_seconds": 0.0007787409995216876,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.074002152
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.2,
+      "processing_seconds": 0.0008315309969475493,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.074908057
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.3,
+      "processing_seconds": 0.1495726859975548,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22777.224662741
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.4,
+      "processing_seconds": 0.0007787409995216876,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.225554064
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.5,
+      "processing_seconds": 0.0007239070000650827,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.226316762
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.6,
+      "processing_seconds": 0.0007221579980978277,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.227071878
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.7,
+      "processing_seconds": 0.0007586160027130973,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.227862577
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.8,
+      "processing_seconds": 0.0007294499991985504,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.228634609
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 5.9,
+      "processing_seconds": 0.1534436389993061,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22777.382111789
+    },
+    {
+      "event": "endpoint",
+      "utterance": 1,
+      "audio_cursor": 5.9,
+      "wall_seconds": 1.431866658000217,
+      "transcript": "机器人请让底盘上前移动二十厘米"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6,
+      "processing_seconds": 0.0007568649998574983,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.383007777
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.1,
+      "processing_seconds": 0.000674325001455145,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.383769601
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.2,
+      "processing_seconds": 0.0007052410001051612,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.38451305
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.3,
+      "processing_seconds": 0.0006507010002678726,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.385204584
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.4,
+      "processing_seconds": 0.0006495329980680253,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.385885908
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.5,
+      "processing_seconds": 0.1566522240027552,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22777.542569632
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.6,
+      "processing_seconds": 0.0007527820016548503,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.543430621
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.7,
+      "processing_seconds": 0.0007090330000210088,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.544222778
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.8,
+      "processing_seconds": 0.000817239997559227,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.54511235
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 6.9,
+      "processing_seconds": 0.0007163249974837527,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.545929882
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7,
+      "processing_seconds": 0.000682490997860441,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.546697247
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.1,
+      "processing_seconds": 0.0006524509990413208,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.547386739
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.2,
+      "processing_seconds": 0.146801596001751,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22777.694289833
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.3,
+      "processing_seconds": 0.0007096160006767605,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.695148489
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.4,
+      "processing_seconds": 0.0006576999985554721,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.695858689
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.5,
+      "processing_seconds": 0.0006515759996545967,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.696541764
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.6,
+      "processing_seconds": 0.0006524499985971488,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.697226005
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.7,
+      "processing_seconds": 0.0006792829990445171,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.697937371
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.8,
+      "processing_seconds": 0.1501939289992151,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22777.848168925
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 7.9,
+      "processing_seconds": 0.0007029080006759614,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.848980623
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8,
+      "processing_seconds": 0.0006603250003536232,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.849680031
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.1,
+      "processing_seconds": 0.0006518670015793759,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.850363981
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.2,
+      "processing_seconds": 0.0006524509990413208,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.851047931
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.3,
+      "processing_seconds": 0.0006521590003103483,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.851804505
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.4,
+      "processing_seconds": 0.0006486579986813013,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22777.852485246
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.5,
+      "processing_seconds": 0.1534908880021248,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.006008509
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.6,
+      "processing_seconds": 0.0006985330001043621,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.006816999
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.7,
+      "processing_seconds": 0.0006550750003952999,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.007507948
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.8,
+      "processing_seconds": 0.0007061169999360573,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.008246148
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 8.9,
+      "processing_seconds": 0.0006530329992529005,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.008938847
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 9,
+      "processing_seconds": 0.0006495330017060041,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.009620172
+    },
+    {
+      "event": "asr_block",
+      "utterance": 1,
+      "audio_cursor": 9.088,
+      "processing_seconds": 0.1534007640002528,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.163051853
+    },
+    {
+      "event": "sample",
+      "index": 1,
+      "input": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/command.wav",
+      "seconds": 2.20720095498109,
+      "rtf": 0.3748642926258645,
+      "audio_seconds": 5.888,
+      "supplied_audio_seconds": 9.088,
+      "rtf_supplied": 0.2428698233914052,
+      "realtime": false,
+      "first_partial_seconds": 0.4729993000000832,
+      "energy_end_seconds": 4.48,
+      "last_partial_seconds": 1.11916711899903,
+      "endpoint_after_energy_seconds": -1,
+      "endpoint_count": 1,
+      "early_endpoint_count": 0,
+      "eof_residual": "",
+      "transcript": "机器人请让底盘上前移动二十厘米",
+      "start_monotonic": 22775.950245131,
+      "end_monotonic": 22778.16342139
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.1,
+      "processing_seconds": 0.0008525310004188213,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.168217497
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.2,
+      "processing_seconds": 0.0006606170027225744,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.169003529
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.3,
+      "processing_seconds": 0.0006533249979838729,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.169690687
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.4,
+      "processing_seconds": 0.0006495329980680253,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.170373178
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.5,
+      "processing_seconds": 0.0006498250004369766,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.171054503
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.6,
+      "processing_seconds": 0.0006530339996970724,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.171781036
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.7,
+      "processing_seconds": 0.0006536169967148453,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.172468486
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.8,
+      "processing_seconds": 0.1567184310006269,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.329219
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 0.9,
+      "processing_seconds": 0.0007177830011642072,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.33004674
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1,
+      "processing_seconds": 0.0006635339996137191,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.330756648
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.1,
+      "processing_seconds": 0.0007136999993235804,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.331506222
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.2,
+      "processing_seconds": 0.0006547830016643275,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.332201546
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.3,
+      "processing_seconds": 0.000650991998554673,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.332885496
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.4,
+      "processing_seconds": 0.1591678180011513,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.49208598
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.5,
+      "processing_seconds": 0.0007008669999777339,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.492899137
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.6,
+      "processing_seconds": 0.0006577010026376229,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.49359592
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.7,
+      "processing_seconds": 0.0006536159999086522,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.494282494
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.8,
+      "processing_seconds": 0.0007131169986678287,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.495027694
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 1.9,
+      "processing_seconds": 0.0007810739989508875,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.495922516
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2,
+      "processing_seconds": 0.0007591989997308701,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.496737422
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.1,
+      "processing_seconds": 0.1539388819983287,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.650765262
+    },
+    {
+      "event": "partial",
+      "utterance": 2,
+      "audio_cursor": 2.1,
+      "wall_seconds": 0.4834011709972401,
+      "transcript": "机器人"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.2,
+      "processing_seconds": 0.0007831160000932869,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.651665626
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.3,
+      "processing_seconds": 0.0006754919995728415,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.652393325
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.4,
+      "processing_seconds": 0.00066849200084107,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.6530939
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.5,
+      "processing_seconds": 0.000669367000227794,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.653795641
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.6,
+      "processing_seconds": 0.0006976580007176381,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.654525965
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.7,
+      "processing_seconds": 0.1518135340011213,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.806378874
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.8,
+      "processing_seconds": 0.0007198250023066066,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.807208072
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 2.9,
+      "processing_seconds": 0.0007341160016949289,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.80798302
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3,
+      "processing_seconds": 0.0006749090025550686,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.808699345
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.1,
+      "processing_seconds": 0.0006699500008835457,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.809401086
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.2,
+      "processing_seconds": 0.000672574999043718,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.810105161
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.3,
+      "processing_seconds": 0.1547190809978929,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22778.964856616
+    },
+    {
+      "event": "partial",
+      "utterance": 2,
+      "audio_cursor": 3.3,
+      "wall_seconds": 0.7974925249982334,
+      "transcript": "机器人请"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.4,
+      "processing_seconds": 0.0007274080016941298,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.965704481
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.5,
+      "processing_seconds": 0.0006798670001444407,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.966423139
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.6,
+      "processing_seconds": 0.0006813250001869164,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.96713713
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.7,
+      "processing_seconds": 0.0007209909999801312,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.96788962
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.8,
+      "processing_seconds": 0.0006862830014142673,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.968698985
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 3.9,
+      "processing_seconds": 0.0006737420007993933,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22778.969405977
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4,
+      "processing_seconds": 0.1620316570006253,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22779.1314703
+    },
+    {
+      "event": "partial",
+      "utterance": 2,
+      "audio_cursor": 4,
+      "wall_seconds": 0.9641062089976913,
+      "transcript": "机器人请让底盘"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.1,
+      "processing_seconds": 0.0007906979990366381,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.132392538
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.2,
+      "processing_seconds": 0.0007556990021839738,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.133230486
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.3,
+      "processing_seconds": 0.0007519069986301474,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.134062601
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.4,
+      "processing_seconds": 0.0008297809981741011,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.134970548
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.5,
+      "processing_seconds": 0.000760074002755573,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.135829496
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.6,
+      "processing_seconds": 0.1576007119983842,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22779.293511873
+    },
+    {
+      "event": "partial",
+      "utterance": 2,
+      "audio_cursor": 4.6,
+      "wall_seconds": 1.126147781997133,
+      "transcript": "机器人请让底盘上前移动"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.7,
+      "processing_seconds": 0.0008324059999722522,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.294466778
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.8,
+      "processing_seconds": 0.0007119499969121534,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.295235894
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 4.9,
+      "processing_seconds": 0.000703491001331713,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.295974384
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5,
+      "processing_seconds": 0.0006996989977778867,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.29670675
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.1,
+      "processing_seconds": 0.0007014500006334856,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.2974397
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.2,
+      "processing_seconds": 0.000739073999284301,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.298210273
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.3,
+      "processing_seconds": 0.1573609650004073,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22779.455621988
+    },
+    {
+      "event": "partial",
+      "utterance": 2,
+      "audio_cursor": 5.3,
+      "wall_seconds": 1.288257896998402,
+      "transcript": "机器人请让底盘上前移动二十厘米"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.4,
+      "processing_seconds": 0.0007731990008323919,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.456518852
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.5,
+      "processing_seconds": 0.0007207000016933307,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.457282134
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.6,
+      "processing_seconds": 0.0007670740014873445,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.458160331
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.7,
+      "processing_seconds": 0.0007204069988802075,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.458922738
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.8,
+      "processing_seconds": 0.0007172000005084556,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.459672021
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 5.9,
+      "processing_seconds": 0.1573084660012682,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22779.617011986
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6,
+      "processing_seconds": 0.0008604059985373169,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.617984974
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.1,
+      "processing_seconds": 0.0007314909998967778,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.618782089
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.2,
+      "processing_seconds": 0.0007189490024757106,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.619537496
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.3,
+      "processing_seconds": 0.0007148660006350838,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.620286779
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.4,
+      "processing_seconds": 0.0007160329987527803,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.621035186
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.5,
+      "processing_seconds": 0.1528693540021777,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22779.773962873
+    },
+    {
+      "event": "endpoint",
+      "utterance": 2,
+      "audio_cursor": 6.5,
+      "wall_seconds": 1.606598782000219,
+      "transcript": "机器人请让底盘上前移动二十厘米"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.6,
+      "processing_seconds": 0.0007834070020180661,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.77488132
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.7,
+      "processing_seconds": 0.0006547830016643275,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.775595602
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.8,
+      "processing_seconds": 0.0006507010002678726,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.776281886
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 6.9,
+      "processing_seconds": 0.0006480750016635284,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.776964377
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7,
+      "processing_seconds": 0.0006480749980255496,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.77764541
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.1,
+      "processing_seconds": 0.0006754920032108203,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.77835386
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.2,
+      "processing_seconds": 0.15576031800083,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22779.934152094
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.3,
+      "processing_seconds": 0.0007796149984642398,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.935042833
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.4,
+      "processing_seconds": 0.0006609080010093749,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.935759449
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.5,
+      "processing_seconds": 0.0006521579998661764,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.936447482
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.6,
+      "processing_seconds": 0.0006544919997395482,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.937214265
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.7,
+      "processing_seconds": 0.000681033001455944,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22779.937929131
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.8,
+      "processing_seconds": 0.1552184080028383,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22780.093185163
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 7.9,
+      "processing_seconds": 0.0007142829999793321,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.094011445
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8,
+      "processing_seconds": 0.0007262409999384545,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.094785519
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.1,
+      "processing_seconds": 0.0006556589978572447,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.095484927
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.2,
+      "processing_seconds": 0.0006524509990413208,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.096172085
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.3,
+      "processing_seconds": 0.0006509920021926519,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.096856618
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.4,
+      "processing_seconds": 0.0006501170028059278,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.097538818
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.5,
+      "processing_seconds": 0.1885283699994034,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22780.286099562
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.6,
+      "processing_seconds": 0.0007577409996883944,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.286968135
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.7,
+      "processing_seconds": 0.0008376559999305755,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.287897957
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.8,
+      "processing_seconds": 0.0007734900027571712,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.288786362
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 8.9,
+      "processing_seconds": 0.0007766989983792882,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.289663685
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9,
+      "processing_seconds": 0.0007650320003449451,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.290538382
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9.1,
+      "processing_seconds": 0.1659959409989824,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22780.456644864
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9.2,
+      "processing_seconds": 0.0007510320028814021,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.457523353
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9.3,
+      "processing_seconds": 0.000868864000949543,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.458466883
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9.4,
+      "processing_seconds": 0.0007174910024332348,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.459284706
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9.5,
+      "processing_seconds": 0.0007093249987519812,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.460066655
+    },
+    {
+      "event": "asr_block",
+      "utterance": 2,
+      "audio_cursor": 9.568,
+      "processing_seconds": 0.0005191609998291824,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.460723772
+    },
+    {
+      "event": "sample",
+      "index": 2,
+      "input": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/command-pause080.wav",
+      "seconds": 2.287451468029758,
+      "rtf": 0.3592103435976379,
+      "audio_seconds": 6.368,
+      "supplied_audio_seconds": 9.568,
+      "rtf_supplied": 0.2390731049362205,
+      "realtime": false,
+      "first_partial_seconds": 0.4834011709972401,
+      "energy_end_seconds": 4.96,
+      "last_partial_seconds": 1.288257896998402,
+      "endpoint_after_energy_seconds": -1,
+      "endpoint_count": 1,
+      "early_endpoint_count": 0,
+      "eof_residual": "",
+      "transcript": "机器人请让底盘上前移动二十厘米",
+      "start_monotonic": 22778.167364091,
+      "end_monotonic": 22780.461402763
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.1,
+      "processing_seconds": 0.0007545319967903197,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.467188483
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.2,
+      "processing_seconds": 0.001033944998198422,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.468344052
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.3,
+      "processing_seconds": 0.0007492830009141471,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.469212625
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.4,
+      "processing_seconds": 0.0007096160006767605,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.470007115
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.5,
+      "processing_seconds": 0.0007005740008025896,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.470789063
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.6,
+      "processing_seconds": 0.0008070309995673597,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.471666094
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.7,
+      "processing_seconds": 0.000686574996507261,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.472452418
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.8,
+      "processing_seconds": 0.1779202940015239,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22780.650424919
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 0.9,
+      "processing_seconds": 0.0009269049987778999,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.651492989
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1,
+      "processing_seconds": 0.0007559900004707742,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.652378186
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.1,
+      "processing_seconds": 0.0007209909999801312,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.653205343
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.2,
+      "processing_seconds": 0.0007186570001067594,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.653998374
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.3,
+      "processing_seconds": 0.0007976990018505603,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.654873364
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.4,
+      "processing_seconds": 0.1737716780007759,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22780.828747707
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 1.4,
+      "wall_seconds": 0.3623146310019365,
+      "transcript": "SCOT"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.5,
+      "processing_seconds": 0.0007317820018215571,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.829601113
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.6,
+      "processing_seconds": 0.0006868669988762122,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.830332021
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.7,
+      "processing_seconds": 0.0007279909987119026,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.831167635
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.8,
+      "processing_seconds": 0.0006924080007593147,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.831910501
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 1.9,
+      "processing_seconds": 0.000678407999657793,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.832632367
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2,
+      "processing_seconds": 0.0006696579985145945,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.833335858
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.1,
+      "processing_seconds": 0.1509414610009117,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22780.984310861
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 2.1,
+      "wall_seconds": 0.517877785001474,
+      "transcript": "SCOTURB"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.2,
+      "processing_seconds": 0.0008175319999281783,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.985301932
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.3,
+      "processing_seconds": 0.0008356150028703269,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.986240212
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.4,
+      "processing_seconds": 0.0007026159983070102,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.987034119
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.5,
+      "processing_seconds": 0.0007212830023490824,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.987790693
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.6,
+      "processing_seconds": 0.0006897829989611637,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22780.988524809
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.7,
+      "processing_seconds": 0.1509160860005068,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22781.139473561
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 2.7,
+      "wall_seconds": 0.6730404850022751,
+      "transcript": "SCOTURB四零三路"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.8,
+      "processing_seconds": 0.0007591989997308701,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.140352342
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 2.9,
+      "processing_seconds": 0.0007813660013198387,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.141181249
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3,
+      "processing_seconds": 0.0006999910001468379,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.141926156
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.1,
+      "processing_seconds": 0.0006932830001460388,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.142654147
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.2,
+      "processing_seconds": 0.000690074000885943,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.143378346
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.3,
+      "processing_seconds": 0.1495683110006212,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22781.292979324
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 3.3,
+      "wall_seconds": 0.8265462480012502,
+      "transcript": "SCOTURB四零三路公交"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.4,
+      "processing_seconds": 0.0007705739990342408,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.293872688
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.5,
+      "processing_seconds": 0.0007831149996491149,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.294787927
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.6,
+      "processing_seconds": 0.0007075739995343611,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.295538959
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.7,
+      "processing_seconds": 0.0007011579982645344,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.296274242
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.8,
+      "processing_seconds": 0.0006994079994910862,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.297006316
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 3.9,
+      "processing_seconds": 0.0008096570018096827,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.297849514
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4,
+      "processing_seconds": 0.1488983620001818,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22781.446787542
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 4,
+      "wall_seconds": 0.9803544660026091,
+      "transcript": "SCOTURB四零三路公交汽车"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.1,
+      "processing_seconds": 0.0007624070021847729,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.447672447
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.2,
+      "processing_seconds": 0.0007717410007899161,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.448484729
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.3,
+      "processing_seconds": 0.0007104920005076565,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.44923547
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.4,
+      "processing_seconds": 0.0007072830012475606,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.449975127
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.5,
+      "processing_seconds": 0.00070494899773621,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.450712451
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.6,
+      "processing_seconds": 0.1521241549999104,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22781.602868689
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 4.6,
+      "wall_seconds": 1.136435612999776,
+      "transcript": "SCOTURB四零三路公交汽车定期发车"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.7,
+      "processing_seconds": 0.0007912820001365617,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.603783636
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.8,
+      "processing_seconds": 0.000792449001892237,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.604622751
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 4.9,
+      "processing_seconds": 0.0007329500003834255,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.605400908
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5,
+      "processing_seconds": 0.0007268240005942062,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.606161273
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.1,
+      "processing_seconds": 0.0007276989999809302,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.606921055
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.2,
+      "processing_seconds": 0.0007244910011650063,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.607678213
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.3,
+      "processing_seconds": 0.1542874199985818,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22781.761998299
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 5.3,
+      "wall_seconds": 1.295565223001176,
+      "transcript": "SCOTURB四零三路公交汽车定期发车前往新"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.4,
+      "processing_seconds": 0.0008114060001389589,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.762998411
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.5,
+      "processing_seconds": 0.0007495739992009476,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.763793193
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.6,
+      "processing_seconds": 0.0007883660000516102,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.764615975
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.7,
+      "processing_seconds": 0.0007349910010816529,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.765384798
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.8,
+      "processing_seconds": 0.000735866000468377,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.766153039
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 5.9,
+      "processing_seconds": 0.1498004749992106,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22781.915986472
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 5.9,
+      "wall_seconds": 1.449553395999828,
+      "transcript": "SCOTURB四零三路公交汽车定期发车前往新特拉"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6,
+      "processing_seconds": 0.0008125739987008274,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.916923586
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.1,
+      "processing_seconds": 0.0008787810002104379,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.917849324
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.2,
+      "processing_seconds": 0.0007510319992434233,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.918649064
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.3,
+      "processing_seconds": 0.0007425740004691761,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.919426054
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.4,
+      "processing_seconds": 0.0007831149996491149,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22781.920242419
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.5,
+      "processing_seconds": 0.1554368639990571,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22782.075744616
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 6.5,
+      "wall_seconds": 1.609311539999908,
+      "transcript": "SCOTURB四零三路公交汽车定期发车前往新特拉在罗卡角"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.6,
+      "processing_seconds": 0.0008767389990680385,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.07674677
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.7,
+      "processing_seconds": 0.000813156999356579,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.077651509
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.8,
+      "processing_seconds": 0.0009339049975096714,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.07864958
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 6.9,
+      "processing_seconds": 0.0008297819986182731,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.079575902
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7,
+      "processing_seconds": 0.0008035320024646353,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.080454391
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.1,
+      "processing_seconds": 0.000885489000211237,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.08141367
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.2,
+      "processing_seconds": 0.1531543089986371,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22782.234734227
+    },
+    {
+      "event": "partial",
+      "utterance": 3,
+      "audio_cursor": 7.2,
+      "wall_seconds": 1.768301151001651,
+      "transcript": "SCOTURB四零三路公交汽车定期发车前往新特拉在罗卡角停靠"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.3,
+      "processing_seconds": 0.0008245320022979286,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.235683299
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.4,
+      "processing_seconds": 0.0007691149985475931,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.236492955
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.5,
+      "processing_seconds": 0.0007641569973202422,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.237289487
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.6,
+      "processing_seconds": 0.0008554480009479448,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.238177893
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.7,
+      "processing_seconds": 0.0007705739990342408,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.238992508
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.8,
+      "processing_seconds": 0.1524470250005834,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22782.391472491
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 7.9,
+      "processing_seconds": 0.0008198649993573781,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.392400855
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8,
+      "processing_seconds": 0.0007705740026722196,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.39321022
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.1,
+      "processing_seconds": 0.0007621150034538005,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.394004418
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.2,
+      "processing_seconds": 0.0008251150029536802,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.394861616
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.3,
+      "processing_seconds": 0.00076153199916007,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.395662231
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.4,
+      "processing_seconds": 0.0007621160002599936,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.396457888
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.5,
+      "processing_seconds": 0.1514542049990268,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22782.547944176
+    },
+    {
+      "event": "endpoint",
+      "utterance": 3,
+      "audio_cursor": 8.5,
+      "wall_seconds": 2.08151110000108,
+      "transcript": "SCOTURB四零三路公交汽车定期发车前往新特拉在罗卡角停靠"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.6,
+      "processing_seconds": 0.000751616000343347,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.548841915
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.7,
+      "processing_seconds": 0.000723324999853503,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.549653905
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.8,
+      "processing_seconds": 0.0007029079970379826,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.55043877
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 8.9,
+      "processing_seconds": 0.0008014899976842571,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.551311426
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9,
+      "processing_seconds": 0.0007029080006759614,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.552112041
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.1,
+      "processing_seconds": 0.1509677109970653,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22782.703197875
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.2,
+      "processing_seconds": 0.000705824997567106,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.704011615
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.3,
+      "processing_seconds": 0.0007101990013325121,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.704761772
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.4,
+      "processing_seconds": 0.0006550750003952999,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.705455639
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.5,
+      "processing_seconds": 0.0006512830004794523,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.70613813
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.6,
+      "processing_seconds": 0.0006504089978989214,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.706820039
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.7,
+      "processing_seconds": 0.1498996410009568,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22782.856751471
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.8,
+      "processing_seconds": 0.0007064079982228577,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.857565502
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 9.9,
+      "processing_seconds": 0.0007049500018183608,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.858310993
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10,
+      "processing_seconds": 0.0006518669979413971,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.859001651
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.1,
+      "processing_seconds": 0.0006498249967989977,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.859683851
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.2,
+      "processing_seconds": 0.0006524499985971488,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.860368676
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.3,
+      "processing_seconds": 0.0006486579986813013,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22782.861049417
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.4,
+      "processing_seconds": 0.1549879939993843,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.016096911
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.5,
+      "processing_seconds": 0.0006967829976929352,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.016900443
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.6,
+      "processing_seconds": 0.000655949999782024,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.017592559
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.7,
+      "processing_seconds": 0.0007294489987543784,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.018354966
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.8,
+      "processing_seconds": 0.0006571169978997204,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.019052333
+    },
+    {
+      "event": "asr_block",
+      "utterance": 3,
+      "audio_cursor": 10.82,
+      "processing_seconds": 0.0001653729996178299,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.01925008
+    },
+    {
+      "event": "sample",
+      "index": 3,
+      "input": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10112798408996336578-pcm16.wav",
+      "seconds": 2.545830798979296,
+      "rtf": 0.3340985300497764,
+      "audio_seconds": 7.62,
+      "supplied_audio_seconds": 10.82,
+      "rtf_supplied": 0.2352893529555726,
+      "realtime": false,
+      "first_partial_seconds": 0.3623146310019365,
+      "energy_end_seconds": 6.7,
+      "last_partial_seconds": 1.768301151001651,
+      "endpoint_after_energy_seconds": -1,
+      "endpoint_count": 1,
+      "early_endpoint_count": 0,
+      "eof_residual": "",
+      "transcript": "SCOTURB四零三路公交汽车定期发车前往新特拉在罗卡角停靠",
+      "start_monotonic": 22780.466433076,
+      "end_monotonic": 22783.01943937
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.1,
+      "processing_seconds": 0.0007189489988377318,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.02435535
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.2,
+      "processing_seconds": 0.0006699500008835457,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.025258047
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.3,
+      "processing_seconds": 0.0006524499985971488,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.025950164
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.4,
+      "processing_seconds": 0.0006521579998661764,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.026634405
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.5,
+      "processing_seconds": 0.000650991998554673,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.02731748
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.6,
+      "processing_seconds": 0.0007282830010808539,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.028077554
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.7,
+      "processing_seconds": 0.0006542000010085758,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.028773462
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.8,
+      "processing_seconds": 0.1532006829984311,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.182006228
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 0.9,
+      "processing_seconds": 0.0007066999969538301,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.18282376
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1,
+      "processing_seconds": 0.0006533249979838729,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.183516168
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.1,
+      "processing_seconds": 0.0006539090027217753,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.184201576
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.2,
+      "processing_seconds": 0.0007023239995760377,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.1849354
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.3,
+      "processing_seconds": 0.0006506999998237006,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.185618183
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.4,
+      "processing_seconds": 0.1536720109979797,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.339321402
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 1.4,
+      "wall_seconds": 0.3156858760012256,
+      "transcript": "这"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.5,
+      "processing_seconds": 0.0007072829976095818,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.340146517
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.6,
+      "processing_seconds": 0.000665284002025146,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.34085205
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.7,
+      "processing_seconds": 0.0007346999991568737,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.341618249
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.8,
+      "processing_seconds": 0.0006632420008827467,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.342397572
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 1.9,
+      "processing_seconds": 0.0006600339984288439,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.343090272
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2,
+      "processing_seconds": 0.0006594500009668991,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.343781222
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.1,
+      "processing_seconds": 0.1588455300006899,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.502658251
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 2.1,
+      "wall_seconds": 0.4790227250014141,
+      "transcript": "这里几乎都"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.2,
+      "processing_seconds": 0.0007346989987127017,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.503511949
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.3,
+      "processing_seconds": 0.000685115999658592,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.504236148
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.4,
+      "processing_seconds": 0.0007230330011225305,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.504991556
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.5,
+      "processing_seconds": 0.0006859919994894881,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.505715172
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.6,
+      "processing_seconds": 0.0006836579996161163,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.506438496
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.7,
+      "processing_seconds": 0.1541550050023943,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.660625584
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 2.7,
+      "wall_seconds": 0.6369900580029935,
+      "transcript": "这里几乎都是沙滩"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.8,
+      "processing_seconds": 0.00085894800213282,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.661611405
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 2.9,
+      "processing_seconds": 0.0007597820003866218,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.662470644
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3,
+      "processing_seconds": 0.0007463649999408517,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.6632978
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.1,
+      "processing_seconds": 0.0007329500003834255,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.664111249
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.2,
+      "processing_seconds": 0.0007994480001798365,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.664974863
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.3,
+      "processing_seconds": 0.1579224169981899,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.822975737
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 3.3,
+      "wall_seconds": 0.7993402110005263,
+      "transcript": "这里几乎都是沙滩游泳很安全"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.4,
+      "processing_seconds": 0.0007714489984209649,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.823871726
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.5,
+      "processing_seconds": 0.0007834070020180661,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.824696257
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.6,
+      "processing_seconds": 0.0007160320019465871,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.825451664
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.7,
+      "processing_seconds": 0.0007180739994510077,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.826284654
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.8,
+      "processing_seconds": 0.0007116580018191598,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.827029853
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 3.9,
+      "processing_seconds": 0.0007460739980160724,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.82780801
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4,
+      "processing_seconds": 0.1548138709986233,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22783.982660381
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 4,
+      "wall_seconds": 0.9590248550011893,
+      "transcript": "这里几乎都是沙滩游泳很安全大部分"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.1,
+      "processing_seconds": 0.000779907000833191,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.983560745
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.2,
+      "processing_seconds": 0.0007285749998118263,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.984332194
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.3,
+      "processing_seconds": 0.0007953649983392097,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.985161392
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.4,
+      "processing_seconds": 0.0007265329986694269,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.985927299
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.5,
+      "processing_seconds": 0.0007271159993251786,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22783.986686206
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.6,
+      "processing_seconds": 0.1563733939983649,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22784.143091683
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 4.6,
+      "wall_seconds": 1.119456157000968,
+      "transcript": "这里几乎都是沙滩游泳很安全大部分地方都"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.7,
+      "processing_seconds": 0.0008049899988691323,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.144018588
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.8,
+      "processing_seconds": 0.0008038230007514358,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.144869369
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 4.9,
+      "processing_seconds": 0.0007381989998975769,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.145657734
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5,
+      "processing_seconds": 0.0007338239993259776,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.146425975
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.1,
+      "processing_seconds": 0.0007329489999392536,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.147192757
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.2,
+      "processing_seconds": 0.0007734899991191924,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.14800008
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.3,
+      "processing_seconds": 0.1489619439998933,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22784.297001107
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 5.3,
+      "wall_seconds": 1.273365581000689,
+      "transcript": "这里几乎都是沙滩游泳很安全大部分地方都有信息"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.4,
+      "processing_seconds": 0.0008618639985797927,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.297987512
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.5,
+      "processing_seconds": 0.000753365002310602,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.298863084
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.6,
+      "processing_seconds": 0.000748408001527423,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.299645325
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.7,
+      "processing_seconds": 0.0007571569985884707,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.30043544
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.8,
+      "processing_seconds": 0.0007886569983384106,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.301261138
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 5.9,
+      "processing_seconds": 0.158499617002235,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22784.459800713
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 5.9,
+      "wall_seconds": 1.436165187002189,
+      "transcript": "这里几乎都是沙滩游泳很安全大部分地方都有信息揽胜难受的"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6,
+      "processing_seconds": 0.0008207399987441022,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.46074716
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.1,
+      "processing_seconds": 0.0008251149993157014,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.461615441
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.2,
+      "processing_seconds": 0.000768240999605041,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.462423056
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.3,
+      "processing_seconds": 0.0007661990021006204,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.463221629
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.4,
+      "processing_seconds": 0.0007632819979335181,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.464016994
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.5,
+      "processing_seconds": 0.1560333150009683,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22784.620082392
+    },
+    {
+      "event": "partial",
+      "utterance": 4,
+      "audio_cursor": 6.5,
+      "wall_seconds": 1.596446866002225,
+      "transcript": "这里几乎都是沙滩游泳很安全大部分地方都有信息揽胜难受的树荫"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.6,
+      "processing_seconds": 0.0008426150016020983,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.621051005
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.7,
+      "processing_seconds": 0.0007979910005815327,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.621994827
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.8,
+      "processing_seconds": 0.0007807820002199151,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.622811775
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 6.9,
+      "processing_seconds": 0.0007731989971944131,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.623618223
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7,
+      "processing_seconds": 0.0008038230007514358,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.624454129
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.1,
+      "processing_seconds": 0.0007729070021014195,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.625264661
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.2,
+      "processing_seconds": 0.1445648319968313,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22784.769863034
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.3,
+      "processing_seconds": 0.0008367810005438514,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.770887355
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.4,
+      "processing_seconds": 0.0008513640023011249,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.771778677
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.5,
+      "processing_seconds": 0.0007711569996899925,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.772588917
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.6,
+      "processing_seconds": 0.0007726160001766402,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.773394199
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.7,
+      "processing_seconds": 0.0007685320015298203,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.774195105
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.8,
+      "processing_seconds": 0.153785467002308,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22784.928013239
+    },
+    {
+      "event": "endpoint",
+      "utterance": 4,
+      "audio_cursor": 7.8,
+      "wall_seconds": 1.904377713002759,
+      "transcript": "这里几乎都是沙滩游泳很安全大部分地方都有信息揽胜难受的树荫"
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 7.9,
+      "processing_seconds": 0.0006988249988353346,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.928849146
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8,
+      "processing_seconds": 0.0006547829980263487,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.92954097
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.1,
+      "processing_seconds": 0.000650991998554673,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.930223754
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.2,
+      "processing_seconds": 0.0006492419997812249,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.930904787
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.3,
+      "processing_seconds": 0.0006932830001460388,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.931629861
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.4,
+      "processing_seconds": 0.0006472000022768043,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22784.932315269
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.5,
+      "processing_seconds": 0.1538064680025855,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22785.086152945
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.6,
+      "processing_seconds": 0.000707574999978533,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.086968435
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.7,
+      "processing_seconds": 0.0006565330004377756,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.087668134
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.8,
+      "processing_seconds": 0.0007137000029615592,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.088413917
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 8.9,
+      "processing_seconds": 0.0006553669991262723,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.089107491
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9,
+      "processing_seconds": 0.0006506999998237006,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.089789983
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.1,
+      "processing_seconds": 0.1496082699995895,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22785.239430044
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.2,
+      "processing_seconds": 0.000764157000958221,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.240375615
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.3,
+      "processing_seconds": 0.0008175309994840063,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.241280062
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.4,
+      "processing_seconds": 0.0006929910014150664,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.242069594
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.5,
+      "processing_seconds": 0.0006982409977354109,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.242834626
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.6,
+      "processing_seconds": 0.000686867002514191,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.243597034
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.7,
+      "processing_seconds": 0.1482625360004022,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22785.391912652
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.8,
+      "processing_seconds": 0.0007338239993259776,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.392906348
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 9.9,
+      "processing_seconds": 0.0006620749991270714,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.393619173
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 10,
+      "processing_seconds": 0.0006524509990413208,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.394303998
+    },
+    {
+      "event": "asr_block",
+      "utterance": 4,
+      "audio_cursor": 10.04,
+      "processing_seconds": 0.0003520370009937324,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.394688118
+    },
+    {
+      "event": "sample",
+      "index": 4,
+      "input": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10134195680525011353-pcm16.wav",
+      "seconds": 2.365054541998688,
+      "rtf": 0.3457682078945451,
+      "audio_seconds": 6.84,
+      "supplied_audio_seconds": 10.04,
+      "rtf_supplied": 0.2355632013942917,
+      "realtime": false,
+      "first_partial_seconds": 0.3156858760012256,
+      "energy_end_seconds": 5.22,
+      "last_partial_seconds": 1.596446866002225,
+      "endpoint_after_energy_seconds": -1,
+      "endpoint_count": 1,
+      "early_endpoint_count": 0,
+      "eof_residual": "",
+      "transcript": "这里几乎都是沙滩游泳很安全大部分地方都有信息揽胜难受的树荫",
+      "start_monotonic": 22783.023635526,
+      "end_monotonic": 22785.394886157
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.1,
+      "processing_seconds": 0.0007096160006767605,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.397494791
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.2,
+      "processing_seconds": 0.0007941980002215132,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.398414405
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.3,
+      "processing_seconds": 0.0006521579998661764,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.399116146
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.4,
+      "processing_seconds": 0.0006477839997387491,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.399796013
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.5,
+      "processing_seconds": 0.0006454499998653773,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.400473546
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.6,
+      "processing_seconds": 0.0006889090000186116,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.401194246
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.7,
+      "processing_seconds": 0.0006495339985121973,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.401882862
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.8,
+      "processing_seconds": 0.1526654819972464,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22785.554649551
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 0.9,
+      "processing_seconds": 0.0007040749987936579,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.555464166
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1,
+      "processing_seconds": 0.0006495340021501761,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.556153949
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.1,
+      "processing_seconds": 0.0006506999998237006,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.556836732
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.2,
+      "processing_seconds": 0.0006483670003945008,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.557516598
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.3,
+      "processing_seconds": 0.0007043660007184371,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.558252464
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.4,
+      "processing_seconds": 0.1526240659986797,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22785.710915321
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.5,
+      "processing_seconds": 0.0008382399973925203,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.711864684
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.6,
+      "processing_seconds": 0.0007128249999368563,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.712678716
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.7,
+      "processing_seconds": 0.0007049490013741888,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.713452789
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.8,
+      "processing_seconds": 0.0006994079994910862,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.714232405
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 1.9,
+      "processing_seconds": 0.0007303249985852744,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.715005312
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2,
+      "processing_seconds": 0.0006527420009661,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.715703553
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.1,
+      "processing_seconds": 0.1660811069996271,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22785.881816743
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.2,
+      "processing_seconds": 0.0007020329976512585,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.882629899
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.3,
+      "processing_seconds": 0.0006515749992104247,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.883321141
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.4,
+      "processing_seconds": 0.0006492419997812249,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.884002466
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.5,
+      "processing_seconds": 0.0007023250000202097,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.88473629
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.6,
+      "processing_seconds": 0.0006512840009236243,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22785.885429573
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.7,
+      "processing_seconds": 0.147573045000172,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22786.033035576
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.8,
+      "processing_seconds": 0.0007265329986694269,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.033960439
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 2.9,
+      "processing_seconds": 0.0007166169998527039,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.034729555
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3,
+      "processing_seconds": 0.0006571160010935273,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.035444712
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.1,
+      "processing_seconds": 0.0006486580023192801,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.036125162
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.2,
+      "processing_seconds": 0.0006509910017484799,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.036807945
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.3,
+      "processing_seconds": 0.1526205660011328,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22786.189459719
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.4,
+      "processing_seconds": 0.000700865999533562,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.1902685
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.5,
+      "processing_seconds": 0.0006562419985129964,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.190963825
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.6,
+      "processing_seconds": 0.0007131160018616356,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.191709316
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.7,
+      "processing_seconds": 0.0006515749992104247,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.192399099
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.8,
+      "processing_seconds": 0.0006518670015793759,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.193082466
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 3.9,
+      "processing_seconds": 0.0006492419997812249,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.193763207
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 4,
+      "processing_seconds": 0.1571880080009578,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 1,
+      "end_monotonic": 22786.35098359
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 4.1,
+      "processing_seconds": 0.0007204079993243795,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.351880746
+    },
+    {
+      "event": "asr_block",
+      "utterance": 5,
+      "audio_cursor": 4.2,
+      "processing_seconds": 0.0006620749991270714,
+      "submit_lateness_seconds": 0,
+      "completion_lag_seconds": 0,
+      "decode_calls": 0,
+      "end_monotonic": 22786.35259532
+    },
+    {
+      "event": "sample",
+      "index": 5,
+      "input": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/silence1.wav",
+      "seconds": 0.9534998839990294,
+      "rtf": 0.9534998839990294,
+      "audio_seconds": 1,
+      "supplied_audio_seconds": 4.2,
+      "rtf_supplied": 0.2270237819045308,
+      "realtime": false,
+      "first_partial_seconds": -1,
+      "energy_end_seconds": -1,
+      "last_partial_seconds": -1,
+      "endpoint_after_energy_seconds": -1,
+      "endpoint_count": 0,
+      "early_endpoint_count": 0,
+      "eof_residual": "",
+      "transcript": "",
+      "start_monotonic": 22785.396784592,
+      "end_monotonic": 22786.352773818
+    },
+    {
+      "event": "phase",
+      "name": "inference",
+      "state": "end",
+      "monotonic_seconds": 22786.352912358
+    }
+  ]
+}

@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:edge-ai:evaluation:1.0",
+  "title": "Edge AI lightweight evaluation v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "producer",
+    "records",
+    "summaries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "summaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_ids",
+          "candidate_id",
+          "comparison_key",
+          "rounds",
+          "successful_runs",
+          "metrics"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "metric": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit",
+        "scope",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "id",
+        "label",
+        "task",
+        "workload",
+        "protocol",
+        "device",
+        "candidate",
+        "comparison",
+        "execution",
+        "completeness",
+        "quality",
+        "assessment",
+        "metrics",
+        "phases",
+        "samples",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "task": {
+          "type": "string"
+        },
+        "workload": {
+          "enum": [
+            "single_module",
+            "coexistence",
+            "integration"
+          ]
+        },
+        "protocol": {
+          "type": "object",
+          "required": [
+            "id",
+            "scenario",
+            "tier",
+            "round",
+            "origin"
+          ],
+          "properties": {
+            "origin": {
+              "enum": [
+                "legacy",
+                "versioned"
+              ]
+            },
+            "tier": {
+              "enum": [
+                "legacy",
+                "screening",
+                "qualification"
+              ]
+            },
+            "round": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          }
+        },
+        "device": {
+          "type": "object",
+          "required": [
+            "id",
+            "platform",
+            "cpu_count",
+            "mem_total_kib"
+          ]
+        },
+        "candidate": {
+          "type": "object",
+          "required": [
+            "id",
+            "model",
+            "precision",
+            "framework",
+            "backend",
+            "assets"
+          ],
+          "properties": {
+            "parameters": {
+              "type": "object"
+            },
+            "assets": {
+              "type": "array"
+            }
+          }
+        },
+        "comparison": {
+          "type": "object",
+          "required": [
+            "type",
+            "group",
+            "key",
+            "conditions",
+            "reason"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "legacy",
+                "deployment",
+                "controlled_backend"
+              ]
+            }
+          }
+        },
+        "execution": {
+          "type": "object",
+          "required": [
+            "status",
+            "returncode"
+          ]
+        },
+        "completeness": {
+          "type": "object",
+          "required": [
+            "status",
+            "expected_samples",
+            "incomplete_samples"
+          ]
+        },
+        "quality": {
+          "type": "object",
+          "required": [
+            "status",
+            "normalization",
+            "evaluated_samples",
+            "total_samples",
+            "cer",
+            "reference_characters",
+            "character_errors",
+            "exact_matches",
+            "samples"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "not_evaluated",
+                "evaluated_subset",
+                "incomplete_outputs"
+              ]
+            },
+            "cer": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "performance",
+            "reason"
+          ]
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/metric"
+          },
+          "required": [
+            "peak_pss_mib",
+            "peak_rss_mib",
+            "ram_percent",
+            "average_cpu_cores",
+            "cpu_capacity_percent",
+            "compute_rtf",
+            "npu_utilization_percent",
+            "npu_memory_mib"
+          ]
+        },
+        "phases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "duration_seconds",
+              "sample_count",
+              "average_cpu_cores",
+              "cpu_capacity_percent",
+              "peak_pss_mib",
+              "peak_rss_mib",
+              "ram_percent"
+            ],
+            "properties": {
+              "duration_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "sample_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "average_cpu_cores": {
+                "$ref": "#/$defs/metric"
+              },
+              "cpu_capacity_percent": {
+                "$ref": "#/$defs/metric"
+              },
+              "peak_pss_mib": {
+                "$ref": "#/$defs/metric"
+              },
+              "peak_rss_mib": {
+                "$ref": "#/$defs/metric"
+              },
+              "ram_percent": {
+                "$ref": "#/$defs/metric"
+              }
+            }
+          }
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": [
+            "result"
+          ],
+          "properties": {
+            "result": {
+              "type": "object",
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

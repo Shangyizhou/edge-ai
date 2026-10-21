@@ -51,10 +51,15 @@ int decode(const SherpaOnnxOnlineRecognizer *recognizer, const SherpaOnnxOnlineS
     return count;
 }
 
+// 阶段边界与资源采样共享主机单调钟。
+void phase(std::ofstream &events, const std::string &name, const std::string &state) {
+    events << "{\"event\":\"phase\",\"name\":" << quote(name) << ",\"state\":" << quote(state) << ",\"monotonic_seconds\":" << now() << "}\n" << std::flush;
+}
+
 // 在一个常驻模型上回放多段音频，端点重置不销毁模型。
 int main(int argc, char **argv) {
-    if (argc != 10) {
-        std::cerr << "model output fixtures.tsv endpoint chunk_ms realtime tail_seconds gate provider\n";
+    if (argc != 10 && argc != 12) {
+        std::cerr << "model output fixtures.tsv endpoint chunk_ms realtime tail_seconds gate provider [idle_seconds threads]\n";
         return 2;
     }
     const std::string model    = argv[1];
@@ -64,7 +69,11 @@ int main(int argc, char **argv) {
     const bool realtime        = std::stoi(argv[6]) != 0;
     const double tail          = std::stod(argv[7]);
     const std::string provider = argv[9];
-    if (chunk <= 0 || tail < 0 || endpoint <= 0) return 2;
+    const double idle_seconds  = argc == 12 ? std::stod(argv[10]) : 0;
+    const int threads          = argc == 12 ? std::stoi(argv[11]) : (provider == "rknn" ? 1 : 2);
+    if (chunk <= 0 || tail < 0 || endpoint <= 0 || idle_seconds < 0 || threads <= 0 || (provider != "rknn" && provider != "cpu") ||
+        (provider == "rknn" && threads != 1))
+        return 2;
     std::ofstream events(output + "/events.jsonl");
     events << std::setprecision(16);
     const std::string encoder = model + (provider == "rknn" ? "/encoder.rknn" : "/encoder-epoch-99-avg-1.int8.onnx");
@@ -80,7 +89,7 @@ int main(int argc, char **argv) {
     config.model_config.transducer.decoder = decoder.c_str();
     config.model_config.transducer.joiner  = joiner.c_str();
     config.model_config.tokens             = tokens.c_str();
-    config.model_config.num_threads        = provider == "rknn" ? 1 : 2;
+    config.model_config.num_threads        = threads;
     config.model_config.provider           = provider.c_str();
     config.decoding_method                 = "greedy_search";
     config.max_active_paths                = 4;
@@ -88,18 +97,35 @@ int main(int argc, char **argv) {
     config.rule1_min_trailing_silence      = 2.4;
     config.rule2_min_trailing_silence      = endpoint;
     config.rule3_min_utterance_length      = 20;
-    const double loading                   = now();
-    const auto *recognizer                 = SherpaOnnxCreateOnlineRecognizer(&config);
+    phase(events, "loading", "start");
+    const double loading   = now();
+    const auto *recognizer = SherpaOnnxCreateOnlineRecognizer(&config);
     if (!recognizer) throw std::runtime_error("online recognizer creation failed");
     const double loaded = now();
-    const auto *warm    = SherpaOnnxCreateOnlineStream(recognizer);
+    phase(events, "loading", "end");
+    // 首次输入单列；预热后稳态测量不混入这次原生调用。
+    phase(events, "first_request", "start");
+    const auto *first = SherpaOnnxCreateOnlineStream(recognizer);
     std::vector<float> zeros(32000, 0);
+    SherpaOnnxOnlineStreamAcceptWaveform(first, 16000, zeros.data(), zeros.size());
+    SherpaOnnxOnlineStreamInputFinished(first);
+    decode(recognizer, first);
+    SherpaOnnxDestroyOnlineStream(first);
+    phase(events, "first_request", "end");
+    phase(events, "warmup", "start");
+    const double warming = now();
+    const auto *warm     = SherpaOnnxCreateOnlineStream(recognizer);
     SherpaOnnxOnlineStreamAcceptWaveform(warm, 16000, zeros.data(), zeros.size());
     SherpaOnnxOnlineStreamInputFinished(warm);
     decode(recognizer, warm);
     SherpaOnnxDestroyOnlineStream(warm);
-    events << "{\"event\":\"loaded\",\"load_seconds\":" << loaded - loading << ",\"warmup_seconds\":" << now() - loaded << ",\"model_creations\":1}\n"
+    phase(events, "warmup", "end");
+    events << "{\"event\":\"loaded\",\"load_seconds\":" << loaded - loading << ",\"warmup_seconds\":" << now() - warming
+           << ",\"model_creations\":1,\"provider\":" << quote(provider) << "}\n"
            << std::flush;
+    phase(events, "idle", "start");
+    std::this_thread::sleep_for(std::chrono::duration<double>(idle_seconds));
+    phase(events, "idle", "end");
     std::ofstream(output + "/ready").put('1');
     if (std::string(argv[8]) != "-") {
         while (!std::ifstream(argv[8]).good())
@@ -111,7 +137,13 @@ int main(int argc, char **argv) {
     std::string filename;
     double anchor;
     int index = 0;
-    while (fixtures >> filename >> anchor) {
+    std::string line;
+    phase(events, "inference", "start");
+    while (std::getline(fixtures, line)) {
+        const auto separator = line.find('\t');
+        if (separator == std::string::npos) throw std::runtime_error("expected WAV path and anchor separated by tab");
+        filename         = line.substr(0, separator);
+        anchor           = std::stod(line.substr(separator + 1));
         const auto *wave = SherpaOnnxReadWave(filename.c_str());
         if (!wave || wave->sample_rate != 16000) throw std::runtime_error("expected readable 16kHz mono WAV");
         const double duration = wave->num_samples / 16000.0;
@@ -187,6 +219,7 @@ int main(int argc, char **argv) {
         SherpaOnnxDestroyOnlineStream(stream);
         ++index;
     }
+    phase(events, "inference", "end");
     SherpaOnnxDestroyOnlineRecognizer(recognizer);
     if (!index) throw std::runtime_error("no streaming fixtures supplied");
 }

@@ -597,6 +597,14 @@ def streaming_asr(config: dict, output: Path) -> None:
     rows = [f for f in fixtures if f["id"] in selected]
     if len(rows) != len(selected):
         raise ValueError("unknown streaming fixture id")
+    (output / "fixtures.json").write_text(
+        json.dumps(
+            {"schema_version": 1, "fixtures": rows},
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n"
+    )
     path = output / "fixtures.tsv"
     path.write_text(
         "".join(f"{f['path']}\t{f['energy_end_s']}\n" for f in rows)
@@ -612,8 +620,24 @@ def streaming_asr(config: dict, output: Path) -> None:
         str(config.get("tail_seconds", 3.2)),
         config.get("gate_file", "-"),
         config.get("provider", "rknn"),
+        str(config.get("idle_seconds", 0)),
+        str(config.get("threads", 1)),
     ]
-    subprocess.run(command, check=True)
+    # 保存实际加载的共享库身份；库映射不独自证明调用了某个后端。
+    child = subprocess.Popen(command)
+    captured = False
+    while child.poll() is None:
+        if not captured and (output / "ready").exists():
+            try:
+                (output / "backend-maps.txt").write_text(
+                    Path(f"/proc/{child.pid}/maps").read_text()
+                )
+                captured = True
+            except FileNotFoundError:
+                pass
+        time.sleep(0.02)
+    if child.returncode:
+        raise subprocess.CalledProcessError(child.returncode, command)
 
 
 def vision_asr(config: dict, output: Path) -> None:

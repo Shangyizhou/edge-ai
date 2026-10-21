@@ -30,7 +30,7 @@ def memory_info() -> dict:
     return {
         line.split(":")[0]: int(line.split()[1])
         for line in Path("/proc/meminfo").read_text().splitlines()
-        if line.split(":")[0] in {"MemAvailable", "SwapFree"}
+        if line.split(":")[0] in {"MemTotal", "MemAvailable", "SwapFree"}
     }
 
 
@@ -77,6 +77,7 @@ def observe(pid: int) -> dict:
     if npu.exists():
         clocks[str(npu)] = int(npu.read_text()) // 1000
     return {
+        "monotonic_seconds": time.monotonic(),
         "rss_kib": rss,
         "pss_kib": pss,
         "swap_kib": swap,
@@ -299,6 +300,7 @@ def inventory(suite: dict) -> dict:
         "assets": files,
         "suite": suite,
         "python": sys.version,
+        "measurement_version": "resource-clock-v1",
     }
 
 
@@ -669,6 +671,12 @@ def combine(sources: list, output: Path) -> Path:
 def run_suite(suite: dict, output: Path) -> Path:
     """串行运行矩阵，累计预算到限只留下未测项，不丢弃已完成例。"""
     identifiers = [case["id"] for case in suite["cases"]]
+    # 新协议配置在加载权重前校验；旧套件继续按历史合约执行。
+    from evaluation import validate_case_config
+
+    for case in suite["cases"]:
+        validate_case_config(case)
+    versioned = any(case.get("evaluation") for case in suite["cases"])
     if len(set(identifiers)) != len(identifiers):
         raise ValueError("case ids must be unique")
     if any(
@@ -691,11 +699,17 @@ def run_suite(suite: dict, output: Path) -> Path:
             budget_limited=remaining < case["timeout"],
         )
         result = run_case(limited, output, suite["python"])
-        report(output)
+        if not versioned:
+            report(output)
         if result["status"] == "interrupted":
             pending.extend(c["id"] for c in suite["cases"][index + 1 :])
             break
     write_json(output / "pending.json", pending)
+    if versioned:
+        from evaluation import export
+
+        export([output], output / "evaluation")
+        return output / "evaluation" / "report.html"
     return report(output)
 
 

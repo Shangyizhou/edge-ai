@@ -17,11 +17,16 @@ studies/<topic>/
 ├── research/                 # 官方资料、候选方案和测量方法
 ├── platforms/<device>/       # 设备说明、部署步骤和外部资产清单
 ├── experiments/<device>/     # 实验索引和各轮完整记录
+├── comparisons/              # 跨实验只读视图，链接原始证据
 └── history/                  # 历史需求和决策（有需要时建立）
 tools/edge_benchmark/          # 多主题共用的测试工具
 ```
 
-本轮先完成文件归类和入口整理。已有实验目录整体搬迁，保留内部布局；后续可在主题内继续整理当前结论和待办。跨主题实验只保留一份原始证据，通过链接引用。
+通用流程和结果格式集中在[研究方法](docs/methodology/README.md)。新增实验按统一协议保存；历史实验目录保留原布局和证据。跨主题实验只保留一份原始证据，通过链接引用。
+
+## 研究方法
+
+通用方法已确认为[端侧模型轻量评测SOP](docs/methodology/model-evaluation-sop.md)（v1.0）：资源和性能优先，少量固定用例，先单模块后共跑，结构化结果生成静态HTML。已完成[ASR首个试点](studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/results.md)，数据契约与入口见[方法索引](docs/methodology/README.md)；历史证据按原比较口径保留。
 
 ## 复测与数据
 

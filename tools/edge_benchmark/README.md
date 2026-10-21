@@ -257,3 +257,27 @@ Production ROS ASR integration is recorded separately in
 That replay uses the actual robot_inference node and ROS audio/control contracts;
 its event-reception latency includes DDS delivery, unlike the direct C API probe.
 Native compute RTF and resource peaks were not collected in that integration run.
+
+## 轻量评测 v1
+
+执行流程与指标边界见[统一SOP](../../docs/methodology/model-evaluation-sop.md)和[结果格式](../../docs/methodology/result-format.md)。ASR首个[计划实例](../../studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/plan.json)复用外部CPU/NPU资产，不下载模型。
+
+```sh
+# 只生成配置并校验共享输入；输出须是新文件。
+python3 tools/edge_benchmark/asr_suite.py /absolute/plan.json /tmp/screening.json --tier screening
+python3 tools/edge_benchmark/benchmark.py run /tmp/screening.json /absolute/new-screening
+python3 tools/edge_benchmark/asr_suite.py /absolute/plan.json /tmp/qualification.json --tier qualification
+python3 tools/edge_benchmark/benchmark.py run /tmp/qualification.json /absolute/new-qualification
+
+# 只读转换已有运行；不覆盖原结果或已有导出目录。
+python3 tools/edge_benchmark/evaluation.py export /absolute/new-view /absolute/run-a /absolute/run-b
+python3 tools/edge_benchmark/evaluation.py validate /absolute/new-view/results.json
+python3 tools/edge_benchmark/evaluation.py report /absolute/new-view/results.json /absolute/new-view/report.html
+python3 -m unittest discover -s tools/edge_benchmark -p 'test_*.py'
+```
+
+新版suite自动生成`evaluation/results.json`及`evaluation/report.html`。两种ASR场景、筛选/复测及两类对照分组展示；三轮显示中位数/范围，并保留逐轮输出。页面使用[静态模板](templates/evaluation.html)，只消费结果，不改变测量。
+
+新计划需指定设备、素材清单、候选identity和adapter、两个强度的fixture_ids和总预算。每条候选保留框架/后端/精度/线程声明；模型来源、文件及SDK身份由manifest固定。路径是设备实例配置，移机时更新外部资产路径，并保留输入hash和协议条件；不往Git提交音频、模型或SDK。
+
+旧suite不带evaluation时沿用原执行/报告入口。新版只读export将其标为legacy；协议、阶段或MemTotal等缺失信息不会从新环境回填。历史面板可查阅，不自动当作新版受控对照。动态库映射和provider结合检查实际运行路径，CPU也可能因SDK依赖映射RKNN库。

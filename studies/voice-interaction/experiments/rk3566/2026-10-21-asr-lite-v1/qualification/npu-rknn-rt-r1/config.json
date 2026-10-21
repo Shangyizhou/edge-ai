@@ -1,0 +1,46 @@
+{
+  "timeout": 100,
+  "binary": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/asr-stream/asr_stream_probe",
+  "env": {
+    "LD_LIBRARY_PATH": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0:/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/lib"
+  },
+  "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+  "provider": "rknn",
+  "threads": 1,
+  "id": "npu-rknn-rt-r1",
+  "kind": "streaming_asr",
+  "fixtures": "/home/orangepi/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/fixtures.json",
+  "fixture_ids": [
+    "official0",
+    "command",
+    "command-pause080",
+    "fleurs-1805-1",
+    "fleurs-1965-2",
+    "silence1"
+  ],
+  "realtime": true,
+  "chunk_ms": 100,
+  "tail_seconds": 3.2,
+  "idle_seconds": 3,
+  "endpoint_silence": 1.2,
+  "evaluation": {
+    "task": "asr",
+    "protocol_id": "edge-asr-lite-v1",
+    "tier": "qualification",
+    "round": 1,
+    "device_id": "orange-pi-3b-rk3566-local",
+    "candidate": {
+      "id": "npu-rknn",
+      "model": "rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+      "framework": "sherpa-onnx 1.13.8 / RKNN runtime 2.2.0",
+      "backend": "rknn",
+      "precision": "fp16-rknn"
+    },
+    "comparison_type": "deployment",
+    "comparison_group": "zipformer-small-bilingual-existing-assets",
+    "preprocessing": "mono16k-pcm16-v1",
+    "output_normalization": "nfkc-casefold-no-punctuation-space-v1"
+  },
+  "requested_timeout_seconds": 100,
+  "budget_limited": false
+}

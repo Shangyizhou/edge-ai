@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "selection": "Existing robot/demo clips plus first two 3–8s entries encountered in official Chinese test archive; no selection by model output",
+  "fixtures": [
+    {
+      "id": "official0",
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/official0.wav",
+      "sha256": "7d93384ca14702cc584a7a33fe2fed92e89e708549161cb12ea38c916882103b",
+      "source_path": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+      "source_sha256": "7d93384ca14702cc584a7a33fe2fed92e89e708549161cb12ea38c916882103b",
+      "sample_rate": 16000,
+      "samples": 160850,
+      "duration_s": 10.053125,
+      "energy_end_s": 9.8,
+      "energy_start_s": 0.7000000000000001,
+      "anchor_definition": "end of last 20 ms window with RMS > -35 dBFS; -1 means none; not human EOS",
+      "splice": null,
+      "reference_text": null,
+      "reference_provenance": "not manually transcribed",
+      "reference": null
+    },
+    {
+      "id": "command",
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/command.wav",
+      "sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+      "source_path": "/home/orangepi/code/ros2_ws/src/robot_voice/test/fixtures/unsafe_motion_request_zh_2026-09-24.wav",
+      "source_sha256": "311b58f5c3925e1ce1a6c9e714f611207fe3d4f252d4bc44a1e142214f97c0c0",
+      "sample_rate": 16000,
+      "samples": 94208,
+      "duration_s": 5.888,
+      "energy_end_s": 4.48,
+      "energy_start_s": 1.26,
+      "anchor_definition": "end of last 20 ms window with RMS > -35 dBFS; -1 means none; not human EOS",
+      "splice": null,
+      "reference_text": "机器人请让底盘上前移动二十厘米",
+      "reference_provenance": "prior local benchmark consensus, not independent manual annotation",
+      "reference": {
+        "kind": "model_consensus",
+        "text": "机器人请让底盘上前移动二十厘米",
+        "source": "historical local outputs; not ground truth"
+      }
+    },
+    {
+      "id": "command-pause080",
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/command-pause080.wav",
+      "sha256": "376a00cb1c704aeb415590853a1831713a072faa66908118244fa9aea676f0d7",
+      "source_path": "/home/orangepi/code/ros2_ws/src/robot_voice/test/fixtures/unsafe_motion_request_zh_2026-09-24.wav",
+      "source_sha256": "311b58f5c3925e1ce1a6c9e714f611207fe3d4f252d4bc44a1e142214f97c0c0",
+      "sample_rate": 16000,
+      "samples": 101888,
+      "duration_s": 6.368,
+      "energy_end_s": 4.96,
+      "energy_start_s": 1.26,
+      "anchor_definition": "end of last 20 ms window with RMS > -35 dBFS; -1 means none; not human EOS",
+      "splice": {
+        "source_range_removed_samples": [
+          31040,
+          36160
+        ],
+        "source_range_removed_s": [
+          1.94,
+          2.26
+        ],
+        "inserted_zero_samples": 12800,
+        "inserted_s": 0.8
+      },
+      "reference_text": "机器人请让底盘上前移动二十厘米",
+      "reference_provenance": "prior local benchmark consensus, not independent manual annotation",
+      "reference": {
+        "kind": "model_consensus",
+        "text": "机器人请让底盘上前移动二十厘米",
+        "source": "historical local outputs; not ground truth"
+      }
+    },
+    {
+      "id": "fleurs-1805-1",
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10112798408996336578-pcm16.wav",
+      "sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+      "duration_s": 7.62,
+      "sample_rate": 16000,
+      "source_url": "https://huggingface.co/datasets/google/fleurs/resolve/main/data/cmn_hans_cn/audio/test.tar.gz",
+      "source_member": "test/10112798408996336578.wav",
+      "source_sha256": "714a1785c636060d6a8f284abcf786c876f70b07e0a8ea966c476abf1e890fe7",
+      "license": "CC-BY-4.0",
+      "conversion": "ffmpeg -ac 1 -ar 16000 -c:a pcm_s16le; float WAV to signed PCM16",
+      "reference": {
+        "text": "Scotturb 403 路公共汽车定期发车前往辛特拉 (Sintra)，在罗卡角停靠。",
+        "kind": "dataset_transcript",
+        "source": "https://huggingface.co/datasets/google/fleurs",
+        "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+      },
+      "energy_end_s": 6.7,
+      "anchor_definition": "end of last 20 ms window with RMS > -35 dBFS; -1 means none; not human EOS"
+    },
+    {
+      "id": "fleurs-1965-2",
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10134195680525011353-pcm16.wav",
+      "sha256": "9c0144247ddb01cafd93d7d874fd61ab24012b8e75f2acd19dc8c2b106b2f945",
+      "duration_s": 6.84,
+      "sample_rate": 16000,
+      "source_url": "https://huggingface.co/datasets/google/fleurs/resolve/main/data/cmn_hans_cn/audio/test.tar.gz",
+      "source_member": "test/10134195680525011353.wav",
+      "source_sha256": "52cd9b630b984ed486d69f8ee8dd841a57f875c752e1af411e0a39dabd3e00cb",
+      "license": "CC-BY-4.0",
+      "conversion": "ffmpeg -ac 1 -ar 16000 -c:a pcm_s16le; float WAV to signed PCM16",
+      "reference": {
+        "text": "这里几乎都是沙滩，游泳很安全，大部分地方都有新西兰圣诞树的树荫。",
+        "kind": "dataset_transcript",
+        "source": "https://huggingface.co/datasets/google/fleurs",
+        "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+      },
+      "energy_end_s": 5.22,
+      "anchor_definition": "end of last 20 ms window with RMS > -35 dBFS; -1 means none; not human EOS"
+    },
+    {
+      "id": "silence1",
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/silence1.wav",
+      "sha256": "643f8a8dc8bd9c19225afffad2becfec5426180b3749cb208abdf1a6c8354efc",
+      "duration_s": 1.0,
+      "sample_rate": 16000,
+      "source": "generated zeros",
+      "expected_behavior": "silence",
+      "reference": null,
+      "energy_end_s": -1,
+      "anchor_definition": "end of last 20 ms window with RMS > -35 dBFS; -1 means none; not human EOS"
+    }
+  ]
+}

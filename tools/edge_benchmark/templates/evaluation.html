@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>端侧模型 · 资源与性能评测</title>
+<style>
+body{font:15px/1.65 system-ui,sans-serif;color:#18283b;background:#f5f7fa;margin:0}main{max-width:1400px;margin:auto;padding:30px}h1{margin-bottom:8px}section{background:white;border:1px solid #dce3ec;border-radius:12px;padding:20px;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:10px;text-align:left;border-bottom:1px solid #e6ebf1;vertical-align:top}th{background:#eef3f9}small,.muted{color:#52657a}a{color:#175fa5}.scroll{overflow:auto}.cards{display:flex;gap:15px;flex-wrap:wrap}.card{background:white;border:1px solid #dce3ec;border-radius:10px;padding:14px 24px}.card b{display:block;font-size:25px}details{margin:10px 0}code{overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}.badge{background:#edf2f8;padding:3px 7px;border-radius:5px}.error{color:#a22828}
+</style><main>
+<h1>端侧模型 · 资源与性能评测</h1>
+<p class="muted">结构化结果格式 $version · $created · <a href="$data_link">results.json</a></p>
+<div class="cards">$cards</div>
+<section><strong>怎样阅读</strong><p>先看资源、RTF和等待，再看输出完整性与参考质量。CPU百分比表示被测进程树占整机逻辑CPU容量；内存占比使用实测MemTotal和采样PSS。没有分阶段数据时明确显示全case口径。NPU频率不当利用率，PSS不当NPU独占内存。</p><p>比较按协议、场景、执行强度及显式比较条件分组；历史条目保留原口径，仅供查阅，不自动生成加速倍率或总分排名。能量锚点等待不是人工末音延迟。</p></section>
+$groups
+<section><h2>指标与局限</h2><p>“未测”不等于零。进程正常退出不表示质量或性能目标达标。质量只覆盖表中有可靠参考的样本；空/缺失输出保留为错误，重复轮次不增加独立语料数量。各轮结果逐条列出，小样本不推断长期p95。</p><p>本页只读取JSON；重建页面不运行模型。移动或分享时应保留证据链接指向的目录结构。</p></section>
+</main></html>
