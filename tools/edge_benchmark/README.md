@@ -251,3 +251,9 @@ The report distinguishes compute RTF from paced wall time and reports missing
 endpoints explicitly. Energy anchors are not human EOS labels. See
 [method](../../docs/research/rk3566/research-streaming-asr-method.md) and
 [measured results](../../reports/rk3566/2026-10-21-asr-streaming/results.md).
+
+Production ROS ASR integration is recorded separately in
+[ROS node validation](../../reports/rk3566/2026-10-21-asr-ros/results.md).
+That replay uses the actual robot_inference node and ROS audio/control contracts;
+its event-reception latency includes DDS delivery, unlike the direct C API probe.
+Native compute RTF and resource peaks were not collected in that integration run.

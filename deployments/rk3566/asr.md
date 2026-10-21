@@ -57,3 +57,12 @@ LD_LIBRARY_PATH="$NPU_ROOT/runtime-2.2.0" \
 保存partial/endpoint事件并处理超时、取消、恢复。先保持rule2=1.2秒；
 0.6秒虽然更快，但本轮会拆分自然指令，应先制定唤醒词/命令分段协议。
 [本轮数据与限制](../../reports/rk3566/2026-10-21-asr-streaming/results.md)。
+
+## 生产C++ ROS节点NPU接入补充
+
+ros-robot的`robot_inference/asr_node`已在本地交付提交`68e2c1b`接入显式
+`provider=rknn`、单核选择及ASR专用SDK/runtime构建配置。此路径复用既有常驻
+节点、有界音频Topic和启停Service；旧`robot_voice`CLI前端继续独立保留。
+真实ROS回放、新流恢复与生产ASR/YOLO共跑已测；
+[原始结果及复现入口](../../reports/rk3566/2026-10-21-asr-ros/results.md)。
+未启完整Agent、麦克风或播放，不能将此补充写成四进程语音总体验收。
