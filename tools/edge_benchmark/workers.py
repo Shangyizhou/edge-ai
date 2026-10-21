@@ -590,6 +590,32 @@ def yolo_cpu(config: dict, output: Path) -> None:
     run(config, output)
 
 
+def streaming_asr(config: dict, output: Path) -> None:
+    """一次加载模型，以固定音频节奏测常驻 RKNN 流式识别。"""
+    fixtures = json.loads(Path(config["fixtures"]).read_text())["fixtures"]
+    selected = set(config.get("fixture_ids", [f["id"] for f in fixtures]))
+    rows = [f for f in fixtures if f["id"] in selected]
+    if len(rows) != len(selected):
+        raise ValueError("unknown streaming fixture id")
+    path = output / "fixtures.tsv"
+    path.write_text(
+        "".join(f"{f['path']}\t{f['energy_end_s']}\n" for f in rows)
+    )
+    command = [
+        config["binary"],
+        config["model"],
+        str(output),
+        str(path),
+        str(config["endpoint_silence"]),
+        str(config.get("chunk_ms", 100)),
+        str(int(config.get("realtime", True))),
+        str(config.get("tail_seconds", 3.2)),
+        config.get("gate_file", "-"),
+        config.get("provider", "rknn"),
+    ]
+    subprocess.run(command, check=True)
+
+
 def vision_asr(config: dict, output: Path) -> None:
     """同时放行视觉与活跃 ASR，保留各进程的原始日志和事件。"""
     gate = output / "start-gate"
@@ -612,7 +638,7 @@ def vision_asr(config: dict, output: Path) -> None:
                 stderr=log,
             )
             children.append((member, directory, child))
-        # 1. YOLO 完成预热；native ASR 在门禁后加载，符合现有 CLI 合约。
+        # 1. 常驻 ASR 与 YOLO 均完成预热；旧 native CLI 在门禁后加载。
         while not all((d / "ready").exists() for _, d, _ in children):
             for member, directory, child in children:
                 if child.poll() is not None:
@@ -663,6 +689,7 @@ def main() -> None:
         "yolo": yolo,
         "yolo_cpu": yolo_cpu,
         "vision_asr": vision_asr,
+        "streaming_asr": streaming_asr,
     }
     adapters[config["kind"]](config, args.output)
 

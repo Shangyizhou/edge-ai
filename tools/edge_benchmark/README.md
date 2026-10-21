@@ -222,3 +222,32 @@ uses the existing process-group teardown contract.
 The default target was confirmed as pre-scaled 640x352 at 30 FPS.
 Frame counts use this 30 Hz input budget; a lower-rate diagnostic is never
 reported as meeting the target. Upstream scaling is a separate stage.
+
+## Persistent RKNN streaming ASR
+
+`asr-streaming.json` replays four fixed 16kHz fixtures at their real arrival rate
+(100ms blocks, 3.2s paced trailing silence), scanning rule2=1.2/0.8/0.6s.
+Each recognizer is created once and warmed before the measurement gate.
+Independent files get new stream state; endpoints reset the stream only.
+The paired cases run actual ROS YOLO with already resized 640×352 input at
+30fps for 45s. `asr-streaming-followup.json` adds one continuous six-turn
+stream and the matched per-file CLI control. No microphone or motion nodes run.
+
+Build against the matching public v1.13.8 C header and external validated SDK:
+
+```sh
+cmake -S tools/edge_benchmark/native/asr_stream -B /tmp/asr-stream-build \
+  -DSHERPA_ROOT=/path/to/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared \
+  -DSHERPA_INCLUDE_DIR=/path/to/include \
+  -DRKNN_RUNTIME_DIR=/path/to/private-runtime-2.2.0
+cmake --build /tmp/asr-stream-build -j2
+python3 tools/edge_benchmark/benchmark.py run tools/edge_benchmark/asr-streaming.json /tmp/stream-results
+```
+
+Adjust local binary/model/fixture paths in a copy of the config. Fixture JSON
+contains `fixtures` entries with `id`, `path`, `energy_end_s` and provenance;
+freeze it with WAV hashes. WAVs, headers, libraries and binaries stay outside Git.
+The report distinguishes compute RTF from paced wall time and reports missing
+endpoints explicitly. Energy anchors are not human EOS labels. See
+[method](../../docs/research/rk3566/research-streaming-asr-method.md) and
+[measured results](../../reports/rk3566/2026-10-21-asr-streaming/results.md).

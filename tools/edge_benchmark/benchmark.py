@@ -256,9 +256,17 @@ def inventory(suite: dict) -> dict:
         paths.update(Path(p) for p in case.get("wavs", []))
         if case.get("binary"):
             paths.add(Path(case["binary"]))
-        for key in ("image", "labels", "decoder"):
+        for key in ("image", "labels", "decoder", "fixtures"):
             if case.get(key):
                 paths.add(Path(case[key]))
+        if case["kind"] == "streaming_asr":
+            fixtures = json.loads(Path(case["fixtures"]).read_text())
+            selected = case.get("fixture_ids")
+            paths.update(
+                Path(f["path"])
+                for f in fixtures["fixtures"]
+                if selected is None or f["id"] in selected
+            )
         if case["kind"] == "sherpa_tts":
             paths.update(
                 Path(p)
@@ -425,6 +433,71 @@ def vision_table(results: list) -> str:
     )
 
 
+def streaming_summary(events: list) -> dict:
+    """从常驻流事件汇总计算占用与延迟，缺失端点不记作零等待。"""
+    samples = [
+        e
+        for e in events
+        if e["event"] == "sample" and "first_partial_seconds" in e
+    ]
+    blocks = [e for e in events if e["event"] == "asr_block"]
+    if not samples:
+        return {}
+    finals = [
+        e["endpoint_after_energy_seconds"]
+        for e in samples
+        if e["endpoint_after_energy_seconds"] >= 0 and not e["eof_residual"]
+    ]
+    return {
+        "utterances": len(samples),
+        "model_creations": sum(e.get("model_creations", 0) for e in events),
+        "compute_rtf": sum(e["seconds"] for e in samples)
+        / sum(e["audio_seconds"] for e in samples),
+        "compute_per_supplied_second": sum(e["seconds"] for e in samples)
+        / sum(e["supplied_audio_seconds"] for e in samples),
+        "endpoint_delays": finals,
+        "missing_final_endpoints": len(samples) - len(finals),
+        "max_submit_lateness_ms": max(
+            (e["submit_lateness_seconds"] * 1000 for e in blocks), default=0
+        ),
+        "max_completion_lag_ms": max(
+            (e["completion_lag_seconds"] * 1000 for e in blocks), default=0
+        ),
+    }
+
+
+def streaming_table(results: list) -> str:
+    """单列流式结果，并标清能量锚点与追加静音口径。"""
+    rows = []
+    for result in results:
+        s = streaming_summary(result["events"])
+        if not s:
+            continue
+        finals = " / ".join(f"{t:.3f}" for t in s["endpoint_delays"])
+        rows.append(
+            f"<tr><td>{html.escape(result['id'])}</td>"
+            f"<td>{s['model_creations']}</td><td>{s['utterances']}</td>"
+            f"<td>{s['compute_rtf']:.3f}</td>"
+            f"<td>{s['compute_per_supplied_second']:.3f}</td>"
+            f"<td>{finals or '—'}</td>"
+            f"<td>{s['missing_final_endpoints']}</td>"
+            f"<td>{s['max_submit_lateness_ms']:.1f}</td></tr>"
+        )
+    if not rows:
+        return ""
+    return (
+        "<section><h2>常驻流式 ASR</h2><p>实时音频块回放；端点等待相对"
+        "固定能量末端，非人工真人末音。RTF包括追加静音的计算，分母为"
+        "原文件长度；供音占用比分母另含追加静音。提交滞后不等于模型"
+        "内部全部缓冲。缺失端点不作零等待成功。</p><div class='scroll'>"
+        "<table><tr><th>配置</th><th>模型创建</th><th>素材数</th>"
+        "<th>计算RTF</th><th>供音占用比</th><th>逐例端点等待s</th>"
+        "<th>缺失端点</th><th>最大提交滞后ms</th></tr>"
+        + "".join(rows)
+        + "</table></div></section>"
+    )
+
+
 def report(root: Path) -> Path:
     """只从已保存事实重建 HTML，失败和未完成例保持可见。"""
     results = [
@@ -565,6 +638,7 @@ RTF = 计算秒数 / 音频秒数，
             observations
             + comparison_charts(results)
             + vision_table(results)
+            + streaming_table(results)
             + '<div class="panel scroll">',
         )
         + "".join(rows)

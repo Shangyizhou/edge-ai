@@ -17,6 +17,30 @@ SPEC.loader.exec_module(BENCHMARK)
 class BenchmarkContractTest(unittest.TestCase):
     """测量器应如实保留超时前结果，且不把结果正文当作 HTML。"""
 
+    def test_streaming_summary_does_not_score_missing_endpoint_as_zero(self):
+        """无端点或 EOF 强制结果不得获得看似更快的端点延迟。"""
+        base = dict(
+            event="sample",
+            first_partial_seconds=1.0,
+            seconds=1.5,
+            audio_seconds=3.0,
+            supplied_audio_seconds=5.0,
+            eof_residual="",
+            endpoint_after_energy_seconds=0.8,
+        )
+        events = [
+            dict(event="loaded", model_creations=1),
+            base,
+            dict(base, endpoint_after_energy_seconds=-1),
+            dict(base, eof_residual="unfinished"),
+        ]
+        summary = BENCHMARK.streaming_summary(events)
+        self.assertEqual(summary["endpoint_delays"], [0.8])
+        self.assertEqual(summary["missing_final_endpoints"], 2)
+        self.assertEqual(summary["model_creations"], 1)
+        self.assertEqual(summary["compute_rtf"], 0.5)
+        self.assertEqual(summary["compute_per_supplied_second"], 0.3)
+
     def test_vision_report_counts_dropped_input_and_frame_latency(self):
         """从公开运行入口核对输入丢帧与延迟，避免把输入率当输出率。"""
         events = [

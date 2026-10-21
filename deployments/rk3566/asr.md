@@ -45,3 +45,15 @@ LD_LIBRARY_PATH="$NPU_ROOT/runtime-2.2.0" \
 当前官方compiler2.1包在encoder op42 `Split:/Gather_64_2sl_2sp`失败；仅替换runtime2.1/2.2/2.3.2/2.5都未解决。2025-02-27 compiler2.3包发生SIGSEGV。改用上面固定的compiler2.2历史产物后通过，无需重新导出、构建onnxoptimizer或更换内核。不能只写“升级runtime即可”。
 
 `SetCoreMask`非RK3588提示在成功运行时仍存在，不是本次失败根因。NPU参数`num_threads=1`对应native core选择，不能当CPU线程数扫描。[完整调查与官方来源](../../docs/research/rk3566/research-speech.md)。
+
+## 常驻流式路径（独立benchmark验证）
+
+已用官方v1.13.8 C API及上述固定RKNN模型/runtime组合验证：模型只加载一次，
+按100ms音频块实时送入；端点时reset stream，继续接收PCM。无需重新转换模型。
+配置、构建和复测见[工具说明](../../tools/edge_benchmark/README.md#persistent-rknn-streaming-asr)。
+
+本轮是独立探针，尚未修改ros-robot的生产ASR适配器。后续集成优先将
+逐WAV启动子进程改成常驻识别器，音频采集与解码通过有界队列衔接，
+保存partial/endpoint事件并处理超时、取消、恢复。先保持rule2=1.2秒；
+0.6秒虽然更快，但本轮会拆分自然指令，应先制定唤醒词/命令分段协议。
+[本轮数据与限制](../../reports/rk3566/2026-10-21-asr-streaming/results.md)。

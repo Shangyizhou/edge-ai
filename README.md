@@ -11,6 +11,7 @@
 | 查看首轮结论和参数对比 | [RK3566 实测记录](reports/rk3566/2026-10-21/results.md) |
 | 打开静态图表报告 | [report.html](reports/rk3566/2026-10-21/report.html)（克隆后用浏览器打开） |
 | 查看 YOLO、30fps 和 ASR 共跑 | [YOLO 实测结论](reports/rk3566/2026-10-21-yolo/results.md) · [静态报告](reports/rk3566/2026-10-21-yolo/report.html) |
+| 查看常驻流式 ASR、端点参数与30fps共跑 | [流式实测结论](reports/rk3566/2026-10-21-asr-streaming/results.md) |
 | 重跑或生成报告 | [benchmark 使用说明](tools/edge_benchmark/README.md) |
 | 按实际步骤部署 | [RK3566 部署入口](deployments/rk3566/README.md) |
 | 查官方依据和失败调查 | [ASR/TTS/NPU](docs/research/rk3566/research-speech.md) · [llama/Qwen](docs/research/rk3566/research-llm.md) · [YOLO](docs/research/rk3566/research-yolo.md) |
