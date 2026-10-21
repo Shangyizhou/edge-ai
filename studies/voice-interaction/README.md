@@ -2,6 +2,8 @@
 
 更直观的阅读入口：[研究看板](https://shangyizhou.github.io/edge-ai/) · [方案与选型](https://shangyizhou.github.io/edge-ai/solutions.html) · [测试与对比](https://shangyizhou.github.io/edge-ai/models.html) · [机器人中的表现](https://shangyizhou.github.io/edge-ai/integration.html)。
 
+第一次接触这些概念，先读[大白话入门与SOP](learn.md)；量化过程单独见[量化与转换](quantization.md)，准备实际接入见[部署交接说明](deployment-guide.md)。
+
 更新：2026-10-21。目标设备：Orange Pi 3B / RK3566 / 标称4GB内存。
 
 我们要让机器人在本地完成“听懂 → 思考 → 说话”，同时为视觉检测留出资源。**ASR节点已接入验证，完整语音交互尚未验收。**

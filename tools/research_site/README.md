@@ -2,6 +2,8 @@
 
 正式入口：https://shangyizhou.github.io/edge-ai/
 
+初学者先读`learn.html`（`studies/voice-interaction/learn.md`），量化支线见`quantization.html`，实际接入见`deployment.html`。三份正文直接由Markdown生成，避免维护两份长文；自动加入目录和阅读样式。
+
 主要阅读顺序为概览 → 方案与选型 → 测试与对比 → 机器人中的表现；实验与证据为辅助入口，研究方法与进度页保留。详情从现有Markdown生成，图表由ASR复测JSON和INT8功能JSON生成，不运行模型。
 
 ## 构建与预览

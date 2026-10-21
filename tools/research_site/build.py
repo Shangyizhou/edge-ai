@@ -59,6 +59,12 @@ def build(output):
     docs = [p for p in tracked if p.suffix == '.md' and (p.parts[0] in ('studies', 'docs') or p == Path('README.md'))]
     assets = [p for p in tracked if p.parts[0] == 'studies']
     published = {str(p): 'read/' + str(p.with_suffix('.html')) for p in docs}
+    guides = {
+        str(VOICE / 'learn.md'): ('learn.html', '从这里读起', 'learn'),
+        str(VOICE / 'quantization.md'): ('quantization.html', '量化与转换', 'learn'),
+        str(VOICE / 'deployment-guide.md'): ('deployment.html', '部署交接说明', ''),
+    }
+    published.update({path: value[0] for path, value in guides.items()})
     published.update({str(p): 'evidence/' + str(p) for p in assets if p.suffix != '.md'})
     output.mkdir(parents=True)
     shutil.copy2(SOURCE / 'style.css', output / 'style.css')
@@ -102,7 +108,11 @@ def build(output):
         title = re.search(r'^# (.+)', (ROOT / p).read_text(), re.M)
         title = title.group(1) if title else p.stem
         entries.append(dict(title=title, path=destination))
-        render(destination, title, '<article class="document"><a class="back" href="' + os.path.relpath(output / 'index.html', (output / destination).parent) + '">← 返回研究概览</a>' + content + '</article>')
+        is_guide = str(p) in guides
+        if is_guide:
+            content = re.sub(r'<div class="toc">(.*?)</div>', lambda match: '<details class="chapter-index"><summary>本篇内容（按需展开）</summary>' + match.group(1) + '</details>', content, flags=re.S)
+        article_class = 'document learning' if is_guide else 'document'
+        render(destination, guides[str(p)][1] if is_guide else title, '<article class="' + article_class + '"><a class="back" href="' + os.path.relpath(output / 'index.html', (output / destination).parent) + '">← 返回研究概览</a>' + content + '</article>', guides[str(p)][2] if is_guide else '')
     for p in assets:
         target = output / 'evidence' / p
         target.parent.mkdir(parents=True, exist_ok=True)
