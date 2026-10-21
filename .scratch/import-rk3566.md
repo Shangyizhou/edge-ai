@@ -1,6 +1,6 @@
 # RK3566 benchmark / 研究 / 部署记录迁入
 
-Status: claimed
+Status: resolved
 Type: task
 Target: git@github.com:Shangyizhou/edge-ai.git
 Branch: codex/import-rk3566-benchmark-20261021
@@ -15,10 +15,14 @@ Branch: codex/import-rk3566-benchmark-20261021
 - [x] 调研与首轮38案例原始数值、资源、失败日志、hash和HTML可追溯。
 - [x] 已走通的CPU/NPU ASR、Summer、候选TTS、Qwen部署整理为手册。
 - [x] Ruff、clang-format、公开接口测试、本地Markdown/HTML链接及资产排除检查通过。
-- [ ] 读取目标远端已有内容后完成兼容整合并推送；不覆盖未知远端历史。
+- [x] 读取目标远端已有内容后完成兼容整合并推送；不覆盖未知远端历史。
 
 ## Evidence
 
 原来源分支最后提交becd9b8，完整来源见reports/rk3566/2026-10-21/migration-provenance.json。Git快照只含选定文本证据与报告，音频在外置完整run中保留。
 
 2026-10-21：原GitHub账号停用；新生成独立SSH key并将公钥给用户，当前仓库core.sshCommand仅选择新key，不改原项目SSH行为。最近访问新key返回Permission denied(publickey)，等待用户在新账号添加。目标URL已由用户更正为Shangyizhou/edge-ai。
+
+## Delivery
+
+2026-10-21：用户将独立公钥添加至新账号后SSH访问通过。远端仅初始README占位，迁移提交`94f0871`正常接在`9dbda46`后，已快进推送`main`，远端读取核验通过。没有强推或改动原ROS集成分支。后续部署以本仓库为维护入口。
