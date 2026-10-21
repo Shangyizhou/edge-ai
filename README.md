@@ -26,7 +26,7 @@ tools/edge_benchmark/          # 多主题共用的测试工具
 
 ## 研究方法
 
-通用方法已确认为[端侧模型轻量评测SOP](docs/methodology/model-evaluation-sop.md)（v1.0）：资源和性能优先，少量固定用例，先单模块后共跑，结构化结果生成静态HTML。已完成[ASR首个试点](studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/results.md)，数据契约与入口见[方法索引](docs/methodology/README.md)；历史证据按原比较口径保留。
+通用方法已确认为[端侧模型轻量评测SOP](docs/methodology/model-evaluation-sop.md)（v1.1）：资源和性能优先，少量固定用例，先单模块后共跑，结构化结果生成静态HTML。已完成[ASR现成方案试点](studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/results.md)，同精度CPU/NPU受控主基线待补齐。数据契约与入口见[方法索引](docs/methodology/README.md)；历史证据按原比较口径保留。
 
 ## 复测与数据
 
