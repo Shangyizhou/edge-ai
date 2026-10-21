@@ -4,19 +4,22 @@
 
 第一批内容是 RK3566（4×Cortex-A55、4GB RAM）上的旧 streaming Zipformer ASR、SummerTTS、微调 Qwen，以及 sherpa-onnx/Piper/Melo TTS 对照。ASR 的 RKNN/NPU 路径已经实际跑通；Summer 和 Qwen 使用 CPU。
 
+新增 ros-robot YOLOv6 的 CPU 重导出候选/NPU 对照、30fps 图像回放、真实 ROS 检测节点与活跃 ASR 共跑测试。
+
 | 要做什么 | 入口 |
 | --- | --- |
 | 查看首轮结论和参数对比 | [RK3566 实测记录](reports/rk3566/2026-10-21/results.md) |
 | 打开静态图表报告 | [report.html](reports/rk3566/2026-10-21/report.html)（克隆后用浏览器打开） |
+| 查看 YOLO、30fps 和 ASR 共跑 | [YOLO 实测结论](reports/rk3566/2026-10-21-yolo/results.md) · [静态报告](reports/rk3566/2026-10-21-yolo/report.html) |
 | 重跑或生成报告 | [benchmark 使用说明](tools/edge_benchmark/README.md) |
 | 按实际步骤部署 | [RK3566 部署入口](deployments/rk3566/README.md) |
-| 查官方依据和失败调查 | [ASR/TTS/NPU](docs/research/rk3566/research-speech.md) · [llama/Qwen](docs/research/rk3566/research-llm.md) |
+| 查官方依据和失败调查 | [ASR/TTS/NPU](docs/research/rk3566/research-speech.md) · [llama/Qwen](docs/research/rk3566/research-llm.md) · [YOLO](docs/research/rk3566/research-yolo.md) |
 | 追溯原始任务 | [范围和确认记录](docs/history/2026-10-21/spec.md) |
 
 ## 内容组织
 
 - `deployments/<board>/`：实际部署步骤、版本、模型身份、命令、已知失败和验证方式。
-- `tools/`：独立可复用的 benchmark 与适配器，不依赖 ROS 启动。
+- `tools/`：独立可复用的 benchmark 与适配器；可选 YOLO ROS 回放仅启动隔离检测节点。
 - `docs/research/<board>/`：官方资料、参数依据和调查过程；历史判断以最后实测结论为准。
 - `reports/<board>/<date>/`：冻结的配置、结果、资源记录、日志和静态报告，包含失败项。
 - `docs/history/`：迁移前的范围记录，保留原项目上下文。

@@ -17,6 +17,70 @@ SPEC.loader.exec_module(BENCHMARK)
 class BenchmarkContractTest(unittest.TestCase):
     """测量器应如实保留超时前结果，且不把结果正文当作 HTML。"""
 
+    def test_vision_report_counts_dropped_input_and_frame_latency(self):
+        """从公开运行入口核对输入丢帧与延迟，避免把输入率当输出率。"""
+        events = [
+            dict(
+                event="frame",
+                seconds=0.04,
+                infer_seconds=0.03,
+                post_seconds=0.01,
+                latency_seconds=0.05,
+            ),
+            dict(
+                event="frame",
+                seconds=0.06,
+                infer_seconds=0.05,
+                post_seconds=0.01,
+                latency_seconds=0.08,
+            ),
+            dict(
+                event="sample",
+                index=0,
+                seconds=0.1,
+                processed=2,
+                dropped=1,
+                offered_frames=3,
+            ),
+        ]
+        program = (
+            "import json,pathlib,sys; "
+            "pathlib.Path(sys.argv[1],'events.jsonl').write_text("
+            "'\\n'.join(json.dumps(e) for e in json.loads(sys.argv[2])))"
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "vision"
+            BENCHMARK.run_suite(
+                dict(
+                    python=sys.executable,
+                    budget_seconds=5,
+                    cases=[
+                        dict(
+                            id="vision",
+                            kind="command",
+                            timeout=3,
+                            command=[
+                                sys.executable,
+                                "-c",
+                                program,
+                                "{output}",
+                                json.dumps(events),
+                            ],
+                        )
+                    ],
+                ),
+                root,
+            )
+            result = json.loads((root / "vision/result.json").read_text())
+            summary = BENCHMARK.vision_summary(result["events"])
+            self.assertEqual(summary["fps"], 20)
+            self.assertEqual(summary["dropped"], 1)
+            self.assertEqual(summary["frame_p95_ms"], 60)
+            self.assertEqual(summary["latency_p95_ms"], 80)
+            report = (root / "report.html").read_text()
+            self.assertIn("2/3", report)
+            self.assertIn("20.00", report)
+
     def test_timeout_preserves_completed_sample_and_stops_descendant(self):
         """子进程悬挂时只终止该实验，保留已生成内容和非成功状态。"""
         program = (

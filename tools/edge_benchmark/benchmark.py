@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import html
 import json
+import math
 import os
 import platform
 import re
@@ -72,6 +73,9 @@ def observe(pid: int) -> dict:
         "cpu[0-9]*/cpufreq/scaling_cur_freq"
     ):
         clocks[str(clock)] = int(clock.read_text())
+    npu = Path("/sys/class/devfreq/fde40000.npu/cur_freq")
+    if npu.exists():
+        clocks[str(npu)] = int(npu.read_text()) // 1000
     return {
         "rss_kib": rss,
         "pss_kib": pss,
@@ -236,6 +240,7 @@ def run_case(config: dict, root: Path, python: str) -> dict:
 def inventory(suite: dict) -> dict:
     """固定环境和输入资产身份，避免事后只按路径猜测权重。"""
     paths = {Path(__file__), Path(__file__).with_name("workers.py")}
+    paths.update(Path(p) for p in suite.get("extra_assets", []))
     cases = list(suite["cases"])
     for case in cases:
         cases.extend(case.get("members", []))
@@ -251,6 +256,9 @@ def inventory(suite: dict) -> dict:
         paths.update(Path(p) for p in case.get("wavs", []))
         if case.get("binary"):
             paths.add(Path(case["binary"]))
+        for key in ("image", "labels", "decoder"):
+            if case.get(key):
+                paths.add(Path(case[key]))
         if case["kind"] == "sherpa_tts":
             paths.update(
                 Path(p)
@@ -334,6 +342,87 @@ def comparison_charts(results: list) -> str:
             f"<section><h2>{title}</h2><p>{html.escape(common)}</p>{bars}</section>"
         )
     return "".join(panels)
+
+
+def vision_summary(events: list) -> dict:
+    """按实测帧与输入预算计算吞吐、丢帧及短样本延迟分位数。"""
+    frames = [e for e in events if e["event"] == "frame"]
+    samples = [
+        e for e in events if e["event"] == "sample" and "processed" in e
+    ]
+    if not frames or not samples:
+        return {}
+    frame_times = sorted(e["seconds"] * 1000 for e in frames)
+    latencies = sorted(e["latency_seconds"] * 1000 for e in frames)
+    processed = sum(e["processed"] for e in samples)
+    dropped = sum(e["dropped"] for e in samples)
+    elapsed = sum(e["seconds"] for e in samples)
+    return {
+        "frames": processed,
+        "fps": processed / elapsed,
+        "dropped": dropped,
+        "offered": sum(e["offered_frames"] for e in samples),
+        "mean_frame_ms": sum(frame_times) / len(frame_times),
+        "scope": frames[0].get("scope", "backend"),
+        "infer_mean_ms": sum(e.get("infer_seconds", 0) for e in frames)
+        * 1000
+        / len(frames),
+        "post_mean_ms": sum(e.get("post_seconds", 0) for e in frames)
+        * 1000
+        / len(frames),
+        "frame_p95_ms": frame_times[math.ceil(len(frames) * 0.95) - 1],
+        "latency_p50_ms": latencies[math.ceil(len(frames) * 0.5) - 1],
+        "latency_p95_ms": latencies[math.ceil(len(frames) * 0.95) - 1],
+        "latency_max_ms": latencies[-1],
+        "over_33ms_percent": 100
+        * sum(t > 1000 / 30 for t in frame_times)
+        / len(frame_times),
+    }
+
+
+def vision_table(results: list) -> str:
+    """在同一报告单列视觉吞吐，避免与语音 RTF 混淆。"""
+    rows = []
+    for result in results:
+        summary = vision_summary(result["events"])
+        if not summary:
+            continue
+        infer = (
+            f"{summary['infer_mean_ms']:.2f}"
+            if summary["scope"] == "backend"
+            else "—"
+        )
+        post = (
+            f"{summary['post_mean_ms']:.2f}"
+            if summary["scope"] == "backend"
+            else "—"
+        )
+        rows.append(
+            f"<tr><td>{html.escape(result['id'])}</td>"
+            f"<td>{summary['fps']:.2f}</td>"
+            f"<td>{summary['frames']}/{summary['offered']}</td>"
+            f"<td>{summary['dropped']}</td>"
+            f"<td>{infer}</td>"
+            f"<td>{post}</td>"
+            f"<td>{summary['frame_p95_ms']:.2f}</td>"
+            f"<td>{summary['latency_p95_ms']:.2f}</td></tr>"
+        )
+    if not rows:
+        return ""
+    return (
+        "<section><h2>YOLO 固定图像回放</h2>"
+        "<p>复用实际 RKNN/RGA 推理与后处理；不含相机、ROS 传输、"
+        "标注和图像编码。最新帧调度与 ROS 双队列并非同一流程。"
+        "带 ros 标识的配置运行真实节点，包含 DDS、双队列、绘图和检测发布，"
+        "处理 p95 对应端到端时延；仍不含相机采集与 MJPEG 解码。"
+        "p95 为本轮样本分位数，不能代替长期稳定性验证。</p>"
+        "<div class='scroll'><table><tr><th>配置</th><th>完成 FPS</th>"
+        "<th>处理/输入</th><th>丢帧</th><th>推理均值 ms</th>"
+        "<th>后处理均值 ms</th><th>整帧 p95 ms</th>"
+        "<th>输入到完成 p95 ms</th></tr>"
+        + "".join(rows)
+        + "</table></div></section>"
+    )
 
 
 def report(root: Path) -> Path:
@@ -442,7 +531,7 @@ a{color:#225cca}audio{width:min(100%,500px)}.scroll{overflow:auto}
 margin:8px 0;font-size:14px}.track{background:#edf1f7;border-radius:4px}
 .track span{display:block;background:#4a78be;color:white;min-width:48px;
 box-sizing:border-box;padding:2px 8px;border-radius:4px}h2{font-size:21px}
-</style><main><h1>RK3566 · ASR / TTS / Qwen 实测</h1>
+</style><main><h1>RK3566 · ASR / TTS / Qwen / YOLO 实测</h1>
 <p>4×Cortex-A55 · 4GB RAM · 文件输入/输出 · 无机器人动作</p>
 <div class="panel"><b>读数口径</b><p>加载与逐例推理分开。
 RTF = 计算秒数 / 音频秒数，
@@ -475,6 +564,7 @@ RTF = 计算秒数 / 音频秒数，
             '<div class="panel scroll">',
             observations
             + comparison_charts(results)
+            + vision_table(results)
             + '<div class="panel scroll">',
         )
         + "".join(rows)

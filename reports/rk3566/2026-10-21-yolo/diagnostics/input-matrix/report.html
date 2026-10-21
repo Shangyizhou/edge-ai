@@ -1,0 +1,1663 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RK3566 推理配置实测</title><style>
+body{font:16px/1.6 system-ui;background:#f4f6f9;color:#172338;margin:0}
+main{max-width:1400px;margin:auto;padding:28px}h1{font-size:30px}
+section,.panel{background:white;padding:22px;border-radius:12px;margin:20px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:10px;
+border-bottom:1px solid #dae1eb;text-align:left}th{background:#eaf0f8}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6f9;padding:14px}
+a{color:#225cca}audio{width:min(100%,500px)}.scroll{overflow:auto}
+.barrow{display:grid;grid-template-columns:minmax(180px,340px) 1fr;gap:12px;
+margin:8px 0;font-size:14px}.track{background:#edf1f7;border-radius:4px}
+.track span{display:block;background:#4a78be;color:white;min-width:48px;
+box-sizing:border-box;padding:2px 8px;border-radius:4px}h2{font-size:21px}
+</style><main><h1>RK3566 · ASR / TTS / Qwen / YOLO 实测</h1>
+<p>4×Cortex-A55 · 4GB RAM · 文件输入/输出 · 无机器人动作</p>
+<div class="panel"><b>读数口径</b><p>加载与逐例推理分开。
+RTF = 计算秒数 / 音频秒数，
+低于1表示该例平均快于音频时长。ASR人为追加2.5秒静音，端点相对文件尾，
+不冒充真人末音延迟。NPU官方CLI另用0.8秒尾静音，每文件重新加载，
+时间只保留CLI输出精度；与Python分块组不是完全同条件。未播放时记录PCM就绪，
+不称首声。RSS为进程树合计，
+可能重复共享页；PSS另列。CPU、温度、频率详见原始时间序列。</p>
+<p>少量筛查样本不提供稳定P95或正式MOS；超时/加载失败不计为零延迟成功。
+三基线优先，效果和最终选型待结果齐全后评判。首次请求与后续请求按序号保留。</p>
+<a href="manifest.json">环境、模型身份和完整矩阵</a></div>
+<section><h2>观察与使用建议</h2><ul><li>历史输入诊断，包含1280×720、无节奏吞吐和10Hz输入；不用于当前640×352、30fps目标结论。当前目标结果见两级上目录results.md。</li><li>旧矩阵的CPU候选不是严格同源同精度硬件对照；runtime2.2视觉案例在初始化失败，未执行推理。</li></ul><details><summary>更多现象、失败原因与解释边界</summary><ul></ul></details></section><section><h2>YOLO 固定图像回放</h2><p>复用实际 RKNN/RGA 推理与后处理；不含相机、ROS 传输、标注和图像编码。最新帧调度与 ROS 双队列并非同一流程。带 ros 标识的配置运行真实节点，包含 DDS、双队列、绘图和检测发布，处理 p95 对应端到端时延；仍不含相机采集与 MJPEG 解码。p95 为本轮样本分位数，不能代替长期稳定性验证。</p><div class='scroll'><table><tr><th>配置</th><th>完成 FPS</th><th>处理/输入</th><th>丢帧</th><th>推理均值 ms</th><th>后处理均值 ms</th><th>整帧 p95 ms</th><th>输入到完成 p95 ms</th></tr><tr><td>yolo-asr-npu-a</td><td>26.79</td><td>536/600</td><td>64</td><td>36.83</td><td>0.29</td><td>40.81</td><td>69.07</td></tr><tr><td>yolo-asr-npu-b</td><td>26.93</td><td>539/600</td><td>61</td><td>36.63</td><td>0.28</td><td>40.14</td><td>68.83</td></tr><tr><td>yolo-cpu-ort-t1</td><td>0.83</td><td>24/24</td><td>0</td><td>1203.01</td><td>0.67</td><td>1290.19</td><td>1290.19</td></tr><tr><td>yolo-cpu-ort-t2</td><td>1.48</td><td>24/24</td><td>0</td><td>674.57</td><td>0.69</td><td>683.43</td><td>683.43</td></tr><tr><td>yolo-cpu-ort-t2-30fps</td><td>1.46</td><td>15/300</td><td>285</td><td>680.80</td><td>0.68</td><td>717.83</td><td>736.36</td></tr><tr><td>yolo-cpu-ort-t4</td><td>1.90</td><td>24/24</td><td>0</td><td>523.67</td><td>0.69</td><td>553.68</td><td>553.68</td></tr><tr><td>yolo-cpu-ort-t4-30fps</td><td>1.89</td><td>19/300</td><td>281</td><td>526.64</td><td>0.67</td><td>566.97</td><td>587.98</td></tr><tr><td>yolo-npu-10fps</td><td>10.00</td><td>100/100</td><td>0</td><td>35.02</td><td>0.25</td><td>43.96</td><td>44.13</td></tr><tr><td>yolo-npu-30fps-a</td><td>29.47</td><td>443/450</td><td>7</td><td>33.50</td><td>0.24</td><td>35.50</td><td>64.54</td></tr><tr><td>yolo-npu-30fps-b</td><td>29.62</td><td>445/450</td><td>5</td><td>33.34</td><td>0.23</td><td>34.66</td><td>64.62</td></tr><tr><td>yolo-npu-conf50</td><td>29.63</td><td>240/240</td><td>0</td><td>33.41</td><td>0.15</td><td>35.71</td><td>35.71</td></tr><tr><td>yolo-npu-native-size</td><td>40.46</td><td>240/240</td><td>0</td><td>24.31</td><td>0.20</td><td>24.95</td><td>24.95</td></tr><tr><td>yolo-npu-native-size-30fps</td><td>29.80</td><td>298/300</td><td>2</td><td>24.95</td><td>0.20</td><td>26.43</td><td>27.73</td></tr><tr><td>yolo-npu-throughput</td><td>29.68</td><td>240/240</td><td>0</td><td>33.26</td><td>0.23</td><td>34.17</td><td>34.17</td></tr><tr><td>yolo-ros-10fps-asr-npu</td><td>10.00</td><td>200/200</td><td>0</td><td>—</td><td>—</td><td>61.48</td><td>61.48</td></tr><tr><td>yolo-ros-30fps</td><td>27.03</td><td>272/300</td><td>28</td><td>—</td><td>—</td><td>115.03</td><td>115.03</td></tr><tr><td>yolo-ros-annotated-30fps</td><td>25.39</td><td>256/300</td><td>44</td><td>—</td><td>—</td><td>116.95</td><td>116.95</td></tr><tr><td>yolo-ros-asr-cpu</td><td>24.48</td><td>491/600</td><td>109</td><td>—</td><td>—</td><td>121.29</td><td>121.29</td></tr><tr><td>yolo-ros-asr-npu</td><td>23.72</td><td>476/600</td><td>124</td><td>—</td><td>—</td><td>122.80</td><td>122.80</td></tr><tr><td>yolo-ros-native-30fps</td><td>30.00</td><td>300/300</td><td>0</td><td>—</td><td>—</td><td>57.58</td><td>57.58</td></tr><tr><td>yolo-ros-native-asr-npu</td><td>29.99</td><td>600/600</td><td>0</td><td>—</td><td>—</td><td>38.50</td><td>38.50</td></tr></table></div></section><div class="panel scroll"><table><tr><th>配置</th><th>状态</th><th>完成例</th>
+<th>加载 s</th><th>逐例计算 s</th><th>逐例 RTF</th><th>TTFT s</th>
+<th>生成 token/s</th><th>RSS MiB</th><th>PSS MiB</th><th>Swap MiB</th>
+<th>进程墙钟 s</th><th>平均CPU 含启动</th></tr><tr><td><a href='#asr-cpu-yolo-control'>asr-cpu-yolo-control</a></td><td>ok</td><td>2</td><td>—</td><td>2.900, 4.200</td><td>0.290, 0.420</td><td>—</td><td>—</td><td>148.6</td><td>142.0</td><td>0.0</td><td>22.3</td><td>161%</td></tr><tr><td><a href='#asr-npu-yolo-control'>asr-npu-yolo-control</a></td><td>ok</td><td>4</td><td>—</td><td>3.100, 3.200, 3.100, 3.200</td><td>0.310, 0.320, 0.310, 0.320</td><td>—</td><td>—</td><td>219.0</td><td>212.2</td><td>0.0</td><td>18.8</td><td>75%</td></tr><tr><td><a href='#yolo-asr-npu-a'>yolo-asr-npu-a</a></td><td>ok</td><td>5</td><td>0.063</td><td>20.009, 4.800, 4.700, 4.700, 3.100</td><td>0.470, 0.460, 0.460, 0.310</td><td>—</td><td>—</td><td>306.4</td><td>283.2</td><td>0.0</td><td>25.2</td><td>111%</td></tr><tr><td><a href='#yolo-asr-npu-b'>yolo-asr-npu-b</a></td><td>ok</td><td>5</td><td>0.062</td><td>20.012, 4.600, 4.600, 4.600, 3.200</td><td>0.450, 0.460, 0.460, 0.320</td><td>—</td><td>—</td><td>306.4</td><td>283.0</td><td>0.0</td><td>24.9</td><td>112%</td></tr><tr><td><a href='#yolo-cpu-ort-t1'>yolo-cpu-ort-t1</a></td><td>ok</td><td>1</td><td>0.151</td><td>28.916</td><td>—</td><td>—</td><td>—</td><td>109.1</td><td>103.4</td><td>0.0</td><td>34.2</td><td>99%</td></tr><tr><td><a href='#yolo-cpu-ort-t2'>yolo-cpu-ort-t2</a></td><td>ok</td><td>1</td><td>0.150</td><td>16.235</td><td>—</td><td>—</td><td>—</td><td>109.4</td><td>103.7</td><td>0.0</td><td>19.7</td><td>191%</td></tr><tr><td><a href='#yolo-cpu-ort-t2-30fps'>yolo-cpu-ort-t2-30fps</a></td><td>ok</td><td>1</td><td>0.151</td><td>10.240</td><td>—</td><td>—</td><td>—</td><td>109.4</td><td>103.8</td><td>0.0</td><td>13.8</td><td>186%</td></tr><tr><td><a href='#yolo-cpu-ort-t4'>yolo-cpu-ort-t4</a></td><td>ok</td><td>1</td><td>0.156</td><td>12.612</td><td>—</td><td>—</td><td>—</td><td>109.6</td><td>103.9</td><td>0.0</td><td>15.8</td><td>356%</td></tr><tr><td><a href='#yolo-cpu-ort-t4-30fps'>yolo-cpu-ort-t4-30fps</a></td><td>ok</td><td>1</td><td>0.153</td><td>10.041</td><td>—</td><td>—</td><td>—</td><td>109.6</td><td>103.9</td><td>0.0</td><td>13.4</td><td>346%</td></tr><tr><td><a href='#yolo-npu-10fps'>yolo-npu-10fps</a></td><td>ok</td><td>1</td><td>0.060</td><td>10.000</td><td>—</td><td>—</td><td>—</td><td>72.4</td><td>64.2</td><td>0.0</td><td>11.2</td><td>26%</td></tr><tr><td><a href='#yolo-npu-30fps-a'>yolo-npu-30fps-a</a></td><td>ok</td><td>1</td><td>0.061</td><td>15.033</td><td>—</td><td>—</td><td>—</td><td>72.5</td><td>64.3</td><td>0.0</td><td>16.4</td><td>55%</td></tr><tr><td><a href='#yolo-npu-30fps-b'>yolo-npu-30fps-b</a></td><td>ok</td><td>1</td><td>0.062</td><td>15.025</td><td>—</td><td>—</td><td>—</td><td>72.4</td><td>64.2</td><td>0.0</td><td>16.3</td><td>55%</td></tr><tr><td><a href='#yolo-npu-conf50'>yolo-npu-conf50</a></td><td>ok</td><td>1</td><td>0.061</td><td>8.100</td><td>—</td><td>—</td><td>—</td><td>72.5</td><td>64.3</td><td>0.0</td><td>9.5</td><td>56%</td></tr><tr><td><a href='#yolo-npu-native-size'>yolo-npu-native-size</a></td><td>ok</td><td>1</td><td>0.060</td><td>5.931</td><td>—</td><td>—</td><td>—</td><td>70.4</td><td>62.1</td><td>0.0</td><td>7.1</td><td>49%</td></tr><tr><td><a href='#yolo-npu-native-size-30fps'>yolo-npu-native-size-30fps</a></td><td>ok</td><td>1</td><td>0.060</td><td>10.000</td><td>—</td><td>—</td><td>—</td><td>70.2</td><td>62.0</td><td>0.0</td><td>11.2</td><td>38%</td></tr><tr><td><a href='#yolo-npu-runtime22'>yolo-npu-runtime22</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>65.0</td><td>56.2</td><td>0.0</td><td>2.2</td><td>37%</td></tr><tr><td><a href='#yolo-npu-throughput'>yolo-npu-throughput</a></td><td>ok</td><td>1</td><td>0.061</td><td>8.086</td><td>—</td><td>—</td><td>—</td><td>72.4</td><td>64.1</td><td>0.0</td><td>9.3</td><td>56%</td></tr><tr><td><a href='#yolo-ros-10fps-asr-npu'>yolo-ros-10fps-asr-npu</a></td><td>ok</td><td>5</td><td>0.425</td><td>20.000, 3.600, 3.600, 3.600, 3.500</td><td>0.360, 0.360, 0.360, 0.350</td><td>—</td><td>—</td><td>335.7</td><td>312.4</td><td>0.0</td><td>24.2</td><td>108%</td></tr><tr><td><a href='#yolo-ros-30fps'>yolo-ros-30fps</a></td><td>ok</td><td>1</td><td>0.429</td><td>10.061</td><td>—</td><td>—</td><td>—</td><td>119.9</td><td>111.5</td><td>0.0</td><td>13.7</td><td>80%</td></tr><tr><td><a href='#yolo-ros-annotated-30fps'>yolo-ros-annotated-30fps</a></td><td>ok</td><td>1</td><td>0.416</td><td>10.082</td><td>—</td><td>—</td><td>—</td><td>125.0</td><td>116.7</td><td>0.0</td><td>13.8</td><td>95%</td></tr><tr><td><a href='#yolo-ros-asr-cpu'>yolo-ros-asr-cpu</a></td><td>ok</td><td>3</td><td>0.442</td><td>20.060, 4.700, 2.900</td><td>0.470, 0.290</td><td>—</td><td>—</td><td>275.9</td><td>253.1</td><td>0.0</td><td>29.4</td><td>217%</td></tr><tr><td><a href='#yolo-ros-asr-npu'>yolo-ros-asr-npu</a></td><td>ok</td><td>5</td><td>0.451</td><td>20.066, 5.400, 5.300, 5.200, 3.000</td><td>0.530, 0.530, 0.520, 0.300</td><td>—</td><td>—</td><td>353.6</td><td>330.3</td><td>0.0</td><td>27.6</td><td>146%</td></tr><tr><td><a href='#yolo-ros-native-30fps'>yolo-ros-native-30fps</a></td><td>ok</td><td>1</td><td>0.313</td><td>10.000</td><td>—</td><td>—</td><td>—</td><td>90.2</td><td>81.9</td><td>0.0</td><td>13.6</td><td>50%</td></tr><tr><td><a href='#yolo-ros-native-asr-npu'>yolo-ros-native-asr-npu</a></td><td>ok</td><td>5</td><td>0.327</td><td>20.007, 5.000, 4.900, 5.100, 3.000</td><td>0.500, 0.490, 0.510, 0.300</td><td>—</td><td>—</td><td>325.2</td><td>301.7</td><td>0.0</td><td>26.5</td><td>113%</td></tr></table></div><section id='asr-cpu-yolo-control'><h2>asr-cpu-yolo-control</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-cpu-yolo-control&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 45,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 2.9,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.29,
+  &quot;wall_seconds&quot;: 10.16899678000118,
+  &quot;start_monotonic&quot;: 10207.53311954,
+  &quot;end_monotonic&quot;: 10217.70211632,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.2,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.42,
+  &quot;wall_seconds&quot;: 11.563589960000172,
+  &quot;start_monotonic&quot;: 10217.70692527,
+  &quot;end_monotonic&quot;: 10229.27051523,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre></details><p><a href='asr-cpu-yolo-control/stderr.log'>错误日志</a> · <a href='asr-cpu-yolo-control/resources.jsonl'>资源时间序列</a> · <a href='asr-cpu-yolo-control/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-cpu-yolo-control/0-native.log'>0-native.log</a> · <a href='asr-cpu-yolo-control/1-native.log'>1-native.log</a> · <a href='asr-cpu-yolo-control/stderr.log'>stderr.log</a> · <a href='asr-cpu-yolo-control/stdout.log'>stdout.log</a></p></section><section id='asr-npu-yolo-control'><h2>asr-npu-yolo-control</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-npu-yolo-control&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 60,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.1,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.31,
+  &quot;wall_seconds&quot;: 4.502932764000434,
+  &quot;start_monotonic&quot;: 10031.247959391,
+  &quot;end_monotonic&quot;: 10035.750892155,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.2,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.32,
+  &quot;wall_seconds&quot;: 4.59416660900024,
+  &quot;start_monotonic&quot;: 10035.756084351,
+  &quot;end_monotonic&quot;: 10040.35025096,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.1,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.31,
+  &quot;wall_seconds&quot;: 4.477067742000145,
+  &quot;start_monotonic&quot;: 10040.35342951,
+  &quot;end_monotonic&quot;: 10044.830497252,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 3,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.2,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.32,
+  &quot;wall_seconds&quot;: 4.55870439300088,
+  &quot;start_monotonic&quot;: 10044.833102392,
+  &quot;end_monotonic&quot;: 10049.391806785,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre></details><p><a href='asr-npu-yolo-control/stderr.log'>错误日志</a> · <a href='asr-npu-yolo-control/resources.jsonl'>资源时间序列</a> · <a href='asr-npu-yolo-control/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-npu-yolo-control/0-native.log'>0-native.log</a> · <a href='asr-npu-yolo-control/1-native.log'>1-native.log</a> · <a href='asr-npu-yolo-control/2-native.log'>2-native.log</a> · <a href='asr-npu-yolo-control/3-native.log'>3-native.log</a> · <a href='asr-npu-yolo-control/stderr.log'>stderr.log</a> · <a href='asr-npu-yolo-control/stdout.log'>stdout.log</a></p></section><section id='yolo-asr-npu-a'><h2>yolo-asr-npu-a</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-asr-npu-a&quot;,
+  &quot;kind&quot;: &quot;vision_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 65,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;vision&quot;,
+      &quot;kind&quot;: &quot;yolo&quot;,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+      &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+      &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+      &quot;width&quot;: 1280,
+      &quot;height&quot;: 720,
+      &quot;frames&quot;: 600,
+      &quot;fps&quot;: 30,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 40,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+      },
+      &quot;confidence&quot;: 0.3
+    },
+    {
+      &quot;id&quot;: &quot;asr-npu-active&quot;,
+      &quot;kind&quot;: &quot;native_asr&quot;,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 60,
+      &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+      },
+      &quot;command&quot;: [
+        &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+        &quot;--provider=rknn&quot;,
+        &quot;--num-threads=1&quot;,
+        &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+        &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+        &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+        &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+      ],
+      &quot;wavs&quot;: [
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+      ]
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 65,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 20.009024103,
+  &quot;processed&quot;: 536,
+  &quot;dropped&quot;: 64,
+  &quot;offered_frames&quot;: 600,
+  &quot;fps&quot;: 26.78791315562643,
+  &quot;offered_fps&quot;: 30,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;vision&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.8,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.47,
+  &quot;wall_seconds&quot;: 6.267940513000212,
+  &quot;start_monotonic&quot;: 10051.320322919,
+  &quot;end_monotonic&quot;: 10057.588263432,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.7,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.46,
+  &quot;wall_seconds&quot;: 6.153307079001024,
+  &quot;start_monotonic&quot;: 10057.593516877,
+  &quot;end_monotonic&quot;: 10063.746823956,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 1,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 3,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.7,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.46,
+  &quot;wall_seconds&quot;: 6.167788761998963,
+  &quot;start_monotonic&quot;: 10063.749721926,
+  &quot;end_monotonic&quot;: 10069.917510688,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 2,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 4,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.1,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.31,
+  &quot;wall_seconds&quot;: 4.5721807119989535,
+  &quot;start_monotonic&quot;: 10069.921510271,
+  &quot;end_monotonic&quot;: 10074.493690983,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 3,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre></details><p><a href='yolo-asr-npu-a/stderr.log'>错误日志</a> · <a href='yolo-asr-npu-a/resources.jsonl'>资源时间序列</a> · <a href='yolo-asr-npu-a/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-asr-npu-a/stderr.log'>stderr.log</a> · <a href='yolo-asr-npu-a/stdout.log'>stdout.log</a></p></section><section id='yolo-asr-npu-b'><h2>yolo-asr-npu-b</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-asr-npu-b&quot;,
+  &quot;kind&quot;: &quot;vision_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 65,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;vision&quot;,
+      &quot;kind&quot;: &quot;yolo&quot;,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+      &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+      &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+      &quot;width&quot;: 1280,
+      &quot;height&quot;: 720,
+      &quot;frames&quot;: 600,
+      &quot;fps&quot;: 30,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 40,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+      },
+      &quot;confidence&quot;: 0.3
+    },
+    {
+      &quot;id&quot;: &quot;asr-npu-active&quot;,
+      &quot;kind&quot;: &quot;native_asr&quot;,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 60,
+      &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+      },
+      &quot;command&quot;: [
+        &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+        &quot;--provider=rknn&quot;,
+        &quot;--num-threads=1&quot;,
+        &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+        &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+        &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+        &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+      ],
+      &quot;wavs&quot;: [
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+      ]
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 65,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 20.012431609,
+  &quot;processed&quot;: 539,
+  &quot;dropped&quot;: 61,
+  &quot;offered_frames&quot;: 600,
+  &quot;fps&quot;: 26.93325881286713,
+  &quot;offered_fps&quot;: 30,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;vision&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.6,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.45,
+  &quot;wall_seconds&quot;: 6.06015292200027,
+  &quot;start_monotonic&quot;: 10077.120021117,
+  &quot;end_monotonic&quot;: 10083.180174039,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.6,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.46,
+  &quot;wall_seconds&quot;: 6.074640728998929,
+  &quot;start_monotonic&quot;: 10083.185506817,
+  &quot;end_monotonic&quot;: 10089.260147546,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 1,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 3,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.6,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.46,
+  &quot;wall_seconds&quot;: 6.139974259000155,
+  &quot;start_monotonic&quot;: 10089.262895309,
+  &quot;end_monotonic&quot;: 10095.402869568,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 2,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 4,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.2,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.32,
+  &quot;wall_seconds&quot;: 4.695646596001097,
+  &quot;start_monotonic&quot;: 10095.406808486,
+  &quot;end_monotonic&quot;: 10100.102455082,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 3,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre></details><p><a href='yolo-asr-npu-b/stderr.log'>错误日志</a> · <a href='yolo-asr-npu-b/resources.jsonl'>资源时间序列</a> · <a href='yolo-asr-npu-b/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-asr-npu-b/stderr.log'>stderr.log</a> · <a href='yolo-asr-npu-b/stdout.log'>stdout.log</a></p></section><section id='yolo-cpu-ort-t1'><h2>yolo-cpu-ort-t1</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-cpu-ort-t1&quot;,
+  &quot;kind&quot;: &quot;yolo_cpu&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 24,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 50,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;decoder&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/libyolo_postprocess.so&quot;,
+  &quot;requested_timeout_seconds&quot;: 50,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;seconds&quot;: 28.91582928599928,
+  &quot;processed&quot;: 24,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 24,
+  &quot;fps&quot;: 0.8299952168973598,
+  &quot;offered_fps&quot;: 0
+}</pre></details><p><a href='yolo-cpu-ort-t1/stderr.log'>错误日志</a> · <a href='yolo-cpu-ort-t1/resources.jsonl'>资源时间序列</a> · <a href='yolo-cpu-ort-t1/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-cpu-ort-t1/stderr.log'>stderr.log</a> · <a href='yolo-cpu-ort-t1/stdout.log'>stdout.log</a></p></section><section id='yolo-cpu-ort-t2'><h2>yolo-cpu-ort-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-cpu-ort-t2&quot;,
+  &quot;kind&quot;: &quot;yolo_cpu&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 24,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 50,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;decoder&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/libyolo_postprocess.so&quot;,
+  &quot;requested_timeout_seconds&quot;: 50,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;seconds&quot;: 16.2347945599995,
+  &quot;processed&quot;: 24,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 24,
+  &quot;fps&quot;: 1.4783063568376156,
+  &quot;offered_fps&quot;: 0
+}</pre></details><p><a href='yolo-cpu-ort-t2/stderr.log'>错误日志</a> · <a href='yolo-cpu-ort-t2/resources.jsonl'>资源时间序列</a> · <a href='yolo-cpu-ort-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-cpu-ort-t2/stderr.log'>stderr.log</a> · <a href='yolo-cpu-ort-t2/stdout.log'>stdout.log</a></p></section><section id='yolo-cpu-ort-t2-30fps'><h2>yolo-cpu-ort-t2-30fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-cpu-ort-t2-30fps&quot;,
+  &quot;kind&quot;: &quot;yolo_cpu&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 300,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 35,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;decoder&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/libyolo_postprocess.so&quot;,
+  &quot;requested_timeout_seconds&quot;: 35,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;seconds&quot;: 10.240425787998902,
+  &quot;processed&quot;: 15,
+  &quot;dropped&quot;: 285,
+  &quot;offered_frames&quot;: 300,
+  &quot;fps&quot;: 1.4647828430707444,
+  &quot;offered_fps&quot;: 30
+}</pre></details><p><a href='yolo-cpu-ort-t2-30fps/stderr.log'>错误日志</a> · <a href='yolo-cpu-ort-t2-30fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-cpu-ort-t2-30fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-cpu-ort-t2-30fps/stderr.log'>stderr.log</a> · <a href='yolo-cpu-ort-t2-30fps/stdout.log'>stdout.log</a></p></section><section id='yolo-cpu-ort-t4'><h2>yolo-cpu-ort-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-cpu-ort-t4&quot;,
+  &quot;kind&quot;: &quot;yolo_cpu&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 24,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 50,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;decoder&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/libyolo_postprocess.so&quot;,
+  &quot;requested_timeout_seconds&quot;: 50,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;seconds&quot;: 12.612222525000107,
+  &quot;processed&quot;: 24,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 24,
+  &quot;fps&quot;: 1.9029159969566742,
+  &quot;offered_fps&quot;: 0
+}</pre></details><p><a href='yolo-cpu-ort-t4/stderr.log'>错误日志</a> · <a href='yolo-cpu-ort-t4/resources.jsonl'>资源时间序列</a> · <a href='yolo-cpu-ort-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-cpu-ort-t4/stderr.log'>stderr.log</a> · <a href='yolo-cpu-ort-t4/stdout.log'>stdout.log</a></p></section><section id='yolo-cpu-ort-t4-30fps'><h2>yolo-cpu-ort-t4-30fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-cpu-ort-t4-30fps&quot;,
+  &quot;kind&quot;: &quot;yolo_cpu&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 300,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 35,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;decoder&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/libyolo_postprocess.so&quot;,
+  &quot;requested_timeout_seconds&quot;: 35,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;seconds&quot;: 10.041155357999742,
+  &quot;processed&quot;: 19,
+  &quot;dropped&quot;: 281,
+  &quot;offered_frames&quot;: 300,
+  &quot;fps&quot;: 1.8922125315851017,
+  &quot;offered_fps&quot;: 30
+}</pre></details><p><a href='yolo-cpu-ort-t4-30fps/stderr.log'>错误日志</a> · <a href='yolo-cpu-ort-t4-30fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-cpu-ort-t4-30fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-cpu-ort-t4-30fps/stderr.log'>stderr.log</a> · <a href='yolo-cpu-ort-t4-30fps/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-10fps'><h2>yolo-npu-10fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-10fps&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 100,
+  &quot;fps&quot;: 10,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 10.000105118,
+  &quot;processed&quot;: 100,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 100,
+  &quot;fps&quot;: 9.999894883104968,
+  &quot;offered_fps&quot;: 10
+}</pre></details><p><a href='yolo-npu-10fps/stderr.log'>错误日志</a> · <a href='yolo-npu-10fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-10fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-10fps/stderr.log'>stderr.log</a> · <a href='yolo-npu-10fps/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-30fps-a'><h2>yolo-npu-30fps-a</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-30fps-a&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 450,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 15.032928628,
+  &quot;processed&quot;: 443,
+  &quot;dropped&quot;: 7,
+  &quot;offered_frames&quot;: 450,
+  &quot;fps&quot;: 29.4686425354856,
+  &quot;offered_fps&quot;: 30
+}</pre></details><p><a href='yolo-npu-30fps-a/stderr.log'>错误日志</a> · <a href='yolo-npu-30fps-a/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-30fps-a/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-30fps-a/stderr.log'>stderr.log</a> · <a href='yolo-npu-30fps-a/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-30fps-b'><h2>yolo-npu-30fps-b</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-30fps-b&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 450,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 15.025425873,
+  &quot;processed&quot;: 445,
+  &quot;dropped&quot;: 5,
+  &quot;offered_frames&quot;: 450,
+  &quot;fps&quot;: 29.61646503475449,
+  &quot;offered_fps&quot;: 30
+}</pre></details><p><a href='yolo-npu-30fps-b/stderr.log'>错误日志</a> · <a href='yolo-npu-30fps-b/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-30fps-b/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-30fps-b/stderr.log'>stderr.log</a> · <a href='yolo-npu-30fps-b/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-conf50'><h2>yolo-npu-conf50</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-conf50&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 240,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.5,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 8.099930565,
+  &quot;processed&quot;: 240,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 240,
+  &quot;fps&quot;: 29.62988362357647,
+  &quot;offered_fps&quot;: 0
+}</pre></details><p><a href='yolo-npu-conf50/stderr.log'>错误日志</a> · <a href='yolo-npu-conf50/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-conf50/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-conf50/stderr.log'>stderr.log</a> · <a href='yolo-npu-conf50/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-native-size'><h2>yolo-npu-native-size</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-native-size&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 640,
+  &quot;height&quot;: 352,
+  &quot;frames&quot;: 240,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 5.931393634,
+  &quot;processed&quot;: 240,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 240,
+  &quot;fps&quot;: 40.46266607973367,
+  &quot;offered_fps&quot;: 0
+}</pre></details><p><a href='yolo-npu-native-size/stderr.log'>错误日志</a> · <a href='yolo-npu-native-size/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-native-size/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-native-size/stderr.log'>stderr.log</a> · <a href='yolo-npu-native-size/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-native-size-30fps'><h2>yolo-npu-native-size-30fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-native-size-30fps&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 640,
+  &quot;height&quot;: 352,
+  &quot;frames&quot;: 300,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 10.000109368,
+  &quot;processed&quot;: 298,
+  &quot;dropped&quot;: 2,
+  &quot;offered_frames&quot;: 300,
+  &quot;fps&quot;: 29.79967408692444,
+  &quot;offered_fps&quot;: 30
+}</pre></details><p><a href='yolo-npu-native-size-30fps/stderr.log'>错误日志</a> · <a href='yolo-npu-native-size-30fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-native-size-30fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-native-size-30fps/stderr.log'>stderr.log</a> · <a href='yolo-npu-native-size-30fps/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-runtime22'><h2>yolo-npu-runtime22</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-runtime22&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 240,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='yolo-npu-runtime22/stderr.log'>错误日志</a> · <a href='yolo-npu-runtime22/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-runtime22/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-runtime22/stderr.log'>stderr.log</a> · <a href='yolo-npu-runtime22/stdout.log'>stdout.log</a></p></section><section id='yolo-npu-throughput'><h2>yolo-npu-throughput</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-npu-throughput&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 240,
+  &quot;fps&quot;: 0,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;
+  },
+  &quot;confidence&quot;: 0.3,
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;fixed image replay&quot;,
+  &quot;seconds&quot;: 8.085734421,
+  &quot;processed&quot;: 240,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 240,
+  &quot;fps&quot;: 29.68190488382601,
+  &quot;offered_fps&quot;: 0
+}</pre></details><p><a href='yolo-npu-throughput/stderr.log'>错误日志</a> · <a href='yolo-npu-throughput/resources.jsonl'>资源时间序列</a> · <a href='yolo-npu-throughput/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-npu-throughput/stderr.log'>stderr.log</a> · <a href='yolo-npu-throughput/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-10fps-asr-npu'><h2>yolo-ros-10fps-asr-npu</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-10fps-asr-npu&quot;,
+  &quot;kind&quot;: &quot;vision_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 65,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;vision&quot;,
+      &quot;kind&quot;: &quot;yolo&quot;,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+      &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+      &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+      &quot;width&quot;: 1280,
+      &quot;height&quot;: 720,
+      &quot;frames&quot;: 200,
+      &quot;fps&quot;: 10,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 40,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+        &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+        &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;
+      }
+    },
+    {
+      &quot;id&quot;: &quot;asr-npu-active&quot;,
+      &quot;kind&quot;: &quot;native_asr&quot;,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 60,
+      &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+      },
+      &quot;command&quot;: [
+        &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+        &quot;--provider=rknn&quot;,
+        &quot;--num-threads=1&quot;,
+        &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+        &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+        &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+        &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+      ],
+      &quot;wavs&quot;: [
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+      ]
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 65,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 20,
+  &quot;processed&quot;: 200,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 200,
+  &quot;sent_frames&quot;: 200,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 10,
+  &quot;offered_fps&quot;: 10,
+  &quot;annotated_subscriber&quot;: false,
+  &quot;annotated_received_including_warmup&quot;: 0,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;vision&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.6,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.36,
+  &quot;wall_seconds&quot;: 5.127109864000886,
+  &quot;start_monotonic&quot;: 10271.406316686,
+  &quot;end_monotonic&quot;: 10276.53342655,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.6,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.36,
+  &quot;wall_seconds&quot;: 5.052621012999225,
+  &quot;start_monotonic&quot;: 10276.539230365,
+  &quot;end_monotonic&quot;: 10281.591851378,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 1,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 3,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.6,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.36,
+  &quot;wall_seconds&quot;: 5.100365184000111,
+  &quot;start_monotonic&quot;: 10281.59446935,
+  &quot;end_monotonic&quot;: 10286.694834534,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 2,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 4,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.5,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.35,
+  &quot;wall_seconds&quot;: 4.970172368999556,
+  &quot;start_monotonic&quot;: 10286.697582297,
+  &quot;end_monotonic&quot;: 10291.667754666,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 3,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre></details><p><a href='yolo-ros-10fps-asr-npu/stderr.log'>错误日志</a> · <a href='yolo-ros-10fps-asr-npu/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-10fps-asr-npu/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-10fps-asr-npu/stderr.log'>stderr.log</a> · <a href='yolo-ros-10fps-asr-npu/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-30fps'><h2>yolo-ros-30fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-30fps&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 300,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+    &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+    &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;
+  },
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 10.06148752199988,
+  &quot;processed&quot;: 272,
+  &quot;dropped&quot;: 28,
+  &quot;offered_frames&quot;: 300,
+  &quot;sent_frames&quot;: 300,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 27.03377601028279,
+  &quot;offered_fps&quot;: 30,
+  &quot;annotated_subscriber&quot;: false,
+  &quot;annotated_received_including_warmup&quot;: 0
+}</pre></details><p><a href='yolo-ros-30fps/stderr.log'>错误日志</a> · <a href='yolo-ros-30fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-30fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-30fps/stderr.log'>stderr.log</a> · <a href='yolo-ros-30fps/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-annotated-30fps'><h2>yolo-ros-annotated-30fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-annotated-30fps&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 1280,
+  &quot;height&quot;: 720,
+  &quot;frames&quot;: 300,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+    &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+    &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;,
+    &quot;YOLO_BENCH_ANNOTATED&quot;: &quot;1&quot;
+  },
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 10.08150527199905,
+  &quot;processed&quot;: 256,
+  &quot;dropped&quot;: 44,
+  &quot;offered_frames&quot;: 300,
+  &quot;sent_frames&quot;: 300,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 25.39303339066132,
+  &quot;offered_fps&quot;: 30,
+  &quot;annotated_subscriber&quot;: true,
+  &quot;annotated_received_including_warmup&quot;: 259
+}</pre></details><p><a href='yolo-ros-annotated-30fps/stderr.log'>错误日志</a> · <a href='yolo-ros-annotated-30fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-annotated-30fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-annotated-30fps/stderr.log'>stderr.log</a> · <a href='yolo-ros-annotated-30fps/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-asr-cpu'><h2>yolo-ros-asr-cpu</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-asr-cpu&quot;,
+  &quot;kind&quot;: &quot;vision_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 65,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;vision&quot;,
+      &quot;kind&quot;: &quot;yolo&quot;,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+      &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+      &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+      &quot;width&quot;: 1280,
+      &quot;height&quot;: 720,
+      &quot;frames&quot;: 600,
+      &quot;fps&quot;: 30,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 40,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+        &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+        &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;
+      }
+    },
+    {
+      &quot;id&quot;: &quot;asr-cpu-active&quot;,
+      &quot;kind&quot;: &quot;native_asr&quot;,
+      &quot;threads&quot;: 2,
+      &quot;timeout&quot;: 45,
+      &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+      },
+      &quot;command&quot;: [
+        &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+        &quot;--provider=cpu&quot;,
+        &quot;--num-threads=2&quot;,
+        &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+        &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+        &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+        &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+      ],
+      &quot;wavs&quot;: [
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+      ]
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 65,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 20.06012444699991,
+  &quot;processed&quot;: 491,
+  &quot;dropped&quot;: 109,
+  &quot;offered_frames&quot;: 600,
+  &quot;sent_frames&quot;: 600,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 24.47641844382633,
+  &quot;offered_fps&quot;: 30,
+  &quot;annotated_subscriber&quot;: false,
+  &quot;annotated_received_including_warmup&quot;: 0,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;vision&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.7,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.47,
+  &quot;wall_seconds&quot;: 15.687937782000517,
+  &quot;start_monotonic&quot;: 10159.692283724,
+  &quot;end_monotonic&quot;: 10175.380221506,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;asr-cpu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 2.9,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.29,
+  &quot;wall_seconds&quot;: 11.578759093999906,
+  &quot;start_monotonic&quot;: 10175.388252464,
+  &quot;end_monotonic&quot;: 10186.967011558,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 1,
+  &quot;module&quot;: &quot;asr-cpu-active&quot;
+}</pre></details><p><a href='yolo-ros-asr-cpu/stderr.log'>错误日志</a> · <a href='yolo-ros-asr-cpu/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-asr-cpu/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-asr-cpu/stderr.log'>stderr.log</a> · <a href='yolo-ros-asr-cpu/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-asr-npu'><h2>yolo-ros-asr-npu</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-asr-npu&quot;,
+  &quot;kind&quot;: &quot;vision_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 65,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;vision&quot;,
+      &quot;kind&quot;: &quot;yolo&quot;,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+      &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+      &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+      &quot;width&quot;: 1280,
+      &quot;height&quot;: 720,
+      &quot;frames&quot;: 600,
+      &quot;fps&quot;: 30,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 40,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+        &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+        &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;
+      }
+    },
+    {
+      &quot;id&quot;: &quot;asr-npu-active&quot;,
+      &quot;kind&quot;: &quot;native_asr&quot;,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 60,
+      &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+      },
+      &quot;command&quot;: [
+        &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+        &quot;--provider=rknn&quot;,
+        &quot;--num-threads=1&quot;,
+        &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+        &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+        &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+        &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+      ],
+      &quot;wavs&quot;: [
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+      ]
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 65,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 20.06594838700039,
+  &quot;processed&quot;: 476,
+  &quot;dropped&quot;: 124,
+  &quot;offered_frames&quot;: 600,
+  &quot;sent_frames&quot;: 600,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 23.72177934576837,
+  &quot;offered_fps&quot;: 30,
+  &quot;annotated_subscriber&quot;: false,
+  &quot;annotated_received_including_warmup&quot;: 0,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;vision&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 5.4,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.53,
+  &quot;wall_seconds&quot;: 7.05528620899895,
+  &quot;start_monotonic&quot;: 10131.680507588,
+  &quot;end_monotonic&quot;: 10138.735793797,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 5.3,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.53,
+  &quot;wall_seconds&quot;: 6.991196625000157,
+  &quot;start_monotonic&quot;: 10138.742413978,
+  &quot;end_monotonic&quot;: 10145.733610603,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 1,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 3,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 5.2,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.52,
+  &quot;wall_seconds&quot;: 6.798311586999262,
+  &quot;start_monotonic&quot;: 10145.738092014,
+  &quot;end_monotonic&quot;: 10152.536403601,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 2,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 4,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.0,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.3,
+  &quot;wall_seconds&quot;: 4.374356934000389,
+  &quot;start_monotonic&quot;: 10152.53959586,
+  &quot;end_monotonic&quot;: 10156.913952794,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 3,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre></details><p><a href='yolo-ros-asr-npu/stderr.log'>错误日志</a> · <a href='yolo-ros-asr-npu/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-asr-npu/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-asr-npu/stderr.log'>stderr.log</a> · <a href='yolo-ros-asr-npu/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-native-30fps'><h2>yolo-ros-native-30fps</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-native-30fps&quot;,
+  &quot;kind&quot;: &quot;yolo&quot;,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+  &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+  &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+  &quot;width&quot;: 640,
+  &quot;height&quot;: 352,
+  &quot;frames&quot;: 300,
+  &quot;fps&quot;: 30,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 40,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+    &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+    &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;
+  },
+  &quot;requested_timeout_seconds&quot;: 40,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 10,
+  &quot;processed&quot;: 300,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 300,
+  &quot;sent_frames&quot;: 300,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 30,
+  &quot;offered_fps&quot;: 30,
+  &quot;annotated_subscriber&quot;: false,
+  &quot;annotated_received_including_warmup&quot;: 0
+}</pre></details><p><a href='yolo-ros-native-30fps/stderr.log'>错误日志</a> · <a href='yolo-ros-native-30fps/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-native-30fps/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-native-30fps/stderr.log'>stderr.log</a> · <a href='yolo-ros-native-30fps/stdout.log'>stdout.log</a></p></section><section id='yolo-ros-native-asr-npu'><h2>yolo-ros-native-asr-npu</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;yolo-ros-native-asr-npu&quot;,
+  &quot;kind&quot;: &quot;vision_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 65,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;vision&quot;,
+      &quot;kind&quot;: &quot;yolo&quot;,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn&quot;,
+      &quot;labels&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt&quot;,
+      &quot;image&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg&quot;,
+      &quot;width&quot;: 640,
+      &quot;height&quot;: 352,
+      &quot;frames&quot;: 600,
+      &quot;fps&quot;: 30,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 40,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu&quot;,
+        &quot;ROS_DOMAIN_ID&quot;: &quot;177&quot;,
+        &quot;ROS_LOCALHOST_ONLY&quot;: &quot;1&quot;
+      }
+    },
+    {
+      &quot;id&quot;: &quot;asr-npu-active&quot;,
+      &quot;kind&quot;: &quot;native_asr&quot;,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 60,
+      &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;env&quot;: {
+        &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+      },
+      &quot;command&quot;: [
+        &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+        &quot;--provider=rknn&quot;,
+        &quot;--num-threads=1&quot;,
+        &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+        &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+        &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+        &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+      ],
+      &quot;wavs&quot;: [
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+        &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+      ]
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 65,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;scope&quot;: &quot;ros&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 20.00739807799982,
+  &quot;processed&quot;: 600,
+  &quot;dropped&quot;: 0,
+  &quot;offered_frames&quot;: 600,
+  &quot;sent_frames&quot;: 600,
+  &quot;source_skipped&quot;: 0,
+  &quot;fps&quot;: 29.98890698634928,
+  &quot;offered_fps&quot;: 30,
+  &quot;annotated_subscriber&quot;: false,
+  &quot;annotated_received_including_warmup&quot;: 0,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;vision&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 5.0,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.5,
+  &quot;wall_seconds&quot;: 6.5350466550007695,
+  &quot;start_monotonic&quot;: 10244.939387752,
+  &quot;end_monotonic&quot;: 10251.474434407,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 2,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 4.9,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.49,
+  &quot;wall_seconds&quot;: 6.46719694300009,
+  &quot;start_monotonic&quot;: 10251.480489636,
+  &quot;end_monotonic&quot;: 10257.947686579,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 1,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 3,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 5.1,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.51,
+  &quot;wall_seconds&quot;: 6.630021086000852,
+  &quot;start_monotonic&quot;: 10257.950763338,
+  &quot;end_monotonic&quot;: 10264.580784424,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 2,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 4,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.0,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.3,
+  &quot;wall_seconds&quot;: 4.412685618000978,
+  &quot;start_monotonic&quot;: 10264.583930308,
+  &quot;end_monotonic&quot;: 10268.996615926,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8,
+  &quot;source_index&quot;: 3,
+  &quot;module&quot;: &quot;asr-npu-active&quot;
+}</pre></details><p><a href='yolo-ros-native-asr-npu/stderr.log'>错误日志</a> · <a href='yolo-ros-native-asr-npu/resources.jsonl'>资源时间序列</a> · <a href='yolo-ros-native-asr-npu/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='yolo-ros-native-asr-npu/stderr.log'>stderr.log</a> · <a href='yolo-ros-native-asr-npu/stdout.log'>stdout.log</a></p></section></main></html>

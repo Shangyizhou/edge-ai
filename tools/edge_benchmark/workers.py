@@ -144,6 +144,8 @@ def request_json(url: str, data=None) -> dict:
 
 def native_asr(config: dict, output: Path) -> None:
     """使用官方 CLI 实测 RKNN 或 CPU，一次只解码一个文件。"""
+    (output / "ready").write_text("ready")
+    await_gate(config)
     for index, filename in enumerate(config["wavs"]):
         command = config["command"] + [filename]
         started = time.monotonic()
@@ -174,6 +176,8 @@ def native_asr(config: dict, output: Path) -> None:
                 "audio_seconds": float(match[2]),
                 "rtf": float(match[3]),
                 "wall_seconds": wall_seconds,
+                "start_monotonic": started,
+                "end_monotonic": started + wall_seconds,
                 "transcript": texts[-1]["text"] if texts else None,
                 "timing_precision": "official CLI, 2 significant digits",
                 "command": command,
@@ -559,6 +563,89 @@ def coexistence(config: dict, output: Path) -> None:
             log.close()
 
 
+def yolo(config: dict, output: Path) -> None:
+    """调用真实 RKNN/RGA 后端，保留逐帧耗时与检测输出。"""
+    command = [
+        config["binary"],
+        config["model"],
+        config["labels"],
+        config["image"],
+        str(output),
+        str(config["width"]),
+        str(config["height"]),
+        str(config["frames"]),
+        str(config.get("fps", 0)),
+        str(config.get("confidence", 0.3)),
+        str(config.get("nms", 0.3)),
+        str(config.get("threads", 1)),
+        config.get("gate_file", "-"),
+    ]
+    subprocess.run(command, check=True)
+
+
+def yolo_cpu(config: dict, output: Path) -> None:
+    """仅 CPU 视觉 worker 加载 ORT/OpenCV 和共享后处理适配器。"""
+    from yolo_cpu import run
+
+    run(config, output)
+
+
+def vision_asr(config: dict, output: Path) -> None:
+    """同时放行视觉与活跃 ASR，保留各进程的原始日志和事件。"""
+    gate = output / "start-gate"
+    children = []
+    logs = []
+    try:
+        for member in config["members"]:
+            directory = output / member["id"]
+            directory.mkdir()
+            child_config = dict(member, gate_file=str(gate))
+            path = directory / "config.json"
+            path.write_text(json.dumps(child_config))
+            log = (directory / "native.log").open("w")
+            logs.append(log)
+            env = dict(os.environ, **member.get("env", {}))
+            child = subprocess.Popen(
+                [sys.executable, __file__, str(path), str(directory)],
+                env=env,
+                stdout=log,
+                stderr=log,
+            )
+            children.append((member, directory, child))
+        # 1. YOLO 完成预热；native ASR 在门禁后加载，符合现有 CLI 合约。
+        while not all((d / "ready").exists() for _, d, _ in children):
+            for member, directory, child in children:
+                if child.poll() is not None:
+                    raise RuntimeError(member["id"] + " exited before gate")
+            time.sleep(0.01)
+        gate.write_text("start")
+        for member, directory, child in children:
+            if child.wait() != 0:
+                raise RuntimeError(member["id"] + " failed during overlap")
+    finally:
+        # 2. 即使子项失败，也合并已完成事件供复核。
+        index = 0
+        for member, directory, child in children:
+            if child.poll() is None:
+                child.terminate()
+                try:
+                    child.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    child.kill()
+                    child.wait()
+            events = directory / "events.jsonl"
+            if events.exists():
+                for line in events.read_text().splitlines():
+                    event = json.loads(line)
+                    if event["event"] == "sample":
+                        event.update(source_index=event["index"], index=index)
+                        index += 1
+                    event["module"] = member["id"]
+                    emit(output, event)
+        for log in logs:
+            log.close()
+
+
 def main() -> None:
     """单个子进程只运行一种 Adapter，便于独立计量和回收。"""
     parser = argparse.ArgumentParser()
@@ -573,6 +660,9 @@ def main() -> None:
         "native_asr": native_asr,
         "piper": piper,
         "coexistence": coexistence,
+        "yolo": yolo,
+        "yolo_cpu": yolo_cpu,
+        "vision_asr": vision_asr,
     }
     adapters[config["kind"]](config, args.output)
 

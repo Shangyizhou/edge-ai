@@ -1,0 +1,383 @@
+Loading checkpoint from /home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.pt
+/home/orangepi/code/robot/rknn_export/YOLOv6-0.3.0/yolov6/utils/checkpoint.py:25: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  ckpt = torch.load(weights, map_location=map_location)  # load
+
+Fusing model...
+Namespace(batch_size=1, conf_thres=0.4, device='cpu', dynamic_batch=False, end2end=False, half=False, img_size=[352, 640], inplace=False, iou_thres=0.45, ort=False, simplify=False, topk_all=100, trt_version=8, weights='/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.pt', with_preprocess=False)
+===================
+Model(
+  (backbone): EfficientRep(
+    (stem): RepVGGBlock(
+      (nonlinearity): ReLU(inplace=True)
+      (se): Identity()
+      (rbr_reparam): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    )
+    (ERBlock_2): Sequential(
+      (0): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      )
+      (1): RepBlock(
+        (conv1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (block): Sequential(
+          (0): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+        )
+      )
+    )
+    (ERBlock_3): Sequential(
+      (0): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      )
+      (1): RepBlock(
+        (conv1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (block): Sequential(
+          (0): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+          (1): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+          (2): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+        )
+      )
+    )
+    (ERBlock_4): Sequential(
+      (0): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      )
+      (1): RepBlock(
+        (conv1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (block): Sequential(
+          (0): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+          (1): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+          (2): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+          (3): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+          (4): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+        )
+      )
+    )
+    (ERBlock_5): Sequential(
+      (0): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      )
+      (1): RepBlock(
+        (conv1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (block): Sequential(
+          (0): RepVGGBlock(
+            (nonlinearity): ReLU(inplace=True)
+            (se): Identity()
+            (rbr_reparam): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+        )
+      )
+      (2): SimCSPSPPF(
+        (cv1): SimConv(
+          (conv): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+        (cv2): SimConv(
+          (conv): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+        (cv3): SimConv(
+          (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+        (cv4): SimConv(
+          (conv): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+        (m): MaxPool2d(kernel_size=5, stride=1, padding=2, dilation=1, ceil_mode=False)
+        (cv5): SimConv(
+          (conv): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+        (cv6): SimConv(
+          (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+        (cv7): SimConv(
+          (conv): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1))
+          (act): ReLU(inplace=True)
+        )
+      )
+    )
+  )
+  (neck): RepBiFPANNeck(
+    (reduce_layer0): SimConv(
+      (conv): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+      (act): ReLU(inplace=True)
+    )
+    (Bifusion0): BiFusion(
+      (cv1): SimConv(
+        (conv): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+      (cv2): SimConv(
+        (conv): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+      (cv3): SimConv(
+        (conv): Conv2d(192, 64, kernel_size=(1, 1), stride=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+      (upsample): Transpose(
+        (upsample_transpose): ConvTranspose2d(64, 64, kernel_size=(2, 2), stride=(2, 2))
+      )
+      (downsample): SimConv(
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+    )
+    (Rep_p4): RepBlock(
+      (conv1): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (block): Sequential(
+        (0): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (2): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+      )
+    )
+    (reduce_layer1): SimConv(
+      (conv): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      (act): ReLU(inplace=True)
+    )
+    (Bifusion1): BiFusion(
+      (cv1): SimConv(
+        (conv): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+      (cv2): SimConv(
+        (conv): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+      (cv3): SimConv(
+        (conv): Conv2d(96, 32, kernel_size=(1, 1), stride=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+      (upsample): Transpose(
+        (upsample_transpose): ConvTranspose2d(32, 32, kernel_size=(2, 2), stride=(2, 2))
+      )
+      (downsample): SimConv(
+        (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (act): ReLU(inplace=True)
+      )
+    )
+    (Rep_p3): RepBlock(
+      (conv1): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (block): Sequential(
+        (0): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (2): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+      )
+    )
+    (downsample2): SimConv(
+      (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (act): ReLU(inplace=True)
+    )
+    (Rep_n3): RepBlock(
+      (conv1): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (block): Sequential(
+        (0): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (2): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+      )
+    )
+    (downsample1): SimConv(
+      (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (act): ReLU(inplace=True)
+    )
+    (Rep_n4): RepBlock(
+      (conv1): RepVGGBlock(
+        (nonlinearity): ReLU(inplace=True)
+        (se): Identity()
+        (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (block): Sequential(
+        (0): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (1): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+        (2): RepVGGBlock(
+          (nonlinearity): ReLU(inplace=True)
+          (se): Identity()
+          (rbr_reparam): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
+      )
+    )
+  )
+  (detect): Detect(
+    (proj_conv): Conv2d(17, 1, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (stems): ModuleList(
+      (0): Conv(
+        (conv): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+        (act): SiLU()
+      )
+      (1): Conv(
+        (conv): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+        (act): SiLU()
+      )
+      (2): Conv(
+        (conv): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+        (act): SiLU()
+      )
+    )
+    (cls_convs): ModuleList(
+      (0): Conv(
+        (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): SiLU()
+      )
+      (1): Conv(
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): SiLU()
+      )
+      (2): Conv(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): SiLU()
+      )
+    )
+    (reg_convs): ModuleList(
+      (0): Conv(
+        (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): SiLU()
+      )
+      (1): Conv(
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): SiLU()
+      )
+      (2): Conv(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (act): SiLU()
+      )
+    )
+    (cls_preds): ModuleList(
+      (0): Conv2d(32, 80, kernel_size=(1, 1), stride=(1, 1))
+      (1): Conv2d(64, 80, kernel_size=(1, 1), stride=(1, 1))
+      (2): Conv2d(128, 80, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (reg_preds): ModuleList(
+      (0): Conv2d(32, 68, kernel_size=(1, 1), stride=(1, 1))
+      (1): Conv2d(64, 68, kernel_size=(1, 1), stride=(1, 1))
+      (2): Conv2d(128, 68, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (reg_preds_lrtb): ModuleList(
+      (0): Conv2d(32, 4, kernel_size=(1, 1), stride=(1, 1))
+      (1): Conv2d(64, 4, kernel_size=(1, 1), stride=(1, 1))
+      (2): Conv2d(128, 4, kernel_size=(1, 1), stride=(1, 1))
+    )
+  )
+)
+Starting to export ONNX...
+ONNX export success, saved as /home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx
+
+Export complete (9.37s)
+
+===================

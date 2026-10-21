@@ -1,0 +1,13 @@
+terminate called after throwing an instance of 'cv::Exception'
+  what():  OpenCV(4.2.0) ../modules/dnn/src/dnn.cpp:562: error: (-2:Unspecified error) Can't create layer "/detect/ReduceMax_output_0" of type "ReduceMax" in function 'getLayerInstance'
+
+Traceback (most recent call last):
+  File "tools/edge_benchmark/workers.py", line 663, in <module>
+    main()
+  File "tools/edge_benchmark/workers.py", line 659, in main
+    adapters[config["kind"]](config, args.output)
+  File "tools/edge_benchmark/workers.py", line 583, in yolo
+    subprocess.run(command, check=True)
+  File "/usr/lib/python3.8/subprocess.py", line 516, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_cpu_probe', '/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx', '/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt', '/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg', '/home/orangepi/.cache/ros-robot-edge-benchmark/runs/yolo-cpu-smoke-01/yolo-cpu-smoke', '1280', '720', '4', '0', '0.3', '0.3', '1', '-']' died with <Signals.SIGABRT: 6>.

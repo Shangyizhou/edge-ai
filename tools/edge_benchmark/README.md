@@ -4,6 +4,10 @@ This standalone tool measures files and model output. It does not start ROS,
 capture a microphone, play sound, execute model function calls, or modify robot
 configuration. The existing integration branch remains independent.
 
+Exception: the optional YOLO ROS replay starts only an isolated detector and
+file-image publisher in ROS domain 177. It does not start robot bringup,
+tracking, motors or camera capture.
+
 The public entry points are `run CONFIG OUTPUT_DIRECTORY` and
 `report OUTPUT_DIRECTORY`. Each run needs a new output directory; records are
 never silently overwritten. Edit `pilot.json` for asset locations and input
@@ -139,3 +143,82 @@ Initialization scope differs by adapter: ASR/sherpa time the model constructor,
 whereas Qwen/Piper include native child startup. Compare these as deployment
 facts rather than identical cold-start measurements. Sampled resource peaks
 are not a kernel high-water measurement.
+
+## YOLOv6 CPU / NPU and active ASR
+
+`yolo.json` uses the agreed target: **30 FPS, pre-scaled 640x352 RGB**.
+It measures CPU 1/2/4 threads, NPU backend, actual ROS detector with and
+without annotated RGB publication, and two active ASR NPU overlap runs.
+The suite uses a fixed public image rather than a camera. Model loads and
+three warmup frames precede timing. Per-frame detections/timing and aggregate
+completed FPS, offered frames, drops and short-sample latency percentiles
+are retained. `yolo-scheduling.json` compares ASR CPU at the same target input.
+Earlier large-input, unpaced and reduced-rate experiments are archived in
+`diagnostics/yolo-input-*.json`; they are not the target configuration.
+
+Build against the actual external ros-robot backend and postprocessor:
+
+```sh
+source /opt/ros/foxy/setup.bash
+cmake -S tools/edge_benchmark/native/yolo \
+  -B /home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DYOLO_SOURCE_DIR=/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6 \
+  -DRKNN_API_INCLUDE_DIR=/home/orangepi/sdk/rknn/include \
+  -DBUILD_ROS_YOLO=ON \
+  -Drobot_interfaces_DIR=/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/share/robot_interfaces/cmake
+cmake --build /home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo -j2
+python3 tools/edge_benchmark/benchmark.py run \
+  tools/edge_benchmark/yolo.json /path/to/new-yolo-run
+```
+
+Set `BUILD_ROS_YOLO=OFF` to omit the ROS replay target. The core NPU probe
+still needs installed rclcpp for the backend's logging dependencies, but never
+initializes a ROS node. CPU uses ONNX Runtime and a small C ABI library compiled
+from the exact same ros-robot postprocessor; it needs no active ROS node.
+`yolo_cpu.py` requires the external Python environment recorded in the config.
+Dependencies and inputs are prepared separately, never installed by `run`.
+
+The current `.rknn` asset has no directly usable same-source ONNX file: its
+legacy ONNX is an LFS pointer. A CPU candidate was re-exported from the existing
+legacy PT at 352x640, using the legacy customized exporter. Its output layout
+matches, but its identity with the deployed RKNN cannot be established by a
+matching artifact hash. Treat this as a deployment comparison, not a proven
+same-precision hardware speedup. Haar is never substituted for CPU YOLO.
+Preparation versions, hashes, export command and failed attempts are in the
+YOLO research/deployment notes and frozen evidence.
+
+Backend `yolo` / `yolo_cpu` cases use a serial latest-frame policy: at 30 Hz,
+old input slots are skipped rather than queued indefinitely. NPU timing includes
+RKNN input, execution, float output retrieval and
+real postprocessing. It excludes initial JPEG decode, ROS, annotation and
+encoding. Model-sized input avoids the RGA resize branch; it does not change
+the compiled model resolution. Target runs receive the already scaled image;
+upstream scaling is outside this detector benchmark. CPU timing includes normalization,
+ORT inference and the same postprocessing. First image decode is outside timing.
+
+`*-ros-*` cases run the actual detector class with its real capacity-two
+queues, drawing and detection publishing, and a composed RGB replay publisher.
+DDS/rclcpp intra-process optimization is not enabled. These are separate scopes
+from backend latency: frame latency is scheduled input to received detection.
+`sent_frames` / `source_skipped` separate replay scheduling loss from missing
+outputs; `dropped` counts all missing offered slots. Output drains for two
+seconds; completed FPS uses max(input-window duration, last completion time),
+not an arbitrary process wall-clock including initialization/drain wait.
+An optional annotated subscriber enables annotated RGB publication, without
+JPEG/web encoding. Neither scope includes USB capture or MJPEG decoding.
+
+`vision_asr` launches members with independently configured runtime paths.
+YOLO warms before the gate; the official ASR CLI starts loading after the gate
+and decodes the same file repeatedly, reloading per request. This is an active,
+unpaced file-throughput stress test, not realtime microphone streaming or
+idle model residency. Each ASR sample records request monotonic intervals,
+RTF and transcript; visual frames record completion timestamps. Compare
+actual overlapping intervals and retain any nonoverlapping tail. Current CLI
+intervals include loading; they cannot locate every NPU kernel. Root process-tree
+PSS is the group total, not per-model NPU memory. Timeout/failed child cleanup
+uses the existing process-group teardown contract.
+
+The default target was confirmed as pre-scaled 640x352 at 30 FPS.
+Frame counts use this 30 Hz input budget; a lower-rate diagnostic is never
+reported as meeting the target. Upstream scaling is a separate stage.

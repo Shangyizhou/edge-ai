@@ -1,0 +1,186 @@
+{
+  "python": "/home/orangepi/.cache/ros-robot-edge-benchmark/yolo-venv/bin/python",
+  "budget_seconds": 240,
+  "extra_assets": [
+    "/home/orangepi/code/edge-ai/tools/edge_benchmark/native/yolo/ros_replay.cpp",
+    "/home/orangepi/code/edge-ai/tools/edge_benchmark/native/yolo/CMakeLists.txt",
+    "/home/orangepi/code/edge-ai/tools/edge_benchmark/native/yolo/yolo_probe.cpp",
+    "/home/orangepi/code/edge-ai/tools/edge_benchmark/native/yolo/postprocess_api.cpp",
+    "/home/orangepi/code/edge-ai/tools/edge_benchmark/yolo_cpu.py",
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.pt",
+    "/lib/librknnrt.so",
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0/librknnrt.so",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/src/detector_backend_rknn.cpp",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/src/postprocess.cpp",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/src/rknn_yolov6_node.cpp",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/include/rknn_yolov6/detector_backend.hpp",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/include/rknn_yolov6/bounded_queue.hpp",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/include/rknn_yolov6/postprocess.hpp",
+    "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/include/rknn_yolov6/rknn_yolov6_node.hpp"
+  ],
+  "cases": [
+    {
+      "id": "yolo-cpu-ort-t4-30fps",
+      "kind": "yolo_cpu",
+      "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/yolov6n.onnx",
+      "labels": "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt",
+      "image": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg",
+      "width": 1280,
+      "height": 720,
+      "frames": 300,
+      "fps": 30,
+      "threads": 4,
+      "timeout": 35,
+      "env": {
+        "LD_LIBRARY_PATH": "/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu"
+      },
+      "decoder": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/libyolo_postprocess.so"
+    },
+    {
+      "id": "asr-cpu-yolo-control",
+      "kind": "native_asr",
+      "threads": 2,
+      "timeout": 45,
+      "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+      "env": {
+        "LD_LIBRARY_PATH": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0"
+      },
+      "command": [
+        "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx",
+        "--provider=cpu",
+        "--num-threads=2",
+        "--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx",
+        "--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx",
+        "--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx",
+        "--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt"
+      ],
+      "wavs": [
+        "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+        "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+      ]
+    },
+    {
+      "id": "yolo-ros-native-30fps",
+      "kind": "yolo",
+      "binary": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe",
+      "model": "/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn",
+      "labels": "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt",
+      "image": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg",
+      "width": 640,
+      "height": 352,
+      "frames": 300,
+      "fps": 30,
+      "threads": 1,
+      "timeout": 40,
+      "env": {
+        "LD_LIBRARY_PATH": "/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu",
+        "ROS_DOMAIN_ID": "177",
+        "ROS_LOCALHOST_ONLY": "1"
+      }
+    },
+    {
+      "id": "yolo-ros-native-asr-npu",
+      "kind": "vision_asr",
+      "threads": 1,
+      "timeout": 65,
+      "members": [
+        {
+          "id": "vision",
+          "kind": "yolo",
+          "binary": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe",
+          "model": "/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn",
+          "labels": "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt",
+          "image": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg",
+          "width": 640,
+          "height": 352,
+          "frames": 600,
+          "fps": 30,
+          "threads": 1,
+          "timeout": 40,
+          "env": {
+            "LD_LIBRARY_PATH": "/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu",
+            "ROS_DOMAIN_ID": "177",
+            "ROS_LOCALHOST_ONLY": "1"
+          }
+        },
+        {
+          "id": "asr-npu-active",
+          "kind": "native_asr",
+          "threads": 1,
+          "timeout": 60,
+          "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+          "env": {
+            "LD_LIBRARY_PATH": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0"
+          },
+          "command": [
+            "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx",
+            "--provider=rknn",
+            "--num-threads=1",
+            "--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn",
+            "--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn",
+            "--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn",
+            "--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt"
+          ],
+          "wavs": [
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "yolo-ros-10fps-asr-npu",
+      "kind": "vision_asr",
+      "threads": 1,
+      "timeout": 65,
+      "members": [
+        {
+          "id": "vision",
+          "kind": "yolo",
+          "binary": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/yolo/yolo_ros_probe",
+          "model": "/home/orangepi/models/ros-robot/vision/yolov6n_85.rknn",
+          "labels": "/home/orangepi/code/ros-robot/ros2_ws/src/rknn_yolov6/config/coco_labels.txt",
+          "image": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/yolo/bus.jpg",
+          "width": 1280,
+          "height": 720,
+          "frames": 200,
+          "fps": 10,
+          "threads": 1,
+          "timeout": 40,
+          "env": {
+            "LD_LIBRARY_PATH": "/home/orangepi/code/ros-robot/ros2_ws/install/robot_interfaces/lib:/opt/ros/foxy/lib:/lib:/usr/lib/aarch64-linux-gnu",
+            "ROS_DOMAIN_ID": "177",
+            "ROS_LOCALHOST_ONLY": "1"
+          }
+        },
+        {
+          "id": "asr-npu-active",
+          "kind": "native_asr",
+          "threads": 1,
+          "timeout": 60,
+          "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+          "env": {
+            "LD_LIBRARY_PATH": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0"
+          },
+          "command": [
+            "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx",
+            "--provider=rknn",
+            "--num-threads=1",
+            "--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn",
+            "--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn",
+            "--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn",
+            "--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt"
+          ],
+          "wavs": [
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+            "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+          ]
+        }
+      ]
+    }
+  ]
+}

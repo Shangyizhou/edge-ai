@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | ASR CPU | sherpa-onnx1.13.8 + 旧bilingual Zipformer混合int8 | [ASR部署](asr.md) |
 | ASR NPU | 同源官方2025-03-19 compiler2.2.0 RKNN + runtime2.2.0 | [ASR部署与失败排查](asr.md) |
+| YOLOv6 | 现用 RKNN/RGA + 系统 runtime1.4.0；CPU 为旧 PT 重导出 ONNX 候选 | [YOLO部署与基准](yolo.md) |
 | SummerTTS | 旧C++/Eigen/OpenMP实现 + 原single_speaker_fast权重 | [TTS部署](tts.md) |
 | sherpa/Piper TTS | huayan非小雅音色、中文VITS、Melo ONNX | [TTS部署](tts.md) |
 | Qwen | 旧微调Qwen GGUF + 现有ARM llama.cpp CPU | [Qwen部署](qwen.md) |
@@ -14,4 +15,4 @@
 
 首先核对 [首轮报告](../../reports/rk3566/2026-10-21/results.md) 中的版本、精度和测量差异；复测配置在 `tools/edge_benchmark/*.json`。配置包含本板已有绝对路径，换机器需要调整顶层python、binary、model、wavs、vits、env，以及native命令里的路径。不要批量改写报告中的历史配置。
 
-Summer和Qwen没有在本轮通过RK3566 NPU验证。框架支持RK NPU不等于每个模型都有可用后端；当前NPU实测范围仅ASR。
+Summer和Qwen没有在本轮通过RK3566 NPU验证。框架支持RK NPU不等于每个模型都有可用后端；当前NPU实测覆盖ASR与YOLOv6，包括二者活跃共跑。
