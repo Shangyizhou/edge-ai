@@ -95,6 +95,24 @@ if (current === "index" || current === "models")
           })
           .join("");
         document.querySelector("#metric-note").textContent = definition.note;
+        const cpu = rows.find((r) => r.backend === "cpu").values[metric].median;
+        const npu = rows.find((r) => r.backend === "rknn").values[metric]
+          .median;
+        const format = (value) =>
+          value.toFixed(definition.decimals) + definition.unit;
+        const scope = scenario.value === "realtime" ? "实时回放" : "非实时供音";
+        const descriptions = {
+          cpu_capacity_percent:
+            "占用更少的CPU容量，可能为LLM、TTS留下余量；但实际共跑是否改善仍需匹配实验。",
+          peak_pss_mib:
+            "PSS更高的方案需要更多主机驻留内存。是否值得，要结合CPU余量、其他进程和质量判断，不能称为NPU独占内存。",
+          ram_percent:
+            "这表示相对于本机实际RAM的占比。剩余空间还需要容纳LLM、TTS、视觉和系统，不能把未占用比例全部当成可分配预算。",
+          compute_rtf:
+            "RTF小于1表示本测量范围内处理比音频时长短，但不代表说完即可得到最终文字；端点与排队也影响等待。",
+        };
+        document.querySelector("#metric-interpretation").textContent =
+          `${scope}下，CPU方案为${format(cpu)}，NPU方案为${format(npu)}。${descriptions[metric]} 两者精度不同，这里不归因纯后端收益。`;
       }
       scenario.addEventListener("change", render);
       document.querySelectorAll("[data-metric]").forEach((button) =>

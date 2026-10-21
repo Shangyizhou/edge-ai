@@ -2,7 +2,7 @@
 
 正式入口：https://shangyizhou.github.io/edge-ai/
 
-四个网页入口为概览、模型与资源、研究进度、资料与证据。详情从现有Markdown生成，图表由ASR复测JSON和INT8功能JSON生成，不运行模型。
+主要阅读顺序为概览 → 方案与选型 → 测试与对比 → 机器人中的表现；实验与证据为辅助入口，研究方法与进度页保留。详情从现有Markdown生成，图表由ASR复测JSON和INT8功能JSON生成，不运行模型。
 
 ## 构建与预览
 
@@ -18,7 +18,7 @@ python -m http.server 8080 --directory /tmp/edge-ai-site-preview
 
 ## 怎样更新
 
-- 当前建议和首页叙述：`index.html`；研究流程：`process.html`；内容判断与对应Markdown一起更新。
+- 当前建议：`index.html`；候选与选择：`solutions.html`；数据及解释：`models.html`、`app.js`；组合方案与验证：`integration.html`；研究方法：`process.html`。内容判断与对应Markdown一起更新。
 - 模型图表：`build.py`读取冻结实验JSON，仅汇总qualification三轮，按供音方式分组，不混入screening。
 - 新实验：先按SOP生成结构化数据，再明确更新数据源和解释；不把未测填成0，不比较不兼容场景。
 - 详细文档：直接编辑`studies/`、`docs/`中的Markdown，自动生成阅读页及标题搜索。

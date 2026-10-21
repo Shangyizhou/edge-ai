@@ -1,0 +1,150 @@
+<div class="eyebrow">02 / 方案与选型</div>
+<h1>先看有哪些选择，<br />再看为什么留下它。</h1>
+<p class="intro">
+  目标是在RK3566上完成离线听说，同时留出CPU和内存给视觉。我们研究的是“模型＋精度＋框架＋后端”的部署组合，而不只是一个模型名字。
+</p>
+<nav class="section-tabs" aria-label="方案章节">
+  <a href="#asr">ASR · 听懂</a><a href="#llm">LLM · 思考</a
+  ><a href="#tts">TTS · 说话</a>
+</nav>
+<section class="card" id="asr">
+  <span class="eyebrow">ASR / 选择如何识别语音</span>
+  <h2>同源Zipformer，先比较可运行的部署组合。</h2>
+  <p>
+    机器人需要常驻识别：音频到达时持续处理，并在判定一句话结束后交付文字。模型推理速度、CPU占用和端点等待都影响使用体验。
+  </p>
+  <div class="table-scroll">
+    <table class="decision-table">
+      <thead>
+        <tr>
+          <th>候选</th>
+          <th>模型、框架与精度</th>
+          <th>为什么测它</th>
+          <th>目前决定</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CPU方案</td>
+          <td>
+            Zipformer-small中英双语2023-02-16；sherpa-onnx / ONNX
+            Runtime；encoder、joiner为动态INT8，decoder浮点
+          </td>
+          <td>已有可运行资产，作为现实CPU部署候选</td>
+          <td>保留；和NPU同精度的主对照待补</td>
+        </tr>
+        <tr>
+          <td>NPU方案</td>
+          <td>同源历史Zipformer；sherpa-onnx / RKNN；FP16，私有runtime2.2.0</td>
+          <td>验证是否能把识别计算迁到NPU，并接入已有ROS节点</td>
+          <td>暂时沿用已验证配置；不宣称优于CPU</td>
+        </tr>
+        <tr>
+          <td>INT8优化支线</td>
+          <td>原FP16 encoder/decoder＋RKNN静态W8A8 joiner</td>
+          <td>尝试减少模型资源；检查量化损失</td>
+          <td>当前不采用：两条独立样本识别明显退化</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="explanation">
+    <h3>为什么CPU和NPU的名字相同，仍不算公平对照？</h3>
+    <p>
+      权重同源只是一个条件。现有CPU是混合动态INT8，NPU是FP16，实际算子、量化方式和处理路径不同。它们可以比较“部署成本”，但数据差异不能全部归因于硬件。两边都叫INT8，也不代表精度已经匹配。
+    </p>
+  </div>
+  <div class="decision">
+    <strong>现在怎么选</strong>
+    <p>
+      继续使用已有FP16
+      NPU集成作为验证起点，先补匹配精度的对照。端点规则暂时保留1.2秒：更短的0.6秒曾拆开指令，不能单纯追求更小等待。
+    </p>
+  </div>
+  <p><a href="models.html">下一页：看资源、速度和质量数据 →</a></p>
+  <details>
+    <summary>核对模型和导出证据</summary>
+    <a
+      href="read/studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/results.html"
+      >已有部署方案复测</a
+    >
+    ·
+    <a
+      href="read/studies/voice-interaction/experiments/rk3566/2026-10-21-asr-int8-ptq/results.html"
+      >INT8构建与质量检查</a
+    >
+  </details>
+</section>
+<section class="card" id="llm">
+  <span class="eyebrow">LLM / 选择如何理解和回复</span>
+  <h2>Qwen先保留候选，不按文件大小决定。</h2>
+  <p>
+    当前路线是本地Qwen的GGUF量化模型，通过llama.cpp在CPU运行。已经比较同源量化、线程、上下文和短提示配置；它负责理解识别文字并生成可供TTS播报的回复。
+  </p>
+  <div class="cards two">
+    <div class="explanation">
+      <h3>有哪些取舍</h3>
+      <p>
+        固定短提示下，Q8比Q4/Q5更快，Q4/Q5内存更低。需要在首段回复等待、生成速度、内存和输出质量之间选择，不能把更小的文件直接等同于更快。
+      </p>
+    </div>
+    <div class="explanation">
+      <h3>为什么还不能定案</h3>
+      <p>
+        真实system、工具目录和对话历史可能比短提示大得多。现有成绩尚不能证明实际机器人任务的等待、理解和工具协议输出可接受。
+      </p>
+    </div>
+  </div>
+  <div class="decision">
+    <strong>下一步如何决定</strong>
+    <p>
+      固定少量实际任务输入，测首个可用回复片段、生成速度与PSS，并检查语义和工具协议。根据瓶颈调整输入或线程，再决定量化档位。
+    </p>
+  </div>
+  <details>
+    <summary>核对已测参数与候选来源</summary>
+    <a
+      href="read/studies/voice-interaction/experiments/rk3566/2026-10-21-baseline/results.html"
+      >首轮参数与性能记录</a
+    >
+    ·
+    <a href="read/studies/voice-interaction/platforms/rk3566/qwen.html"
+      >Qwen部署身份</a
+    >
+  </details>
+</section>
+<section class="card" id="tts">
+  <span class="eyebrow">TTS / 选择如何把回复说出来</span>
+  <h2>先解决首段语音，继续保留CPU候选。</h2>
+  <p>
+    已有SummerTTS及非小雅等CPU候选的性能记录。具体引擎和依赖按各候选部署配置冻结，不假定所有TTS共用一套框架。当前没有确认可直接部署的成熟RK3566中文NPU
+    TTS产物。
+  </p>
+  <div class="explanation">
+    <h3>真正需要比较什么</h3>
+    <p>
+      除了整句合成速度，还要知道第一段PCM何时就绪、分句是否产生明显停顿，以及数字、日期和机器人指令是否读对。PCM就绪和扬声器实际发声是两个时间点。
+    </p>
+  </div>
+  <div class="decision">
+    <strong>现在怎么选</strong>
+    <p>
+      保留CPU路线，先用少量现有文本和试听检查可用性，再比较整句与分句。暂不把自研NPU转换变成前置工作；和LLM重叠是否更快，需要实际共跑验证。
+    </p>
+  </div>
+  <details>
+    <summary>核对TTS方案与已测数据</summary>
+    <a href="read/studies/voice-interaction/platforms/rk3566/tts.html"
+      >TTS部署与框架</a
+    >
+    ·
+    <a
+      href="read/studies/voice-interaction/experiments/rk3566/2026-10-21-baseline/results.html"
+      >首轮候选测试</a
+    >
+  </details>
+</section>
+<div class="reading-next">
+  <a href="index.html">← 研究概览</a
+  ><a class="button primary" href="models.html">下一步：用数据理解取舍 →</a>
+</div>

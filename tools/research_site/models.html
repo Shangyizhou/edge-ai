@@ -1,8 +1,30 @@
-<div class="eyebrow">MODELS / 单模型测试与选择</div>
+<div class="eyebrow">03 / 测试与对比</div>
 <h1>性能要看，代价也要看。</h1>
 <p class="intro">
   先单独测量，再决定保留什么。模型、精度与测量范围始终一起展示。
 </p>
+<section class="card">
+  <span class="eyebrow">这页要回答的问题</span>
+  <h2>CPU、内存和识别质量，怎样一起取舍？</h2>
+  <p>
+    下面首先比较两套现成ASR部署，随后检查INT8候选的输出。我们关心的是机器人还能留下多少资源，以及输出能否用；目前没有证据支持一个统一“最佳后端”。
+  </p>
+  <div class="test-context">
+    <div>
+      <strong>固定小输入</strong
+      ><span>6条约38秒素材，公开转写与模型共识分开。</span>
+    </div>
+    <div>
+      <strong>两种供音方式</strong
+      ><span>实时回放看交付与资源；非实时供音看计算吞吐。</span>
+    </div>
+    <div>
+      <strong>筛选后再复测</strong
+      ><span>图中为入围方案3轮中位数及范围，不混入筛选轮。</span>
+    </div>
+  </div>
+  <a href="solutions.html#asr">先回顾两套ASR方案 →</a>
+</section>
 <div class="notice">
   <strong>部署方案对照，尚非公平后端基线。</strong> CPU为混合INT8
   ONNX，NPU为FP16 RKNN。下面的差异不能直接解释成NPU硬件加速收益。
@@ -34,6 +56,10 @@
   </div>
   <div id="comparison-chart" aria-live="polite"></div>
   <p id="metric-note" class="muted"></p>
+  <div class="explanation" aria-live="polite">
+    <h3>这组数据对选择意味着什么？</h3>
+    <p id="metric-interpretation">正在读取实验数据…</p>
+  </div>
   <div class="chart-legend">
     <span><i class="legend-dot cpu"></i>CPU · 混合INT8</span
     ><span><i class="legend-dot npu"></i>NPU · FP16</span
@@ -69,6 +95,12 @@
     decoder保持历史FP16；两条FLEURS未参与校准。CER越低越好。
   </p>
   <div id="quality-chart"></div>
+  <div class="decision">
+    <strong>为什么不能用“更小”换取这个结果？</strong>
+    <p>
+      独立参考音频中大量文字丢失，当前候选无法保持原有识别能力。它在质量检查后就停止，不进入性能复测。下一步若继续，应先定位误差和校准覆盖，而不是拿单次功能执行时间计算提速倍数。
+    </p>
+  </div>
   <details>
     <summary>看看机器人指令实际识别成什么</summary>
     <div id="transcripts" class="transcripts"></div>
@@ -94,7 +126,7 @@
     </p>
     <span class="tag amber">下一步：实际任务输入与质量</span>
     <p>
-      <a href="read/studies/voice-interaction/models.html">阅读候选判断 →</a>
+      <a href="solutions.html">查看方案与取舍 →</a>
     </p>
   </article>
   <article class="card">
@@ -105,8 +137,22 @@
     </p>
     <span class="tag amber">下一步：首段语音与有限试听</span>
     <p>
-      <a href="read/studies/voice-interaction/models.html">阅读候选判断 →</a>
+      <a href="solutions.html">查看方案与取舍 →</a>
     </p>
   </article>
 </div>
 <p class="load-error" role="status" hidden></p>
+<section class="next-panel">
+  <div>
+    <span class="eyebrow">当前决定</span>
+    <h2>先补公平对照，暂不替换INT8。</h2>
+    <p>
+      现有结果帮助估计成本，但还没有完成同源同精度主基线。LLM/TTS需要真实任务和有限质量复测；完整组合不能仅由这些单项数据推算。
+    </p>
+  </div>
+  <a class="button dark" href="integration.html">接下来：机器人中的表现 →</a>
+</section>
+<div class="reading-next">
+  <a href="solutions.html">← 方案与选型</a
+  ><a href="integration.html">机器人中的表现 →</a>
+</div>

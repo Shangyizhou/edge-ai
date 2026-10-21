@@ -108,7 +108,7 @@ def build(output):
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / p, target)
     (output / 'search.json').write_text(json.dumps(entries, ensure_ascii=False))
-    for name, title in [('index', '研究概览'), ('models', '模型与资源'), ('process', '研究进度'), ('evidence', '资料与证据')]:
+    for name, title in [('index', '研究概览'), ('solutions', '方案与选型'), ('models', '测试与对比'), ('integration', '机器人中的表现'), ('process', '研究方法与进度'), ('evidence', '实验与证据')]:
         render(name + '.html', title, (SOURCE / (name + '.html')).read_text(), name)
     # Check generated navigation and copied report links, without reaching external services.
     from html.parser import HTMLParser

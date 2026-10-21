@@ -1,6 +1,6 @@
 # 机器人本地语音：现在怎么选，下一步做什么
 
-更直观的阅读入口：[研究看板](https://shangyizhou.github.io/edge-ai/) · [资源图表](https://shangyizhou.github.io/edge-ai/models.html) · [研究进度](https://shangyizhou.github.io/edge-ai/process.html)。
+更直观的阅读入口：[研究看板](https://shangyizhou.github.io/edge-ai/) · [方案与选型](https://shangyizhou.github.io/edge-ai/solutions.html) · [测试与对比](https://shangyizhou.github.io/edge-ai/models.html) · [机器人中的表现](https://shangyizhou.github.io/edge-ai/integration.html)。
 
 更新：2026-10-21。目标设备：Orange Pi 3B / RK3566 / 标称4GB内存。
 
