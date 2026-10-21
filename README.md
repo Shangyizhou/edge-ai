@@ -4,16 +4,19 @@
 
 | 研究主题 | 做了什么 | 阅读入口 |
 | --- | --- | --- |
-| 语音交互 | RK3566上的ASR、TTS、Qwen对照；流式ASR、生产ROS节点NPU接入及视觉共跑 | [语音交互总览](studies/voice-interaction/README.md) |
+| 语音交互 | RK3566上的ASR、TTS、Qwen对照；流式ASR、生产ROS节点NPU接入及视觉共跑 | [语音交互：当前建议与下一步](studies/voice-interaction/README.md) |
 | 目标检测 | ros-robot YOLOv6 CPU候选/NPU对照、640×352@30fps回放及ASR共跑 | [目标检测总览](studies/object-detection/README.md) |
 
-从主题总览开始，先看结论和验证范围，再按需查部署、实验与原始数据。新增研究主题放在`studies/<topic>/`，共用测试工具保留在`tools/`。
+从主题首页看当前建议、关键数据和下一步，再按需查依据。语音交互的详情收敛为[准备](studies/voice-interaction/plan.md)、[单模型对比](studies/voice-interaction/models.md)、[机器人验证](studies/voice-interaction/integration.md)三页。新增研究主题放在`studies/<topic>/`，共用测试工具保留在`tools/`。
 
 ## 目录约定
 
 ```text
 studies/<topic>/
-├── README.md                 # 目标、当前进展与阅读入口
+├── README.md                 # 当前建议、关键数据、下一步
+├── plan.md                   # 准备：目标、设备、候选与怎样测
+├── models.md                 # 单模型对比：筛选、复测与选择
+├── integration.md            # 机器人验证：共跑、接入与完整体验
 ├── research/                 # 官方资料、候选方案和测量方法
 ├── platforms/<device>/       # 设备说明、部署步骤和外部资产清单
 ├── experiments/<device>/     # 实验索引和各轮完整记录
@@ -21,6 +24,8 @@ studies/<topic>/
 └── history/                  # 历史需求和决策（有需要时建立）
 tools/edge_benchmark/          # 多主题共用的测试工具
 ```
+
+上面是语音交互的阅读布局；其他主题按已有内容逐步采用，不预建空页面。日常页面汇总判断，研究资料和实验目录保留详细证据。
 
 通用流程和结果格式集中在[研究方法](docs/methodology/README.md)。新增实验按统一协议保存；历史实验目录保留原布局和证据。跨主题实验只保留一份原始证据，通过链接引用。
 
