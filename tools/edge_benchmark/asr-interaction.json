@@ -1,0 +1,29 @@
+{
+  "python": "/home/orangepi/venvs/sherpa-onnx/bin/python",
+  "budget_seconds": 45,
+  "cases": [
+    {
+      "id": "asr-realtime-t2",
+      "kind": "asr",
+      "threads": 2,
+      "timeout": 45,
+      "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+      "wavs": [
+        "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+      ],
+      "realtime": true
+    },
+    {
+      "id": "asr-beam4-t2",
+      "kind": "asr",
+      "threads": 2,
+      "timeout": 45,
+      "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+      "wavs": [
+        "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+      ],
+      "decoding_method": "modified_beam_search",
+      "max_active_paths": 4
+    }
+  ]
+}

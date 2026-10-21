@@ -1,0 +1,111 @@
+{
+  "created_at": "2026-10-21T03:31:22.028372+00:00",
+  "platform": "Linux-5.10.160-rockchip-rk356x-aarch64-with-glibc2.29",
+  "cpu_count": 4,
+  "cpuinfo": "processor\t: 0\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nprocessor\t: 1\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nprocessor\t: 2\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nprocessor\t: 3\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nSerial\t\t: 7cd8dbf648179980\n",
+  "host_memory": {
+    "MemAvailable": 2428476,
+    "SwapFree": 798908
+  },
+  "assets": [
+    {
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin",
+      "bytes": 80050316,
+      "sha256": "87b774813258a3636b3f1d9adddd3652ede503b4e8f4eb3c39065cba2a4951c4"
+    },
+    {
+      "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe",
+      "bytes": 17644512,
+      "sha256": "2af24bf319b4c714f1aee977477a8e21dace0a270c07add4ae730f0c2377303d"
+    },
+    {
+      "path": "/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server",
+      "bytes": 4624112,
+      "sha256": "0d7f54030c565d8872e60df5634ee568929a2546174dfcab37967af070571117"
+    },
+    {
+      "path": "/home/orangepi/models/qwen3/qwen3-robot-q8_0.gguf",
+      "bytes": 639443232,
+      "sha256": "27dc23f5d549e8e4c11defbafcbb8e405db995ef82e32a3cc2fa0b56b6c5f615"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx",
+      "bytes": 13877276,
+      "sha256": "89be509a83175261695bdef5fd1c7b9ab1129a663d1284e7ba9f8507b21e0906"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx",
+      "bytes": 42980793,
+      "sha256": "db6f51551762e40e549166fe041ea3e45464370b595e9ad23f06478ec3794fbb"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx",
+      "bytes": 3228485,
+      "sha256": "bdda356d6f9b8c2d7cee9ee0e26075fa537490f7fd06520be408d287073667b9"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt",
+      "bytes": 56317,
+      "sha256": "a8e0e4ec53810e433789b54a5c0134a7eaa2ffca595a6334d54c00da858841d3"
+    },
+    {
+      "path": "tools/edge_benchmark/benchmark.py",
+      "bytes": 17376,
+      "sha256": "e600adef487abe7123229ae0703f8eeedd7404c1f68fd880b0a460a414889226"
+    },
+    {
+      "path": "tools/edge_benchmark/workers.py",
+      "bytes": 21233,
+      "sha256": "eb4254f432b065408534b10f99879019c92fadd37ca9bcc57f87c65520909d2e"
+    }
+  ],
+  "suite": {
+    "python": "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "budget_seconds": 75,
+    "cases": [
+      {
+        "id": "three-models-q8-overlap",
+        "kind": "coexistence",
+        "timeout": 75,
+        "members": [
+          {
+            "id": "asr-resident",
+            "kind": "asr",
+            "threads": 1,
+            "timeout": 45,
+            "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+            "wavs": []
+          },
+          {
+            "id": "summer-overlap",
+            "kind": "summer",
+            "threads": 2,
+            "timeout": 60,
+            "binary": "/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe",
+            "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin",
+            "texts": [
+              "你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。"
+            ]
+          },
+          {
+            "id": "qwen-overlap",
+            "kind": "llama",
+            "threads": 2,
+            "timeout": 90,
+            "binary": "/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server",
+            "model": "/home/orangepi/models/qwen3/qwen3-robot-q8_0.gguf",
+            "max_tokens": 64,
+            "texts": [
+              "我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。"
+            ],
+            "context": 1024,
+            "batch": 128,
+            "microbatch": 64,
+            "kv": "f16"
+          }
+        ]
+      }
+    ]
+  },
+  "python": "3.8.10 (default, Sep 11 2024, 16:02:53) \n[GCC 9.4.0]"
+}

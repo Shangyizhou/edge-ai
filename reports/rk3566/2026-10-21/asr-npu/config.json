@@ -1,0 +1,23 @@
+{
+  "id": "asr-npu",
+  "kind": "native_asr",
+  "threads": 1,
+  "timeout": 45,
+  "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+  "env": {
+    "LD_LIBRARY_PATH": "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0"
+  },
+  "command": [
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx",
+    "--provider=rknn",
+    "--num-threads=1",
+    "--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn",
+    "--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn",
+    "--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn",
+    "--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt"
+  ],
+  "wavs": [
+    "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+    "/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav"
+  ]
+}

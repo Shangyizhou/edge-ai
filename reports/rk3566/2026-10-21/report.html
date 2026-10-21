@@ -1,0 +1,1372 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RK3566 推理配置实测</title><style>
+body{font:16px/1.6 system-ui;background:#f4f6f9;color:#172338;margin:0}
+main{max-width:1400px;margin:auto;padding:28px}h1{font-size:30px}
+section,.panel{background:white;padding:22px;border-radius:12px;margin:20px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:10px;
+border-bottom:1px solid #dae1eb;text-align:left}th{background:#eaf0f8}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6f9;padding:14px}
+a{color:#225cca}audio{width:min(100%,500px)}.scroll{overflow:auto}
+.barrow{display:grid;grid-template-columns:minmax(180px,340px) 1fr;gap:12px;
+margin:8px 0;font-size:14px}.track{background:#edf1f7;border-radius:4px}
+.track span{display:block;background:#4a78be;color:white;min-width:48px;
+box-sizing:border-box;padding:2px 8px;border-radius:4px}h2{font-size:21px}
+</style><main><h1>RK3566 · ASR / TTS / Qwen 实测</h1>
+<p>4×Cortex-A55 · 4GB RAM · 文件输入/输出 · 无机器人动作</p>
+<div class="panel"><b>读数口径</b><p>加载与逐例推理分开。
+RTF = 计算秒数 / 音频秒数，
+低于1表示该例平均快于音频时长。ASR人为追加2.5秒静音，端点相对文件尾，
+不冒充真人末音延迟。NPU官方CLI另用0.8秒尾静音，每文件重新加载，
+时间只保留CLI输出精度；与Python分块组不是完全同条件。未播放时记录PCM就绪，
+不称首声。RSS为进程树合计，
+可能重复共享页；PSS另列。CPU、温度、频率详见原始时间序列。</p>
+<p>少量筛查样本不提供稳定P95或正式MOS；超时/加载失败不计为零延迟成功。
+三基线优先，效果和最终选型待结果齐全后评判。首次请求与后续请求按序号保留。</p>
+<a href="manifest.json">环境、模型身份和完整矩阵</a></div>
+<section><h2>观察与使用建议</h2><ul><li>本轮正常中长输入短测：旧ASR、Summer、旧Qwen均有完整输出。NPU实际跑通的是同源ASR；Summer/Qwen仍为CPU。原集成分支保持暂停。 共11组38配置，累计案例墙钟15.9分钟（含加载/失败/超时，部署准备另计）。</li><li>复测起点：ASR CPU2线程、Summer2线程、Qwen Q8两线程。当前样本增加到4线程反而更慢；不把该现象推广成所有模型都应使用两线程。</li><li>相同文本：Summer2线程RTF约0.80，sherpa huayan4线程与Piper默认线程约0.66，中文VITS与Melo约3.77/5.09。此Git快照不附音频；完整音频保存在本机外置原始run目录，速度不能替代音质判断。</li><li>Piper使用原生默认ORT线程池，并非一线程。huayan两部署模型图/张量一致，前端与ORT版本不同，因此不是纯引擎对照。</li></ul><details><summary>更多现象、失败原因与解释边界</summary><ul><li>ASR NPU使用官方2025-03-19 compiler2.2.0同源产物+runtime2.2.0。当前compiler2.1包失败保留在asr-npu行。native CPU RTF0.29/0.32、NPU0.34/0.37；整组CPU约32.27→7.52核秒，墙钟21.30→9.84秒。精度和模型加载不同，不能宣称解码全面加速。</li><li>初始C270历史8秒录音在CPU/NPU都得到空文本，不算正确识别。另用历史6秒真人语音补测，其原文在recorded案例中。没有新录音或硬件动作。</li><li>BF16重新生成的Q8与原Q8 hash完全一致，Q5/Q4同源。当前Q8约6.01 token/s、PSS986MiB；Q5约3.31、604MiB；Q4-no-repack约3.61、557MiB。更小的量化不一定更快。</li><li>Q4默认CPU_REPACK加载触发stack smashing；仅关闭repack后同输入完成。旧失败行保留，新的working-profiles明确使用no-repack。短提示下context2048只验证容量/资源设置，未测长历史填充。</li><li>BF16长提示60秒超时，旧worker没有持久化部分流，不能推断其未生成token。补测短提示TTFT22.23秒、90秒仍未完整结束，新流日志保留了部分输出。</li><li>共存实测：ASR常驻空闲，Summer/Qwen实际同时计算约12秒。峰值PSS1547MiB、主机最小可用848MiB；Summer RTF从0.803升至1.571，Qwen约4.19 token/s。建议错开重计算，再验证整条业务链。</li><li>vits-zh-ll-t2的timeout来自整个180秒套件剩余约8.9秒，并非完整独立超时；低线程其他候选未执行。全部原始记录保留。</li><li>加载指标范围不同：ASR/sherpa为模型构造，Qwen/Piper含原生进程启动。hash读取可预热磁盘缓存；不是受控冷盘实验。PSS/RSS为200ms采样峰值，NPU设备内存可能未完全计入。</li><li>本轮没有稳定p95、CER/WER或MOS。Q4回复出现低电量措辞等语义问题，原文供后续效果评判；函数名只作数据保存，没有执行。三档复测候选与详细建议见本目录results.md。</li></ul></details></section><section><h2>ASR 同录音计算 RTF · 越低越快</h2><p>/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav</p><div class='barrow'><a href='#asr-beam4-t2'>asr-beam4-t2</a><div class='track'><span style='width:61.4%'>0.488</span></div></div><div class='barrow'><a href='#asr-cpu-t1'>asr-cpu-t1</a><div class='track'><span style='width:56.8%'>0.452</span></div></div><div class='barrow'><a href='#asr-cpu-t2'>asr-cpu-t2</a><div class='track'><span style='width:43.0%'>0.342</span></div></div><div class='barrow'><a href='#asr-cpu-t4'>asr-cpu-t4</a><div class='track'><span style='width:100.0%'>0.795</span></div></div><div class='barrow'><a href='#asr-realtime-t2'>asr-realtime-t2</a><div class='track'><span style='width:84.2%'>0.670</span></div></div></section><section><h2>TTS 同文本 RTF · 越低越快</h2><p>你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。</p><div class='barrow'><a href='#huayan-t1'>huayan-t1</a><div class='track'><span style='width:26.3%'>1.339</span></div></div><div class='barrow'><a href='#huayan-t2'>huayan-t2</a><div class='track'><span style='width:15.4%'>0.782</span></div></div><div class='barrow'><a href='#huayan-t4'>huayan-t4</a><div class='track'><span style='width:13.0%'>0.662</span></div></div><div class='barrow'><a href='#melo-t4'>melo-t4</a><div class='track'><span style='width:100.0%'>5.085</span></div></div><div class='barrow'><a href='#piper-huayan-default'>piper-huayan-default</a><div class='track'><span style='width:13.2%'>0.671</span></div></div><div class='barrow'><a href='#summer-matched-t2'>summer-matched-t2</a><div class='track'><span style='width:15.8%'>0.803</span></div></div><div class='barrow'><a href='#vits-zh-ll-t4'>vits-zh-ll-t4</a><div class='track'><span style='width:74.2%'>3.772</span></div></div></section><section><h2>Qwen 同提示生成 token/s · 越高越快</h2><p>我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。</p><div class='barrow'><a href='#qwen-derived-q5_k_m-t2'>qwen-derived-q5_k_m-t2</a><div class='track'><span style='width:55.1%'>3.312</span></div></div><div class='barrow'><a href='#qwen-derived-q8_0-t2'>qwen-derived-q8_0-t2</a><div class='track'><span style='width:100.0%'>6.014</span></div></div><div class='barrow'><a href='#qwen-q4-b256-u128-c1024-f16-no-repack'>qwen-q4-b256-u128-c1024-f16-no-repack</a><div class='track'><span style='width:41.3%'>2.485</span></div></div><div class='barrow'><a href='#qwen-q4-b256-u128-c2048-f16-no-repack'>qwen-q4-b256-u128-c2048-f16-no-repack</a><div class='track'><span style='width:54.1%'>3.254</span></div></div><div class='barrow'><a href='#qwen-q4-b256-u128-c2048-q8_0-no-repack'>qwen-q4-b256-u128-c2048-q8_0-no-repack</a><div class='track'><span style='width:34.6%'>2.081</span></div></div><div class='barrow'><a href='#qwen-q4-no-repack-t2'>qwen-q4-no-repack-t2</a><div class='track'><span style='width:60.1%'>3.615</span></div></div><div class='barrow'><a href='#qwen-q8-t1'>qwen-q8-t1</a><div class='track'><span style='width:66.8%'>4.020</span></div></div><div class='barrow'><a href='#qwen-q8-t2'>qwen-q8-t2</a><div class='track'><span style='width:97.2%'>5.845</span></div></div><div class='barrow'><a href='#qwen-q8-t4'>qwen-q8-t4</a><div class='track'><span style='width:25.4%'>1.529</span></div></div></section><div class="panel scroll"><table><tr><th>配置</th><th>状态</th><th>完成例</th>
+<th>加载 s</th><th>逐例计算 s</th><th>逐例 RTF</th><th>TTFT s</th>
+<th>生成 token/s</th><th>RSS MiB</th><th>PSS MiB</th><th>Swap MiB</th>
+<th>进程墙钟 s</th><th>平均CPU 含启动</th></tr><tr><td><a href='#asr-beam4-t2'>asr-beam4-t2</a></td><td>ok</td><td>1</td><td>3.946</td><td>4.907</td><td>0.488</td><td>—</td><td>—</td><td>162.9</td><td>156.9</td><td>0.0</td><td>10.3</td><td>221%</td></tr><tr><td><a href='#asr-cpu-t1'>asr-cpu-t1</a></td><td>ok</td><td>2</td><td>3.765</td><td>4.545, 4.022</td><td>0.452, 0.503</td><td>—</td><td>—</td><td>172.5</td><td>167.5</td><td>0.0</td><td>14.2</td><td>95%</td></tr><tr><td><a href='#asr-cpu-t2'>asr-cpu-t2</a></td><td>ok</td><td>2</td><td>4.206</td><td>3.440, 2.791</td><td>0.342, 0.349</td><td>—</td><td>—</td><td>162.3</td><td>157.2</td><td>0.0</td><td>12.1</td><td>207%</td></tr><tr><td><a href='#asr-cpu-t4'>asr-cpu-t4</a></td><td>ok</td><td>2</td><td>4.271</td><td>7.996, 6.099</td><td>0.795, 0.762</td><td>—</td><td>—</td><td>176.3</td><td>171.2</td><td>0.0</td><td>19.9</td><td>298%</td></tr><tr><td><a href='#asr-native-cpu-t2'>asr-native-cpu-t2</a></td><td>ok</td><td>2</td><td>—</td><td>2.900, 2.500</td><td>0.290, 0.320</td><td>—</td><td>—</td><td>150.2</td><td>143.0</td><td>0.0</td><td>21.3</td><td>151%</td></tr><tr><td><a href='#asr-native-cpu-t2-recorded'>asr-native-cpu-t2-recorded</a></td><td>ok</td><td>1</td><td>—</td><td>1.800</td><td>0.310</td><td>—</td><td>—</td><td>138.5</td><td>131.2</td><td>0.0</td><td>10.6</td><td>136%</td></tr><tr><td><a href='#asr-npu'>asr-npu</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>177.8</td><td>171.9</td><td>0.0</td><td>9.2</td><td>26%</td></tr><tr><td><a href='#asr-npu-compiler22'>asr-npu-compiler22</a></td><td>ok</td><td>2</td><td>—</td><td>3.500, 2.900</td><td>0.340, 0.370</td><td>—</td><td>—</td><td>220.4</td><td>213.4</td><td>0.0</td><td>9.8</td><td>76%</td></tr><tr><td><a href='#asr-npu-compiler22-recorded'>asr-npu-compiler22-recorded</a></td><td>ok</td><td>1</td><td>—</td><td>1.900</td><td>0.320</td><td>—</td><td>—</td><td>219.6</td><td>212.4</td><td>0.0</td><td>3.8</td><td>75%</td></tr><tr><td><a href='#asr-realtime-t2'>asr-realtime-t2</a></td><td>ok</td><td>1</td><td>4.055</td><td>6.731</td><td>0.670</td><td>—</td><td>—</td><td>162.5</td><td>156.4</td><td>0.0</td><td>18.5</td><td>116%</td></tr><tr><td><a href='#huayan-t1'>huayan-t1</a></td><td>ok</td><td>2</td><td>8.677</td><td>7.965, 12.315</td><td>1.339, 1.306</td><td>—</td><td>—</td><td>263.4</td><td>258.6</td><td>0.0</td><td>30.8</td><td>99%</td></tr><tr><td><a href='#huayan-t2'>huayan-t2</a></td><td>ok</td><td>2</td><td>8.657</td><td>4.713, 7.395</td><td>0.782, 0.794</td><td>—</td><td>—</td><td>254.6</td><td>249.7</td><td>0.0</td><td>22.5</td><td>153%</td></tr><tr><td><a href='#huayan-t4'>huayan-t4</a></td><td>ok</td><td>2</td><td>8.927</td><td>3.909, 6.122</td><td>0.662, 0.662</td><td>—</td><td>—</td><td>260.8</td><td>255.9</td><td>0.0</td><td>21.0</td><td>232%</td></tr><tr><td><a href='#melo-t4'>melo-t4</a></td><td>ok</td><td>1</td><td>22.224</td><td>29.219</td><td>5.085</td><td>—</td><td>—</td><td>381.6</td><td>376.7</td><td>0.0</td><td>54.2</td><td>247%</td></tr><tr><td><a href='#piper-huayan-default'>piper-huayan-default</a></td><td>ok</td><td>2</td><td>2.180</td><td>4.258, 6.751</td><td>0.671, 0.659</td><td>—</td><td>—</td><td>318.9</td><td>313.0</td><td>0.0</td><td>13.7</td><td>308%</td></tr><tr><td><a href='#qwen-bf16-short-t2'>qwen-bf16-short-t2</a></td><td>timeout</td><td>0</td><td>13.355</td><td>—</td><td>—</td><td>22.232</td><td>—</td><td>1370.2</td><td>1363.4</td><td>0.0</td><td>90.3</td><td>177%</td></tr><tr><td><a href='#qwen-bf16-t2'>qwen-bf16-t2</a></td><td>timeout</td><td>0</td><td>16.188</td><td>—</td><td>—</td><td>—</td><td>—</td><td>1329.8</td><td>1323.1</td><td>0.0</td><td>60.2</td><td>157%</td></tr><tr><td><a href='#qwen-derived-q4_k_m-t2'>qwen-derived-q4_k_m-t2</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>251.4</td><td>244.7</td><td>0.0</td><td>7.6</td><td>70%</td></tr><tr><td><a href='#qwen-derived-q5_k_m-t2'>qwen-derived-q5_k_m-t2</a></td><td>ok</td><td>1</td><td>7.063</td><td>16.715</td><td>—</td><td>5.845</td><td>3.31</td><td>610.6</td><td>603.8</td><td>0.0</td><td>24.9</td><td>157%</td></tr><tr><td><a href='#qwen-derived-q8_0-t2'>qwen-derived-q8_0-t2</a></td><td>ok</td><td>1</td><td>13.290</td><td>8.339</td><td>—</td><td>1.854</td><td>6.01</td><td>992.9</td><td>986.3</td><td>0.0</td><td>23.0</td><td>120%</td></tr><tr><td><a href='#qwen-q4-b256-u128-c1024-f16'>qwen-q4-b256-u128-c1024-f16</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>246.0</td><td>238.6</td><td>0.0</td><td>7.8</td><td>70%</td></tr><tr><td><a href='#qwen-q4-b256-u128-c1024-f16-no-repack'>qwen-q4-b256-u128-c1024-f16-no-repack</a></td><td>ok</td><td>1</td><td>6.733</td><td>22.741</td><td>—</td><td>5.031</td><td>2.48</td><td>585.2</td><td>577.9</td><td>0.0</td><td>30.7</td><td>140%</td></tr><tr><td><a href='#qwen-q4-b256-u128-c2048-f16'>qwen-q4-b256-u128-c2048-f16</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>253.4</td><td>246.5</td><td>0.0</td><td>7.2</td><td>71%</td></tr><tr><td><a href='#qwen-q4-b256-u128-c2048-f16-no-repack'>qwen-q4-b256-u128-c2048-f16-no-repack</a></td><td>ok</td><td>1</td><td>8.280</td><td>19.542</td><td>—</td><td>6.018</td><td>3.25</td><td>699.6</td><td>691.6</td><td>0.0</td><td>29.3</td><td>147%</td></tr><tr><td><a href='#qwen-q4-b256-u128-c2048-q8_0'>qwen-q4-b256-u128-c2048-q8_0</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>249.9</td><td>243.3</td><td>0.0</td><td>7.5</td><td>72%</td></tr><tr><td><a href='#qwen-q4-b256-u128-c2048-q8_0-no-repack'>qwen-q4-b256-u128-c2048-q8_0-no-repack</a></td><td>ok</td><td>1</td><td>7.405</td><td>33.714</td><td>—</td><td>5.843</td><td>2.08</td><td>624.7</td><td>616.8</td><td>0.0</td><td>42.5</td><td>131%</td></tr><tr><td><a href='#qwen-q4-b256-u64-c1024-f16'>qwen-q4-b256-u64-c1024-f16</a></td><td>error</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>256.1</td><td>249.3</td><td>0.0</td><td>7.4</td><td>72%</td></tr><tr><td><a href='#qwen-q4-no-repack-t2'>qwen-q4-no-repack-t2</a></td><td>ok</td><td>1</td><td>6.774</td><td>16.971</td><td>—</td><td>4.799</td><td>3.61</td><td>564.3</td><td>557.3</td><td>0.0</td><td>24.9</td><td>158%</td></tr><tr><td><a href='#qwen-q8-t1'>qwen-q8-t1</a></td><td>ok</td><td>2</td><td>13.415</td><td>10.216, 13.219</td><td>—</td><td>2.133, 3.514</td><td>4.08, 4.02</td><td>989.8</td><td>983.2</td><td>0.0</td><td>38.1</td><td>91%</td></tr><tr><td><a href='#qwen-q8-t2'>qwen-q8-t2</a></td><td>ok</td><td>2</td><td>13.998</td><td>7.418, 8.544</td><td>—</td><td>1.212, 1.871</td><td>5.32, 5.84</td><td>993.5</td><td>987.4</td><td>0.0</td><td>31.2</td><td>133%</td></tr><tr><td><a href='#qwen-q8-t4'>qwen-q8-t4</a></td><td>ok</td><td>2</td><td>13.652</td><td>27.092, 28.701</td><td>—</td><td>2.529, 3.202</td><td>1.34, 1.53</td><td>1013.2</td><td>1006.6</td><td>0.0</td><td>70.6</td><td>194%</td></tr><tr><td><a href='#summer-matched-t2'>summer-matched-t2</a></td><td>ok</td><td>2</td><td>3.883</td><td>6.347, 9.205</td><td>0.803, 0.797</td><td>—</td><td>—</td><td>548.3</td><td>546.0</td><td>0.0</td><td>20.8</td><td>125%</td></tr><tr><td><a href='#summer-t1'>summer-t1</a></td><td>ok</td><td>2</td><td>4.246</td><td>9.787, 18.928</td><td>1.150, 1.310</td><td>—</td><td>—</td><td>588.8</td><td>587.4</td><td>0.0</td><td>34.3</td><td>95%</td></tr><tr><td><a href='#summer-t2'>summer-t2</a></td><td>ok</td><td>2</td><td>4.187</td><td>8.308, 12.301</td><td>0.976, 0.851</td><td>—</td><td>—</td><td>593.6</td><td>592.2</td><td>0.0</td><td>26.4</td><td>123%</td></tr><tr><td><a href='#summer-t4'>summer-t4</a></td><td>ok</td><td>2</td><td>4.050</td><td>11.954, 14.946</td><td>1.404, 1.034</td><td>—</td><td>—</td><td>603.8</td><td>602.4</td><td>0.0</td><td>32.4</td><td>166%</td></tr><tr><td><a href='#three-models-q8-overlap'>three-models-q8-overlap</a></td><td>ok</td><td>2</td><td>14.423</td><td>12.415, 12.069</td><td>1.571</td><td>2.754</td><td>4.19</td><td>1570.8</td><td>1547.0</td><td>0.0</td><td>29.2</td><td>215%</td></tr><tr><td><a href='#vits-zh-ll-t2'>vits-zh-ll-t2</a></td><td>timeout</td><td>0</td><td>5.458</td><td>—</td><td>—</td><td>—</td><td>—</td><td>207.8</td><td>202.9</td><td>0.0</td><td>8.9</td><td>125%</td></tr><tr><td><a href='#vits-zh-ll-t4'>vits-zh-ll-t4</a></td><td>ok</td><td>1</td><td>5.533</td><td>21.926</td><td>3.772</td><td>—</td><td>—</td><td>251.5</td><td>246.6</td><td>0.0</td><td>29.1</td><td>310%</td></tr></table></div><section id='asr-beam4-t2'><h2>asr-beam4-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-beam4-t2&quot;,
+  &quot;kind&quot;: &quot;asr&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 26.538282423000055,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;decoding_method&quot;: &quot;modified_beam_search&quot;,
+  &quot;max_active_paths&quot;: 4,
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;audio_seconds&quot;: 10.053125,
+  &quot;seconds&quot;: 4.906509135004853,
+  &quot;wall_seconds&quot;: 4.907594121999864,
+  &quot;rtf&quot;: 0.4880581048186363,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;first_partial_audio_s&quot;: 1.1,
+  &quot;first_partial_wall_seconds&quot;: 0.41875375199924747,
+  &quot;endpoint_audio_s&quot;: 4.0,
+  &quot;endpoint_from_file_end_s&quot;: -6.053125,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre></details><p><a href='asr-beam4-t2/stderr.log'>错误日志</a> · <a href='asr-beam4-t2/resources.jsonl'>资源时间序列</a> · <a href='asr-beam4-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-beam4-t2/stderr.log'>stderr.log</a> · <a href='asr-beam4-t2/stdout.log'>stdout.log</a></p></section><section id='asr-cpu-t1'><h2>asr-cpu-t1</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-cpu-t1&quot;,
+  &quot;kind&quot;: &quot;asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 45,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;audio_seconds&quot;: 10.053125,
+  &quot;seconds&quot;: 4.544586288998289,
+  &quot;wall_seconds&quot;: 4.545792613000231,
+  &quot;rtf&quot;: 0.45205707568525105,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;first_partial_audio_s&quot;: 1.1,
+  &quot;endpoint_audio_s&quot;: 4.0,
+  &quot;endpoint_from_file_end_s&quot;: -6.053125,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;,
+  &quot;audio_seconds&quot;: 8.0,
+  &quot;seconds&quot;: 4.022479508003926,
+  &quot;wall_seconds&quot;: 4.023576760999276,
+  &quot;rtf&quot;: 0.5028099385004907,
+  &quot;transcript&quot;: &quot;&quot;,
+  &quot;first_partial_audio_s&quot;: null,
+  &quot;endpoint_audio_s&quot;: null,
+  &quot;endpoint_from_file_end_s&quot;: null,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre></details><p><a href='asr-cpu-t1/stderr.log'>错误日志</a> · <a href='asr-cpu-t1/resources.jsonl'>资源时间序列</a> · <a href='asr-cpu-t1/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-cpu-t1/stderr.log'>stderr.log</a> · <a href='asr-cpu-t1/stdout.log'>stdout.log</a></p></section><section id='asr-cpu-t2'><h2>asr-cpu-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-cpu-t2&quot;,
+  &quot;kind&quot;: &quot;asr&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 45,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;audio_seconds&quot;: 10.053125,
+  &quot;seconds&quot;: 3.4401004619985542,
+  &quot;wall_seconds&quot;: 3.4411974089998694,
+  &quot;rtf&quot;: 0.34219215040085094,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;first_partial_audio_s&quot;: 1.1,
+  &quot;endpoint_audio_s&quot;: 4.0,
+  &quot;endpoint_from_file_end_s&quot;: -6.053125,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;,
+  &quot;audio_seconds&quot;: 8.0,
+  &quot;seconds&quot;: 2.7910750960027144,
+  &quot;wall_seconds&quot;: 2.792002295000202,
+  &quot;rtf&quot;: 0.3488843870003393,
+  &quot;transcript&quot;: &quot;&quot;,
+  &quot;first_partial_audio_s&quot;: null,
+  &quot;endpoint_audio_s&quot;: null,
+  &quot;endpoint_from_file_end_s&quot;: null,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre></details><p><a href='asr-cpu-t2/stderr.log'>错误日志</a> · <a href='asr-cpu-t2/resources.jsonl'>资源时间序列</a> · <a href='asr-cpu-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-cpu-t2/stderr.log'>stderr.log</a> · <a href='asr-cpu-t2/stdout.log'>stdout.log</a></p></section><section id='asr-cpu-t4'><h2>asr-cpu-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-cpu-t4&quot;,
+  &quot;kind&quot;: &quot;asr&quot;,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 45,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;audio_seconds&quot;: 10.053125,
+  &quot;seconds&quot;: 7.996264049001184,
+  &quot;wall_seconds&quot;: 7.997419039000306,
+  &quot;rtf&quot;: 0.7954008379485169,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;first_partial_audio_s&quot;: 1.1,
+  &quot;endpoint_audio_s&quot;: 4.0,
+  &quot;endpoint_from_file_end_s&quot;: -6.053125,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;,
+  &quot;audio_seconds&quot;: 8.0,
+  &quot;seconds&quot;: 6.099298391000048,
+  &quot;wall_seconds&quot;: 6.10022908999963,
+  &quot;rtf&quot;: 0.762412298875006,
+  &quot;transcript&quot;: &quot;&quot;,
+  &quot;first_partial_audio_s&quot;: null,
+  &quot;endpoint_audio_s&quot;: null,
+  &quot;endpoint_from_file_end_s&quot;: null,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: false
+}</pre></details><p><a href='asr-cpu-t4/stderr.log'>错误日志</a> · <a href='asr-cpu-t4/resources.jsonl'>资源时间序列</a> · <a href='asr-cpu-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-cpu-t4/stderr.log'>stderr.log</a> · <a href='asr-cpu-t4/stdout.log'>stdout.log</a></p></section><section id='asr-native-cpu-t2'><h2>asr-native-cpu-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-native-cpu-t2&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 45,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 2.9,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.29,
+  &quot;wall_seconds&quot;: 10.865067429999726,
+  &quot;transcript&quot;: null,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;,
+  &quot;seconds&quot;: 2.5,
+  &quot;audio_seconds&quot;: 8.0,
+  &quot;rtf&quot;: 0.32,
+  &quot;wall_seconds&quot;: 9.931019546999778,
+  &quot;transcript&quot;: null,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre></details><p><a href='asr-native-cpu-t2/stderr.log'>错误日志</a> · <a href='asr-native-cpu-t2/resources.jsonl'>资源时间序列</a> · <a href='asr-native-cpu-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-native-cpu-t2/0-native.log'>0-native.log</a> · <a href='asr-native-cpu-t2/1-native.log'>1-native.log</a> · <a href='asr-native-cpu-t2/stderr.log'>stderr.log</a> · <a href='asr-native-cpu-t2/stdout.log'>stdout.log</a></p></section><section id='asr-native-cpu-t2-recorded'><h2>asr-native-cpu-t2-recorded</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-native-cpu-t2-recorded&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 25,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/unsafe_motion_request_zh_2026-09-24.wav&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 25,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/unsafe_motion_request_zh_2026-09-24.wav&quot;,
+  &quot;seconds&quot;: 1.8,
+  &quot;audio_seconds&quot;: 5.9,
+  &quot;rtf&quot;: 0.31,
+  &quot;wall_seconds&quot;: 9.975131342000168,
+  &quot;transcript&quot;: &quot;机器人请让底盘上前移动二十厘米&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=cpu&quot;,
+    &quot;--num-threads=2&quot;,
+    &quot;--encoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--decoder=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx&quot;,
+    &quot;--joiner=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx&quot;,
+    &quot;--tokens=/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/unsafe_motion_request_zh_2026-09-24.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre></details><p><a href='asr-native-cpu-t2-recorded/stderr.log'>错误日志</a> · <a href='asr-native-cpu-t2-recorded/resources.jsonl'>资源时间序列</a> · <a href='asr-native-cpu-t2-recorded/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-native-cpu-t2-recorded/0-native.log'>0-native.log</a> · <a href='asr-native-cpu-t2-recorded/stderr.log'>stderr.log</a> · <a href='asr-native-cpu-t2-recorded/stdout.log'>stdout.log</a></p></section><section id='asr-npu'><h2>asr-npu</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-npu&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 45,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='asr-npu/stderr.log'>错误日志</a> · <a href='asr-npu/resources.jsonl'>资源时间序列</a> · <a href='asr-npu/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-npu/0-native.log'>0-native.log</a> · <a href='asr-npu/stderr.log'>stderr.log</a> · <a href='asr-npu/stdout.log'>stdout.log</a></p></section><section id='asr-npu-compiler22'><h2>asr-npu-compiler22</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-npu-compiler22&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 44.999982209000336,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;seconds&quot;: 3.5,
+  &quot;audio_seconds&quot;: 10.0,
+  &quot;rtf&quot;: 0.34,
+  &quot;wall_seconds&quot;: 4.982934634999765,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS AFTER TOMORROW是星期三&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;,
+  &quot;seconds&quot;: 2.9,
+  &quot;audio_seconds&quot;: 8.0,
+  &quot;rtf&quot;: 0.37,
+  &quot;wall_seconds&quot;: 4.352806400999725,
+  &quot;transcript&quot;: &quot;&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/c270_unsafe_motion_2026-09-24.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre></details><p><a href='asr-npu-compiler22/stderr.log'>错误日志</a> · <a href='asr-npu-compiler22/resources.jsonl'>资源时间序列</a> · <a href='asr-npu-compiler22/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-npu-compiler22/0-native.log'>0-native.log</a> · <a href='asr-npu-compiler22/1-native.log'>1-native.log</a> · <a href='asr-npu-compiler22/stderr.log'>stderr.log</a> · <a href='asr-npu-compiler22/stdout.log'>stdout.log</a></p></section><section id='asr-npu-compiler22-recorded'><h2>asr-npu-compiler22-recorded</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-npu-compiler22-recorded&quot;,
+  &quot;kind&quot;: &quot;native_asr&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 25,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;env&quot;: {
+    &quot;LD_LIBRARY_PATH&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/runtime-2.2.0&quot;
+  },
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;
+  ],
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/unsafe_motion_request_zh_2026-09-24.wav&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 25,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/unsafe_motion_request_zh_2026-09-24.wav&quot;,
+  &quot;seconds&quot;: 1.9,
+  &quot;audio_seconds&quot;: 5.9,
+  &quot;rtf&quot;: 0.32,
+  &quot;wall_seconds&quot;: 3.260523406000175,
+  &quot;transcript&quot;: &quot;机器人请让底盘上前移动二十厘米&quot;,
+  &quot;timing_precision&quot;: &quot;official CLI, 2 significant digits&quot;,
+  &quot;command&quot;: [
+    &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/npu/sherpa-onnx-v1.13.8-rknn-linux-aarch64-shared/bin/sherpa-onnx&quot;,
+    &quot;--provider=rknn&quot;,
+    &quot;--num-threads=1&quot;,
+    &quot;--encoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder.rknn&quot;,
+    &quot;--decoder=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder.rknn&quot;,
+    &quot;--joiner=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner.rknn&quot;,
+    &quot;--tokens=/home/orangepi/.cache/ros-robot-edge-benchmark/npu/historical/5ff8b9e4d971c082a808b229bf0e3060b1f2c926/sherpa-onnx-rk3566-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt&quot;,
+    &quot;/home/orangepi/local-data/ros-robot/voice-fixtures/unsafe_motion_request_zh_2026-09-24.wav&quot;
+  ],
+  &quot;includes_model_reload&quot;: true,
+  &quot;appended_silence_s&quot;: 0.8
+}</pre></details><p><a href='asr-npu-compiler22-recorded/stderr.log'>错误日志</a> · <a href='asr-npu-compiler22-recorded/resources.jsonl'>资源时间序列</a> · <a href='asr-npu-compiler22-recorded/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-npu-compiler22-recorded/0-native.log'>0-native.log</a> · <a href='asr-npu-compiler22-recorded/stderr.log'>stderr.log</a> · <a href='asr-npu-compiler22-recorded/stdout.log'>stdout.log</a></p></section><section id='asr-realtime-t2'><h2>asr-realtime-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;asr-realtime-t2&quot;,
+  &quot;kind&quot;: &quot;asr&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 44.99998279200008,
+  &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+  &quot;wavs&quot;: [
+    &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;
+  ],
+  &quot;realtime&quot;: true,
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav&quot;,
+  &quot;audio_seconds&quot;: 10.053125,
+  &quot;seconds&quot;: 6.731445966002866,
+  &quot;wall_seconds&quot;: 12.554764206000073,
+  &quot;rtf&quot;: 0.6695874134662472,
+  &quot;transcript&quot;: &quot;昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三&quot;,
+  &quot;first_partial_audio_s&quot;: 1.1,
+  &quot;first_partial_wall_seconds&quot;: 1.2105009819997576,
+  &quot;endpoint_audio_s&quot;: 4.0,
+  &quot;endpoint_from_file_end_s&quot;: -6.053125,
+  &quot;appended_silence_s&quot;: 2.5,
+  &quot;realtime&quot;: true
+}</pre></details><p><a href='asr-realtime-t2/stderr.log'>错误日志</a> · <a href='asr-realtime-t2/resources.jsonl'>资源时间序列</a> · <a href='asr-realtime-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='asr-realtime-t2/stderr.log'>stderr.log</a> · <a href='asr-realtime-t2/stdout.log'>stdout.log</a></p></section><section id='huayan-t1'><h2>huayan-t1</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;huayan-t1&quot;,
+  &quot;kind&quot;: &quot;sherpa_tts&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 61.97266098599994,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/zh_CN-huayan-medium.onnx&quot;,
+  &quot;vits&quot;: {
+    &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/zh_CN-huayan-medium.onnx&quot;,
+    &quot;tokens&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/tokens.txt&quot;,
+    &quot;data_dir&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/espeak-ng-data&quot;
+  },
+  &quot;tts_config&quot;: {},
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+  &quot;seconds&quot;: 7.9649236269997346,
+  &quot;samples&quot;: 131200,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 1.3386171187145133
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;,
+  &quot;seconds&quot;: 12.314713615000073,
+  &quot;samples&quot;: 207896,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 1.306131119457573
+}</pre></details><p><a href='huayan-t1/stderr.log'>错误日志</a> · <a href='huayan-t1/resources.jsonl'>资源时间序列</a> · <a href='huayan-t1/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='huayan-t1/stderr.log'>stderr.log</a> · <a href='huayan-t1/stdout.log'>stdout.log</a></p></section><section id='huayan-t2'><h2>huayan-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;huayan-t2&quot;,
+  &quot;kind&quot;: &quot;sherpa_tts&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 31.166888917000506,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/zh_CN-huayan-medium.onnx&quot;,
+  &quot;vits&quot;: {
+    &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/zh_CN-huayan-medium.onnx&quot;,
+    &quot;tokens&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/tokens.txt&quot;,
+    &quot;data_dir&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/espeak-ng-data&quot;
+  },
+  &quot;tts_config&quot;: {},
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+  &quot;seconds&quot;: 4.7125597509993895,
+  &quot;samples&quot;: 132864,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 0.7820925345431158
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;,
+  &quot;seconds&quot;: 7.394506567999997,
+  &quot;samples&quot;: 205237,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 0.7944418882774545
+}</pre></details><p><a href='huayan-t2/stderr.log'>错误日志</a> · <a href='huayan-t2/resources.jsonl'>资源时间序列</a> · <a href='huayan-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='huayan-t2/stderr.log'>stderr.log</a> · <a href='huayan-t2/stdout.log'>stdout.log</a></p></section><section id='huayan-t4'><h2>huayan-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;huayan-t4&quot;,
+  &quot;kind&quot;: &quot;sherpa_tts&quot;,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 90,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/zh_CN-huayan-medium.onnx&quot;,
+  &quot;vits&quot;: {
+    &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/zh_CN-huayan-medium.onnx&quot;,
+    &quot;tokens&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/tokens.txt&quot;,
+    &quot;data_dir&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-piper-zh_CN-huayan-medium/espeak-ng-data&quot;
+  },
+  &quot;tts_config&quot;: {},
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+  &quot;seconds&quot;: 3.909360407999884,
+  &quot;samples&quot;: 130304,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 0.6615406817626277
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;,
+  &quot;seconds&quot;: 6.121718574000624,
+  &quot;samples&quot;: 203756,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 0.6624781334376104
+}</pre></details><p><a href='huayan-t4/stderr.log'>错误日志</a> · <a href='huayan-t4/resources.jsonl'>资源时间序列</a> · <a href='huayan-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='huayan-t4/stderr.log'>stderr.log</a> · <a href='huayan-t4/stdout.log'>stdout.log</a></p></section><section id='melo-t4'><h2>melo-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;melo-t4&quot;,
+  &quot;kind&quot;: &quot;sherpa_tts&quot;,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 65,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/model.onnx&quot;,
+  &quot;vits&quot;: {
+    &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/model.onnx&quot;,
+    &quot;tokens&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/tokens.txt&quot;,
+    &quot;lexicon&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/lexicon.txt&quot;
+  },
+  &quot;tts_config&quot;: {
+    &quot;rule_fsts&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/phone.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/date.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/number.fst&quot;
+  },
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+  &quot;seconds&quot;: 29.218564558000253,
+  &quot;samples&quot;: 253424,
+  &quot;sample_rate&quot;: 44100,
+  &quot;rtf&quot;: 5.08451723991339
+}</pre></details><p><a href='melo-t4/stderr.log'>错误日志</a> · <a href='melo-t4/resources.jsonl'>资源时间序列</a> · <a href='melo-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='melo-t4/stderr.log'>stderr.log</a> · <a href='melo-t4/stdout.log'>stdout.log</a></p></section><section id='piper-huayan-default'><h2>piper-huayan-default</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;piper-huayan-default&quot;,
+  &quot;kind&quot;: &quot;piper&quot;,
+  &quot;threads&quot;: 1,
+  &quot;thread_control&quot;: &quot;ORT runtime default, not a one-thread claim&quot;,
+  &quot;timeout&quot;: 90,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/piper/piper/piper&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/piper-huayan-original/zh_CN-huayan-medium.onnx&quot;,
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+  &quot;seconds&quot;: 4.258438314999694,
+  &quot;samples&quot;: 139892,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 0.6712218343132077,
+  &quot;timing_scope&quot;: &quot;frontend+inference+WAV+ready_poll&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;,
+  &quot;seconds&quot;: 6.750574523999603,
+  &quot;samples&quot;: 225908,
+  &quot;sample_rate&quot;: 22050,
+  &quot;rtf&quot;: 0.6588972867458932,
+  &quot;timing_scope&quot;: &quot;frontend+inference+WAV+ready_poll&quot;
+}</pre></details><p><a href='piper-huayan-default/stderr.log'>错误日志</a> · <a href='piper-huayan-default/resources.jsonl'>资源时间序列</a> · <a href='piper-huayan-default/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='piper-huayan-default/native.log'>native.log</a> · <a href='piper-huayan-default/stderr.log'>stderr.log</a> · <a href='piper-huayan-default/stdout.log'>stdout.log</a></p></section><section id='qwen-bf16-short-t2'><h2>qwen-bf16-short-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-bf16-short-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 90,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/qwen3/qwen3-robot-bf16.gguf&quot;,
+  &quot;max_tokens&quot;: 32,
+  &quot;texts&quot;: [
+    &quot;你好，请介绍一下自己。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 90,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-bf16-short-t2/stderr.log'>错误日志</a> · <a href='qwen-bf16-short-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-bf16-short-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-bf16-short-t2/native.log'>native.log</a> · <a href='qwen-bf16-short-t2/stderr.log'>stderr.log</a> · <a href='qwen-bf16-short-t2/stdout.log'>stdout.log</a><a href='qwen-bf16-short-t2/0-stream.jsonl'>0-stream.jsonl</a></p></section><section id='qwen-bf16-t2'><h2>qwen-bf16-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-bf16-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/qwen3/qwen3-robot-bf16.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-bf16-t2/stderr.log'>错误日志</a> · <a href='qwen-bf16-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-bf16-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-bf16-t2/native.log'>native.log</a> · <a href='qwen-bf16-t2/stderr.log'>stderr.log</a> · <a href='qwen-bf16-t2/stdout.log'>stdout.log</a></p></section><section id='qwen-derived-q4_k_m-t2'><h2>qwen-derived-q4_k_m-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-derived-q4_k_m-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-derived-q4_k_m-t2/stderr.log'>错误日志</a> · <a href='qwen-derived-q4_k_m-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-derived-q4_k_m-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-derived-q4_k_m-t2/native.log'>native.log</a> · <a href='qwen-derived-q4_k_m-t2/stderr.log'>stderr.log</a> · <a href='qwen-derived-q4_k_m-t2/stdout.log'>stdout.log</a></p></section><section id='qwen-derived-q5_k_m-t2'><h2>qwen-derived-q5_k_m-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-derived-q5_k_m-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q5_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 16.715464885000074,
+  &quot;ttft_seconds&quot;: 5.845267091999631,
+  &quot;started_monotonic_seconds&quot;: 6551.222775459,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，再查看相机是否正常工作，最后确认周围环境安全，就可以安全开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 5829.922,
+    &quot;prompt_per_token_ms&quot;: 166.5692,
+    &quot;prompt_per_second&quot;: 6.003510853146921,
+    &quot;predicted_n&quot;: 36,
+    &quot;predicted_ms&quot;: 10870.354,
+    &quot;predicted_per_token_ms&quot;: 301.95427777777775,
+    &quot;predicted_per_second&quot;: 3.3117596722241065
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 36,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-derived-q5_k_m-t2/stderr.log'>错误日志</a> · <a href='qwen-derived-q5_k_m-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-derived-q5_k_m-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-derived-q5_k_m-t2/native.log'>native.log</a> · <a href='qwen-derived-q5_k_m-t2/stderr.log'>stderr.log</a> · <a href='qwen-derived-q5_k_m-t2/stdout.log'>stdout.log</a></p></section><section id='qwen-derived-q8_0-t2'><h2>qwen-derived-q8_0-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-derived-q8_0-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q8_0.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 8.33866609800043,
+  &quot;ttft_seconds&quot;: 1.8544654470006208,
+  &quot;started_monotonic_seconds&quot;: 6534.568958061,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，再确认相机是否开启，最后查看周围环境，比如是否有障碍物，就可以安全开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 1838.801,
+    &quot;prompt_per_token_ms&quot;: 52.537171428571426,
+    &quot;prompt_per_second&quot;: 19.034142356894524,
+    &quot;predicted_n&quot;: 39,
+    &quot;predicted_ms&quot;: 6484.425,
+    &quot;predicted_per_token_ms&quot;: 166.2673076923077,
+    &quot;predicted_per_second&quot;: 6.0144114551405865
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 39,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-derived-q8_0-t2/stderr.log'>错误日志</a> · <a href='qwen-derived-q8_0-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-derived-q8_0-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-derived-q8_0-t2/native.log'>native.log</a> · <a href='qwen-derived-q8_0-t2/stderr.log'>stderr.log</a> · <a href='qwen-derived-q8_0-t2/stdout.log'>stdout.log</a></p></section><section id='qwen-q4-b256-u128-c1024-f16'><h2>qwen-q4-b256-u128-c1024-f16</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u128-c1024-f16&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 56.896930125000836,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 128,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-q4-b256-u128-c1024-f16/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u128-c1024-f16/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u128-c1024-f16/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u128-c1024-f16/native.log'>native.log</a> · <a href='qwen-q4-b256-u128-c1024-f16/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u128-c1024-f16/stdout.log'>stdout.log</a></p></section><section id='qwen-q4-b256-u128-c1024-f16-no-repack'><h2>qwen-q4-b256-u128-c1024-f16-no-repack</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u128-c1024-f16-no-repack&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 45,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 128,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;repack&quot;: false,
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 22.740771574000064,
+  &quot;ttft_seconds&quot;: 5.0311034699998345,
+  &quot;started_monotonic_seconds&quot;: 7065.538843607,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，确保机器人处于低电量状态，然后查看相机是否正常工作，最后确认周围环境已安全测试，就可以开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 5014.943,
+    &quot;prompt_per_token_ms&quot;: 143.2840857142857,
+    &quot;prompt_per_second&quot;: 6.979142135812909,
+    &quot;predicted_n&quot;: 44,
+    &quot;predicted_ms&quot;: 17708.687,
+    &quot;predicted_per_token_ms&quot;: 402.47015909090914,
+    &quot;predicted_per_second&quot;: 2.4846562593827537
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 44,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q4-b256-u128-c1024-f16-no-repack/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u128-c1024-f16-no-repack/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u128-c1024-f16-no-repack/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u128-c1024-f16-no-repack/native.log'>native.log</a> · <a href='qwen-q4-b256-u128-c1024-f16-no-repack/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u128-c1024-f16-no-repack/stdout.log'>stdout.log</a><a href='qwen-q4-b256-u128-c1024-f16-no-repack/0-stream.jsonl'>0-stream.jsonl</a></p></section><section id='qwen-q4-b256-u128-c2048-f16'><h2>qwen-q4-b256-u128-c2048-f16</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u128-c2048-f16&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 49.04941073900045,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 2048,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 128,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-q4-b256-u128-c2048-f16/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u128-c2048-f16/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u128-c2048-f16/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u128-c2048-f16/native.log'>native.log</a> · <a href='qwen-q4-b256-u128-c2048-f16/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u128-c2048-f16/stdout.log'>stdout.log</a></p></section><section id='qwen-q4-b256-u128-c2048-f16-no-repack'><h2>qwen-q4-b256-u128-c2048-f16-no-repack</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u128-c2048-f16-no-repack&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 45,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 2048,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 128,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;repack&quot;: false,
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 19.54153720100021,
+  &quot;ttft_seconds&quot;: 6.018461927000317,
+  &quot;started_monotonic_seconds&quot;: 7098.029105897,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，确保机器人处于低电量状态，然后查看相机是否正常工作，最后确认周围环境已安全测试，就可以开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 5990.923,
+    &quot;prompt_per_token_ms&quot;: 171.16922857142856,
+    &quot;prompt_per_second&quot;: 5.842171565216245,
+    &quot;predicted_n&quot;: 44,
+    &quot;predicted_ms&quot;: 13523.133,
+    &quot;predicted_per_token_ms&quot;: 307.34393181818183,
+    &quot;predicted_per_second&quot;: 3.253683891151555
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 44,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q4-b256-u128-c2048-f16-no-repack/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u128-c2048-f16-no-repack/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u128-c2048-f16-no-repack/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u128-c2048-f16-no-repack/native.log'>native.log</a> · <a href='qwen-q4-b256-u128-c2048-f16-no-repack/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u128-c2048-f16-no-repack/stdout.log'>stdout.log</a><a href='qwen-q4-b256-u128-c2048-f16-no-repack/0-stream.jsonl'>0-stream.jsonl</a></p></section><section id='qwen-q4-b256-u128-c2048-q8_0'><h2>qwen-q4-b256-u128-c2048-q8_0</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u128-c2048-q8_0&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 41.79200333400058,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 2048,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 128,
+  &quot;kv&quot;: &quot;q8_0&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-q4-b256-u128-c2048-q8_0/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u128-c2048-q8_0/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u128-c2048-q8_0/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u128-c2048-q8_0/native.log'>native.log</a> · <a href='qwen-q4-b256-u128-c2048-q8_0/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u128-c2048-q8_0/stdout.log'>stdout.log</a></p></section><section id='qwen-q4-b256-u128-c2048-q8_0-no-repack'><h2>qwen-q4-b256-u128-c2048-q8_0-no-repack</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u128-c2048-q8_0-no-repack&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 44.984286367000095,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 2048,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 128,
+  &quot;kv&quot;: &quot;q8_0&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;repack&quot;: false,
+  &quot;requested_timeout_seconds&quot;: 45,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 33.714003635000154,
+  &quot;ttft_seconds&quot;: 5.843153114000415,
+  &quot;started_monotonic_seconds&quot;: 7126.369989891,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查机器人电量是否充足，确保电量不会亏电，然后查看相机是否开启，确认图像采集正常，接着检查周围环境是否安全，比如是否有障碍物或危险物体，最后安全开启机器人，开始测试\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 5824.929,
+    &quot;prompt_per_token_ms&quot;: 166.42654285714286,
+    &quot;prompt_per_second&quot;: 6.008656929552274,
+    &quot;predicted_n&quot;: 58,
+    &quot;predicted_ms&quot;: 27871.384,
+    &quot;predicted_per_token_ms&quot;: 480.5411034482758,
+    &quot;predicted_per_second&quot;: 2.0809874385857556
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 58,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/native.log'>native.log</a> · <a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/stdout.log'>stdout.log</a><a href='qwen-q4-b256-u128-c2048-q8_0-no-repack/0-stream.jsonl'>0-stream.jsonl</a></p></section><section id='qwen-q4-b256-u64-c1024-f16'><h2>qwen-q4-b256-u64-c1024-f16</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-b256-u64-c1024-f16&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 256,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;kv_v&quot;: &quot;f16&quot;,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='qwen-q4-b256-u64-c1024-f16/stderr.log'>错误日志</a> · <a href='qwen-q4-b256-u64-c1024-f16/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-b256-u64-c1024-f16/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-b256-u64-c1024-f16/native.log'>native.log</a> · <a href='qwen-q4-b256-u64-c1024-f16/stderr.log'>stderr.log</a> · <a href='qwen-q4-b256-u64-c1024-f16/stdout.log'>stdout.log</a></p></section><section id='qwen-q4-no-repack-t2'><h2>qwen-q4-no-repack-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q4-no-repack-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/qwen3-robot-derived-q4_k_m.gguf&quot;,
+  &quot;max_tokens&quot;: 64,
+  &quot;texts&quot;: [
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;,
+  &quot;repack&quot;: false,
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: false
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 16.970524164999915,
+  &quot;ttft_seconds&quot;: 4.798915580000539,
+  &quot;started_monotonic_seconds&quot;: 6936.733911531,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，确保机器人处于低电量状态，然后查看相机是否正常工作，最后确认周围环境已安全测试，就可以开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 4780.94,
+    &quot;prompt_per_token_ms&quot;: 136.5982857142857,
+    &quot;prompt_per_second&quot;: 7.320736089555611,
+    &quot;predicted_n&quot;: 44,
+    &quot;predicted_ms&quot;: 12172.472,
+    &quot;predicted_per_token_ms&quot;: 276.6470909090909,
+    &quot;predicted_per_second&quot;: 3.6147135930976058
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 44,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q4-no-repack-t2/stderr.log'>错误日志</a> · <a href='qwen-q4-no-repack-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-q4-no-repack-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q4-no-repack-t2/native.log'>native.log</a> · <a href='qwen-q4-no-repack-t2/stderr.log'>stderr.log</a> · <a href='qwen-q4-no-repack-t2/stdout.log'>stdout.log</a><a href='qwen-q4-no-repack-t2/0-stream.jsonl'>0-stream.jsonl</a></p></section><section id='qwen-q8-t1'><h2>qwen-q8-t1</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q8-t1&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 90,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/qwen3/qwen3-robot-q8_0.gguf&quot;,
+  &quot;max_tokens&quot;: 96,
+  &quot;texts&quot;: [
+    &quot;你好，请用两句话介绍你能怎样帮助我完成机器人实验。&quot;,
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，请用两句话介绍你能怎样帮助我完成机器人实验。&quot;,
+  &quot;seconds&quot;: 10.216220930000418,
+  &quot;ttft_seconds&quot;: 2.1333435730002748,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;我很乐意帮你完成机器人实验，我可以帮你规划实验步骤，或者帮你调试机器人的各项参数哦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 21,
+    &quot;prompt_ms&quot;: 2117.382,
+    &quot;prompt_per_token_ms&quot;: 100.8277142857143,
+    &quot;prompt_per_second&quot;: 9.917908058158613,
+    &quot;predicted_n&quot;: 33,
+    &quot;predicted_ms&quot;: 8081.725,
+    &quot;predicted_per_token_ms&quot;: 244.90075757575758,
+    &quot;predicted_per_second&quot;: 4.083286674565145
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 33,
+  &quot;tokens_evaluated&quot;: 21
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 13.218794740999328,
+  &quot;ttft_seconds&quot;: 3.5136131139997815,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，再确认相机是否开启，最后查看周围环境，比如是否有障碍物，就可以安全开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 3498.422,
+    &quot;prompt_per_token_ms&quot;: 99.95491428571428,
+    &quot;prompt_per_second&quot;: 10.004510605067084,
+    &quot;predicted_n&quot;: 39,
+    &quot;predicted_ms&quot;: 9702.596,
+    &quot;predicted_per_token_ms&quot;: 248.78451282051282,
+    &quot;predicted_per_second&quot;: 4.0195428110167635
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 39,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q8-t1/stderr.log'>错误日志</a> · <a href='qwen-q8-t1/resources.jsonl'>资源时间序列</a> · <a href='qwen-q8-t1/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q8-t1/native.log'>native.log</a> · <a href='qwen-q8-t1/stderr.log'>stderr.log</a> · <a href='qwen-q8-t1/stdout.log'>stdout.log</a></p></section><section id='qwen-q8-t2'><h2>qwen-q8-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q8-t2&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 90,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/qwen3/qwen3-robot-q8_0.gguf&quot;,
+  &quot;max_tokens&quot;: 96,
+  &quot;texts&quot;: [
+    &quot;你好，请用两句话介绍你能怎样帮助我完成机器人实验。&quot;,
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，请用两句话介绍你能怎样帮助我完成机器人实验。&quot;,
+  &quot;seconds&quot;: 7.417660285000238,
+  &quot;ttft_seconds&quot;: 1.2118772530002389,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;我很乐意帮你完成机器人实验，我可以帮你规划实验步骤，或者帮你调试机器人的各项参数哦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 21,
+    &quot;prompt_ms&quot;: 1196.389,
+    &quot;prompt_per_token_ms&quot;: 56.970904761904755,
+    &quot;prompt_per_second&quot;: 17.55281935892089,
+    &quot;predicted_n&quot;: 33,
+    &quot;predicted_ms&quot;: 6205.963,
+    &quot;predicted_per_token_ms&quot;: 188.05948484848483,
+    &quot;predicted_per_second&quot;: 5.317466443161198
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 33,
+  &quot;tokens_evaluated&quot;: 21
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 8.544040429000233,
+  &quot;ttft_seconds&quot;: 1.871228093999889,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，再确认相机是否开启，最后查看周围环境，比如是否有障碍物，就可以安全开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 1856.116,
+    &quot;prompt_per_token_ms&quot;: 53.031885714285714,
+    &quot;prompt_per_second&quot;: 18.856580084434377,
+    &quot;predicted_n&quot;: 39,
+    &quot;predicted_ms&quot;: 6672.426,
+    &quot;predicted_per_token_ms&quot;: 171.08784615384616,
+    &quot;predicted_per_second&quot;: 5.844950547222254
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 39,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q8-t2/stderr.log'>错误日志</a> · <a href='qwen-q8-t2/resources.jsonl'>资源时间序列</a> · <a href='qwen-q8-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q8-t2/native.log'>native.log</a> · <a href='qwen-q8-t2/stderr.log'>stderr.log</a> · <a href='qwen-q8-t2/stdout.log'>stdout.log</a></p></section><section id='qwen-q8-t4'><h2>qwen-q8-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;qwen-q8-t4&quot;,
+  &quot;kind&quot;: &quot;llama&quot;,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 90,
+  &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/models/qwen3/qwen3-robot-q8_0.gguf&quot;,
+  &quot;max_tokens&quot;: 96,
+  &quot;texts&quot;: [
+    &quot;你好，请用两句话介绍你能怎样帮助我完成机器人实验。&quot;,
+    &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+  ],
+  &quot;context&quot;: 1024,
+  &quot;batch&quot;: 128,
+  &quot;microbatch&quot;: 64,
+  &quot;kv&quot;: &quot;f16&quot;
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，请用两句话介绍你能怎样帮助我完成机器人实验。&quot;,
+  &quot;seconds&quot;: 27.09158041899991,
+  &quot;ttft_seconds&quot;: 2.5291582410000046,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;我很乐意帮你完成机器人实验，我可以帮你规划实验步骤，或者帮你调试机器人的各项参数哦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 21,
+    &quot;prompt_ms&quot;: 2512.334,
+    &quot;prompt_per_token_ms&quot;: 119.63495238095237,
+    &quot;prompt_per_second&quot;: 8.358761215666389,
+    &quot;predicted_n&quot;: 33,
+    &quot;predicted_ms&quot;: 24562.239,
+    &quot;predicted_per_token_ms&quot;: 744.3102727272727,
+    &quot;predicted_per_second&quot;: 1.3435257266245149
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 33,
+  &quot;tokens_evaluated&quot;: 21
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 28.701036323000153,
+  &quot;ttft_seconds&quot;: 3.2021898570001213,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，再确认相机是否开启，最后查看周围环境，比如是否有障碍物，就可以安全开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 3186.942,
+    &quot;prompt_per_token_ms&quot;: 91.05548571428571,
+    &quot;prompt_per_second&quot;: 10.98231470795515,
+    &quot;predicted_n&quot;: 39,
+    &quot;predicted_ms&quot;: 25498.743,
+    &quot;predicted_per_token_ms&quot;: 653.8139230769231,
+    &quot;predicted_per_second&quot;: 1.529487159425859
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 39,
+  &quot;tokens_evaluated&quot;: 35
+}</pre></details><p><a href='qwen-q8-t4/stderr.log'>错误日志</a> · <a href='qwen-q8-t4/resources.jsonl'>资源时间序列</a> · <a href='qwen-q8-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='qwen-q8-t4/native.log'>native.log</a> · <a href='qwen-q8-t4/stderr.log'>stderr.log</a> · <a href='qwen-q8-t4/stdout.log'>stdout.log</a></p></section><section id='summer-matched-t2'><h2>summer-matched-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;summer-matched-t2&quot;,
+  &quot;kind&quot;: &quot;summer&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 59.99997579200044,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin&quot;,
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先检查相机和周围环境，再提醒我确认电量，不要直接移动机器人。&quot;
+  ],
+  &quot;requested_timeout_seconds&quot;: 60,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 6.347218193,
+  &quot;samples&quot;: 126464,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 0.803038738992915,
+  &quot;started_monotonic_seconds&quot;: 6611.292534658
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;seconds&quot;: 9.205214262,
+  &quot;samples&quot;: 184832,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 0.7968502650623269,
+  &quot;started_monotonic_seconds&quot;: 6617.641641664
+}</pre></details><p><a href='summer-matched-t2/stderr.log'>错误日志</a> · <a href='summer-matched-t2/resources.jsonl'>资源时间序列</a> · <a href='summer-matched-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='summer-matched-t2/stderr.log'>stderr.log</a> · <a href='summer-matched-t2/stdout.log'>stdout.log</a></p></section><section id='summer-t1'><h2>summer-t1</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;summer-t1&quot;,
+  &quot;kind&quot;: &quot;summer&quot;,
+  &quot;threads&quot;: 1,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin&quot;,
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续和你交流了。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先查看前方是否有人，再说明相机和语音模块的状态，最后提醒我检查电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 9.78652,
+  &quot;samples&quot;: 136192,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 1.14973
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;seconds&quot;: 18.9282,
+  &quot;samples&quot;: 231168,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 1.31009
+}</pre></details><p><a href='summer-t1/stderr.log'>错误日志</a> · <a href='summer-t1/resources.jsonl'>资源时间序列</a> · <a href='summer-t1/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='summer-t1/stderr.log'>stderr.log</a> · <a href='summer-t1/stdout.log'>stdout.log</a></p></section><section id='summer-t2'><h2>summer-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;summer-t2&quot;,
+  &quot;kind&quot;: &quot;summer&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin&quot;,
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续和你交流了。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先查看前方是否有人，再说明相机和语音模块的状态，最后提醒我检查电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 8.3083,
+  &quot;samples&quot;: 136192,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 0.976069
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;seconds&quot;: 12.3009,
+  &quot;samples&quot;: 231168,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 0.85139
+}</pre></details><p><a href='summer-t2/stderr.log'>错误日志</a> · <a href='summer-t2/resources.jsonl'>资源时间序列</a> · <a href='summer-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='summer-t2/stderr.log'>stderr.log</a> · <a href='summer-t2/stdout.log'>stdout.log</a></p></section><section id='summer-t4'><h2>summer-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;summer-t4&quot;,
+  &quot;kind&quot;: &quot;summer&quot;,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 60,
+  &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe&quot;,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin&quot;,
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续和你交流了。&quot;,
+    &quot;今天是10月21日，室内温度25摄氏度。请先查看前方是否有人，再说明相机和语音模块的状态，最后提醒我检查电量，不要直接移动机器人。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 11.9541,
+  &quot;samples&quot;: 136192,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 1.40438
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;seconds&quot;: 14.9462,
+  &quot;samples&quot;: 231168,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 1.03448
+}</pre></details><p><a href='summer-t4/stderr.log'>错误日志</a> · <a href='summer-t4/resources.jsonl'>资源时间序列</a> · <a href='summer-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='summer-t4/stderr.log'>stderr.log</a> · <a href='summer-t4/stdout.log'>stdout.log</a></p></section><section id='three-models-q8-overlap'><h2>three-models-q8-overlap</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;three-models-q8-overlap&quot;,
+  &quot;kind&quot;: &quot;coexistence&quot;,
+  &quot;timeout&quot;: 74.99998249999953,
+  &quot;members&quot;: [
+    {
+      &quot;id&quot;: &quot;asr-resident&quot;,
+      &quot;kind&quot;: &quot;asr&quot;,
+      &quot;threads&quot;: 1,
+      &quot;timeout&quot;: 45,
+      &quot;model&quot;: &quot;/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16&quot;,
+      &quot;wavs&quot;: []
+    },
+    {
+      &quot;id&quot;: &quot;summer-overlap&quot;,
+      &quot;kind&quot;: &quot;summer&quot;,
+      &quot;threads&quot;: 2,
+      &quot;timeout&quot;: 60,
+      &quot;binary&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/build/summer/summer_probe&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/single_speaker_fast.bin&quot;,
+      &quot;texts&quot;: [
+        &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;qwen-overlap&quot;,
+      &quot;kind&quot;: &quot;llama&quot;,
+      &quot;threads&quot;: 2,
+      &quot;timeout&quot;: 90,
+      &quot;binary&quot;: &quot;/home/orangepi/build/llama.cpp-qwen3-22cd/bin/llama-server&quot;,
+      &quot;model&quot;: &quot;/home/orangepi/models/qwen3/qwen3-robot-q8_0.gguf&quot;,
+      &quot;max_tokens&quot;: 64,
+      &quot;texts&quot;: [
+        &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;
+      ],
+      &quot;context&quot;: 1024,
+      &quot;batch&quot;: 128,
+      &quot;microbatch&quot;: 64,
+      &quot;kv&quot;: &quot;f16&quot;
+    }
+  ],
+  &quot;requested_timeout_seconds&quot;: 75,
+  &quot;budget_limited&quot;: true
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;seconds&quot;: 12.415229981,
+  &quot;samples&quot;: 126464,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 1.5707527809969635,
+  &quot;started_monotonic_seconds&quot;: 6698.798711954,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;summer-overlap&quot;
+}</pre><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 1,
+  &quot;input&quot;: &quot;我准备在室内测试机器人，请用简短的中文说明如何先检查电量、相机和周围环境，再安全开始测试。&quot;,
+  &quot;seconds&quot;: 12.0690185200001,
+  &quot;ttft_seconds&quot;: 2.753651064999758,
+  &quot;started_monotonic_seconds&quot;: 6698.804936931,
+  &quot;reply&quot;: &quot;{\&quot;res\&quot;:\&quot;首先检查电量是否充足，再确认相机是否开启，最后查看周围环境，比如是否有障碍物，就可以安全开始测试啦\&quot;, \&quot;fc\&quot;:[\&quot;head_think\&quot;]}&quot;,
+  &quot;timings&quot;: {
+    &quot;cache_n&quot;: 0,
+    &quot;prompt_n&quot;: 35,
+    &quot;prompt_ms&quot;: 2736.412,
+    &quot;prompt_per_token_ms&quot;: 78.1832,
+    &quot;prompt_per_second&quot;: 12.790471610269215,
+    &quot;predicted_n&quot;: 39,
+    &quot;predicted_ms&quot;: 9315.007,
+    &quot;predicted_per_token_ms&quot;: 238.84633333333332,
+    &quot;predicted_per_second&quot;: 4.186792344868877
+  },
+  &quot;stop_type&quot;: &quot;eos&quot;,
+  &quot;stopped_limit&quot;: null,
+  &quot;tokens_predicted&quot;: 39,
+  &quot;tokens_evaluated&quot;: 35,
+  &quot;source_index&quot;: 0,
+  &quot;module&quot;: &quot;qwen-overlap&quot;
+}</pre></details><p><a href='three-models-q8-overlap/stderr.log'>错误日志</a> · <a href='three-models-q8-overlap/resources.jsonl'>资源时间序列</a> · <a href='three-models-q8-overlap/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='three-models-q8-overlap/stderr.log'>stderr.log</a> · <a href='three-models-q8-overlap/stdout.log'>stdout.log</a></p></section><section id='vits-zh-ll-t2'><h2>vits-zh-ll-t2</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;vits-zh-ll-t2&quot;,
+  &quot;kind&quot;: &quot;sherpa_tts&quot;,
+  &quot;threads&quot;: 2,
+  &quot;timeout&quot;: 8.674253891000262,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/model.onnx&quot;,
+  &quot;vits&quot;: {
+    &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/model.onnx&quot;,
+    &quot;tokens&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/tokens.txt&quot;,
+    &quot;lexicon&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/lexicon.txt&quot;
+  },
+  &quot;tts_config&quot;: {
+    &quot;rule_fsts&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/phone.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/date.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/number.fst&quot;
+  },
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary></details><p><a href='vits-zh-ll-t2/stderr.log'>错误日志</a> · <a href='vits-zh-ll-t2/resources.jsonl'>资源时间序列</a> · <a href='vits-zh-ll-t2/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='vits-zh-ll-t2/stderr.log'>stderr.log</a> · <a href='vits-zh-ll-t2/stdout.log'>stdout.log</a></p></section><section id='vits-zh-ll-t4'><h2>vits-zh-ll-t4</h2><details><summary>完整参数</summary><pre>{
+  &quot;id&quot;: &quot;vits-zh-ll-t4&quot;,
+  &quot;kind&quot;: &quot;sherpa_tts&quot;,
+  &quot;threads&quot;: 4,
+  &quot;timeout&quot;: 65,
+  &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/model.onnx&quot;,
+  &quot;vits&quot;: {
+    &quot;model&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/model.onnx&quot;,
+    &quot;tokens&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/tokens.txt&quot;,
+    &quot;lexicon&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/lexicon.txt&quot;
+  },
+  &quot;tts_config&quot;: {
+    &quot;rule_fsts&quot;: &quot;/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/phone.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/date.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/sherpa-onnx-vits-zh-ll/number.fst&quot;
+  },
+  &quot;texts&quot;: [
+    &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;
+  ]
+}</pre></details><details><summary>逐例输入输出与音频</summary><pre>{
+  &quot;event&quot;: &quot;sample&quot;,
+  &quot;index&quot;: 0,
+  &quot;input&quot;: &quot;你好，我是小沫。现在正在检查本地语音功能，准备好之后就可以继续交流。&quot;,
+  &quot;seconds&quot;: 21.926310007999746,
+  &quot;samples&quot;: 93015,
+  &quot;sample_rate&quot;: 16000,
+  &quot;rtf&quot;: 3.7716600562059446
+}</pre></details><p><a href='vits-zh-ll-t4/stderr.log'>错误日志</a> · <a href='vits-zh-ll-t4/resources.jsonl'>资源时间序列</a> · <a href='vits-zh-ll-t4/result.json'>原始结果</a></p><p>原生输出/流式记录：<a href='vits-zh-ll-t4/stderr.log'>stderr.log</a> · <a href='vits-zh-ll-t4/stdout.log'>stdout.log</a></p></section></main></html>

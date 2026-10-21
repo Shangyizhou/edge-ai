@@ -1,0 +1,77 @@
+{
+  "created_at": "2026-10-21T03:30:27.050687+00:00",
+  "platform": "Linux-5.10.160-rockchip-rk356x-aarch64-with-glibc2.29",
+  "cpu_count": 4,
+  "cpuinfo": "processor\t: 0\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nprocessor\t: 1\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nprocessor\t: 2\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nprocessor\t: 3\nBogoMIPS\t: 48.00\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp\nCPU implementer\t: 0x41\nCPU architecture: 8\nCPU variant\t: 0x2\nCPU part\t: 0xd05\nCPU revision\t: 0\n\nSerial\t\t: 7cd8dbf648179980\n",
+  "host_memory": {
+    "MemAvailable": 2428556,
+    "SwapFree": 798140
+  },
+  "assets": [
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/decoder-epoch-99-avg-1.onnx",
+      "bytes": 13877276,
+      "sha256": "89be509a83175261695bdef5fd1c7b9ab1129a663d1284e7ba9f8507b21e0906"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/encoder-epoch-99-avg-1.int8.onnx",
+      "bytes": 42980793,
+      "sha256": "db6f51551762e40e549166fe041ea3e45464370b595e9ad23f06478ec3794fbb"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/joiner-epoch-99-avg-1.int8.onnx",
+      "bytes": 3228485,
+      "sha256": "bdda356d6f9b8c2d7cee9ee0e26075fa537490f7fd06520be408d287073667b9"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+      "bytes": 321744,
+      "sha256": "7d93384ca14702cc584a7a33fe2fed92e89e708549161cb12ea38c916882103b"
+    },
+    {
+      "path": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/tokens.txt",
+      "bytes": 56317,
+      "sha256": "a8e0e4ec53810e433789b54a5c0134a7eaa2ffca595a6334d54c00da858841d3"
+    },
+    {
+      "path": "tools/edge_benchmark/benchmark.py",
+      "bytes": 17376,
+      "sha256": "e600adef487abe7123229ae0703f8eeedd7404c1f68fd880b0a460a414889226"
+    },
+    {
+      "path": "tools/edge_benchmark/workers.py",
+      "bytes": 21233,
+      "sha256": "eb4254f432b065408534b10f99879019c92fadd37ca9bcc57f87c65520909d2e"
+    }
+  ],
+  "suite": {
+    "python": "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "budget_seconds": 45,
+    "cases": [
+      {
+        "id": "asr-realtime-t2",
+        "kind": "asr",
+        "threads": 2,
+        "timeout": 45,
+        "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+        "wavs": [
+          "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+        ],
+        "realtime": true
+      },
+      {
+        "id": "asr-beam4-t2",
+        "kind": "asr",
+        "threads": 2,
+        "timeout": 45,
+        "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+        "wavs": [
+          "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+        ],
+        "decoding_method": "modified_beam_search",
+        "max_active_paths": 4
+      }
+    ]
+  },
+  "python": "3.8.10 (default, Sep 11 2024, 16:02:53) \n[GCC 9.4.0]"
+}

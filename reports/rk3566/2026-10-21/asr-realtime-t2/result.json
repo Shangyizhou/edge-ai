@@ -1,0 +1,54 @@
+{
+  "id": "asr-realtime-t2",
+  "config": {
+    "id": "asr-realtime-t2",
+    "kind": "asr",
+    "threads": 2,
+    "timeout": 44.99998279200008,
+    "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+    "wavs": [
+      "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+    ],
+    "realtime": true,
+    "requested_timeout_seconds": 45,
+    "budget_limited": true
+  },
+  "command": [
+    "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "tools/edge_benchmark/workers.py",
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/runs/asr-interaction-01/asr-realtime-t2/config.json",
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/runs/asr-interaction-01/asr-realtime-t2"
+  ],
+  "status": "ok",
+  "returncode": 0,
+  "wall_seconds": 18.45079039800021,
+  "peak_rss_mib": 162.49609375,
+  "peak_pss_mib": 156.4287109375,
+  "peak_swap_mib": 0.0,
+  "cpu_seconds": 21.43,
+  "peak_threads": 4,
+  "min_host_available_mib": 2185.3515625,
+  "events": [
+    {
+      "event": "loaded",
+      "load_seconds": 4.055057190000298,
+      "engine_version": "1.13.8"
+    },
+    {
+      "event": "sample",
+      "index": 0,
+      "input": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+      "audio_seconds": 10.053125,
+      "seconds": 6.731445966002866,
+      "wall_seconds": 12.554764206000073,
+      "rtf": 0.6695874134662472,
+      "transcript": "昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三",
+      "first_partial_audio_s": 1.1,
+      "first_partial_wall_seconds": 1.2105009819997576,
+      "endpoint_audio_s": 4.0,
+      "endpoint_from_file_end_s": -6.053125,
+      "appended_silence_s": 2.5,
+      "realtime": true
+    }
+  ]
+}

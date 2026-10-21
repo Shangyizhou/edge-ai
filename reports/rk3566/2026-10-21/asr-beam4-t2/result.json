@@ -1,0 +1,55 @@
+{
+  "id": "asr-beam4-t2",
+  "config": {
+    "id": "asr-beam4-t2",
+    "kind": "asr",
+    "threads": 2,
+    "timeout": 26.538282423000055,
+    "model": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16",
+    "wavs": [
+      "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav"
+    ],
+    "decoding_method": "modified_beam_search",
+    "max_active_paths": 4,
+    "requested_timeout_seconds": 45,
+    "budget_limited": true
+  },
+  "command": [
+    "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "tools/edge_benchmark/workers.py",
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/runs/asr-interaction-01/asr-beam4-t2/config.json",
+    "/home/orangepi/.cache/ros-robot-edge-benchmark/runs/asr-interaction-01/asr-beam4-t2"
+  ],
+  "status": "ok",
+  "returncode": 0,
+  "wall_seconds": 10.311822901000596,
+  "peak_rss_mib": 162.9375,
+  "peak_pss_mib": 156.939453125,
+  "peak_swap_mib": 0.0,
+  "cpu_seconds": 22.82,
+  "peak_threads": 4,
+  "min_host_available_mib": 2233.6640625,
+  "events": [
+    {
+      "event": "loaded",
+      "load_seconds": 3.9456500709993634,
+      "engine_version": "1.13.8"
+    },
+    {
+      "event": "sample",
+      "index": 0,
+      "input": "/home/orangepi/models/voice/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16/test_wavs/0.wav",
+      "audio_seconds": 10.053125,
+      "seconds": 4.906509135004853,
+      "wall_seconds": 4.907594121999864,
+      "rtf": 0.4880581048186363,
+      "transcript": "昨天是 MONDAY TODAY IS THEY AFTER TOMORROW是星期三",
+      "first_partial_audio_s": 1.1,
+      "first_partial_wall_seconds": 0.41875375199924747,
+      "endpoint_audio_s": 4.0,
+      "endpoint_from_file_end_s": -6.053125,
+      "appended_silence_s": 2.5,
+      "realtime": false
+    }
+  ]
+}
