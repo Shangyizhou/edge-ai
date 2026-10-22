@@ -1,0 +1,125 @@
+{
+  "id": "volume_set",
+  "user": "把音量设置为30。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 30
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "把音量设置为30。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "arguments": "{\"level\": 30}"
+        }
+      }
+    ],
+    "wall_seconds": 72.23718600599386,
+    "ttft_seconds": 68.57817808400432,
+    "prompt_tokens": 444,
+    "evaluated_prefill_tokens": 444,
+    "native_usage": {
+      "completion_tokens": 21,
+      "prompt_tokens": 444,
+      "total_tokens": 465,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 444,
+      "prompt_ms": 66120.228,
+      "prompt_per_token_ms": 148.91943243243244,
+      "prompt_per_second": 6.715040365559537,
+      "predicted_n": 21,
+      "predicted_ms": 6096.209,
+      "predicted_per_token_ms": 304.81045,
+      "predicted_per_second": 3.2807274160055866
+    },
+    "cache_prompt": false,
+    "output_tokens": 21,
+    "prefill_seconds": 66.120228,
+    "decode_seconds": 6.096209,
+    "prefill_tokens_per_second": 6.715040365559537,
+    "decode_tokens_per_second": 3.2807274160055866,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 30
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 30
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 73.7284513850027,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 150729,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 274,
+    "wall_seconds": 73.79610674300056,
+    "cpu_seconds": 144.09,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 48.813550727615684,
+    "peak_rss_bytes": 623554560,
+    "peak_pss_bytes": 623403008,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2816000000,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

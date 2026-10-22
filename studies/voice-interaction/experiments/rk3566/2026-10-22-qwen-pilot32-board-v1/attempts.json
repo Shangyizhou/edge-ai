@@ -1,0 +1,21 @@
+{
+  "attempts": [
+    {
+      "path": "failed-runs/f16-cold-v1",
+      "scope": "existing22cd default directIO/repack",
+      "result": "owned server SIGABRT -6 during tensor loading; see server.log and resource samples"
+    },
+    {
+      "path": "failed-runs/f16-cold-v2",
+      "scope": "launcher port preflight, before model launch",
+      "result": "OSError errno98 Address already in use after prior service exit; observer transcribed from exec session43905 stderr, no server launched",
+      "repair": "SO_REUSEADDR on unused-port probe; still rejects an active listener. Covered by public occupied-port test."
+    },
+    {
+      "path": "failed-runs/f16-cold-v3",
+      "scope": "existing22cd --no-repack --mmap --fit off",
+      "result": "health ready, exactschema /apply-template HTTP400; no successful native inference claim"
+    }
+  ],
+  "observer": "assistant; diagnostic descriptions are annotations over immutable attempt files"
+}

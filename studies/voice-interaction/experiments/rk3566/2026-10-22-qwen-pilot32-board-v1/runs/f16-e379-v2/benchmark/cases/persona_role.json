@@ -1,0 +1,92 @@
+{
+  "id": "persona_role",
+  "user": "你是什么身份，主要做什么？",
+  "expected": {
+    "kind": "persona",
+    "contains_any": [
+      "科研",
+      "机器人助手"
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "你是什么身份，主要做什么？"
+    }
+  ],
+  "kind": "persona",
+  "status": "completed",
+  "generation": {
+    "raw": "我是AI机器人，主要用来提供帮助和信息。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 70.22737703399616,
+    "ttft_seconds": 65.8360897829989,
+    "prompt_tokens": 443,
+    "evaluated_prefill_tokens": 443,
+    "native_usage": {
+      "completion_tokens": 12,
+      "prompt_tokens": 443,
+      "total_tokens": 455,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 443,
+      "prompt_ms": 65816.625,
+      "prompt_per_token_ms": 148.57025959367945,
+      "prompt_per_second": 6.730822189682319,
+      "predicted_n": 12,
+      "predicted_ms": 4390.875,
+      "predicted_per_token_ms": 399.17045454545456,
+      "predicted_per_second": 2.5051954337119593
+    },
+    "cache_prompt": false,
+    "output_tokens": 12,
+    "prefill_seconds": 65.816625,
+    "decode_seconds": 4.390875,
+    "prefill_tokens_per_second": 6.730822189682319,
+    "decode_tokens_per_second": 2.5051954337119593,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": false,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "我是AI机器人，主要用来提供帮助和信息。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 149081,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 256,
+    "wall_seconds": 70.30064865799795,
+    "cpu_seconds": 139.79999999999995,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 49.7150462580032,
+    "peak_rss_bytes": 734068736,
+    "peak_pss_bytes": 733153280,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2719649792,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

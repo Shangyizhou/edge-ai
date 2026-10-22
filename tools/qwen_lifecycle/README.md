@@ -75,8 +75,8 @@ potentially overlapping quantities; Linux PSS is separate. No available field
 is invented for another platform.
 
 `report` is read-only and imports no MLX runtime. A combined HTML embeds result
-JSON; each run's generated HTML also carries a zip of raw JSON evidence. It
-follows the existing approved layout without modifying historical reports.
+JSON; the benchmark CLI's HTML also carries a zip of raw JSON evidence.
+It follows the approved layout without modifying historical reports.
 
 For isolated Linux CPU preparation and benchmarking, run
 `python -m tools.qwen_lifecycle.board_run REQUEST NEW_OUTPUT` on the board.
@@ -94,6 +94,18 @@ prefill rate uses evaluated tokens, never the full prompt length. Keep cache
 conditions in separate run groups. Linux raw samples include thermal-zone
 readings when available and system-wide swap-in/out counters; their deltas
 cannot be attributed solely to the model process.
+
+### Versioned server flags
+
+Server flags are versioned inputs: inspect the actual binary's `--help`
+before freezing `server.argv`. Observed Linux compatibility: `22cd28d`
+accepts `--mmap`; `e3797b1` removes that flag and requires
+`--load-mode mmap`. The launcher passes the frozen argv through unchanged,
+records startup failures, and never silently rewrites historical requests.
+Current verified RK3566 pilot argv is `-t 2 -tb 2 -c 2048 -np 1 -b 512
+-ub 128 -ngl 0 --jinja -ctk f16 -ctv f16 --no-repack --load-mode mmap
+--fit off -fa on`; the separate KV comparison changes both cache types to
+`q8_0`. These flags still require actual loading/inference on a new binary.
 
 ### Intake metric layers
 
