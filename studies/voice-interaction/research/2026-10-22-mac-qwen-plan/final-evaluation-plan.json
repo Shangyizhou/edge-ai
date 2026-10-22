@@ -1,0 +1,67 @@
+{
+  "schema": "edge-model-final-evaluation-plan/v1",
+  "date": "2026-10-22",
+  "status": "candidate and scope frozen before opening final holdout; exact launcher config to be frozen from completed board pilot",
+  "selection_inputs": "validation only; ticket11 selected adapter/prompt and ticket13 selected primary Q4",
+  "models": [
+    {
+      "id": "untrained-q4-matched",
+      "artifact": "matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+      "bytes": 396705024,
+      "sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab"
+    },
+    {
+      "id": "selected-lora-q4",
+      "artifact": "selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+      "bytes": 396704704,
+      "sha256": "6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5"
+    }
+  ],
+  "devices": [
+    "Mac M5 / Metal",
+    "Orange Pi 3B RK3566 / ARM CPU"
+  ],
+  "cohorts": [
+    {
+      "id": "original-holdout",
+      "samples": 120,
+      "tool_requests": 72,
+      "persona_requests": 36,
+      "chat_requests": 12,
+      "sha256": "12ecc86b2bde791728312d8660ea66af26fd8e51477803bb52f0d7cb760de3a5"
+    },
+    {
+      "id": "supplemental-multicall",
+      "samples": 12,
+      "tool_requests": 12,
+      "expected_calls": 28,
+      "sha256": "22f20895471afba0887f641acf1229e9b87dfa371540818cc9bf66171d59e7eb"
+    }
+  ],
+  "total_samples_per_model_device": 132,
+  "primary_candidate_reason": "Q4 validation format/Schema36/36 and contextual persona18/18; smallest prepared artifact. Six semantic tool failures retained as observation. User prioritizes small-memory native format pilot.",
+  "q8_scope": "Mac measured quantization-loss reference only; not selected for a third complete board final matrix. No inference of unmeasured board Q8 resources.",
+  "q5_scope": "Not selected: two contextual persona failures in validation.",
+  "runtime_source": "e3797b184d428c7a019362612b76971f60af6670",
+  "board_config_basis": "completed ticket12 development KV/cache study; prefer proven q8_0 KV plus cache_prompt=true; exact argv/context/threads frozen before first final generation",
+  "cache_reporting": "Separate first cold, exact-repeat and changed-prefix observations; full input usage distinct from evaluated prefill and cached tokens. Do not claim cached latency reduction as model throughput gain.",
+  "metrics": [
+    "native calls",
+    "strict parameter JSON",
+    "JSON Schema",
+    "pure Registry",
+    "exact tool semantics as observation",
+    "no-call behavior",
+    "contextual persona facts by Codex assistant, not human acceptance",
+    "native prefill/decode counters",
+    "TTFT and complete valid-call latency",
+    "model process-tree CPU/platform memory and system-wide context"
+  ],
+  "rules": [
+    "Do not omit final cases for runtime budget.",
+    "Original120 and supplemental12 reported separately; optional combined132 retains cohort counts.",
+    "Do not train, change prompt, select precision or tune configuration using final predictions.",
+    "Record incomplete gates and all failures honestly; do not promote candidates based on final feedback.",
+    "No handlers, hardware actions, legacy production edits or Pages publication."
+  ]
+}
