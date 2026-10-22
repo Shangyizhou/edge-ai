@@ -1,0 +1,9 @@
+# Final independent Spec-axis re-review
+
+Reviewed correction HEAD `470d62a` against the prior two findings. **No remaining actionable Spec findings.**
+
+- **Native string preservation fixed.** `tools/qwen_lifecycle/protocol.py` now decodes the strict JSON object boundary before consuming native envelope markers. The public-intake regression exercises selected `play_music`, literal opening/closing markers inside strings, Unicode, escaped quotes/backslashes, three ordered calls including a repeat, surrounding content and incomplete/garbage boundaries. I independently ran all nine protocol-layer tests: PASS. This satisfies #8's observable argument/order preservation requirement for the reported defect.
+- **Saved results independently rechecked.** I reran `docs/validation/qwen-review-2026-10-22/reassess.py` without a model, Registry subprocess or browser. Its 33 runs / 1,739 cases have zero old/current and zero recorded/current differences across available JSON/native/completion/Schema/exact/reply fields; output equals committed `reassessment.json`. Source request/suite/result hashes are checked unchanged. This includes all 528 canonical final requests; contextual persona and Registry outcomes are preserved, not newly validated by this script.
+- **Visual requirement explicitly waived by user.** The user's latest choice accepts static acceptance while retaining rendered desktop/mobile validation as unverified. Accordingly, the former #14 visual-acceptance gap is no longer a blocking spec finding under the revised authorized scope. Existing static evidence is not a visual PASS; historical records remain intact.
+
+Persona 21/36 and ten misroutes remain explicit UNMET experimental results, with fresh-development-data/fresh-holdout next steps. Format success does not establish semantic, production, human-persona or robot acceptance. No scope creep or further implementation mismatch found in this focused re-review.
