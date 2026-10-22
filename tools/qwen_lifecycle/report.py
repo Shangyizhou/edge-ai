@@ -95,10 +95,15 @@ def render(results, evidence_bundle=None):
         out.extend([f'<section id="{ident}"><div class="eyebrow">'
                     f'{esc(result["stage"])}</div><h2>{esc(result["run_id"])}</h2>',
                     '<div class="method"><strong>怎样测：</strong>固定工具、system和输入；'
-                    '每例新建模型prompt cache；非思考模式。真实响应完整解析后，'
+                    f'缓存策略：{esc(result.get("measurement", {}).get("cache", "未记录"))}；'
+                    f'计时记录：{esc(result.get("measurement", {}).get("timing", "未记录"))}；'
+                    '非思考模式。真实响应完整解析后，'
                     '只通过JSON Schema及可配置Registry纯校验，不执行设备。<br>',
                     '<strong>怎样读：</strong>prefill与decode tokens/s采用运行时计时，'
-                    'TTFT为生成入口至首非空输出，完整有效调用等待包含模板/推理/解析/校验；'
+                    '完整输入量由adapter记录（HTTP优先usage，MLX使用完整prompt计数）；'
+                    '实际prefill量为运行时本次评估tokens，缓存开启时二者不同。'
+                    'TTFT为各adapter入口至首非空输出（HTTP含请求/传输，MLX从生成入口起算）；'
+                    '完整有效调用等待含模板/推理/解析/校验，不等于服务端prefill或decode计时；'
                     '缺失字段为未测，失败/截断不是快速成功。角色采用预先固定文本规则，'
                     '不是独立人工整体人设评审。</div>',
                     '<h3>工具调用 · 实际输入与输出</h3>'])
@@ -122,11 +127,16 @@ def render(results, evidence_bundle=None):
                            f'<small>实际输出</small><div class="output '
                            f'{"" if passed else "fail"}">{esc(raw or case.get("error"))}</div>'
                            f'<small>预期</small><pre>{esc(json.dumps(case["expected"], ensure_ascii=False))}</pre>'
-                           f'<div class="stats"><span>prompt {number(generation.get("prompt_tokens"), 0)} tokens</span>'
+                           f'<div class="stats"><span>完整输入 usage {number(generation.get("prompt_tokens"), 0)} tokens</span>'
+                           f'<span>实际 prefill {number(generation.get("evaluated_prefill_tokens"), 0)} tokens</span>'
+                           f'<span>cache_prompt {esc(generation.get("cache_prompt", "未记录"))}</span>'
                            f'<span>首内容 {number(generation.get("ttft_seconds"))}s</span>'
                            f'<span>完整有效调用 {number(case.get("valid_call_seconds"))}s</span>'
                            f'<span>prefill {number(generation.get("prefill_tokens_per_second"))} tokens/s</span>'
                            f'<span>decode {number(generation.get("decode_tokens_per_second"))} tokens/s</span></div>'
+                           f'<p class="foot">计时来源：{esc(generation.get("timing_source", "未记录"))}</p>'
+                           f'<details><summary>原生usage与计时（缓存命中仅以原生字段为准，不用输入减prefill推算）</summary><pre>'
+                           f'{esc(json.dumps({"native_usage": generation.get("native_usage"), "native_timings": generation.get("native_timings")}, ensure_ascii=False, indent=2))}</pre></details>'
                            f'<details><summary>解析、Schema与角色检查</summary><pre>'
                            f'{esc(json.dumps(assessed, ensure_ascii=False, indent=2))}</pre></details></article>')
         summary = result["summary"]
@@ -140,6 +150,7 @@ def render(results, evidence_bundle=None):
                '<p>只有模型、输入、设备、运行时、context/KV和解码可比时才解释精度差异。'
                '模型文件大小不等于运行内存。没有测量的精度不推算成绩。</p>'
                '<div class="scroll"><table><thead><tr><th>候选 / 阶段</th><th>文件MiB</th>'
+               '<th>完整输入 usage tokens 中位数</th><th>实际 prefill tokens 中位数</th>'
                '<th>prefill tokens/s 中位数</th><th>decode tokens/s 中位数</th>'
                '<th>TTFT中位数 s</th><th>CPU容量</th><th>采样峰值</th></tr></thead><tbody>')
     for result in results:
@@ -147,6 +158,8 @@ def render(results, evidence_bundle=None):
         res = resources(cases)
         out.append(f'<tr><td>{esc(result["run_id"])}</td>'
                    f'<td>{number(result["artifacts"]["total_bytes"] / 1024**2)}</td>'
+                   f'<td>{number(median(cases, "prompt_tokens"), 0)}</td>'
+                   f'<td>{number(median(cases, "evaluated_prefill_tokens"), 0)}</td>'
                    f'<td>{number(median(cases, "prefill_tokens_per_second"))}</td>'
                    f'<td>{number(median(cases, "decode_tokens_per_second"))}</td>'
                    f'<td>{number(median(cases, "ttft_seconds"))}</td>'
@@ -169,7 +182,8 @@ def render(results, evidence_bundle=None):
                '<footer class="foot">Qwen lifecycle · 自包含离线报告 · '
                '渲染只读数据，不执行模型</footer></main><script>'
                'const links=[...document.querySelectorAll(".rail a")];'
-               'function nav(){let id="summary";for(const a of links){'
+               'const chapters=links.filter(a=>a.getAttribute("href")!=="#top");'
+               'function nav(){let id="summary";for(const a of chapters){'
                'const s=document.querySelector(a.getAttribute("href"));'
                'if(s&&s.getBoundingClientRect().top<=150)id=s.id;}'
                'for(const a of links)a.classList.toggle("active",'
