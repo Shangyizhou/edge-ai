@@ -48,6 +48,7 @@ class FinalAccountingTests(unittest.TestCase):
         result = {"run_id": "frozen", "candidate": {}, "cases": cases}
         review = {
             "reviewer": "Codex assistant",
+            "human_review": False,
             "cases": [
                 {
                     "run_id": "frozen",
@@ -68,6 +69,32 @@ class FinalAccountingTests(unittest.TestCase):
         self.assertEqual(groups[-1]["contextual_persona_pass"], 0)
         self.assertEqual(groups[-1]["valid_call_latency"]["n"], 0)
         self.assertEqual(groups[-1]["format_gate"], "UNMET")
+
+    def test_persona_misroute_latency_never_enters_tool_success_stats(self):
+        result, suite, review = self.fixture()
+        persona = result["cases"][1]
+        persona["status"] = "completed"
+        persona["valid_call_seconds"] = 0.001
+        persona["assessment"].update(
+            {
+                key: True
+                for key in (
+                    "native_parse",
+                    "json_valid",
+                    "schema_valid",
+                    "registry_valid",
+                )
+            }
+        )
+        persona["assessment"]["reply"] = {
+            "tool_calls": [{"name": "following_status"}]
+        }
+        combined = summarize_final([result], suite, review)["runs"][0][
+            "cohorts"
+        ][-1]
+        self.assertEqual(combined["valid_call_latency"]["n"], 0)
+        self.assertEqual(combined["persona_unintended_tool_requests"], 1)
+        self.assertEqual(combined["persona_gate"], "UNMET")
 
     def test_omitted_case_or_changed_target_rejected(self):
         r, s, v = self.fixture()
@@ -150,6 +177,49 @@ class FinalAccountingTests(unittest.TestCase):
             "limitations": ["visual unverified"],
             "freeze": {},
         }
+        with self.assertRaisesRegex(ValueError, "four-run"):
+            render(document)
+        cases = []
+        for kind, count in (
+            ("tool", 72),
+            ("persona", 36),
+            ("chat", 12),
+            ("multi", 12),
+        ):
+            for i in range(count):
+                c = copy.deepcopy(result["cases"][0])
+                c.update(
+                    id=f"{kind}_{i}", kind="tool" if kind == "multi" else kind
+                )
+                c["expected"] = {"kind": c["kind"]}
+                if c["kind"] == "tool":
+                    c["expected"]["calls"] = [{}] * (
+                        3
+                        if kind == "multi" and i < 4
+                        else 2
+                        if kind == "multi"
+                        else 1
+                    )
+                cases.append(c)
+        suite["samples"] = [
+            dict(
+                c,
+                cohort="supplemental-multicall"
+                if c["id"].startswith("multi")
+                else "original-holdout",
+            )
+            for c in cases
+        ]
+        result["cases"] = cases
+        document["results"] = [
+            dict(copy.deepcopy(result), run_id=f"run{i}") for i in range(4)
+        ]
+        review["cases"] = [
+            dict(review["cases"][0], run_id=r["run_id"], case_id=c["id"])
+            for r in document["results"]
+            for c in cases
+            if c["kind"] == "persona"
+        ]
         output, _ = render(document)
         self.assertNotIn("<script>alert('model')", output)
         self.assertIn("&lt;script&gt;", output)

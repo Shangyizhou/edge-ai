@@ -28,6 +28,8 @@ def quantile(values, fraction):
 def summarize_final(results, suite, review):
     """Fail closed on omitted samples, cohort drift or missing claim review."""
     paired(results)
+    if review.get("human_review") is not False or not review.get("reviewer"):
+        raise ValueError("explicit assistant review identity required")
     expected = [(s["id"], s["user"], s["expected"]) for s in suite["samples"]]
     reviews = {(r["run_id"], r["case_id"]): r for r in review["cases"]}
     if len(reviews) != len(review["cases"]):
@@ -155,6 +157,23 @@ def summarize_final(results, suite, review):
                     "p50": statistics.median(present) if present else None,
                     "p95_nearest_rank": quantile(present, 0.95),
                 }
+            group["response_latency_by_kind"] = {}
+            for kind in ("tool", "persona", "chat"):
+                own = [c for c in cases if c["kind"] == kind]
+                fields = {}
+                for key in ("ttft_seconds", "wall_seconds"):
+                    values = [c.get("generation", {}).get(key) for c in own]
+                    values = [v for v in values if v is not None]
+                    fields[key] = {
+                        "n_measured": len(values),
+                        "p50": statistics.median(values) if values else None,
+                        "p95_nearest_rank": quantile(values, 0.95),
+                    }
+                group["response_latency_by_kind"][kind] = {
+                    "requests": len(own),
+                    "metrics": fields,
+                    "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency",
+                }
             valid = [
                 c.get("valid_call_seconds")
                 for c in cases
@@ -215,6 +234,44 @@ def render(document):
     results, suite, review = (
         document[k] for k in ("results", "suite", "review")
     )
+    samples = suite["samples"]
+    original = [s for s in samples if s.get("cohort") == "original-holdout"]
+    supplement = [
+        s for s in samples if s.get("cohort") == "supplemental-multicall"
+    ]
+    if (
+        len(results) != 4
+        or len({r["run_id"] for r in results}) != 4
+        or len(samples) != 132
+        or len(original) != 120
+        or len(supplement) != 12
+        or [
+            sum(s["expected"]["kind"] == k for s in original)
+            for k in ("tool", "persona", "chat")
+        ]
+        != [72, 36, 12]
+        or any(s["expected"]["kind"] != "tool" for s in supplement)
+        or sum(len(s["expected"].get("calls", [])) for s in samples) != 100
+    ):
+        raise ValueError("final report requires frozen four-run 120+12 scope")
+    if any(
+        len(s["expected"].get("calls", [])) != 1
+        for s in original
+        if s["expected"]["kind"] == "tool"
+    ) or any(len(s["expected"].get("calls", [])) < 2 for s in supplement):
+        raise ValueError(
+            "original single-tool and supplemental multicall scope changed"
+        )
+    expected_reviews = {
+        (r["run_id"], c["id"])
+        for r in results
+        for c in r["cases"]
+        if c["kind"] == "persona"
+    }
+    if {
+        (c["run_id"], c["case_id"]) for c in review["cases"]
+    } != expected_reviews:
+        raise ValueError("contextual review coverage differs from final scope")
     summary = summarize_final(results, suite, review)
 
     def e(value):
@@ -364,6 +421,8 @@ def render(document):
         )
         combined = s["cohorts"][-1]
         for metric, values in combined["timing"].items():
+            if metric in ("ttft_seconds", "wall_seconds"):
+                continue
             out.append(
                 "<tr><td>"
                 + e(metric)
@@ -371,6 +430,30 @@ def render(document):
                 + number(values["p50"])
                 + "</td><td>"
                 + number(values["p95_nearest_rank"])
+                + "</td></tr>"
+            )
+        out.append("</table></div>")
+        out.append(
+            '<p class="method">以下为按期望类别分组的响应等待，含失败/误调用，'
+            "不是合格角色文本等待；完整有效工具等待及其成功n单列上表。</p>"
+            '<div class="scroll"><table><tr><th>期望类别 / 请求n</th>'
+            "<th>TTFT P50/P95 s /实测n</th><th>完整响应 P50/P95 s /实测n</th></tr>"
+        )
+        for kind, own in combined["response_latency_by_kind"].items():
+            first, wall = (
+                own["metrics"][k] for k in ("ttft_seconds", "wall_seconds")
+            )
+            out.append(
+                "<tr><td>"
+                + e(f"{kind} / {own['requests']}")
+                + "</td><td>"
+                + e(
+                    f"{number(first['p50'])}/{number(first['p95_nearest_rank'])} / {first['n_measured']}"
+                )
+                + "</td><td>"
+                + e(
+                    f"{number(wall['p50'])}/{number(wall['p95_nearest_rank'])} / {wall['n_measured']}"
+                )
                 + "</td></tr>"
             )
         out.append("</table></div>")
@@ -447,7 +530,7 @@ def render(document):
                 )
                 + '</p><p class="foot">'
                 + e(
-                    f"TTFT {number(raw.get('ttft_seconds'))}s；完整 {number(raw.get('wall_seconds'))}s；有效工具 {number(c.get('valid_call_seconds'))}s；full/evaluated/output {raw.get('prompt_tokens')}/{raw.get('evaluated_prefill_tokens')}/{raw.get('output_tokens')}"
+                    f"TTFT {number(raw.get('ttft_seconds'))}s；完整 {number(raw.get('wall_seconds'))}s；原始校验调用 {number(c.get('valid_call_seconds'))}s（类别/意图另判）；full/evaluated/output {raw.get('prompt_tokens')}/{raw.get('evaluated_prefill_tokens')}/{raw.get('output_tokens')}"
                 )
                 + "</p></div>"
             )
@@ -467,6 +550,14 @@ def render(document):
         + payload
         + '">下载内嵌完整结构化输入</a>：本页核心阅读、全部最终输出、审核与阶段表均已内嵌，无网络依赖。</p>'
     )
+    bundle = document.get("evidence_bundle_base64")
+    if bundle:
+        out.append(
+            '<p><a download="raw-evidence.zip" href="data:application/zip;base64,'
+            + e(bundle)
+            + '">下载内嵌原始证据ZIP</a>：包含本轮原始运行、请求、事件、源码与manifest；'
+            "历史阶段完整raw仍由下列伴随目录链接提供。</p>"
+        )
     for link in document.get("links", []):
         out.append(
             '<p><a href="'
