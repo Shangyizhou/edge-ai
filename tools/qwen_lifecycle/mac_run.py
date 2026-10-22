@@ -18,6 +18,24 @@ from .measure import ResourceSampler
 from .report import render
 
 
+def launcher_handoff(result, benchmark_result_path):
+    """Rebase launcher evidence; preserve the raw result."""
+    handoff = dict(result)
+    handoff["source"] = dict(
+        result["source"],
+        raw_evidence="benchmark/cases/ and benchmark/events/",
+    )
+    handoff["evidence"] = [
+        dict(item, path="benchmark/" + item["path"])
+        for item in result["evidence"]
+    ]
+    handoff["benchmark_result"] = {
+        "path": "benchmark/results.json",
+        "sha256": file_hash(benchmark_result_path),
+    }
+    return handoff
+
+
 def execute(request, output):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -166,8 +184,14 @@ def execute(request, output):
             (output / "benchmark/report.html").write_text(
                 render([result]), encoding="utf-8"
             )
-            write_json(output / "results.json", result)
-            return result
+            handoff = launcher_handoff(
+                result, output / "benchmark/results.json"
+            )
+            write_json(output / "results.json", handoff)
+            (output / "report.html").write_text(
+                render([handoff]), encoding="utf-8"
+            )
+            return handoff
         except Exception as error:
             write_json(
                 output / "launcher-failure.json",
