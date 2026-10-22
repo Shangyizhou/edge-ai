@@ -4,7 +4,7 @@
 
 执行范围与验收以[GitHub规格 #8](https://github.com/Shangyizhou/edge-ai/issues/8)为准，已标记ready-for-agent。用户已确认独立原生推理→Agent调用结构→Registry纯JSON/Schema校验的测试边界；本页保留研究依据和候选配置。
 
-工单拆分时用户追加并确认了角色人设/背景/介绍评测、各阶段资源与效果数据、沿用已认可HTML以及按需新增可复用skill的要求；6张工单已发布，见[生命周期报告范围与工单索引](lifecycle-report-plan.md)和[技能输入输出设计](skill-workflow-draft.md)。父规格保持原样；已完成基线#9和最小训练导出#10，当前#11与#12推进中。工单入口为[基线工单#9](https://github.com/Shangyizhou/edge-ai/issues/9)。
+工单拆分时用户追加并确认了角色人设/背景/介绍评测、各阶段资源与效果数据、沿用已认可HTML以及按需新增可复用skill的要求；6张工单已发布，见[生命周期报告范围与工单索引](lifecycle-report-plan.md)和[技能输入输出设计](skill-workflow-draft.md)。父规格保持原样；已完成基线#9、最小训练导出#10和工具/人设验证#11，当前#12与#13推进中。工单入口为[基线工单#9](https://github.com/Shangyizhou/edge-ai/issues/9)。
 
 ## 用户确认的范围
 
