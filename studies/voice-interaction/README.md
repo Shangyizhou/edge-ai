@@ -10,7 +10,8 @@
 | --- | --- | --- |
 | ASR zh14M混合INT8 / FP32 | 同3条有声材料真实运行；机器人指令输出与用户确认文本一致。实时INT8 CPU26.05%、PSS115.28MiB；FP32 CPU29.47%、PSS158.69MiB | 两条公开参考子集CER均45.45%；不代表整体识别率或完整交互达标 |
 | Qwen2.5-0.5B Q4_K_M | 通用6任务检查5/6；另外6工具的fc/res兼容路径诊断0/3 | 0/3只覆盖兼容路径，不能外推当前ros-robot原生tool_calls；原生调用未测 |
-| Qwen3-0.6B BF16 / Mac MLX Metal | 新增14条开发用例的两组实际原生基线：精简system工具格式/Schema/Registry 10/10、人设1/3；完整system工具格式8/10、人设3/3 | 仅Mac小集；尚未微调、未完成新权重板端或产品验收，不能继承旧兼容路径结论 |
+| Qwen3-0.6B BF16 / Mac MLX Metal | 14条开发用例原生基线：精简system工具格式/Schema/Registry 10/10、人设1/3；完整system工具格式8/10、人设3/3 | 仅未微调Mac小集对照；不能继承旧兼容路径结论或推断新权重板端效果 |
+| Qwen3-0.6B LoRA 32微步试点 | 已实际训练4次优化器更新，327680可训练参数，MLX峰值约2.090GB；adapter/合并/F16/Q4分别完成7例冒烟，代表工具3/3、角色1/3；Q4约396.7MB | 只证明小步训练及合并转换通路；完整工具/人设适配、板端与产品验收仍未完成 |
 | Melo zh_en FP32 | 原4条文本均生成有效WAV，整句PCM就绪约18.9–25.8秒 | 尚未试听评审，发音/自然度与实际扬声器等待未知 |
 
 ASR资源只取本轮3条有声输入的实时推理窗，CPU为被测进程树占整机4核容量、PSS为200ms采样峰值。各模块独立运行，不相加推算共跑。[模型详情](models.md)列出精度、框架、后端与证据。
@@ -22,12 +23,13 @@ ASR资源只取本轮3条有声输入的实时推理窗，CPU为被测进程树�
 3. [实际就绪](experiments/rk3566/2026-10-22-preparation-smoke-v1/README.md)：ASR解码、LLM生成、TTS合成均完成最小真实推理。
 4. [单模块初筛](experiments/rk3566/2026-10-22-voice-screening-v2-r1/README.md)、[ASR三条材料对照](experiments/rk3566/2026-10-22-asr-three-samples-v1/README.md)：原始输入/输出、资源、计时与哈希保留。
 5. [业务兼容路径诊断](experiments/rk3566/2026-10-22-qwen-business-fit-v1/README.md)：保存失败证据；当前目标已澄清为原生tool_calls，不沿用该兼容协议训练。
-6. [Qwen3业务LoRA方案](research/2026-10-22-qwen-adaptation/README.md)：工具目录仍传递，训练目标是当前ros-robot业务规则与原生调用。尚未训练。
+6. [Qwen3业务LoRA方案](research/2026-10-22-qwen-adaptation/README.md)：保留当时尚未训练的研究记录，后续范围以当前规格和实验为准。
 7. [Mac原生调用与人设基线](experiments/mac/2026-10-22-qwen-native-baseline-v1/README.md)：同一官方Qwen3、9个选定工具、14条开发输入，对照完整/精简system；真实输出、资源与失败均保留。[离线HTML](experiments/mac/2026-10-22-qwen-native-baseline-v1/report.html)。
+8. [最小LoRA与导出试点](experiments/mac/2026-10-22-qwen-lora-export-pilot-v1/README.md)：真实32微步、合并/转换/量化和逐制品冒烟；保留转换兼容与本地代理失败及修复记录。
 
 ## 下一步
 
-实施已进入[集成PR #15](https://github.com/Shangyizhou/edge-ai/pull/15)：#9基线完成，#10最小LoRA与合并转换实施中。技能来源另见[personal-skills PR #3](https://github.com/Shangyizhou/personal-skills/pull/3)，实验结果仍维护于本仓库。
+实施已进入[集成PR #15](https://github.com/Shangyizhou/edge-ai/pull/15)：#9基线与#10最小LoRA导出完成，#11关键工具/人设适配及#12香橙派试点独立推进。三个新增技能已从[personal-skills PR #3](https://github.com/Shangyizhou/personal-skills/pull/3)来源安装，本仓库维护实验结果。
 
 先选关键有用工具，冻结Schema、原生调用样例和独立测试集；Mac做小规模LoRA，将固定SystemPrompt行为和重复示例尽量学入模型，推理继续提供精简指令及选定工具目录。首轮独立验证Agent原生tool_calls、JSON合法和Schema接收，模型调通后再改旧项目代码，不以旧C++或全60工具业务覆盖作为前置条件。[细化计划及用户范围澄清](research/2026-10-22-mac-qwen-plan/README.md)：已确认M5/16GB、磁盘剩约58GiB，SSH可达RK3566；训练依赖与实跑仍未验证。部署优先评估Q4_K_M与小上下文，KV和共跑资源仍需测量。
 
