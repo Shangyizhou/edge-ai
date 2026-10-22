@@ -1,0 +1,72 @@
+{
+  "id": "valid_026",
+  "user": "能否把任务切换到播放歌曲\"海阔天空\"？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "海阔天空"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到播放歌曲\"海阔天空\"？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请提供歌曲名称以便我为您播放。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.17013462499016896,
+    "wall_seconds": 0.30385750002460554,
+    "prompt_tokens": 888,
+    "output_tokens": 10,
+    "prefill_tokens_per_second": 5251.215425687926,
+    "decode_tokens_per_second": 82.01460682772438,
+    "prefill_seconds": 0.16910370800178498,
+    "decode_seconds": 0.12192949996097013,
+    "mlx_peak_allocated_bytes": 1632178372,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请提供歌曲名称以便我为您播放。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 53827,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 3,
+    "wall_seconds": 0.3248701249831356,
+    "cpu_seconds": 0.25089894399999935,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.7230537591914254,
+    "peak_rss_bytes": 802111488,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3152560128,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

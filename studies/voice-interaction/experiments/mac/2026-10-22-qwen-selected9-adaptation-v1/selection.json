@@ -1,0 +1,34 @@
+{
+  "schema": "edge-ai/selected9-adaptation-decision-v1",
+  "status": "selected validation candidate; not production acceptance",
+  "conclusion": "选定 v3 768步 adapter + 仅路由精简system：工具原生/JSON/Schema/Registry 36/36，精确33/36，角色完整审核18/18、聊天无调用6/6。3个工具语义/参数复制失败保留；最终测试和部署验收尚未执行。",
+  "training_run": "selected9-train768-v3",
+  "export_run": "selected9-768-v3-export-v1",
+  "dataset_version": "v3",
+  "paired_runs": [
+    "selected9-base-full",
+    "selected9-base-routing",
+    "selected9-lora768-v3-full",
+    "selected9-lora768-v3-routing",
+    "selected9-base-short",
+    "selected9-lora768-v3-short"
+  ],
+  "selected_system": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。",
+  "facts_in_system": false,
+  "selection_basis": "原短system下，同一验证输入base角色1/18→v3 17/18，表明事实记忆提升；路由cue不含名字、科研/机器人角色、创造者、Qwen或背景事实，仅修复身份问题的工具误路由，使v3角色18/18。选取格式完整且角色事实一致的候选，非按最低loss。",
+  "counterfactual_warning": "相同路由cue让未微调base原生工具0/36、角色0/18；这是提示敏感性，不是通用基座能力。必须同时看原短system基线：工具精确33/36、角色1/18；不能只用较弱routing基线夸大微调收益。",
+  "remaining_failures": "选定routing下仍3/36工具精确失败（目标跟随开关混淆及特殊字符复制）；所有原始输出保留。",
+  "runtime_inputs_still_required": [
+    "当前9工具目录/Schema与白名单",
+    "当次用户输入和会话上下文",
+    "权限、设备实时状态及工具执行回执",
+    "未知背景新资料若被用户确认时需提供"
+  ],
+  "scope": "60条合成验证，单轮Mac MLX/Metal/BF16基座+F32LoRA；最终120+独立补充12未读取，未进行设备动作、生产集成或完整交互验收。",
+  "primary_matrix_runs": [
+    "selected9-base-full",
+    "selected9-base-routing",
+    "selected9-lora768-v3-full",
+    "selected9-lora768-v3-routing"
+  ]
+}

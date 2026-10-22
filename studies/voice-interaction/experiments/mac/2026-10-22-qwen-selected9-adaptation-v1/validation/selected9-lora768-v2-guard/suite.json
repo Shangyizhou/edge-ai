@@ -1,0 +1,1021 @@
+{
+  "schema": "edge-model-benchmark/suite-v1",
+  "id": "qwen-selected9-valid60-v1",
+  "split": "validation",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "start_camera",
+        "description": "恢复采集，不把发布完成当作设备开启确认。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "stop_camera",
+        "description": "先确认 Follow standby，再暂停采集，失败则不继续。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "enable_lidar",
+        "description": "开启 tracker 扫描融合，保留服务端 TF/发布端检查。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "disable_lidar",
+        "description": "关闭融合，服务确认后记录其隐含的 Follow standby。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "enable_tracking",
+        "description": "仅启用 Follow，保留融合尚未开启时服务端拒绝的语义。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "disable_tracking",
+        "description": "仅进入 Follow 待机，保持当前融合订阅。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "following_status",
+        "description": "读取ObjectTrack当前状态；不可用时不猜测或返回旧缓存。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "volume_set",
+        "description": "模拟源 level 的整数转换与0至100饱和。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "音量执行时量化并按原契约饱和。",
+          "properties": {
+            "level": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "default": 50,
+              "description": "音量，执行时取整并限制在0至100",
+              "title": "Level"
+            }
+          },
+          "title": "LevelInput",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "play_music",
+        "description": "模拟切换当前歌曲，保留等待队列。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "歌曲与队列接受非空名称。",
+          "properties": {
+            "song_name": {
+              "description": "歌曲名称",
+              "maxLength": 2048,
+              "minLength": 1,
+              "pattern": "\\S",
+              "title": "Song Name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "song_name"
+          ],
+          "title": "SongInput",
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "system": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。",
+  "system_variant": "compact-guard",
+  "samples": [
+    {
+      "id": "valid_000",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——相机重新采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_001",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——相机停止采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_002",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——把扫描融合打开。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_003",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——把扫描融合关掉。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_004",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——进入目标跟随。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_005",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——进入跟随待机。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_006",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——查看目标跟随的当前状态。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_007",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——将音量设为0。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_008",
+      "source_group": "valid-operation-frame-0",
+      "user": "收到指令后，请完成以下操作——播放歌曲\"稻香\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "稻香"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_009",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为相机重新采集图像，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_010",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为相机停止采集图像，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_011",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为把扫描融合打开，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_012",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为把扫描融合关掉，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_013",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为进入目标跟随，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_014",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为进入跟随待机，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_015",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为查看目标跟随的当前状态，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_016",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为将音量设为1，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_017",
+      "source_group": "valid-operation-frame-1",
+      "user": "当前环节改为播放歌曲\"晴天\"，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "晴天"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_018",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到相机重新采集图像？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_019",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到相机停止采集图像？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_020",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到把扫描融合打开？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_021",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到把扫描融合关掉？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_022",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_023",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到进入跟随待机？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_024",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到查看目标跟随的当前状态？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_025",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到将音量设为17.5？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 17.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_026",
+      "source_group": "valid-operation-frame-2",
+      "user": "能否把任务切换到播放歌曲\"海阔天空\"？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海阔天空"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_027",
+      "source_group": "valid-dual-request-0",
+      "user": "有两项请求：音量调成3，然后点播\"星晴\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_028",
+      "source_group": "valid-dual-request-0",
+      "user": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_029",
+      "source_group": "valid-dual-request-0",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_030",
+      "source_group": "valid-dual-request-1",
+      "user": "请同时安排音量3和歌曲\"星晴\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_031",
+      "source_group": "valid-dual-request-1",
+      "user": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_032",
+      "source_group": "valid-dual-request-1",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_033",
+      "source_group": "valid-dual-request-2",
+      "user": "播放前先设置音量3，所选歌曲是\"星晴\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_034",
+      "source_group": "valid-dual-request-2",
+      "user": "播放前先设置音量23.5，所选歌曲是\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_035",
+      "source_group": "valid-dual-request-2",
+      "user": "播放前先设置音量99，所选歌曲是\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "valid_036",
+      "source_group": "valid-persona-name-0",
+      "user": "如果我给你写称呼标签，标签上应写哪个名字？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "name",
+        "contains_all": [
+          "小沫"
+        ]
+      }
+    },
+    {
+      "id": "valid_037",
+      "source_group": "valid-persona-name-1",
+      "user": "机器人名册里你对应的姓名是什么？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "name",
+        "contains_all": [
+          "小沫"
+        ]
+      }
+    },
+    {
+      "id": "valid_038",
+      "source_group": "valid-persona-name-2",
+      "user": "别人想叫你时应使用哪个角色名称？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "name",
+        "contains_all": [
+          "小沫"
+        ]
+      }
+    },
+    {
+      "id": "valid_039",
+      "source_group": "valid-persona-role-0",
+      "user": "有人问这位小助手的研究与机器人职责，你怎么说明？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "role",
+        "contains_all": [
+          "科研",
+          "机器人助手"
+        ]
+      }
+    },
+    {
+      "id": "valid_040",
+      "source_group": "valid-persona-role-1",
+      "user": "请从用途角度讲清你在项目里的定位。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "role",
+        "contains_all": [
+          "科研",
+          "机器人助手"
+        ]
+      }
+    },
+    {
+      "id": "valid_041",
+      "source_group": "valid-persona-role-2",
+      "user": "科研讨论时，你以哪种助手身份参与？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "role",
+        "contains_all": [
+          "科研",
+          "机器人助手"
+        ]
+      }
+    },
+    {
+      "id": "valid_042",
+      "source_group": "valid-persona-creator-0",
+      "user": "关于小沫的人设创作归属，现有资料能确认什么？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "creator",
+        "contains_all": [
+          "用户"
+        ]
+      }
+    },
+    {
+      "id": "valid_043",
+      "source_group": "valid-persona-creator-1",
+      "user": "这个机器人角色最初是由哪一类主体创造的？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "creator",
+        "contains_all": [
+          "用户"
+        ]
+      }
+    },
+    {
+      "id": "valid_044",
+      "source_group": "valid-persona-creator-2",
+      "user": "若问角色的创造者而非模型公司，你会怎么回答？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "creator",
+        "contains_all": [
+          "用户"
+        ]
+      }
+    },
+    {
+      "id": "valid_045",
+      "source_group": "valid-persona-intro-0",
+      "user": "迎接第一次使用机器人的同学时，请讲清自己的角色。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "intro",
+        "contains_all": [
+          "小沫",
+          "科研",
+          "用户"
+        ]
+      }
+    },
+    {
+      "id": "valid_046",
+      "source_group": "valid-persona-intro-1",
+      "user": "写一段包含角色名称、用途和创造者的开场白。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "intro",
+        "contains_all": [
+          "小沫",
+          "科研",
+          "用户"
+        ]
+      }
+    },
+    {
+      "id": "valid_047",
+      "source_group": "valid-persona-intro-2",
+      "user": "请面向来访者给出完整但简短的角色介绍。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "intro",
+        "contains_all": [
+          "小沫",
+          "科研",
+          "用户"
+        ]
+      }
+    },
+    {
+      "id": "valid_048",
+      "source_group": "valid-persona-unknown-0",
+      "user": "能给出创建者身份证上的姓名及你的确切生日吗？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "unknown",
+        "contains_all": []
+      }
+    },
+    {
+      "id": "valid_049",
+      "source_group": "valid-persona-unknown-1",
+      "user": "小沫在什么城市诞生，后来任职过哪些公司？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "unknown",
+        "contains_all": []
+      }
+    },
+    {
+      "id": "valid_050",
+      "source_group": "valid-persona-unknown-2",
+      "user": "请提供角色的具体年龄和出生日期，资料有记载吗？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "unknown",
+        "contains_all": []
+      }
+    },
+    {
+      "id": "valid_051",
+      "source_group": "valid-persona-origin-0",
+      "user": "既然用户创造了小沫，是不是Qwen底层模型也由用户研发？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "origin",
+        "contains_all": [
+          "用户",
+          "Qwen"
+        ]
+      }
+    },
+    {
+      "id": "valid_052",
+      "source_group": "valid-persona-origin-1",
+      "user": "如果把人设叫作小沫，底层模型的真实来源应如何说明？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "origin",
+        "contains_all": [
+          "用户",
+          "Qwen"
+        ]
+      }
+    },
+    {
+      "id": "valid_053",
+      "source_group": "valid-persona-origin-2",
+      "user": "请说明用户创造角色和Qwen模型来源这两件事。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "origin",
+        "contains_all": [
+          "用户",
+          "Qwen"
+        ]
+      }
+    },
+    {
+      "id": "valid_054",
+      "source_group": "valid-chat-context-0",
+      "user": "闲聊环节，你好呀，今天心情不错",
+      "expected": {
+        "kind": "chat"
+      }
+    },
+    {
+      "id": "valid_055",
+      "source_group": "valid-chat-context-0",
+      "user": "闲聊环节，谢谢你的耐心",
+      "expected": {
+        "kind": "chat"
+      }
+    },
+    {
+      "id": "valid_056",
+      "source_group": "valid-chat-context-0",
+      "user": "闲聊环节，我们暂时休息一下",
+      "expected": {
+        "kind": "chat"
+      }
+    },
+    {
+      "id": "valid_057",
+      "source_group": "valid-chat-context-0",
+      "user": "闲聊环节，科研学习需要坚持",
+      "expected": {
+        "kind": "chat"
+      }
+    },
+    {
+      "id": "valid_058",
+      "source_group": "valid-chat-context-0",
+      "user": "闲聊环节，给我一句鼓励",
+      "expected": {
+        "kind": "chat"
+      }
+    },
+    {
+      "id": "valid_059",
+      "source_group": "valid-chat-context-0",
+      "user": "闲聊环节，我完成了今天的阅读",
+      "expected": {
+        "kind": "chat"
+      }
+    }
+  ]
+}

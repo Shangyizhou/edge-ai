@@ -1,0 +1,72 @@
+{
+  "id": "valid_016",
+  "user": "当前环节改为将音量设为1，请调用相应能力。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 1
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "当前环节改为将音量设为1，请调用相应能力。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请调用volume_set功能，将音量设为1。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.258580332971178,
+    "wall_seconds": 0.5081890830188058,
+    "prompt_tokens": 922,
+    "output_tokens": 15,
+    "prefill_tokens_per_second": 3573.335245765654,
+    "decode_tokens_per_second": 63.169032437421116,
+    "prefill_seconds": 0.2580222499673255,
+    "decode_seconds": 0.2374581249896437,
+    "mlx_peak_allocated_bytes": 1702777048,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请调用volume_set功能，将音量设为1。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 71140,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.5259289169916883,
+    "cpu_seconds": 0.2414461439999993,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.590851276652945,
+    "peak_rss_bytes": 634650624,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3040772096,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

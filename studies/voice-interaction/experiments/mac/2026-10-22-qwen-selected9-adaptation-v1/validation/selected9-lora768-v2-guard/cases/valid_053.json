@@ -1,0 +1,69 @@
+{
+  "id": "valid_053",
+  "user": "请说明用户创造角色和Qwen模型来源这两件事。",
+  "expected": {
+    "kind": "persona",
+    "rubric": "origin",
+    "contains_all": [
+      "用户",
+      "Qwen"
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+    },
+    {
+      "role": "user",
+      "content": "请说明用户创造角色和Qwen模型来源这两件事。"
+    }
+  ],
+  "kind": "persona",
+  "status": "completed",
+  "generation": {
+    "raw": "小沫是用户创造的科研AI与机器人助手角色；Qwen模型是QwenQ，角色设定和模型来源不涉及虚构。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.28137904196046293,
+    "wall_seconds": 0.8124624579795636,
+    "prompt_tokens": 924,
+    "output_tokens": 31,
+    "prefill_tokens_per_second": 3293.726227826248,
+    "decode_tokens_per_second": 59.7122830680752,
+    "prefill_seconds": 0.2805333340074867,
+    "decode_seconds": 0.5191561669926159,
+    "mlx_peak_allocated_bytes": 1704586448,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": true,
+    "persona_valid": true,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "小沫是用户创造的科研AI与机器人助手角色；Qwen模型是QwenQ，角色设定和模型来源不涉及虚构。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 62650,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.8236288749612868,
+    "cpu_seconds": 0.4918077440000026,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 5.971229991458461,
+    "peak_rss_bytes": 105529344,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3178856448,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

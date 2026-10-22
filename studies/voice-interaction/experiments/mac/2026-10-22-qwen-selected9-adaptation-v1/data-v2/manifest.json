@@ -1,0 +1,44 @@
+{
+  "version": "selected9-persona-v2",
+  "seed": 42,
+  "construction": "deterministic assistant-curated synthetic families; no random row split",
+  "limitations": "Small templated synthetic suite, semantic intent overlap is required across splits; independent wording/discourse families only. Not a natural user distribution.",
+  "tools_sha256": "67f71077042a4bcf27ad86cea8734c04e797ca1eff34a324093dc0e69254aa8f",
+  "persona_sha256": "23a56479a6e664409954575de1ca4e1172a9311786420931ef688ffe680be721",
+  "excluded_development_prompts": 39,
+  "splits": {
+    "train": {
+      "samples": 300,
+      "groups": 105,
+      "sha256": "7fa45e7b21278dd1ccb49b14421ebc3eab0a079e0cdd2b9bf70f188050d46f39",
+      "kinds": {
+        "tool": 174,
+        "persona": 108,
+        "chat": 18
+      }
+    },
+    "valid": {
+      "samples": 60,
+      "groups": 25,
+      "sha256": "7d5039a3c3f2b36ba1c17cb30a875cdb6c261481d840fffe625863d6370b5189",
+      "kinds": {
+        "tool": 36,
+        "persona": 18,
+        "chat": 6
+      }
+    },
+    "holdout": {
+      "samples": 120,
+      "groups": 16,
+      "sha256": "12ecc86b2bde791728312d8660ea66af26fd8e51477803bb52f0d7cb760de3a5",
+      "kinds": {
+        "tool": 72,
+        "persona": 36,
+        "chat": 12
+      }
+    }
+  },
+  "holdout_policy": "Use original v1 sealed120; no copy/read by this repair or training",
+  "parent_version": "selected9-persona-v1",
+  "change_rationale": "v1 validation exposed missing escaped multi-call coverage and fabricated unknown biography; replace84 redundant no-argument variants, retain300train and same60valid. No holdout content read."
+}

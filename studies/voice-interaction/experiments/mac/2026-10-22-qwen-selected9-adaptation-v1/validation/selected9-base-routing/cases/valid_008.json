@@ -1,0 +1,72 @@
+{
+  "id": "valid_008",
+  "user": "收到指令后，请完成以下操作——播放歌曲\"稻香\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "稻香"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "收到指令后，请完成以下操作——播放歌曲\"稻香\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "播放歌曲\"稻香\"。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.2465017079957761,
+    "wall_seconds": 0.3765707080019638,
+    "prompt_tokens": 922,
+    "output_tokens": 8,
+    "prefill_tokens_per_second": 3747.5282423270855,
+    "decode_tokens_per_second": 68.76697277752496,
+    "prefill_seconds": 0.24602883297484368,
+    "decode_seconds": 0.11633491597604007,
+    "mlx_peak_allocated_bytes": 1702777048,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "播放歌曲\"稻香\"。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 71140,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 3,
+    "wall_seconds": 0.39219350001076236,
+    "cpu_seconds": 0.15918233600000065,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.058770377266131,
+    "peak_rss_bytes": 634535936,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3015000064,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}
