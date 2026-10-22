@@ -94,3 +94,25 @@ prefill rate uses evaluated tokens, never the full prompt length. Keep cache
 conditions in separate run groups. Linux raw samples include thermal-zone
 readings when available and system-wide swap-in/out counters; their deltas
 cannot be attributed solely to the model process.
+
+### Intake metric layers
+
+`json_valid` describes strict JSON in identifiable native tool payloads,
+independent of native envelope fields, tool schemas, and finish metadata.
+Valid JSON arrays/non-object arguments or missing native fields may therefore
+be JSON-valid but `native_parse=false`; Schema/Registry remain null because
+no complete native call can be assessed. `response_complete` records whether
+the finish reason is `stop`/`tool_calls`. A length-finished response with an
+already complete JSON payload remains JSON-valid, but is never accepted as a
+complete native reply. An observed incomplete JSON fragment is JSON-invalid;
+missing/malformed markers alone are native failures, not JSON failures.
+
+No identifiable tool payload (including ordinary content JSON, an empty wire
+call list, or only a stray closing marker) has `json_valid=null`. All observed
+payloads must pass strict decoding: duplicate keys and non-finite numbers are
+rejected. Wire arguments supplied as JSON strings are decoded strictly;
+already transport-decoded wire envelopes are checked for JSON serialization
+and finite values (duplicate keys discarded upstream cannot be reconstructed).
+`native_parse` requires a complete response and valid native envelope;
+`schema_valid` concerns the parsed tool's declared parameter schema. These
+layers do not imply correct intent, handler execution, or product acceptance.
