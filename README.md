@@ -2,7 +2,7 @@
 
 在 **RK3566 · Orange Pi 3B · 4GB** 上验证机器人本地语音交互：**听懂 → 理解 → 回答 → 发声**。
 
-**[查看 HTML 报告 ↗](https://shangyizhou.github.io/edge-ai/)** · [语音评测主报告](https://shangyizhou.github.io/edge-ai/reports/voice-screening/report.html) · [任务进展](https://github.com/Shangyizhou/edge-ai/issues/7)
+**[查看 HTML 报告 ↗](https://shangyizhou.github.io/edge-ai/reports.html)** · [语音评测主报告](https://shangyizhou.github.io/edge-ai/reports/voice-screening/report.html) · [任务进展](https://github.com/Shangyizhou/edge-ai/issues/7)
 
 ## 当前进展
 

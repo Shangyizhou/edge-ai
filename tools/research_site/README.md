@@ -12,3 +12,5 @@ python -m http.server 8080 --directory /tmp/edge-ai-report-site
 主报告展示快照位于 `studies/voice-interaction/reports/2026-10-22-voice-screening/`。公开版不携带录音，试听仍使用 Mac 离线版；模型权重、录音与运行库均在 Git 外。冻结的实验 HTML 和测量结果不覆盖、不重新推理。当前 ros-robot 原生 tool_calls 尚未验证。
 
 推送 main 后由 `.github/workflows/pages.yml` 自动构建并发布。
+
+对外报告入口使用 `reports.html`；根首页也保留报告列表，避免旧根页面缓存影响新入口。
