@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | ASR | Streaming Zipformer zh14M，混合INT8；同源FP32对照 | sherpa-onnx1.13.8 / ONNX Runtime1.28.2，CPU Execution Provider | [3条有声材料对照](experiments/rk3566/2026-10-22-asr-three-samples-v1/README.md)：指令用户确认；同时查看公开语音的实际转写及CER，不只看速度 |
 | LLM初筛 | 官方Qwen2.5-0.5B-Instruct Q4_K_M GGUF | llama.cpp b6500 / GGML CPU，OpenMP | [通用初筛](experiments/rk3566/2026-10-22-voice-screening-v2-r1/README.md)；[fc/res兼容路径诊断](experiments/rk3566/2026-10-22-qwen-business-fit-v1/README.md)未通过，不能代表原生tool_calls |
-| LLM原生试点 | 官方Qwen3-0.6B，596049920唯一参数；选定LoRA→Q4_K_M，396704704bytes | Mac MLX-LM0.32.2/Metal训练；llama.cpp e3797b1，Mac Metal和板端ARM CPU | [微调验证](experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/README.md) · [同权重量化](experiments/mac/2026-10-22-qwen-selected-precision-v1/README.md)；Q4验证工具格式36/36、人设审核18/18、工具精确30/36。板端[最小试点](experiments/rk3566/2026-10-22-qwen-pilot32-board-v1/README.md)已执行；最终权重独立回归待完成 |
+| LLM原生试点 | 官方Qwen3-0.6B，596049920唯一参数；选定LoRA→Q4_K_M，396704704bytes | Mac MLX-LM0.32.2/Metal训练；llama.cpp e3797b1，Mac Metal和板端ARM CPU | [微调验证](experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/README.md) · [同权重量化](experiments/mac/2026-10-22-qwen-selected-precision-v1/README.md)；验证之外，[最终独立集](experiments/final/2026-10-22-qwen-final132-v1/README.md)Mac/板端各84/84工具格式通过、人设21/36；板端PSS600.30MiB、CPU46.04%四核容量，工具精确72/84。仅独立格式试点，角色内化及生产/共跑未验收 |
 | TTS | MeloTTS zh_en FP32 ONNX | sherpa-onnx1.13.8 / ONNX Runtime1.28.2，CPU Execution Provider | [本轮4文本](experiments/rk3566/2026-10-22-voice-screening-v2-r1/README.md)：音频有效但整句等待长，尚未试听评审 |
 
 ASR混合INT8的decoder仍是FP32；文件精度不能等同整个执行图精度。FP16本轮未准备、未测试，不填估计值。
