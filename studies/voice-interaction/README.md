@@ -31,7 +31,7 @@ ASR资源只取本轮3条有声输入的实时推理窗，CPU为被测进程树�
 
 实施已进入[集成PR #15](https://github.com/Shangyizhou/edge-ai/pull/15)：#9基线与#10最小LoRA导出完成，#11关键工具/人设适配及#12香橙派试点独立推进。三个新增技能已从[personal-skills PR #3](https://github.com/Shangyizhou/personal-skills/pull/3)来源安装，本仓库维护实验结果。
 
-先选关键有用工具，冻结Schema、原生调用样例和独立测试集；Mac做小规模LoRA，将固定SystemPrompt行为和重复示例尽量学入模型，推理继续提供精简指令及选定工具目录。首轮独立验证Agent原生tool_calls、JSON合法和Schema接收，模型调通后再改旧项目代码，不以旧C++或全60工具业务覆盖作为前置条件。[细化计划及用户范围澄清](research/2026-10-22-mac-qwen-plan/README.md)：已确认M5/16GB、磁盘剩约58GiB，SSH可达RK3566；训练依赖与实跑仍未验证。部署优先评估Q4_K_M与小上下文，KV和共跑资源仍需测量。
+先选关键有用工具，冻结Schema、原生调用样例和独立测试集；Mac做小规模LoRA，将固定SystemPrompt行为和重复示例尽量学入模型，推理继续提供精简指令及选定工具目录。首轮独立验证Agent原生tool_calls、JSON合法和Schema接收，模型调通后再改旧项目代码，不以旧C++或全60工具业务覆盖作为前置条件。[细化计划及用户范围澄清](research/2026-10-22-mac-qwen-plan/README.md)：已确认M5/16GB、磁盘剩约58GiB，SSH可达RK3566；训练依赖、基线及最小LoRA导出已实际验证，完整适配与板端结果仍在补齐。部署优先评估Q4_K_M与小上下文，KV和共跑资源仍需测量。
 
 完整语音交互、ROS/视觉共跑与硬件动作均未验收，不因最小推理或几条成功样例宣称产品通过。[准备计划](plan.md) · [接入边界](integration.md) · [实验索引](experiments/rk3566/README.md)。
 
