@@ -1,0 +1,23 @@
+{
+  "schema": "edge-model-precision-selection/validation-v1",
+  "conclusion": "为#14保留最小体积Q4_K_M作未微调/微调同精度主对照，明确其额外语义退化；Q8_0选为可选质量候选，恢复F16的33/36工具精确目标和18/18人设上下文结果。Q5未成为推荐备选：工具31/36且人设16/18。所有精度格式/JSON/Schema均36/36，不等于语义正确或产品通过。",
+  "baseline_warning": "不要把routing提示下基座退化当成一般微调收益。历史同原始短提示MLX基座已33/36精确工具、人设1/18；v3原始短提示32/36、人设17/18。选定routing与LoRA组合33/36、人设18/18。新matched基座Q4 routing16/36原生、15/36精确，人设上下文3/18，仅为该部署组合的同提示参考。",
+  "quality_finding": "MLX adapter与merged全60例原文完全一致，F16保留33/36语义。Q4变30/36、Q5为31/36。Q5的valid_042/049写成“我是小沫，用户创造者”，关键词仍通过但上下文事实失败。Q8恢复F16表现；三处共同失败valid_022跟随意图及valid_029/032歌曲反斜杠仍存在。",
+  "selection_split": "frozen 60 validation only; final120 and extra12 untouched",
+  "primary_board_pair": {
+    "precision": "Q4_K_M",
+    "base_artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+    "tuned_artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+    "reason": "Mandatory iso-precision adaptation control, smallest measured candidate; known six validation semantic failures retained. No claim of semantic equivalence to F16.",
+    "runtime_revision": "e3797b184d428c7a019362612b76971f60af6670",
+    "recommended_initial_board_controls": {"backend": "CPU", "threads": 2, "parallel": 1, "context_tokens": 2048, "kv_k": "f16", "kv_v": "f16", "temperature": 0, "max_tokens": 256, "cache_prompt": false, "nonthinking": true},
+    "scope": "#13 measures Mac8192/Metal/4threads only. Board2048/CPU/2threads controls require #14 preflight and real evidence; not measured here."
+  },
+  "optional_quality_board_candidate": {
+    "precision": "Q8_0",
+    "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+    "bytes": 639446976,
+    "tradeoff": "Q4 396704704bytes → Q8 639446976bytes (+242742272). Mac sampled serverRSS1433.08→1663.81MiB; median decode115.34→86.05tok/s, complete response .481→.516s, single60case trial. Q8 restores F16 exact33/36 and contextual18/18; no board latency/RAM inferred. Only transfer after #14 disk check; do not require full precision board matrix."
+  },
+  "unmeasured": "No precision remains unmeasured among selected F16/Q4/Q5/Q8 on Mac; board results reserved #14. No GPU utilization or MacPSS. No training, production integration, hardware actions or final interaction acceptance."
+}

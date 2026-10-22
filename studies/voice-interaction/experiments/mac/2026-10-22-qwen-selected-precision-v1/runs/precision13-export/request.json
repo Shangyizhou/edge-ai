@@ -1,0 +1,73 @@
+{
+  "schema": "edge-model-export/request-v1",
+  "run_id": "precision13-export",
+  "artifacts": {
+    "selected-f16": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+    "base": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "operations": [
+    {
+      "kind": "quantize",
+      "inputs": [
+        "selected-f16"
+      ],
+      "output": {
+        "id": "selected-q5",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q5_k_m.gguf"
+      },
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q5_k_m.gguf",
+        "Q5_K_M",
+        "4"
+      ]
+    },
+    {
+      "kind": "convert",
+      "inputs": [
+        "base"
+      ],
+      "output": {
+        "id": "base-f16",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-v1/qwen3-base-f16.gguf"
+      },
+      "cwd": "/tmp/edge-ai-ticket-13",
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python",
+        "-m",
+        "tools.qwen_lifecycle.convert_hf",
+        "--source",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+        "--tokenizer-source",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+        "--staging",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-v1/converter-input",
+        "--converter-python",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/converter-venv/bin/python",
+        "--converter",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/convert_hf_to_gguf.py",
+        "--output",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-v1/qwen3-base-f16.gguf"
+      ]
+    },
+    {
+      "kind": "quantize",
+      "inputs": [
+        "base-f16"
+      ],
+      "output": {
+        "id": "base-q4",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-v1/qwen3-base-q4_k_m.gguf"
+      },
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-v1/qwen3-base-f16.gguf",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-v1/qwen3-base-q4_k_m.gguf",
+        "Q4_K_M",
+        "4"
+      ]
+    }
+  ],
+  "sampling_interval_seconds": 0.1
+}

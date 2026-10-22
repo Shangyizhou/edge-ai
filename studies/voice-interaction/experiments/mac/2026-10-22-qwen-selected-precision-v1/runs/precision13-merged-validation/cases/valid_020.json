@@ -1,0 +1,90 @@
+{
+  "id": "valid_020",
+  "user": "能否把任务切换到把扫描融合打开？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "enable_lidar",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到把扫描融合打开？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"enable_lidar\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.17664329201215878,
+    "wall_seconds": 0.4015368749969639,
+    "prompt_tokens": 917,
+    "output_tokens": 17,
+    "prefill_tokens_per_second": 5217.662203565184,
+    "decode_tokens_per_second": 79.69845854726898,
+    "prefill_seconds": 0.17574920802144334,
+    "decode_seconds": 0.2133039999753237,
+    "mlx_peak_allocated_bytes": 1697272024,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "enable_lidar",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "enable_lidar",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.6649400839814916,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 78182,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.6787017090246081,
+    "cpu_seconds": 0.30102061099999844,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.435241682721093,
+    "peak_rss_bytes": 151912448,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2868281344,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 9240576,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

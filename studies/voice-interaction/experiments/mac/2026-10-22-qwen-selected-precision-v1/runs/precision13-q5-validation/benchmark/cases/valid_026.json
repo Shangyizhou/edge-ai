@@ -1,0 +1,125 @@
+{
+  "id": "valid_026",
+  "user": "能否把任务切换到播放歌曲\"海阔天空\"？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "海阔天空"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到播放歌曲\"海阔天空\"？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"海阔天空\"}"
+        }
+      }
+    ],
+    "wall_seconds": 0.49260187498293817,
+    "ttft_seconds": 0.36094024998601526,
+    "prompt_tokens": 920,
+    "evaluated_prefill_tokens": 920,
+    "native_usage": {
+      "completion_tokens": 23,
+      "prompt_tokens": 920,
+      "total_tokens": 943,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 920,
+      "prompt_ms": 279.544,
+      "prompt_per_token_ms": 0.3038521739130435,
+      "prompt_per_second": 3291.074034856767,
+      "predicted_n": 23,
+      "predicted_ms": 206.947,
+      "predicted_per_token_ms": 9.406681818181818,
+      "predicted_per_second": 106.30741204269692
+    },
+    "cache_prompt": false,
+    "output_tokens": 23,
+    "prefill_seconds": 0.27954399999999996,
+    "decode_seconds": 0.206947,
+    "prefill_tokens_per_second": 3291.074034856767,
+    "decode_tokens_per_second": 106.30741204269692,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "海阔天空"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "海阔天空"
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.7183366249664687,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 80300,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.7283702080021612,
+    "cpu_seconds": 0.47878915199999916,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 6.573431295512,
+    "peak_rss_bytes": 1485438976,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2572861440,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 49152,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

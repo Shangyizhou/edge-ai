@@ -1,0 +1,997 @@
+{
+  "schema": "edge-model-prepare/readiness-v1",
+  "status": "READY_FOR_BENCHMARK",
+  "request_sha256": "dd02b8538c39a49418afe6ed29da84c529d64833b99e5e6723b2d290b4a3ff39",
+  "device": {
+    "name": "MacBook Air M5",
+    "memory_bytes": 17179869184
+  },
+  "requirements": {
+    "scope": "real minimum inference and frozen executable validation config; no product acceptance"
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "id": "adapter",
+        "name": "precision13-adapter-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+        "runtime": {
+          "name": "mlx-lm",
+          "version": "0.32.2",
+          "mlx_version": "0.32.4",
+          "backend": "Metal"
+        },
+        "backend": "Metal",
+        "precision": "BF16"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "adapter-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "adapter-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "adapter-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "adapter-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "adapter-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    },
+    {
+      "candidate": {
+        "id": "merged",
+        "name": "precision13-merged-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/merged",
+        "runtime": {
+          "name": "mlx-lm",
+          "version": "0.32.2",
+          "mlx_version": "0.32.4",
+          "backend": "Metal"
+        },
+        "backend": "Metal",
+        "precision": "BF16"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "merged-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "merged-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "merged-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "merged-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "merged-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    },
+    {
+      "candidate": {
+        "id": "f16",
+        "name": "precision13-f16-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        },
+        "backend": "Metal",
+        "precision": "F16"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "f16-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "f16-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "f16-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "f16-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "f16-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    },
+    {
+      "candidate": {
+        "id": "q4",
+        "name": "precision13-q4-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        },
+        "backend": "Metal",
+        "precision": "Q4_K_M"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "q4-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "q4-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "q4-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "q4-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "q4-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    },
+    {
+      "candidate": {
+        "id": "q5",
+        "name": "precision13-q5-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q5_k_m.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        },
+        "backend": "Metal",
+        "precision": "Q5_K_M"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "q5-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "q5-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "q5-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "q5-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "q5-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    },
+    {
+      "candidate": {
+        "id": "baseq4matched",
+        "name": "precision13-baseq4matched-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        },
+        "backend": "Metal",
+        "precision": "Q4_K_M"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "baseq4matched-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "baseq4matched-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "baseq4matched-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "baseq4matched-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "baseq4matched-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    },
+    {
+      "candidate": {
+        "id": "q8",
+        "name": "precision13-q8-validation",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        },
+        "backend": "Metal",
+        "precision": "Q8_0"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "pinned official revision / selected lineage; existing verified Mac Metal build"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "inspected actual assets evidence; minimum functional scope only",
+          "evidence": [
+            "q8-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "inspected actual runtime evidence; minimum functional scope only",
+          "evidence": [
+            "q8-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "inspected actual smoke evidence; minimum functional scope only",
+          "evidence": [
+            "q8-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "inspected actual benchmark evidence; minimum functional scope only",
+          "evidence": [
+            "q8-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "q8-benchmark_config"
+      ],
+      "next_action": "Use validation evidence for selection; final sealed evaluation reserved #14."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "adapter-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-adapter-validation/assets-manifest.json",
+      "sha256": "d2d3dfd774b3d4291212f5135168fa5ed8f512755d9b77e45ddf92227ebdeff5",
+      "description": "Actual assets evidence for precision13-adapter-validation"
+    },
+    {
+      "id": "adapter-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-adapter-validation/results.json",
+      "sha256": "a115d80f1feb795572457d0eb6cb23f2cc972482310a9cbdf26a1449652e3e07",
+      "description": "Actual runtime evidence for precision13-adapter-validation"
+    },
+    {
+      "id": "adapter-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-adapter-validation/cases/valid_000.json",
+      "sha256": "f658ef1eafe6643e7a8307e2d073ad9e88ba70714f877b79608ea24f82b9dfe8",
+      "description": "Actual smoke evidence for precision13-adapter-validation"
+    },
+    {
+      "id": "adapter-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-adapter-validation/request.json",
+      "sha256": "dbcbf45052ea8ea1c244e29caf8e91e4aa278d2d0a73a188e171e7870778d905",
+      "description": "Actual benchmark_config evidence for precision13-adapter-validation"
+    },
+    {
+      "id": "merged-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-merged-validation/assets-manifest.json",
+      "sha256": "9a1bea0bb8bf2eb41e34129b2467bd1ca8c0c2cf1968d71335a2ccf5ee952176",
+      "description": "Actual assets evidence for precision13-merged-validation"
+    },
+    {
+      "id": "merged-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-merged-validation/results.json",
+      "sha256": "bc7fdcdbdfdcf1aec35b234404f2268e5a6485d0f7984a0be3f4526d1119f319",
+      "description": "Actual runtime evidence for precision13-merged-validation"
+    },
+    {
+      "id": "merged-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-merged-validation/cases/valid_000.json",
+      "sha256": "aad348497167b9f6c778b54e60933a93a4e19abf2af3e99df7375d8fe751e37c",
+      "description": "Actual smoke evidence for precision13-merged-validation"
+    },
+    {
+      "id": "merged-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-merged-validation/request.json",
+      "sha256": "9bfd68524f03646baf57a82e64a7ea453569bd5f07ba20d0a8795f52729466ff",
+      "description": "Actual benchmark_config evidence for precision13-merged-validation"
+    },
+    {
+      "id": "f16-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-f16-validation/assets-manifest.json",
+      "sha256": "b8b7acbfb0bd6122a6585990f78350379aeb197bc45fecdb487b50092fb602b5",
+      "description": "Actual assets evidence for precision13-f16-validation"
+    },
+    {
+      "id": "f16-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-f16-validation/runtime.json",
+      "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+      "description": "Actual runtime evidence for precision13-f16-validation"
+    },
+    {
+      "id": "f16-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-f16-prepare/results.json",
+      "sha256": "7282e3bd95dd787a58333aaa3a5ab55454846c139837a55d3d0a029d0a673ed9",
+      "description": "Actual smoke evidence for precision13-f16-validation"
+    },
+    {
+      "id": "f16-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-f16-validation/launcher-request.json",
+      "sha256": "563f6587929621e29e5696c4d325fff37a5af08cf5e2573c88ca448c464cfe23",
+      "description": "Actual benchmark_config evidence for precision13-f16-validation"
+    },
+    {
+      "id": "q4-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-q4-validation/assets-manifest.json",
+      "sha256": "5dcb3c78060c66ff666b8dad9ef62e86e670282bef9d24c10e7b3a60762f60f0",
+      "description": "Actual assets evidence for precision13-q4-validation"
+    },
+    {
+      "id": "q4-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-q4-validation/runtime.json",
+      "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+      "description": "Actual runtime evidence for precision13-q4-validation"
+    },
+    {
+      "id": "q4-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-q4-prepare/results.json",
+      "sha256": "27d19d64ca8d6860ebbd9bc123d8e724ed886f6d2da199a9d99e65795f18d848",
+      "description": "Actual smoke evidence for precision13-q4-validation"
+    },
+    {
+      "id": "q4-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-q4-validation/launcher-request.json",
+      "sha256": "ecf753a164d55d60e91dc877f9ea1f1145931afb89154ecd6f606cf5794da853",
+      "description": "Actual benchmark_config evidence for precision13-q4-validation"
+    },
+    {
+      "id": "q5-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-q5-validation/assets-manifest.json",
+      "sha256": "c6191075ce2148ac57d53f9bdc8cc25e6efa7232bfef370508f39524787a99c4",
+      "description": "Actual assets evidence for precision13-q5-validation"
+    },
+    {
+      "id": "q5-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-q5-validation/runtime.json",
+      "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+      "description": "Actual runtime evidence for precision13-q5-validation"
+    },
+    {
+      "id": "q5-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-q5-prepare/results.json",
+      "sha256": "046142c6a555065118a25fc183abbd7a70b4720b49793bc70aad64edc0adc3b9",
+      "description": "Actual smoke evidence for precision13-q5-validation"
+    },
+    {
+      "id": "q5-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-q5-validation/launcher-request.json",
+      "sha256": "4b3136dd6425540f767c68573e01af771c4f418db309def421fbdf9e77be622c",
+      "description": "Actual benchmark_config evidence for precision13-q5-validation"
+    },
+    {
+      "id": "baseq4matched-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-baseq4matched-validation/assets-manifest.json",
+      "sha256": "c641d22c1cf8c7add1cc988458dc1744aef83673113f510a4d4c56f418f1ee8d",
+      "description": "Actual assets evidence for precision13-baseq4matched-validation"
+    },
+    {
+      "id": "baseq4matched-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-baseq4matched-validation/runtime.json",
+      "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+      "description": "Actual runtime evidence for precision13-baseq4matched-validation"
+    },
+    {
+      "id": "baseq4matched-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-baseq4matched-prepare/results.json",
+      "sha256": "4c0bac997a4c8d0b72e422ad35c4e6436af3629edc09ba3b27483575c13191ce",
+      "description": "Actual smoke evidence for precision13-baseq4matched-validation"
+    },
+    {
+      "id": "baseq4matched-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-baseq4matched-validation/launcher-request.json",
+      "sha256": "b9d988fe0c93bbd1adac7a9dd61090f8ccc38318c727fad87e8b32847b7256b8",
+      "description": "Actual benchmark_config evidence for precision13-baseq4matched-validation"
+    },
+    {
+      "id": "q8-assets",
+      "kind": "assets",
+      "location": "../runs/precision13-q8-validation/assets-manifest.json",
+      "sha256": "397f28d2d7560fc5e64a831f53f238415af202b7c4353e5e0495fb33db7b39cc",
+      "description": "Actual assets evidence for precision13-q8-validation"
+    },
+    {
+      "id": "q8-runtime",
+      "kind": "runtime",
+      "location": "../runs/precision13-q8-validation/runtime.json",
+      "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+      "description": "Actual runtime evidence for precision13-q8-validation"
+    },
+    {
+      "id": "q8-smoke",
+      "kind": "smoke",
+      "location": "../runs/precision13-q8-prepare/results.json",
+      "sha256": "838a37eb23e6103649eb9e5f43013a12104c6bbe47c4ac48047334c79c1551b9",
+      "description": "Actual smoke evidence for precision13-q8-validation"
+    },
+    {
+      "id": "q8-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../runs/precision13-q8-validation/launcher-request.json",
+      "sha256": "07139dfa88930693f84640f2cb2a01eb2ef61679baf91674b5d45d6e1f5314e6",
+      "description": "Actual benchmark_config evidence for precision13-q8-validation"
+    }
+  ],
+  "evidence_verification": "references_only",
+  "product_acceptance": "NOT_EVALUATED",
+  "benchmark_handoff": {
+    "candidates": [
+      {
+        "candidate": {
+          "id": "adapter",
+          "name": "precision13-adapter-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+          "runtime": {
+            "name": "mlx-lm",
+            "version": "0.32.2",
+            "mlx_version": "0.32.4",
+            "backend": "Metal"
+          },
+          "backend": "Metal",
+          "precision": "BF16"
+        },
+        "configurations": [
+          {
+            "id": "adapter-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-adapter-validation/request.json",
+            "sha256": "dbcbf45052ea8ea1c244e29caf8e91e4aa278d2d0a73a188e171e7870778d905",
+            "description": "Actual benchmark_config evidence for precision13-adapter-validation"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "merged",
+          "name": "precision13-merged-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/merged",
+          "runtime": {
+            "name": "mlx-lm",
+            "version": "0.32.2",
+            "mlx_version": "0.32.4",
+            "backend": "Metal"
+          },
+          "backend": "Metal",
+          "precision": "BF16"
+        },
+        "configurations": [
+          {
+            "id": "merged-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-merged-validation/request.json",
+            "sha256": "9bfd68524f03646baf57a82e64a7ea453569bd5f07ba20d0a8795f52729466ff",
+            "description": "Actual benchmark_config evidence for precision13-merged-validation"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "f16",
+          "name": "precision13-f16-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "Metal",
+            "network": "direct"
+          },
+          "backend": "Metal",
+          "precision": "F16"
+        },
+        "configurations": [
+          {
+            "id": "f16-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-f16-validation/launcher-request.json",
+            "sha256": "563f6587929621e29e5696c4d325fff37a5af08cf5e2573c88ca448c464cfe23",
+            "description": "Actual benchmark_config evidence for precision13-f16-validation"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "q4",
+          "name": "precision13-q4-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "Metal",
+            "network": "direct"
+          },
+          "backend": "Metal",
+          "precision": "Q4_K_M"
+        },
+        "configurations": [
+          {
+            "id": "q4-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-q4-validation/launcher-request.json",
+            "sha256": "ecf753a164d55d60e91dc877f9ea1f1145931afb89154ecd6f606cf5794da853",
+            "description": "Actual benchmark_config evidence for precision13-q4-validation"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "q5",
+          "name": "precision13-q5-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q5_k_m.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "Metal",
+            "network": "direct"
+          },
+          "backend": "Metal",
+          "precision": "Q5_K_M"
+        },
+        "configurations": [
+          {
+            "id": "q5-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-q5-validation/launcher-request.json",
+            "sha256": "4b3136dd6425540f767c68573e01af771c4f418db309def421fbdf9e77be622c",
+            "description": "Actual benchmark_config evidence for precision13-q5-validation"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "baseq4matched",
+          "name": "precision13-baseq4matched-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "Metal",
+            "network": "direct"
+          },
+          "backend": "Metal",
+          "precision": "Q4_K_M"
+        },
+        "configurations": [
+          {
+            "id": "baseq4matched-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-baseq4matched-validation/launcher-request.json",
+            "sha256": "b9d988fe0c93bbd1adac7a9dd61090f8ccc38318c727fad87e8b32847b7256b8",
+            "description": "Actual benchmark_config evidence for precision13-baseq4matched-validation"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "q8",
+          "name": "precision13-q8-validation",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "Metal",
+            "network": "direct"
+          },
+          "backend": "Metal",
+          "precision": "Q8_0"
+        },
+        "configurations": [
+          {
+            "id": "q8-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../runs/precision13-q8-validation/launcher-request.json",
+            "sha256": "07139dfa88930693f84640f2cb2a01eb2ef61679baf91674b5d45d6e1f5314e6",
+            "description": "Actual benchmark_config evidence for precision13-q8-validation"
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "adapter-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-adapter-validation/assets-manifest.json",
+        "sha256": "d2d3dfd774b3d4291212f5135168fa5ed8f512755d9b77e45ddf92227ebdeff5",
+        "description": "Actual assets evidence for precision13-adapter-validation"
+      },
+      {
+        "id": "adapter-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-adapter-validation/results.json",
+        "sha256": "a115d80f1feb795572457d0eb6cb23f2cc972482310a9cbdf26a1449652e3e07",
+        "description": "Actual runtime evidence for precision13-adapter-validation"
+      },
+      {
+        "id": "adapter-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-adapter-validation/cases/valid_000.json",
+        "sha256": "f658ef1eafe6643e7a8307e2d073ad9e88ba70714f877b79608ea24f82b9dfe8",
+        "description": "Actual smoke evidence for precision13-adapter-validation"
+      },
+      {
+        "id": "adapter-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-adapter-validation/request.json",
+        "sha256": "dbcbf45052ea8ea1c244e29caf8e91e4aa278d2d0a73a188e171e7870778d905",
+        "description": "Actual benchmark_config evidence for precision13-adapter-validation"
+      },
+      {
+        "id": "merged-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-merged-validation/assets-manifest.json",
+        "sha256": "9a1bea0bb8bf2eb41e34129b2467bd1ca8c0c2cf1968d71335a2ccf5ee952176",
+        "description": "Actual assets evidence for precision13-merged-validation"
+      },
+      {
+        "id": "merged-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-merged-validation/results.json",
+        "sha256": "bc7fdcdbdfdcf1aec35b234404f2268e5a6485d0f7984a0be3f4526d1119f319",
+        "description": "Actual runtime evidence for precision13-merged-validation"
+      },
+      {
+        "id": "merged-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-merged-validation/cases/valid_000.json",
+        "sha256": "aad348497167b9f6c778b54e60933a93a4e19abf2af3e99df7375d8fe751e37c",
+        "description": "Actual smoke evidence for precision13-merged-validation"
+      },
+      {
+        "id": "merged-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-merged-validation/request.json",
+        "sha256": "9bfd68524f03646baf57a82e64a7ea453569bd5f07ba20d0a8795f52729466ff",
+        "description": "Actual benchmark_config evidence for precision13-merged-validation"
+      },
+      {
+        "id": "f16-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-f16-validation/assets-manifest.json",
+        "sha256": "b8b7acbfb0bd6122a6585990f78350379aeb197bc45fecdb487b50092fb602b5",
+        "description": "Actual assets evidence for precision13-f16-validation"
+      },
+      {
+        "id": "f16-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-f16-validation/runtime.json",
+        "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+        "description": "Actual runtime evidence for precision13-f16-validation"
+      },
+      {
+        "id": "f16-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-f16-prepare/results.json",
+        "sha256": "7282e3bd95dd787a58333aaa3a5ab55454846c139837a55d3d0a029d0a673ed9",
+        "description": "Actual smoke evidence for precision13-f16-validation"
+      },
+      {
+        "id": "f16-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-f16-validation/launcher-request.json",
+        "sha256": "563f6587929621e29e5696c4d325fff37a5af08cf5e2573c88ca448c464cfe23",
+        "description": "Actual benchmark_config evidence for precision13-f16-validation"
+      },
+      {
+        "id": "q4-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-q4-validation/assets-manifest.json",
+        "sha256": "5dcb3c78060c66ff666b8dad9ef62e86e670282bef9d24c10e7b3a60762f60f0",
+        "description": "Actual assets evidence for precision13-q4-validation"
+      },
+      {
+        "id": "q4-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-q4-validation/runtime.json",
+        "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+        "description": "Actual runtime evidence for precision13-q4-validation"
+      },
+      {
+        "id": "q4-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-q4-prepare/results.json",
+        "sha256": "27d19d64ca8d6860ebbd9bc123d8e724ed886f6d2da199a9d99e65795f18d848",
+        "description": "Actual smoke evidence for precision13-q4-validation"
+      },
+      {
+        "id": "q4-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-q4-validation/launcher-request.json",
+        "sha256": "ecf753a164d55d60e91dc877f9ea1f1145931afb89154ecd6f606cf5794da853",
+        "description": "Actual benchmark_config evidence for precision13-q4-validation"
+      },
+      {
+        "id": "q5-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-q5-validation/assets-manifest.json",
+        "sha256": "c6191075ce2148ac57d53f9bdc8cc25e6efa7232bfef370508f39524787a99c4",
+        "description": "Actual assets evidence for precision13-q5-validation"
+      },
+      {
+        "id": "q5-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-q5-validation/runtime.json",
+        "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+        "description": "Actual runtime evidence for precision13-q5-validation"
+      },
+      {
+        "id": "q5-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-q5-prepare/results.json",
+        "sha256": "046142c6a555065118a25fc183abbd7a70b4720b49793bc70aad64edc0adc3b9",
+        "description": "Actual smoke evidence for precision13-q5-validation"
+      },
+      {
+        "id": "q5-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-q5-validation/launcher-request.json",
+        "sha256": "4b3136dd6425540f767c68573e01af771c4f418db309def421fbdf9e77be622c",
+        "description": "Actual benchmark_config evidence for precision13-q5-validation"
+      },
+      {
+        "id": "baseq4matched-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-baseq4matched-validation/assets-manifest.json",
+        "sha256": "c641d22c1cf8c7add1cc988458dc1744aef83673113f510a4d4c56f418f1ee8d",
+        "description": "Actual assets evidence for precision13-baseq4matched-validation"
+      },
+      {
+        "id": "baseq4matched-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-baseq4matched-validation/runtime.json",
+        "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+        "description": "Actual runtime evidence for precision13-baseq4matched-validation"
+      },
+      {
+        "id": "baseq4matched-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-baseq4matched-prepare/results.json",
+        "sha256": "4c0bac997a4c8d0b72e422ad35c4e6436af3629edc09ba3b27483575c13191ce",
+        "description": "Actual smoke evidence for precision13-baseq4matched-validation"
+      },
+      {
+        "id": "baseq4matched-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-baseq4matched-validation/launcher-request.json",
+        "sha256": "b9d988fe0c93bbd1adac7a9dd61090f8ccc38318c727fad87e8b32847b7256b8",
+        "description": "Actual benchmark_config evidence for precision13-baseq4matched-validation"
+      },
+      {
+        "id": "q8-assets",
+        "kind": "assets",
+        "location": "../runs/precision13-q8-validation/assets-manifest.json",
+        "sha256": "397f28d2d7560fc5e64a831f53f238415af202b7c4353e5e0495fb33db7b39cc",
+        "description": "Actual assets evidence for precision13-q8-validation"
+      },
+      {
+        "id": "q8-runtime",
+        "kind": "runtime",
+        "location": "../runs/precision13-q8-validation/runtime.json",
+        "sha256": "0c955fe109d9262ce42ea28d6fd14965bdd4f1e69da8e7d1b7b690401fcb0cd8",
+        "description": "Actual runtime evidence for precision13-q8-validation"
+      },
+      {
+        "id": "q8-smoke",
+        "kind": "smoke",
+        "location": "../runs/precision13-q8-prepare/results.json",
+        "sha256": "838a37eb23e6103649eb9e5f43013a12104c6bbe47c4ac48047334c79c1551b9",
+        "description": "Actual smoke evidence for precision13-q8-validation"
+      },
+      {
+        "id": "q8-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../runs/precision13-q8-validation/launcher-request.json",
+        "sha256": "07139dfa88930693f84640f2cb2a01eb2ef61679baf91674b5d45d6e1f5314e6",
+        "description": "Actual benchmark_config evidence for precision13-q8-validation"
+      }
+    ]
+  }
+}

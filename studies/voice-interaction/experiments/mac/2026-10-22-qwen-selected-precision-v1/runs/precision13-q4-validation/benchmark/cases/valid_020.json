@@ -1,0 +1,119 @@
+{
+  "id": "valid_020",
+  "user": "能否把任务切换到把扫描融合打开？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "enable_lidar",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到把扫描融合打开？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_tracking",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 0.39683883398538455,
+    "ttft_seconds": 0.33944758400321007,
+    "prompt_tokens": 917,
+    "evaluated_prefill_tokens": 917,
+    "native_usage": {
+      "completion_tokens": 16,
+      "prompt_tokens": 917,
+      "total_tokens": 933,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 917,
+      "prompt_ms": 269.27,
+      "prompt_per_token_ms": 0.2936423118865867,
+      "prompt_per_second": 3405.5037694507373,
+      "predicted_n": 16,
+      "predicted_ms": 122.104,
+      "predicted_per_token_ms": 8.140266666666667,
+      "predicted_per_second": 122.84609840791455
+    },
+    "cache_prompt": false,
+    "output_tokens": 16,
+    "prefill_seconds": 0.26927,
+    "decode_seconds": 0.122104,
+    "prefill_tokens_per_second": 3405.5037694507373,
+    "decode_tokens_per_second": 122.84609840791455,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "enable_tracking",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "enable_tracking",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.6031883339746855,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 79900,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.6138771249679849,
+    "cpu_seconds": 0.24222126399999944,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 3.94576136083637,
+    "peak_rss_bytes": 1452343296,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2830958592,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

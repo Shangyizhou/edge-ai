@@ -1,0 +1,119 @@
+{
+  "id": "valid_024",
+  "user": "能否把任务切换到查看目标跟随的当前状态？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "following_status",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到查看目标跟随的当前状态？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "following_status",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 0.5475992080173455,
+    "ttft_seconds": 0.4215448330505751,
+    "prompt_tokens": 919,
+    "evaluated_prefill_tokens": 919,
+    "native_usage": {
+      "completion_tokens": 16,
+      "prompt_tokens": 919,
+      "total_tokens": 935,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 919,
+      "prompt_ms": 284.261,
+      "prompt_per_token_ms": 0.3093155603917302,
+      "prompt_per_second": 3232.944371545868,
+      "predicted_n": 16,
+      "predicted_ms": 256.353,
+      "predicted_per_token_ms": 17.0902,
+      "predicted_per_second": 58.51306596763057
+    },
+    "cache_prompt": false,
+    "output_tokens": 16,
+    "prefill_seconds": 0.28426100000000004,
+    "decode_seconds": 0.256353,
+    "prefill_tokens_per_second": 3232.944371545868,
+    "decode_tokens_per_second": 58.51306596763057,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "following_status",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "following_status",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.7969842499587685,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 79249,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.8112517090048641,
+    "cpu_seconds": 0.5191335039999991,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 6.399166845969462,
+    "peak_rss_bytes": 2241069056,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2281046016,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 1425408,
+    "host_swap_out_delta_bytes": 327680,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "id": "valid_027",
+  "user": "有两项请求：音量调成3，然后点播\"星晴\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 3
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "星晴"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "有两项请求：音量调成3，然后点播\"星晴\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "- 音量调成3\n- 点播\"星晴\"",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 0.5202125840005465,
+    "ttft_seconds": 0.3702133749611676,
+    "prompt_tokens": 925,
+    "evaluated_prefill_tokens": 925,
+    "native_usage": {
+      "completion_tokens": 17,
+      "prompt_tokens": 925,
+      "total_tokens": 942,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 925,
+      "prompt_ms": 365.816,
+      "prompt_per_token_ms": 0.39547675675675675,
+      "prompt_per_second": 2528.593609902246,
+      "predicted_n": 17,
+      "predicted_ms": 149.876,
+      "predicted_per_token_ms": 9.36725,
+      "predicted_per_second": 106.75491739838266
+    },
+    "cache_prompt": false,
+    "output_tokens": 17,
+    "prefill_seconds": 0.365816,
+    "decode_seconds": 0.149876,
+    "prefill_tokens_per_second": 2528.593609902246,
+    "decode_tokens_per_second": 106.75491739838266,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "- 音量调成3\n- 点播\"星晴\"",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 83435,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.5311308340169489,
+    "cpu_seconds": 0.29619273600000007,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 5.576643588169996,
+    "peak_rss_bytes": 1502068736,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3603316736,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 8355840,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

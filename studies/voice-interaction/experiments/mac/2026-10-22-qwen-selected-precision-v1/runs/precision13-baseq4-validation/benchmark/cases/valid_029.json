@@ -1,0 +1,102 @@
+{
+  "id": "valid_029",
+  "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 99
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "海\\浪"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "- volume_set: Level=99\n- play_music: Song Name=海浪",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 0.5653553750016727,
+    "ttft_seconds": 0.3729063339997083,
+    "prompt_tokens": 927,
+    "evaluated_prefill_tokens": 927,
+    "native_usage": {
+      "completion_tokens": 19,
+      "prompt_tokens": 927,
+      "total_tokens": 946,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 927,
+      "prompt_ms": 365.13,
+      "prompt_per_token_ms": 0.3938834951456311,
+      "prompt_per_second": 2538.8217894996305,
+      "predicted_n": 19,
+      "predicted_ms": 192.315,
+      "predicted_per_token_ms": 10.684166666666666,
+      "predicted_per_second": 93.59644333515327
+    },
+    "cache_prompt": false,
+    "output_tokens": 19,
+    "prefill_seconds": 0.36513,
+    "decode_seconds": 0.19231499999999999,
+    "prefill_tokens_per_second": 2538.8217894996305,
+    "decode_tokens_per_second": 93.59644333515327,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "- volume_set: Level=99\n- play_music: Song Name=海浪",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 80864,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.5794053329736926,
+    "cpu_seconds": 0.4206778559999993,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.2605105969761565,
+    "peak_rss_bytes": 1540030464,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2625667072,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 3424256,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}
