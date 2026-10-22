@@ -15,7 +15,7 @@ GitHub工单是范围、验收与状态的权威来源；下表仅作入口。�
 | [#13 交付合并转换与同权重量化的质量／资源对照](https://github.com/Shangyizhou/edge-ai/issues/13) | #11 |
 | [#14 完成最终香橙派回归与模型生命周期 HTML](https://github.com/Shangyizhou/edge-ai/issues/14) | #12、#13 |
 
-当前#9、#10、#11和#13已完成；#12板端试点收尾，#14仍等待#12完成。ready-for-agent表示规格已明确，执行仍需满足阻塞关系。
+当前#9至#13均已完成；#14开始最终准备、独立回归与总报告。ready-for-agent表示规格已明确，执行仍需满足阻塞关系。
 
 ## 全流程目标
 

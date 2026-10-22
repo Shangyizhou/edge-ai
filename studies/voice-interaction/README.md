@@ -33,9 +33,11 @@ ASR资源只取本轮3条有声输入的实时推理窗，CPU为被测进程树�
 
 10. [合并与同权重量化对照](experiments/mac/2026-10-22-qwen-selected-precision-v1/README.md)：adapter/merged 60条原文一致，F16/Q4/Q5/Q8及同布局未微调Q4实际加载验证，所有语义和人设失败保留。[离线HTML](experiments/mac/2026-10-22-qwen-selected-precision-v1/report.html)。
 
+11. [板端LoRA试点与缓存/KV](experiments/rk3566/2026-10-22-qwen-pilot32-board-v1/README.md)：23次开发执行，隔离新运行时与失败记录；九工具目录q8KV缓存冷/重复/前缀变更约166.3/9.7/11.9秒，模型进程树峰PSS约565.6MiB，仅为试点权重和指定样本。
+
 ## 下一步
 
-实施已进入[集成PR #15](https://github.com/Shangyizhou/edge-ai/pull/15)：#9基线、#10最小LoRA导出与#11工具/人设验证完成，#13同权重量化也已完成；#12香橙派缓存/KV试点收尾后进入#14最终回归。三个新增技能已从[personal-skills PR #3](https://github.com/Shangyizhou/personal-skills/pull/3)来源安装，本仓库维护实验结果。
+实施已进入[集成PR #15](https://github.com/Shangyizhou/edge-ai/pull/15)：#9基线、#10最小LoRA导出与#11工具/人设验证完成，#13同权重量化也已完成；#12香橙派缓存/KV试点也已完成，#14开始最终权重准备、独立回归和生命周期总报告。三个新增技能已从[personal-skills PR #3](https://github.com/Shangyizhou/personal-skills/pull/3)来源安装，本仓库维护实验结果。
 
 先选关键有用工具，冻结Schema、原生调用样例和独立测试集；Mac做小规模LoRA，将固定SystemPrompt行为和重复示例尽量学入模型，推理继续提供精简指令及选定工具目录。首轮独立验证Agent原生tool_calls、JSON合法和Schema接收，模型调通后再改旧项目代码，不以旧C++或全60工具业务覆盖作为前置条件。[细化计划及用户范围澄清](research/2026-10-22-mac-qwen-plan/README.md)：已确认M5/16GB、磁盘剩约58GiB，SSH可达RK3566；训练依赖、基线及最小LoRA导出已实际验证，完整适配与板端结果仍在补齐。部署优先评估Q4_K_M与小上下文，KV和共跑资源仍需测量。
 
