@@ -1,5 +1,6 @@
 """Native transport, JSON and Schema are separate layers."""
 
+import json
 import unittest
 
 from tools.qwen_lifecycle.protocol import intake
@@ -22,6 +23,67 @@ VALID = '<tool_call>{"name":"x","arguments":{}}</tool_call>'
 
 
 class LayerTests(unittest.TestCase):
+    def test_selected_string_tool_preserves_marker_strings_and_order(self):
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "play_music",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"song_name": {"type": "string"}},
+                        "required": ["song_name"],
+                        "additionalProperties": False,
+                    },
+                },
+            }
+        ]
+        songs = [
+            '开场 <tool_call> 歌 </tool_call> "引号" \\ 路径',
+            "第二首 </tool_call> <tool_call> 雪",
+            '开场 <tool_call> 歌 </tool_call> "引号" \\ 路径',
+        ]
+        calls = [
+            {"name": "play_music", "arguments": {"song_name": song}}
+            for song in songs
+        ]
+        raw = (
+            "<think>ignore tool syntax</think>前文"
+            + "\n".join(
+                "<tool_call>"
+                + json.dumps(call, ensure_ascii=False)
+                + "</tool_call>"
+                for call in calls
+            )
+            + "后文"
+        )
+        result = intake(raw, "stop", tools, {"kind": "tool", "calls": calls})
+        for key in [
+            "native_parse",
+            "json_valid",
+            "schema_valid",
+            "expected_behavior",
+        ]:
+            self.assertTrue(result[key], key)
+        self.assertIsNone(result["registry_valid"])
+        self.assertEqual(
+            [
+                {"name": c["name"], "arguments": c["arguments"]}
+                for c in result["reply"]["tool_calls"]
+            ],
+            calls,
+        )
+        self.assertEqual(result["reply"]["content"], "前文\n\n后文")
+        payload = "<tool_call>" + json.dumps(calls[0], ensure_ascii=False)
+        for raw, valid in [
+            (payload, True),
+            (payload + " garbage", False),
+            (payload[:-3], False),
+        ]:
+            status = intake(raw, "stop", tools, {"kind": "tool"})
+            self.assertEqual(status["json_valid"], valid)
+            self.assertFalse(status["native_parse"])
+
     def test_legal_json_bad_native_envelope_is_not_json_failure(self):
         for payload in [
             '{"name":"x","arguments":[]}',

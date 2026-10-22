@@ -128,3 +128,17 @@ and finite values (duplicate keys discarded upstream cannot be reconstructed).
 `native_parse` requires a complete response and valid native envelope;
 `schema_valid` concerns the parsed tool's declared parameter schema. These
 layers do not imply correct intent, handler execution, or product acceptance.
+
+Mac uses `python -m tools.qwen_lifecycle.mac_run REQUEST NEW_OUTPUT` with
+explicit `otool -L` identity probing; board uses `ldd`. Both thin entrypoints
+share `server_lifecycle.py` for guards, readiness, complete-context preflight,
+owned PID sampling, evidence rebasing and cleanup. The public module paths,
+requests and output layout remain the same. Historical source copies remain
+immutable evidence.
+
+Raw native intake decodes each strict JSON boundary before consuming its
+closing tool marker. Literal opening/closing markers inside JSON strings,
+Unicode and escapes are preserved, including repeated ordered calls.
+[Review validation](../../docs/validation/qwen-review-2026-10-22/README.md)
+records the read-only historical comparison. Desktop/mobile visual acceptance
+remains pending; static checks do not establish rendered acceptance.

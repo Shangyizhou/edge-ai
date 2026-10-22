@@ -68,33 +68,49 @@ def json_status(raw, wire_calls=None):
             if end == -1:
                 return None
             text = text[end + len("</think>") :]
-        found, cursor = False, 0
-        decoder = json.JSONDecoder()
-        while True:
-            start = text.find("<tool_call>", cursor)
-            if start == -1:
-                return True if found else None
-            found = True
-            body = text[start + len("<tool_call>") :].lstrip()
-            # Decode boundaries so markers inside a JSON string do not
-            # become closing markers.
-            try:
-                _, end = decoder.raw_decode(body)
-            except ValueError:
-                close = body.find("</tool_call>")
-                strict_json(body if close == -1 else body[:close])
-                raise ProtocolError("unreachable JSON boundary")
-            tail = body[end:].lstrip()
-            if tail and not re.match(r"</?tool_call\b", tail):
-                close = body.find("</tool_call>", end)
-                strict_json(body if close == -1 else body[:close])
-            strict_json(body[:end])
-            consumed = (
-                len(text[start + len("<tool_call>") :]) - len(body) + end
-            )
-            cursor = start + len("<tool_call>") + consumed
+        payloads, _ = _raw_payloads(text, require_envelopes=False)
+        return True if payloads else None
     except (ValueError, TypeError, OverflowError):
         return False
+
+
+def _raw_payloads(text, require_envelopes):
+    """Decode JSON boundaries before inspecting envelope markers."""
+    decoder = json.JSONDecoder(
+        object_pairs_hook=unique_object,
+        parse_constant=lambda value: strict_json(value),
+        parse_float=lambda value: strict_json(value),
+    )
+    payloads, content, cursor = [], [], 0
+    while True:
+        marker = re.search(r"</?tool_call\b", text[cursor:])
+        if marker is None:
+            content.append(text[cursor:])
+            return payloads, "".join(content)
+        start = cursor + marker.start()
+        content.append(text[cursor:start])
+        if not text.startswith("<tool_call>", start):
+            if require_envelopes:
+                raise ProtocolError("unfinished or unmatched tool marker")
+            # Malformed envelopes do not create a JSON payload.
+            cursor = start + len(marker.group())
+            continue
+        body_start = start + len("<tool_call>")
+        while body_start < len(text) and text[body_start].isspace():
+            body_start += 1
+        value, end = decoder.raw_decode(text, body_start)
+        payloads.append(value)
+        cursor = end
+        while cursor < len(text) and text[cursor].isspace():
+            cursor += 1
+        if text.startswith("</tool_call>", cursor):
+            cursor += len("</tool_call>")
+        elif require_envelopes:
+            raise ProtocolError("unfinished or unmatched tool marker")
+        elif cursor < len(text) and not re.match(
+            r"</?tool_call\b", text[cursor:]
+        ):
+            raise ProtocolError("trailing native JSON garbage")
 
 
 def native_reply(raw, finish_reason="stop", wire_calls=None):
@@ -124,13 +140,9 @@ def native_reply(raw, finish_reason="stop", wire_calls=None):
         if end == -1:
             raise ProtocolError("unfinished thinking block")
         text = text[end + len("</think>") :]
-    matches = list(re.finditer(r"<tool_call>(.*?)</tool_call>", text, re.S))
-    rest = re.sub(r"<tool_call>.*?</tool_call>", "", text, flags=re.S)
-    if re.search(r"</?tool_call\b", rest):
-        raise ProtocolError("unfinished or unmatched tool marker")
+    payloads, rest = _raw_payloads(text, require_envelopes=True)
     calls = []
-    for index, match in enumerate(matches):
-        value = strict_json(match.group(1))
+    for index, value in enumerate(payloads):
         if not isinstance(value, dict) or set(value) != {"name", "arguments"}:
             raise ProtocolError("tool object must contain name and arguments")
         calls.append(_call(value["name"], value["arguments"], index))
