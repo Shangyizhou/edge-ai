@@ -37,7 +37,10 @@ PYTHONPATH=. /Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python docs
 /Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python -m unittest discover -s tools/qwen_lifecycle -t . -q
 ```
 
-All 44 lifecycle unit tests pass. Explicit changed-file Ruff checks use the
+All 44 lifecycle unit tests pass. The shared-launcher test also passes in a
+fresh standalone Python process (four platform/success/failure subcases).
+Its platform identity calls are explicit fixtures, avoiding dependence on
+`platform` cache state while subprocess identity commands are mocked. Explicit changed-file Ruff checks use the
 repository Python 3.8 target. Python 3.8 AST parsing checks new maintained
 modules; this is syntax compatibility, not a new board runtime measurement.
 Frozen experiment paths have no Git diff. Maintained whitespace checks pass.

@@ -89,6 +89,7 @@ class LifecycleContracts(unittest.TestCase):
                 return raw
 
             def command(argv, **kwargs):
+                self.assertIn(argv[0], [str(binary), probe])
                 if argv[0] == probe:
                     self.assertEqual(
                         argv,
@@ -100,6 +101,21 @@ class LifecycleContracts(unittest.TestCase):
 
             with patch.object(server_lifecycle.socket, "socket"), patch.object(
                 server_lifecycle, "asset_manifest", return_value={}
+            ), patch.object(
+                server_lifecycle.platform,
+                "platform",
+                return_value="fixture platform",
+            ), patch.object(
+                server_lifecycle.platform,
+                "uname",
+                return_value=(
+                    "fixture",
+                    "host",
+                    "release",
+                    "version",
+                    "cpu",
+                    "",
+                ),
             ), patch.object(
                 server_lifecycle.subprocess, "run", side_effect=command
             ), patch.object(
@@ -158,6 +174,9 @@ class LifecycleContracts(unittest.TestCase):
             self.assertIn(
                 probe, json.loads((output / "runtime.json").read_text())
             )
+            identity = json.loads((output / "runtime.json").read_text())
+            self.assertEqual(identity["platform"], "fixture platform")
+            self.assertEqual(identity["uname"][0], "fixture")
             self.assertEqual(process.returncode, -15)
             self.assertTrue((output / "owned-process-exit.json").is_file())
             self.assertEqual(
