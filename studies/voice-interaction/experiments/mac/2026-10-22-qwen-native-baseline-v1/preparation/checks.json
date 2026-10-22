@@ -1,0 +1,85 @@
+{
+  "schema": "edge-model-prepare/checks-v1",
+  "request_sha256": "183cd409fdfbebe9bbaad8d2f03312db60b69d8cbb289a449d1868ee3ac04131",
+  "evidence": [
+    {
+      "id": "assets",
+      "kind": "assets",
+      "location": "../base-artifact-manifest.json",
+      "sha256": "0db0b8bab795d64cda8ee73a3f8c104e7d58b8eb3f6052d9afc881b341a31ae0",
+      "description": "Actual frozen assets evidence from this run; source files retained."
+    },
+    {
+      "id": "runtime",
+      "kind": "runtime",
+      "location": "../environment.txt",
+      "sha256": "7564f28c1c55301a49a7abef43c6605fdddd8cb467e5baeadf9e7ded34433674",
+      "description": "Actual frozen runtime evidence from this run; source files retained."
+    },
+    {
+      "id": "smoke",
+      "kind": "smoke",
+      "location": "../short/cases/start_camera.json",
+      "sha256": "00ccb1c34f986fa1c103adfbf2e67c4080904792a726ffa490fe233cc900075f",
+      "description": "Actual frozen smoke evidence from this run; source files retained."
+    },
+    {
+      "id": "config",
+      "kind": "benchmark_config",
+      "location": "../short/request.json",
+      "sha256": "199a90be7455423f9c29c6f293980df58712b98f5dcb3b83f804cd0be8de5f7b",
+      "description": "Actual frozen benchmark_config evidence from this run; source files retained."
+    }
+  ],
+  "candidates": [
+    {
+      "id": "qwen3-06b-mlx-bf16",
+      "acquisition": {
+        "model": "download",
+        "runtime": "binary",
+        "reason": "Official pinned HF files and isolated Apple Silicon MLX packages; no model runtime compiled for this baseline."
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "Official pinned assets and actual hashes recorded.",
+          "evidence": [
+            "assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "Exact MLX/Python dependencies and actual runtime identity preserved.",
+          "evidence": [
+            "runtime"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "The actual run loaded the model and generated a complete response.",
+          "evidence": [
+            "smoke"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "Actual first camera request produced native call and passed pure Registry validation.",
+          "evidence": [
+            "smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "Frozen request and suite were actually executed; output/errors preserved.",
+          "evidence": [
+            "config"
+          ]
+        }
+      },
+      "benchmark_configs": [
+        "config"
+      ],
+      "next_action": "Use the frozen native/role development observations for the bounded LoRA pilot, keeping final tests separate."
+    }
+  ]
+}

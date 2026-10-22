@@ -1,0 +1,284 @@
+"""ROS 2正常在线入口：唯一麦克风逐轮交互及退出生命周期。"""
+
+import asyncio
+import json
+import signal
+import threading
+import time
+from typing import Dict, List, Optional
+
+import rclpy
+from rclpy.executors import SingleThreadedExecutor
+from rclpy.node import Node
+from std_msgs.msg import String
+
+from robot_agent.actions.capabilities import create_default_actions
+from robot_agent.actions.perception import (
+    PerceptionActions,
+)
+from robot_agent.actions.simulation import simulate_cue
+from robot_agent.application import AgentApplication
+from robot_agent.diagnostics import configure_logging
+from robot_agent.offline_config import offline_parameters, select_backend
+from robot_agent.results import VoiceRecord, result_to_json
+from robot_agent.ros.offline import RosInference
+from robot_agent.ros.perception import RosPerception
+from robot_agent.runtime import (
+    build_application,
+    load_config,
+    shutdown_timeout,
+)
+
+
+def create_ros_application(
+    node: Node,
+    config: Dict,
+    *,
+    input_mode: str = "recording",
+    perception: Optional[RosPerception] = None,
+    inference: Optional[RosInference] = None,
+) -> AgentApplication:
+    """组装同一语音Implementation与ROS感知Adapter，供运行和独立验收。"""
+    capabilities = create_default_actions()
+    actions = capabilities.registry
+    perception_capability = PerceptionActions(
+        RosPerception(node) if perception is None else perception
+    )
+    actions.register_perception(perception_capability)
+    if select_backend(config) == "offline":
+        if inference is None:
+            raise ValueError("offline 组装必须提供所属 ROS inference")
+        return build_application(
+            config,
+            capabilities=capabilities,
+            speech_input=inference.input,
+            model=inference.model,
+            speech_output=inference.output,
+        )
+    return build_application(
+        config, capabilities=capabilities, input_mode=input_mode
+    )
+
+
+class OnlineVoiceRosNode(Node):
+    """薄 ROS 接线；唯一应用由主事件循环明确运行和关闭。"""
+
+    def __init__(self) -> None:
+        """读取配置并接线；不启动麦克风、业务线程或事件循环。"""
+        super().__init__("online_voice_agent")
+        filename = self.declare_parameter("config_file", "").value
+        if not isinstance(filename, str) or not filename:
+            raise ValueError("必须指定外部 config_file 路径")
+        self._config = load_config(filename)
+        if select_backend(self._config) == "offline":
+            offline_parameters(self._config)
+        configure_logging(self._config.get("log_level", "INFO"))
+        self._shutdown_timeout = shutdown_timeout(self._config)
+        self._shutdown_deadline: Optional[float] = None
+        self._closing: Optional[asyncio.Task] = None
+        self._perception = RosPerception(self)
+        self._voice: Optional[AgentApplication] = None
+        self._inference: Optional[RosInference] = None
+        self._publisher = self.create_publisher(
+            String, "/online_agent/result", 10
+        )
+
+    async def run(self) -> None:
+        """主循环只运行统一应用，不持有另一份回合或会话状态。"""
+        backend = select_backend(self._config)
+        if backend == "offline":
+            self._inference = RosInference(self, self._config)
+        self._voice = create_ros_application(
+            self,
+            self._config,
+            input_mode="microphone",
+            perception=self._perception,
+            inference=self._inference,
+        )
+        if self._inference is not None:
+            await self._inference.wait_ready(
+                self._config.get("startup_timeout", 120)
+            )
+        self.get_logger().info(simulate_cue("startup").detail)
+        self.get_logger().info(
+            backend + " voice starting; continuous ASR input"
+        )
+        await self._voice.run(self._publish)
+
+    def _publish(self, result: VoiceRecord) -> None:
+        """只发布执行事实；输入重连耗尽明确报告，不重复提交模型。"""
+        if result.status == "failed":
+            self.get_logger().info(simulate_cue("error").detail)
+        message = String()
+        message.data = json.dumps(result_to_json(result), ensure_ascii=False)
+        self._publisher.publish(message)
+
+    @property
+    def shutdown_deadline(self) -> Optional[float]:
+        """executor最后使用同一个已经建立的绝对退出期限。"""
+        return self._shutdown_deadline
+
+    async def aclose(self, deadline: Optional[float] = None) -> None:
+        """节点和应用共享第一次退出期限，保留回执交接直到应用保存事实。"""
+        if self._closing is None:
+            existing = (
+                self._voice.shutdown_deadline
+                if self._voice is not None
+                else None
+            )
+            self._shutdown_deadline = (
+                existing
+                if existing is not None
+                else (
+                    time.monotonic() + self._shutdown_timeout
+                    if deadline is None
+                    else deadline
+                )
+            )
+            if self._voice is not None:
+                self._voice.stop()
+            self._perception.stop()
+            self._closing = asyncio.create_task(
+                self._close_resources(self._shutdown_deadline)
+            )
+        await asyncio.shield(self._closing)
+
+    async def _close_resources(self, deadline: float) -> None:
+        """应用资源收尾后才断开原ROS回执桥接。"""
+        try:
+            if self._voice is not None:
+                await self._voice.aclose(deadline)
+        finally:
+            await self._perception.aclose(deadline)
+
+    def destroy_ros_entities(self) -> None:
+        """executor 已停止后，先释放 Foxy 不随 node 销毁的 waitable。"""
+        if self._inference is not None:
+            self._inference.destroy_ros_entities()
+
+
+class RosExecutor:
+    """显式拥有唯一 ROS executor 线程，并把线程异常交回应用循环。"""
+
+    def __init__(self, *nodes: Node) -> None:
+        """只组装 executor；start 才启动接收线程。"""
+        self._executor = SingleThreadedExecutor()
+        for node in nodes:
+            self._executor.add_node(node)
+        self._thread: Optional[threading.Thread] = None
+        self._stopped: Optional[asyncio.Future] = None
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._handoff = threading.Lock()
+
+    def start(self) -> None:
+        """在应用循环中建立线程到循环的完成通知。"""
+        loop = asyncio.get_running_loop()
+        self._loop = loop
+        stopped = loop.create_future()
+        self._stopped = stopped
+
+        def spin():
+            """线程只处理 ROS 回调，任何异常都由拥有者观察。"""
+            error = None
+            try:
+                self._executor.spin()
+            except BaseException as caught:
+                error = caught
+            with self._handoff:
+                if self._loop is not None:
+                    self._loop.call_soon_threadsafe(stopped.set_result, error)
+
+        self._thread = threading.Thread(
+            target=spin, name="online-ros-executor", daemon=True
+        )
+        self._thread.start()
+
+    async def wait(self) -> None:
+        """executor 意外退出会立即结束上层等待，不隐藏回调错误。"""
+        assert self._stopped is not None, "ROS executor 尚未启动"
+        error = await asyncio.shield(self._stopped)
+        if error is not None:
+            raise error
+
+    async def aclose(self, deadline: float) -> None:
+        """停止接收并在剩余预算内回收线程，不阻塞应用循环。"""
+        self._executor.shutdown(timeout_sec=0)
+        if self._thread is None:
+            return
+        try:
+            while self._thread.is_alive():
+                if time.monotonic() >= deadline:
+                    raise asyncio.TimeoutError(
+                        "ROS executor 线程未在期限内退出"
+                    )
+                await asyncio.sleep(0.01)
+            self._thread.join(0)
+            # Foxy 在未完成回调时首次 shutdown 可能只设置退出标志。
+            self._executor.shutdown(timeout_sec=0)
+            await self.wait()
+        finally:
+            with self._handoff:
+                self._loop = None
+
+
+async def _run(args: Optional[List[str]]) -> None:
+    """主事件循环拥有 ROS、应用、信号与明确的关闭顺序。"""
+    rclpy.init(args=args)
+    node = None
+    executor = None
+    tasks = []
+    loop = asyncio.get_running_loop()
+    stop = asyncio.Event()
+    handlers = {
+        signum: signal.getsignal(signum)
+        for signum in (signal.SIGINT, signal.SIGTERM)
+    }
+    try:
+        # Foxy 没有 signal_handler_options；由主循环接管退出信号。
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(signum, stop.set)
+        node = OnlineVoiceRosNode()
+        executor = RosExecutor(node)
+        executor.start()
+        tasks = [
+            asyncio.create_task(node.run()),
+            asyncio.create_task(executor.wait()),
+            asyncio.create_task(stop.wait()),
+        ]
+        done, _ = await asyncio.wait(
+            tasks, return_when=asyncio.FIRST_COMPLETED
+        )
+        for task in done:
+            task.result()
+    finally:
+        deadline: Optional[float] = None
+        try:
+            if node is not None:
+                try:
+                    await node.aclose()
+                finally:
+                    assert node.shutdown_deadline is not None
+                    deadline = node.shutdown_deadline
+        finally:
+            for task in tasks:
+                task.cancel()
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+            try:
+                if executor is not None:
+                    assert deadline is not None
+                    await executor.aclose(deadline)
+            finally:
+                if node is not None:
+                    node.destroy_ros_entities()
+                    node.destroy_node()
+                if rclpy.ok():
+                    rclpy.shutdown()
+                for signum, handler in handlers.items():
+                    loop.remove_signal_handler(signum)
+                    signal.signal(signum, handler)
+
+
+def main(args: Optional[List[str]] = None) -> None:
+    """正常入口只启动麦克风；应用运行在 asyncio 主循环。"""
+    asyncio.run(_run(args))

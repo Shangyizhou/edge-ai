@@ -1,0 +1,347 @@
+{
+  "schema": "edge-model-benchmark/suite-v1",
+  "id": "qwen-native-dev-14-v1",
+  "split": "development_only",
+  "test_isolation": "This suite is not the final held-out test set; do not reuse its paraphrase families there.",
+  "persona_ref": "inputs/persona.json",
+  "system": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。",
+  "system_variant": "short",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "start_camera",
+        "description": "恢复采集，不把发布完成当作设备开启确认。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "stop_camera",
+        "description": "先确认 Follow standby，再暂停采集，失败则不继续。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "enable_lidar",
+        "description": "开启 tracker 扫描融合，保留服务端 TF/发布端检查。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "disable_lidar",
+        "description": "关闭融合，服务确认后记录其隐含的 Follow standby。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "enable_tracking",
+        "description": "仅启用 Follow，保留融合尚未开启时服务端拒绝的语义。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "disable_tracking",
+        "description": "仅进入 Follow 待机，保持当前融合订阅。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "following_status",
+        "description": "读取ObjectTrack当前状态；不可用时不猜测或返回旧缓存。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "volume_set",
+        "description": "模拟源 level 的整数转换与0至100饱和。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "音量执行时量化并按原契约饱和。",
+          "properties": {
+            "level": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "default": 50,
+              "description": "音量，执行时取整并限制在0至100",
+              "title": "Level"
+            }
+          },
+          "title": "LevelInput",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "play_music",
+        "description": "模拟切换当前歌曲，保留等待队列。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "歌曲与队列接受非空名称。",
+          "properties": {
+            "song_name": {
+              "description": "歌曲名称",
+              "maxLength": 2048,
+              "minLength": 1,
+              "pattern": "\\S",
+              "title": "Song Name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "song_name"
+          ],
+          "title": "SongInput",
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "samples": [
+    {
+      "id": "start_camera",
+      "user": "开启摄像头。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "stop_camera",
+      "user": "停止摄像头。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "enable_lidar",
+      "user": "开启雷达融合。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "disable_lidar",
+      "user": "关闭雷达融合。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "enable_tracking",
+      "user": "开启跟随。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "disable_tracking",
+      "user": "关闭跟随。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "following_status",
+      "user": "查询现在的融合和跟随状态。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "volume_set",
+      "user": "把音量设置为30。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 30
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "play_music",
+      "user": "播放夜曲。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "夜曲"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ordered_calls",
+      "user": "先把音量设为30，再播放夜曲。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 30
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "夜曲"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "persona_name",
+      "user": "你叫什么名字？用一句话介绍自己。",
+      "expected": {
+        "kind": "persona",
+        "contains_all": [
+          "小沫"
+        ]
+      }
+    },
+    {
+      "id": "persona_role",
+      "user": "你是什么身份，主要做什么？",
+      "expected": {
+        "kind": "persona",
+        "contains_any": [
+          "科研",
+          "机器人助手"
+        ]
+      }
+    },
+    {
+      "id": "persona_creator",
+      "user": "这个机器人助手角色是谁创造的？",
+      "expected": {
+        "kind": "persona",
+        "contains_any": [
+          "用户",
+          "你创造",
+          "您创造"
+        ]
+      }
+    },
+    {
+      "id": "chat",
+      "user": "你好。",
+      "expected": {
+        "kind": "chat"
+      }
+    }
+  ]
+}
