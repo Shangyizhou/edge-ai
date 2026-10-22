@@ -1,0 +1,269 @@
+{
+  "schema": "edge-model-finetune/result-v1",
+  "run_id": "qwen3-pilot32-lora-v2-seeded",
+  "status": "completed",
+  "source": {
+    "kind": "device_measurement"
+  },
+  "base_artifact": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "BF16",
+    "artifact_format": "HF safetensors",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "runtime default unquantized",
+    "lineage": "official untrained base"
+  },
+  "request_sha256": "c9f29f442caaa2858bd3b17a34ad2b593d778a95a884c153b0887c166ba35999",
+  "dataset": {
+    "train_samples": 20,
+    "valid_samples": 5,
+    "test_loaded": false,
+    "train_sha256": "cc99a6bd7d60feff35f06764501de469afe8f271efb39a0500109c0ebf8cca28",
+    "valid_sha256": "4e4a04c7a492aef7272bc29ff7ea4f2076c8a4399e7383d7b0dde36a88c542ae"
+  },
+  "runtime": {
+    "mlx": "0.32.4",
+    "mlx-lm": "0.32.2",
+    "transformers": "5.20.2"
+  },
+  "config": {
+    "model": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "train": true,
+    "fine_tune_type": "lora",
+    "optimizer": "adam",
+    "optimizer_config": {
+      "adam": {},
+      "adamw": {},
+      "muon": {},
+      "sgd": {},
+      "adafactor": {}
+    },
+    "data": "mlx-community/WikiSQL",
+    "seed": 42,
+    "num_layers": 8,
+    "batch_size": 1,
+    "iters": 32,
+    "val_batches": 5,
+    "learning_rate": 0.0001,
+    "steps_per_report": 8,
+    "steps_per_eval": 16,
+    "resume_adapter_file": null,
+    "adapter_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/pilot-train32-seeded-v2/adapter",
+    "save_every": 32,
+    "test": false,
+    "test_batches": 500,
+    "max_seq_length": 2048,
+    "config": null,
+    "grad_checkpoint": true,
+    "grad_accumulation_steps": 8,
+    "clear_cache_threshold": 0,
+    "lr_schedule": null,
+    "lora_parameters": {
+      "rank": 8,
+      "scale": 16.0,
+      "dropout": 0.0,
+      "keys": [
+        "self_attn.q_proj",
+        "self_attn.v_proj"
+      ]
+    },
+    "mask_prompt": true,
+    "report_to": null,
+    "project_name": null,
+    "trust_remote_code": false
+  },
+  "metrics": [
+    {
+      "kind": "validation",
+      "elapsed_seconds": 1.8493005000054836,
+      "upstream": {
+        "iteration": 0,
+        "val_loss": 2.757126808166504,
+        "val_time": 0.5985099160461687
+      },
+      "microstep": 0
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 3.103977041959297,
+      "upstream": {
+        "iteration": 8,
+        "train_loss": 3.004206895828247,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 6.385414431149166,
+        "tokens_per_second": 118.13016697625957,
+        "trained_tokens": 148,
+        "peak_memory": 2.064953208
+      },
+      "microstep": 8
+    },
+    {
+      "kind": "validation",
+      "elapsed_seconds": 4.657002874999307,
+      "upstream": {
+        "iteration": 15,
+        "val_loss": 1.5685290098190308,
+        "val_time": 0.42883470898959786
+      },
+      "microstep": 16
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 4.822212083963677,
+      "upstream": {
+        "iteration": 16,
+        "train_loss": 3.057904005050659,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 6.226976198213539,
+        "tokens_per_second": 105.08022334485348,
+        "trained_tokens": 283,
+        "peak_memory": 2.06758887
+      },
+      "microstep": 16
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 6.026766666967887,
+      "upstream": {
+        "iteration": 24,
+        "train_loss": 0.7712187767028809,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 6.651365991806871,
+        "tokens_per_second": 133.85874058511328,
+        "trained_tokens": 444,
+        "peak_memory": 2.090020862
+      },
+      "microstep": 24
+    },
+    {
+      "kind": "validation",
+      "elapsed_seconds": 7.473989124991931,
+      "upstream": {
+        "iteration": 31,
+        "val_loss": 0.611765444278717,
+        "val_time": 0.4180705000180751
+      },
+      "microstep": 32
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 7.620406166999601,
+      "upstream": {
+        "iteration": 32,
+        "train_loss": 0.5027671456336975,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 6.81576096153221,
+        "tokens_per_second": 141.42703995179335,
+        "trained_tokens": 610,
+        "peak_memory": 2.090020862
+      },
+      "microstep": 32
+    }
+  ],
+  "measurement_sources": [
+    {
+      "path": "collector-source/training.py",
+      "sha256": "bd25e52b463cb44fd524940be2a1733654cffcea25f02d4e8ebe9441f9ca9f3e"
+    },
+    {
+      "path": "collector-source/measure.py",
+      "sha256": "2b3a7375523ec64d392d85667cc37fe841985988c747cc3a327befcad307bfca"
+    },
+    {
+      "path": "collector-source/benchmark.py",
+      "sha256": "d008dd7238bc1659a7096e9a5643e7c2b197825e228c85a171cb638a1c47aadb"
+    },
+    {
+      "path": "collector-source/lineage.py",
+      "sha256": "ee4295b3e69db7679c892e5360db98c9ddf07b519c8acd89c51d5646a10a5401"
+    }
+  ],
+  "measurement": "whole run resources include model load, preflight, training and validation; native training tokens/s counts supervised tokens and excludes validation; MLX GB are decimal, not RSS",
+  "load_seconds": 1.0930465839919634,
+  "preflight": {
+    "maximum_tokens": 469,
+    "mask_prefix_matches": true
+  },
+  "trainable_parameters": 327680,
+  "training_wall_seconds": 6.461063165974338,
+  "mlx_peak_allocated_bytes": 2090020862,
+  "microsteps": 32,
+  "optimizer_updates": 4,
+  "adapter": {
+    "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/pilot-train32-seeded-v2/adapter",
+    "total_bytes": 2629532,
+    "files": [
+      {
+        "name": "0000032_adapters.safetensors",
+        "bytes": 1314143,
+        "sha256": "ae00090e52fd03027304fed9b558966bc893a569c073cf726a8826883cd652c2"
+      },
+      {
+        "name": "adapter_config.json",
+        "bytes": 1246,
+        "sha256": "96a1307d9c90c5c825b150e43404801b52962588603aefdfbdd83d0466dc639b"
+      },
+      {
+        "name": "adapters.safetensors",
+        "bytes": 1314143,
+        "sha256": "ae00090e52fd03027304fed9b558966bc893a569c073cf726a8826883cd652c2"
+      }
+    ]
+  },
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 36670,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 36,
+    "wall_seconds": 7.6333559160120785,
+    "cpu_seconds": 3.61432368,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.734907843637198,
+    "peak_rss_bytes": 496189440,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 1951334400,
+    "host_swap_delta_bytes": 736296960,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  },
+  "wall_seconds": 7.643723749963101,
+  "evidence": [
+    {
+      "path": "metrics.jsonl",
+      "sha256": "ace121b520570e9b89fcf9f16e218f778b9d2c0f7ecee8eec2fcf0a0ade7043e"
+    },
+    {
+      "path": "preflight.json",
+      "sha256": "44d25bc1ae0e6dc3865a1f3f136a3f04dee6932fb9ef4a5f2cd4cc2b31cced1d"
+    },
+    {
+      "path": "request.json",
+      "sha256": "c9f29f442caaa2858bd3b17a34ad2b593d778a95a884c153b0887c166ba35999"
+    },
+    {
+      "path": "resource-samples.json",
+      "sha256": "b38b987c2d286d942e8db44c9bb0636937f1789180b96e66aa789cc310634047"
+    },
+    {
+      "path": "train-config.json",
+      "sha256": "48d69b001b35ecb5b7830e0defc0eda065aeb82c08e77a6bab2cde2096771a3a"
+    },
+    {
+      "path": "train.jsonl",
+      "sha256": "cc99a6bd7d60feff35f06764501de469afe8f271efb39a0500109c0ebf8cca28"
+    },
+    {
+      "path": "training.log",
+      "sha256": "66d94bfff20a706f5077305a022cdbe260a07a109a83af999e49ab9d4dad8234"
+    },
+    {
+      "path": "valid.jsonl",
+      "sha256": "4e4a04c7a492aef7272bc29ff7ea4f2076c8a4399e7383d7b0dde36a88c542ae"
+    }
+  ]
+}

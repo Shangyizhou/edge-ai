@@ -1,0 +1,921 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qwen 原生调用 · 模型生命周期实测</title>
+<style>
+:root{--ink:#18313b;--muted:#536873;--line:#dce5e7;--teal:#08776b;--paper:#fff;--bg:#f2f5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}main{max-width:1150px;margin:0 auto;padding:42px 30px 80px}body{padding-right:230px}.rail{position:fixed;right:0;top:0;height:100vh;width:230px;border-left:1px solid var(--line);padding:42px 22px;background:#fbfcfc;overflow-y:auto}.rail strong{display:block;margin-bottom:18px}.rail a{display:block;color:var(--muted);text-decoration:none;padding:11px 12px;border-radius:8px;margin:4px 0;font-size:14px}.rail a.active{background:#e2f1ed;color:#066457;font-weight:700}.rail small{display:block;margin-top:24px;color:var(--muted)}header{padding:0 0 18px}h1{font-size:clamp(29px,3.6vw,42px);line-height:1.3;margin:14px 0;letter-spacing:-.7px}h2{font-size:27px;line-height:1.4;margin:8px 0 16px}h3{font-size:20px;margin:24px 0 12px}h4{font-size:17px;margin:8px 0}p{margin:10px 0}.eyebrow,.badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--teal)}.badge{display:inline-block;padding:3px 10px;border:1px solid #bedbd3;border-radius:15px;letter-spacing:0}.muted,small{color:var(--muted)}section{background:var(--paper);padding:30px;border:1px solid var(--line);border-radius:16px;margin:20px 0;scroll-margin-top:24px}.deployment-table td:first-child{min-width:285px;white-space:pre-line;font-size:13px;line-height:1.85}.lead{font-size:22px;font-weight:650;line-height:1.6}.scroll{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf4f3;white-space:nowrap}td{min-width:92px}tr:last-child td{border:0}.sample{padding:20px;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:#fcfdfd}.sample-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.number{font-weight:700;color:var(--teal)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.output{padding:14px;background:#edf4f3;border-radius:8px;white-space:pre-wrap;font-size:17px;margin:8px 0}.fail{background:#fff1e6;border-left:3px solid #b6671f}.reference{padding:10px 0;font-size:14px;color:var(--muted)}audio{width:100%;max-width:540px;display:block;margin:12px 0}.finding{border-left:4px solid var(--teal);background:#e9f4ef;border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}.finding strong{font-size:18px}.finding p{margin:7px 0}.method{font-size:14px;color:var(--muted);background:#f5f7f8;padding:14px 18px;border-radius:10px}.stats{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin:12px 0}.stats span{padding:4px 9px;background:#f1f4f6;border-radius:6px}a{color:var(--teal);text-underline-offset:3px}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal)}pre{font-size:12px;background:#f4f6f7;padding:15px;white-space:pre-wrap;max-height:400px;overflow:auto}p,td,pre,.output{overflow-wrap:anywhere}.foot{font-size:13px;color:var(--muted)}.warning{color:#97541d;font-weight:600}.meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meter{padding:14px;border:1px solid var(--line);border-radius:10px}.track{height:9px;background:#e5ebed;border-radius:10px;overflow:hidden;margin:10px 0}.track b{display:block;height:100%;background:var(--teal);border-radius:10px}.meter small{font-size:12px}@media(max-width:1100px){body{padding-right:190px}.rail{width:190px;padding:30px 14px}main{padding:30px 20px}section{padding:24px}}@media(max-width:760px){body{padding-right:0}.rail{position:sticky;top:0;width:100%;height:auto;padding:8px 12px;border:0;border-bottom:1px solid var(--line);z-index:10;display:flex;gap:4px;overflow-x:auto}.rail a{display:inline-block;white-space:nowrap;padding:8px 12px;margin:0}.rail strong,.rail small{display:none}main{padding:20px 12px}section{padding:20px 15px;scroll-margin-top:76px}.pair,.meters{grid-template-columns:1fr}h2{font-size:24px}.sample{padding:16px}.lead{font-size:20px}}@media print{body{padding:0}.rail{display:none}section{break-inside:avoid}audio{display:none}}
+</style></head><body>
+<nav class="rail" aria-label="章节导航"><strong>本页导航</strong>
+<a href="#summary">结论与选择</a>
+<a href="#run-0">qwen3-pilot32-seeded-q4-direct-smoke-v2</a>
+<a href="#resources">精度与资源对比</a>
+<a href="#evidence">口径与原始证据</a>
+<a href="#top">回到顶部</a></nav><main id="top">
+<header><span class="badge">原生工具 / 角色事实 / 独立模型实验</span>
+<h1>Qwen：从未微调基线到部署制品</h1>
+<p class="muted">同一结构化结果生成 · 实际输入输出保留 · 无硬件动作或完整交互验收</p></header>
+<section id="summary"><div class="eyebrow">先给结论</div>
+<h2>原生调用、角色设定和硬件资源分别判断</h2>
+<div class="scroll"><table class="deployment-table"><thead><tr>
+<th>候选部署方案</th><th>本轮能力观察</th>
+<th>CPU / 整机容量</th><th>采样峰值内存 / 实际内存</th>
+</tr></thead><tbody>
+<tr><td>Qwen/Qwen3-0.6B · 596049920
+精度：Q4_K_M
+框架：llama.cpp e3797b184d428c7a019362612b76971f60af6670
+后端：Metal / Darwin
+阶段：LoRA32 / Q4_K_M 原生独立冒烟</td><td>工具 Schema 3/3；原生调用 3/3；角色固定规则 1/3</td><td>3.11%</td><td>RSS 774.08 MiB / 4.72%<br>MLX峰值分配 未测 MiB（不相加）</td></tr>
+</tbody></table></div><p class="foot">CPU为已声明进程树占整机逻辑核容量，内存为逐例窗口的采样峰值。CPU不包含Metal GPU利用率。Mac RSS 与 Linux PSS 不等价；资源窗口包含模板、推理、解析与纯校验。未将不同设备混成纯加速比较。</p></section>
+<section id="run-0"><div class="eyebrow">LoRA32 / Q4_K_M 原生独立冒烟</div><h2>qwen3-pilot32-seeded-q4-direct-smoke-v2</h2>
+<div class="method"><strong>怎样测：</strong>固定工具、system和输入；每例新建模型prompt cache；非思考模式。真实响应完整解析后，只通过JSON Schema及可配置Registry纯校验，不执行设备。<br>
+<strong>怎样读：</strong>prefill与decode tokens/s采用运行时计时，TTFT为生成入口至首非空输出，完整有效调用等待包含模板/推理/解析/校验；缺失字段为未测，失败/截断不是快速成功。角色采用预先固定文本规则，不是独立人工整体人设评审。</div>
+<h3>工具调用 · 实际输入与输出</h3>
+<article class="sample"><div class="sample-head"><h4>start_camera</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>开启摄像头。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: &quot;{}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: {}}]}</pre><div class="stats"><span>prompt 439 tokens</span><span>首内容 0.14s</span><span>完整有效调用 0.34s</span><span>prefill 4595.94 tokens/s</span><span>decode 159.26 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;arguments&quot;: {}
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;parameters&quot;: {},
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>volume_set</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>把音量设置为30。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;volume_set&quot;, &quot;arguments&quot;: &quot;{\&quot;level\&quot;: 30}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;volume_set&quot;, &quot;arguments&quot;: {&quot;level&quot;: 30}}]}</pre><div class="stats"><span>prompt 444 tokens</span><span>首内容 0.13s</span><span>完整有效调用 0.28s</span><span>prefill 5331.03 tokens/s</span><span>decode 185.31 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;volume_set&quot;,
+        &quot;arguments&quot;: {
+          &quot;level&quot;: 30
+        }
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;volume_set&quot;,
+        &quot;parameters&quot;: {
+          &quot;level&quot;: 30
+        },
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>play_music</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>播放夜曲。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;play_music&quot;, &quot;arguments&quot;: &quot;{\&quot;song_name\&quot;: \&quot;夜曲\&quot;}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;play_music&quot;, &quot;arguments&quot;: {&quot;song_name&quot;: &quot;夜曲&quot;}}]}</pre><div class="stats"><span>prompt 440 tokens</span><span>首内容 0.13s</span><span>完整有效调用 0.29s</span><span>prefill 5218.46 tokens/s</span><span>decode 186.50 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;play_music&quot;,
+        &quot;arguments&quot;: {
+          &quot;song_name&quot;: &quot;夜曲&quot;
+        }
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;play_music&quot;,
+        &quot;parameters&quot;: {
+          &quot;song_name&quot;: &quot;夜曲&quot;
+        },
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<h3>角色 / 背景 / 自我介绍</h3>
+<article class="sample"><div class="sample-head"><h4>persona_name</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>你叫什么名字？用一句话介绍自己。</p><small>实际输出</small><div class="output ">我叫小沫，是AI机器人。</div><small>预期</small><pre>{&quot;kind&quot;: &quot;persona&quot;, &quot;contains_all&quot;: [&quot;小沫&quot;]}</pre><div class="stats"><span>prompt 446 tokens</span><span>首内容 0.09s</span><span>完整有效调用 未测s</span><span>prefill 5324.86 tokens/s</span><span>decode 187.52 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: true,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;我叫小沫，是AI机器人。&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>persona_role</h4><span class="badge">检查未通过 / 未完成</span></div><small>输入</small><p>你是什么身份，主要做什么？</p><small>实际输出</small><div class="output fail">我是AI机器人，主要用来提供帮助和信息。</div><small>预期</small><pre>{&quot;kind&quot;: &quot;persona&quot;, &quot;contains_any&quot;: [&quot;科研&quot;, &quot;机器人助手&quot;]}</pre><div class="stats"><span>prompt 443 tokens</span><span>首内容 0.09s</span><span>完整有效调用 未测s</span><span>prefill 5295.43 tokens/s</span><span>decode 180.33 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: false,
+  &quot;persona_valid&quot;: false,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;我是AI机器人，主要用来提供帮助和信息。&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>persona_creator</h4><span class="badge">检查未通过 / 未完成</span></div><small>输入</small><p>这个机器人助手角色是谁创造的？</p><small>实际输出</small><div class="output fail">这个机器人助手角色是AI创造的。</div><small>预期</small><pre>{&quot;kind&quot;: &quot;persona&quot;, &quot;contains_any&quot;: [&quot;用户&quot;, &quot;你创造&quot;, &quot;您创造&quot;]}</pre><div class="stats"><span>prompt 444 tokens</span><span>首内容 0.09s</span><span>完整有效调用 未测s</span><span>prefill 5280.06 tokens/s</span><span>decode 184.09 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: false,
+  &quot;persona_valid&quot;: false,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;这个机器人助手角色是AI创造的。&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<h3>普通聊天 · 无调用</h3>
+<article class="sample"><div class="sample-head"><h4>chat</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>你好。</p><small>实际输出</small><div class="output ">你好！</div><small>预期</small><pre>{&quot;kind&quot;: &quot;chat&quot;}</pre><div class="stats"><span>prompt 438 tokens</span><span>首内容 0.09s</span><span>完整有效调用 未测s</span><span>prefill 5273.11 tokens/s</span><span>decode 198.65 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;你好！&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<aside class="finding"><strong>本阶段发现</strong><p>工具调用Schema通过 3/3，与期望函数和参数一致 3/3；角色规则通过 1/3。这些是当前固定样例的观察，不能外推完整业务或所有人设已学入。失败输出保留，作为下一阶段数据与协议诊断依据。</p></aside></section>
+<section id="resources"><h2>精度与资源对比</h2><p>只有模型、输入、设备、运行时、context/KV和解码可比时才解释精度差异。模型文件大小不等于运行内存。没有测量的精度不推算成绩。</p><div class="scroll"><table><thead><tr><th>候选 / 阶段</th><th>文件MiB</th><th>prefill tokens/s 中位数</th><th>decode tokens/s 中位数</th><th>TTFT中位数 s</th><th>CPU容量</th><th>采样峰值</th></tr></thead><tbody>
+<tr><td>qwen3-pilot32-seeded-q4-direct-smoke-v2</td><td>378.33</td><td>5280.06</td><td>185.31</td><td>0.09</td><td>3.11%</td><td>RSS 774.08MiB / MLX 未测MiB</td></tr>
+</tbody></table></div></section><section id="evidence"><h2>口径与原始证据</h2><p>统计覆盖本页全部样例，而非挑选成功项；单轮小样本不能宣称稳定尾延迟。MLX峰值分配与RSS可能重叠，不相加。未执行生产集成、ROS共跑或完整交互验收。</p>
+<p><a download="benchmark-results.json" href="data:application/json;base64,WwogIHsKICAgICJzY2hlbWEiOiAiZWRnZS1tb2RlbC1iZW5jaG1hcmsvcmVzdWx0LXYxIiwKICAgICJydW5faWQiOiAicXdlbjMtcGlsb3QzMi1zZWVkZWQtcTQtZGlyZWN0LXNtb2tlLXYyIiwKICAgICJzb3VyY2UiOiB7CiAgICAgICJraW5kIjogImRldmljZV9tZWFzdXJlbWVudCIsCiAgICAgICJyYXdfZXZpZGVuY2UiOiAiY2FzZXMvIGFuZCBldmVudHMvIHdpdGhpbiB0aGlzIHJ1biIKICAgIH0sCiAgICAiY2FuZGlkYXRlIjogewogICAgICAibW9kZWwiOiAiUXdlbi9Rd2VuMy0wLjZCIiwKICAgICAgIm1vZGVsX3BhdGgiOiAiL1VzZXJzL3N5ei8ubG9jYWwvc2hhcmUvZWRnZS1haS9xd2VuLWxpZmVjeWNsZS9hcnRpZmFjdHMvcGlsb3QzMi1zZWVkZWQtdjIvcXdlbjMtcGlsb3QzMi1xNF9rX20uZ2d1ZiIsCiAgICAgICJyZXZpc2lvbiI6ICJjMTg5OWRlMjg5YTA0ZDEyMTAwZGIzNzBkODE0ODVjZGY3NWU0N2NhIiwKICAgICAgInBhcmFtZXRlcl9jb3VudCI6IDU5NjA0OTkyMCwKICAgICAgInBhcmFtZXRlcl9jb3VudF9zdG9yZWQiOiA3NTE2MzIzODQsCiAgICAgICJwcmVjaXNpb24iOiAiUTRfS19NIiwKICAgICAgImFydGlmYWN0X2Zvcm1hdCI6ICJHR1VGIiwKICAgICAgImJhY2tlbmQiOiAiTWV0YWwiLAogICAgICAiY29udGV4dF90b2tlbnMiOiA4MTkyLAogICAgICAia3ZfdHlwZSI6ICJydW50aW1lIGRlZmF1bHQgdW5xdWFudGl6ZWQiLAogICAgICAibGluZWFnZSI6ICJzZWVkZWQgcGlsb3QzMiBtZXJnZWTihpJjYW5vbmljYWwgdG9rZW5pemVy4oaSRjE24oaSUTRfS19NIiwKICAgICAgInJ1bnRpbWVfdmVyc2lvbiI6ICJlMzc5N2IxODRkNDI4YzdhMDE5MzYyNjEyYjc2OTcxZjYwYWY2NjcwIiwKICAgICAgImNvbnN0cmFpbnRfbW9kZSI6ICJsbGFtYS1zZXJ2ZXIgbmF0aXZlIHRvb2wgZ3JhbW1hcjsgZGlmZmVycyBmcm9tIHVuY29uc3RyYWluZWQgTUxYIiwKICAgICAgImFjdHVhbF9ydW50aW1lIjogewogICAgICAgICJuYW1lIjogImxsYW1hLmNwcCIsCiAgICAgICAgInZlcnNpb24iOiAiZTM3OTdiMTg0ZDQyOGM3YTAxOTM2MjYxMmI3Njk3MWY2MGFmNjY3MCIsCiAgICAgICAgImJhY2tlbmQiOiAiTWV0YWwiLAogICAgICAgICJuZXR3b3JrIjogImRpcmVjdCIKICAgICAgfQogICAgfSwKICAgICJzdGFnZSI6ICJMb1JBMzIgLyBRNF9LX00g5Y6f55Sf54us56uL5YaS54OfIiwKICAgICJyZXF1ZXN0X3NoYTI1NiI6ICIwMzljYjA5NjJlM2IxMjI4OTNkNTgzODczMjZhZTg4NjBkNzQ3M2Y2Y2MyNzE1MGY3YTlmMTc5MTMxYTAyNWQ1IiwKICAgICJzdWl0ZV9zaGEyNTYiOiAiMDc2YmI2NjA0NTk1YTUwZWQ2NDI2Y2I2MDkwNGJhNzg3YzUzMmQzZDJmNjU0OTI1ZTRkNmQ2ZGYzNjFjNDJhYiIsCiAgICAiYXJ0aWZhY3RzIjogewogICAgICAicm9vdCI6ICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL2FydGlmYWN0cy9waWxvdDMyLXNlZWRlZC12Mi9xd2VuMy1waWxvdDMyLXE0X2tfbS5nZ3VmIiwKICAgICAgInRvdGFsX2J5dGVzIjogMzk2NzA0NzA0LAogICAgICAiZmlsZXMiOiBbCiAgICAgICAgewogICAgICAgICAgIm5hbWUiOiAicXdlbjMtcGlsb3QzMi1xNF9rX20uZ2d1ZiIsCiAgICAgICAgICAiYnl0ZXMiOiAzOTY3MDQ3MDQsCiAgICAgICAgICAic2hhMjU2IjogIjhhMWU1NTg0YTlmOGVlMDRiMWU1NGFmYWQyMTdmMmRiYjZmNGUzMWFiMGExZDg4MzJkOGZhYWRkYTkyZTdhOWIiCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgImVudmlyb25tZW50IjogewogICAgICAic3lzdGVtIjogIkRhcndpbiIsCiAgICAgICJtYWNoaW5lIjogImFybTY0IiwKICAgICAgInBsYXRmb3JtIjogIm1hY09TLTI2LjYuMi1hcm02NC1hcm0tNjRiaXQiLAogICAgICAicHl0aG9uIjogIjMuMTIuMTQiLAogICAgICAibG9naWNhbF9jcHVzIjogMTAKICAgIH0sCiAgICAibG9hZGluZyI6IHsKICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMDIyNDYxNDU3OTkyOTAzODg4LAogICAgICAicmVzb3VyY2VzIjogewogICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICJwaWQiOiAzODUyMiwKICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAic2FtcGxlX2NvdW50IjogMiwKICAgICAgICAid2FsbF9zZWNvbmRzIjogMC4wMTAwNDYwNDE5NzgwNTc0NzQsCiAgICAgICAgImNwdV9zZWNvbmRzIjogMS4yMzAzOTk5OTk5OTYzMDExZS0wNSwKICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiAxMCwKICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAwLjAxMjI0NzYwOTU4Mjc5NjI1LAogICAgICAgICJwZWFrX3Jzc19ieXRlcyI6IDc2NjkzNTA0MCwKICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICJob3N0X21lbV90b3RhbF9ieXRlcyI6IDE3MTc5ODY5MTg0LAogICAgICAgICJtaW5pbXVtX2hvc3RfbWVtX2F2YWlsYWJsZV9ieXRlcyI6IDM0NDU3NjgxOTIsCiAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgfQogICAgfSwKICAgICJtZWFzdXJlbWVudCI6IHsKICAgICAgInJlc291cmNlcyI6ICJwZXItY2FzZSBzYW1wbGVkIHByb2Nlc3MgdHJlZSIsCiAgICAgICJjYWNoZSI6ICJuZXcgTUxYIHByb21wdCBjYWNoZSBwZXIgY2FzZSAvIGxsYW1hIGNhY2hlX3Byb21wdD1mYWxzZSIsCiAgICAgICJ0aW1pbmciOiAicmVxdWVzdCB0byBjb21wbGV0ZSByZXNwb25zZTsgdmFsaWQtY2FsbCBsYXRlbmN5IG9ubHkgaWYgbmF0aXZlK3NjaGVtYSBwYXNzIiwKICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICJxdWFsaXR5X3Njb3BlIjogImZyb3plbiBkZXRlcm1pbmlzdGljIGZpeHR1cmUgcnVsZXM7IG5vIGhhcmR3YXJlIGV4ZWN1dGlvbiBvciBwcm9kdWN0IGFjY2VwdGFuY2UiCiAgICB9LAogICAgImNhc2VzIjogWwogICAgICB7CiAgICAgICAgImlkIjogInN0YXJ0X2NhbWVyYSIsCiAgICAgICAgInVzZXIiOiAi5byA5ZCv5pGE5YOP5aS044CCIiwKICAgICAgICAiZXhwZWN0ZWQiOiB7CiAgICAgICAgICAia2luZCI6ICJ0b29sIiwKICAgICAgICAgICJjYWxscyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJuYW1lIjogInN0YXJ0X2NhbWVyYSIsCiAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHt9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6ZyA6KaB5pON5L2c5pe25L2/55So5o+Q5L6b55qE5bel5YW377yM5ZCm5YiZ5q2j5bi45Zue5aSN44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIuW8gOWQr+aRhOWDj+WktOOAgiIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAiIiwKICAgICAgICAgICJmaW5pc2hfcmVhc29uIjogInRvb2xfY2FsbHMiLAogICAgICAgICAgIndpcmVfY2FsbHMiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAidHlwZSI6ICJmdW5jdGlvbiIsCiAgICAgICAgICAgICAgImZ1bmN0aW9uIjogewogICAgICAgICAgICAgICAgIm5hbWUiOiAic3RhcnRfY2FtZXJhIiwKICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiAie30iCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICBdLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMTk1NzU0NzA4OTU1MDY0NDIsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogMC4xNDQzMzMwODM5OTc0ODA1NywKICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogNDM5LAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAxNiwKICAgICAgICAgICJwcmVmaWxsX3NlY29uZHMiOiAwLjA5NTUxOSwKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDAuMDk0MTgzLAogICAgICAgICAgInByZWZpbGxfdG9rZW5zX3Blcl9zZWNvbmQiOiA0NTk1Ljk0NDI2MjM5ODA1NywKICAgICAgICAgICJkZWNvZGVfdG9rZW5zX3Blcl9zZWNvbmQiOiAxNTkuMjY0NDEwNzc0NzY4MjQsCiAgICAgICAgICAibWx4X3BlYWtfYWxsb2NhdGVkX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJ0aW1pbmdfc291cmNlIjogImxsYW1hLXNlcnZlciBmaW5hbCB0aW1pbmdzOyB1bmtub3duIGlmIHJ1bnRpbWUgZG9lcyBub3QgZW1pdCB0aW1pbmdzIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjYWxsX2lkIjogImxvY2FsX2NhbGxfMCIsCiAgICAgICAgICAgICAgICAibmFtZSI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHt9CiAgICAgICAgICAgICAgfQogICAgICAgICAgICBdCiAgICAgICAgICB9LAogICAgICAgICAgInNjaGVtYV9lcnJvcnMiOiBbXSwKICAgICAgICAgICJyZWdpc3RyeV9yZXN1bHQiOiB7CiAgICAgICAgICAgICJwYXNzZWQiOiB0cnVlLAogICAgICAgICAgICAiY29tbWFuZHMiOiBbCiAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgIm5hbWUiOiAic3RhcnRfY2FtZXJhIiwKICAgICAgICAgICAgICAgICJwYXJhbWV0ZXJzIjoge30sCiAgICAgICAgICAgICAgICAidG9vbF9jYWxsX2lkIjogImxvY2FsX2NhbGxfMCIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiAwLjMzODI0NDQxNzA0MjAwNTgsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDM4NTIyLAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogMywKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjM0NDE2MDgzMzA0Njc3MTYsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAwLjA5MTM2OTg2Mzk5OTk5OTkxLAogICAgICAgICAgImhvc3RfbG9naWNhbF9jcHVzIjogMTAsCiAgICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAyLjY1NDg1OTQ1MDE5MTQ5NTcsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA4MTE2Nzk3NDQsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAzNDQ1NzY4MTkyLAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJ2b2x1bWVfc2V0IiwKICAgICAgICAidXNlciI6ICLmiorpn7Pph4/orr7nva7kuLozMOOAgiIsCiAgICAgICAgImV4cGVjdGVkIjogewogICAgICAgICAgImtpbmQiOiAidG9vbCIsCiAgICAgICAgICAiY2FsbHMiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAibmFtZSI6ICJ2b2x1bWVfc2V0IiwKICAgICAgICAgICAgICAiYXJndW1lbnRzIjogewogICAgICAgICAgICAgICAgImxldmVsIjogMzAKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6ZyA6KaB5pON5L2c5pe25L2/55So5o+Q5L6b55qE5bel5YW377yM5ZCm5YiZ5q2j5bi45Zue5aSN44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIuaKiumfs+mHj+iuvue9ruS4ujMw44CCIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAidG9vbCIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICIiLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAidG9vbF9jYWxscyIsCiAgICAgICAgICAid2lyZV9jYWxscyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJ0eXBlIjogImZ1bmN0aW9uIiwKICAgICAgICAgICAgICAiZnVuY3Rpb24iOiB7CiAgICAgICAgICAgICAgICAibmFtZSI6ICJ2b2x1bWVfc2V0IiwKICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiAie1wibGV2ZWxcIjogMzB9IgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgXSwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjE5MzAyMDA4Mjk1MTk4OTAyLAogICAgICAgICAgInR0ZnRfc2Vjb25kcyI6IDAuMTI4MDEwMTI0OTU3NjU0NjMsCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQ0NCwKICAgICAgICAgICJvdXRwdXRfdG9rZW5zIjogMjEsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogMC4wODMyODYsCiAgICAgICAgICAiZGVjb2RlX3NlY29uZHMiOiAwLjEwNzkyOSwKICAgICAgICAgICJwcmVmaWxsX3Rva2Vuc19wZXJfc2Vjb25kIjogNTMzMS4wMjgwMjM5MTc1ODQ1LAogICAgICAgICAgImRlY29kZV90b2tlbnNfcGVyX3NlY29uZCI6IDE4NS4zMDcwMDczODQ0ODQyMiwKICAgICAgICAgICJtbHhfcGVha19hbGxvY2F0ZWRfYnl0ZXMiOiBudWxsLAogICAgICAgICAgInRpbWluZ19zb3VyY2UiOiAibGxhbWEtc2VydmVyIGZpbmFsIHRpbWluZ3M7IHVua25vd24gaWYgcnVudGltZSBkb2VzIG5vdCBlbWl0IHRpbWluZ3MiCiAgICAgICAgfSwKICAgICAgICAiYXNzZXNzbWVudCI6IHsKICAgICAgICAgICJuYXRpdmVfcGFyc2UiOiB0cnVlLAogICAgICAgICAgImpzb25fdmFsaWQiOiB0cnVlLAogICAgICAgICAgInNjaGVtYV92YWxpZCI6IHRydWUsCiAgICAgICAgICAicmVnaXN0cnlfdmFsaWQiOiB0cnVlLAogICAgICAgICAgImV4cGVjdGVkX2JlaGF2aW9yIjogdHJ1ZSwKICAgICAgICAgICJwZXJzb25hX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJyZXZpZXdlciI6ICJkZXRlcm1pbmlzdGljIGZyb3plbiBmaXh0dXJlIHJ1bGVzIiwKICAgICAgICAgICJyZXBseSI6IHsKICAgICAgICAgICAgImNvbnRlbnQiOiAiIiwKICAgICAgICAgICAgInRvb2xfY2FsbHMiOiBbCiAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgImNhbGxfaWQiOiAibG9jYWxfY2FsbF8wIiwKICAgICAgICAgICAgICAgICJuYW1lIjogInZvbHVtZV9zZXQiLAogICAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHsKICAgICAgICAgICAgICAgICAgImxldmVsIjogMzAKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0KICAgICAgICAgIH0sCiAgICAgICAgICAic2NoZW1hX2Vycm9ycyI6IFtdLAogICAgICAgICAgInJlZ2lzdHJ5X3Jlc3VsdCI6IHsKICAgICAgICAgICAgInBhc3NlZCI6IHRydWUsCiAgICAgICAgICAgICJjb21tYW5kcyI6IFsKICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAibmFtZSI6ICJ2b2x1bWVfc2V0IiwKICAgICAgICAgICAgICAgICJwYXJhbWV0ZXJzIjogewogICAgICAgICAgICAgICAgICAibGV2ZWwiOiAzMAogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgICJ0b29sX2NhbGxfaWQiOiAibG9jYWxfY2FsbF8wIgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInZhbGlkX2NhbGxfc2Vjb25kcyI6IDAuMjc2ODQ5NzUwMDIxOTM4MjMsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDM4NTIyLAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogMywKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjI4MjU3MTg3NTAyNDU4NjksCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAwLjA5NDM5NjMxOTk5OTk5OTk4LAogICAgICAgICAgImhvc3RfbG9naWNhbF9jcHVzIjogMTAsCiAgICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAzLjM0MDYxMjcxOTkyNDMxNzYsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA4MTE2Nzk3NDQsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAzNDQ1NzY4MTkyLAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJwbGF5X211c2ljIiwKICAgICAgICAidXNlciI6ICLmkq3mlL7lpJzmm7LjgIIiLAogICAgICAgICJleHBlY3RlZCI6IHsKICAgICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICAgImNhbGxzIjogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgIm5hbWUiOiAicGxheV9tdXNpYyIsCiAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHsKICAgICAgICAgICAgICAgICJzb25nX25hbWUiOiAi5aSc5puyIgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgXQogICAgICAgIH0sCiAgICAgICAgIm1lc3NhZ2VzIjogWwogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJzeXN0ZW0iLAogICAgICAgICAgICAiY29udGVudCI6ICLkvaDmmK/mnLrlmajkurrliqnmiYvjgILpnIDopoHmk43kvZzml7bkvb/nlKjmj5DkvpvnmoTlt6XlhbfvvIzlkKbliJnmraPluLjlm57lpI3jgIIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5pKt5pS+5aSc5puy44CCIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAidG9vbCIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICIiLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAidG9vbF9jYWxscyIsCiAgICAgICAgICAid2lyZV9jYWxscyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJ0eXBlIjogImZ1bmN0aW9uIiwKICAgICAgICAgICAgICAiZnVuY3Rpb24iOiB7CiAgICAgICAgICAgICAgICAibmFtZSI6ICJwbGF5X211c2ljIiwKICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiAie1wic29uZ19uYW1lXCI6IFwi5aSc5puyXCJ9IgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgXSwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjE5ODczNTc5MTk1NzAwNTg2LAogICAgICAgICAgInR0ZnRfc2Vjb25kcyI6IDAuMTI4MzYwMjQ5OTc1MjMwNTQsCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQ0MCwKICAgICAgICAgICJvdXRwdXRfdG9rZW5zIjogMjIsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogMC4wODQzMTYsCiAgICAgICAgICAiZGVjb2RlX3NlY29uZHMiOiAwLjExMjYwMDk5OTk5OTk5OTk5LAogICAgICAgICAgInByZWZpbGxfdG9rZW5zX3Blcl9zZWNvbmQiOiA1MjE4LjQ2Mzg3Mzk5NzgxNywKICAgICAgICAgICJkZWNvZGVfdG9rZW5zX3Blcl9zZWNvbmQiOiAxODYuNDk5MjMxODAwNzgzMzIsCiAgICAgICAgICAibWx4X3BlYWtfYWxsb2NhdGVkX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJ0aW1pbmdfc291cmNlIjogImxsYW1hLXNlcnZlciBmaW5hbCB0aW1pbmdzOyB1bmtub3duIGlmIHJ1bnRpbWUgZG9lcyBub3QgZW1pdCB0aW1pbmdzIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjYWxsX2lkIjogImxvY2FsX2NhbGxfMCIsCiAgICAgICAgICAgICAgICAibmFtZSI6ICJwbGF5X211c2ljIiwKICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiB7CiAgICAgICAgICAgICAgICAgICJzb25nX25hbWUiOiAi5aSc5puyIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgICAgfSwKICAgICAgICAgICJzY2hlbWFfZXJyb3JzIjogW10sCiAgICAgICAgICAicmVnaXN0cnlfcmVzdWx0IjogewogICAgICAgICAgICAicGFzc2VkIjogdHJ1ZSwKICAgICAgICAgICAgImNvbW1hbmRzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJuYW1lIjogInBsYXlfbXVzaWMiLAogICAgICAgICAgICAgICAgInBhcmFtZXRlcnMiOiB7CiAgICAgICAgICAgICAgICAgICJzb25nX25hbWUiOiAi5aSc5puyIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgICJ0b29sX2NhbGxfaWQiOiAibG9jYWxfY2FsbF8wIgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInZhbGlkX2NhbGxfc2Vjb25kcyI6IDAuMjkyNTM0MjUwMDA5MzM5MywKICAgICAgICAicmVzb3VyY2VzIjogewogICAgICAgICAgInNjb3BlIjogImRlY2xhcmVkIHByb2Nlc3MgYW5kIHJlY3Vyc2l2ZSBjaGlsZHJlbiIsCiAgICAgICAgICAicGlkIjogMzg1MjIsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAzLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMjk4Nzg4NzkxOTg4MDQ1LAogICAgICAgICAgImNwdV9zZWNvbmRzIjogMC4wOTc5MDYwNDgwMDAwMDAwMiwKICAgICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogMy4yNzY3NjQ0MTEwMjY0MTUsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA4MTA2OTY3MDQsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAzNDQ1NzY4MTkyLAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJwZXJzb25hX25hbWUiLAogICAgICAgICJ1c2VyIjogIuS9oOWPq+S7gOS5iOWQjeWtl++8n+eUqOS4gOWPpeivneS7i+e7jeiHquW3seOAgiIsCiAgICAgICAgImV4cGVjdGVkIjogewogICAgICAgICAgImtpbmQiOiAicGVyc29uYSIsCiAgICAgICAgICAiY29udGFpbnNfYWxsIjogWwogICAgICAgICAgICAi5bCP5rKrIgogICAgICAgICAgXQogICAgICAgIH0sCiAgICAgICAgIm1lc3NhZ2VzIjogWwogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJzeXN0ZW0iLAogICAgICAgICAgICAiY29udGVudCI6ICLkvaDmmK/mnLrlmajkurrliqnmiYvjgILpnIDopoHmk43kvZzml7bkvb/nlKjmj5DkvpvnmoTlt6XlhbfvvIzlkKbliJnmraPluLjlm57lpI3jgIIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5Y+r5LuA5LmI5ZCN5a2X77yf55So5LiA5Y+l6K+d5LuL57uN6Ieq5bex44CCIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAicGVyc29uYSIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICLmiJHlj6vlsI/msqvvvIzmmK9BSeacuuWZqOS6uuOAgiIsCiAgICAgICAgICAiZmluaXNoX3JlYXNvbiI6ICJzdG9wIiwKICAgICAgICAgICJ3aXJlX2NhbGxzIjogbnVsbCwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjEzMzY4NDI5MjAyODE5MjQzLAogICAgICAgICAgInR0ZnRfc2Vjb25kcyI6IDAuMDg1NzE0NjY2OTg3NzY5MywKICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogNDQ2LAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAxMCwKICAgICAgICAgICJwcmVmaWxsX3NlY29uZHMiOiAwLjA4Mzc1OCwKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDAuMDQ3OTk0OTk5OTk5OTk5OTk2LAogICAgICAgICAgInByZWZpbGxfdG9rZW5zX3Blcl9zZWNvbmQiOiA1MzI0Ljg2NDQ5MDU1NjEyNywKICAgICAgICAgICJkZWNvZGVfdG9rZW5zX3Blcl9zZWNvbmQiOiAxODcuNTE5NTMzMjg0NzE3MTcsCiAgICAgICAgICAibWx4X3BlYWtfYWxsb2NhdGVkX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJ0aW1pbmdfc291cmNlIjogImxsYW1hLXNlcnZlciBmaW5hbCB0aW1pbmdzOyB1bmtub3duIGlmIHJ1bnRpbWUgZG9lcyBub3QgZW1pdCB0aW1pbmdzIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiBudWxsLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IHRydWUsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIuaIkeWPq+Wwj+ayq++8jOaYr0FJ5py65Zmo5Lq644CCIiwKICAgICAgICAgICAgInRvb2xfY2FsbHMiOiBbXQogICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInZhbGlkX2NhbGxfc2Vjb25kcyI6IG51bGwsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDM4NTIyLAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogMiwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjE0MDEwNzA4NDAwNzQ2ODA3LAogICAgICAgICAgImNwdV9zZWNvbmRzIjogMC4wNDg3ODIwOTYwMDAwMDAwNSwKICAgICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogMy40ODE3NzIyNzA1MTU1ODksCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA4MTA3MTMwODgsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAzNDQ1NzY4MTkyLAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJwZXJzb25hX3JvbGUiLAogICAgICAgICJ1c2VyIjogIuS9oOaYr+S7gOS5iOi6q+S7ve+8jOS4u+imgeWBmuS7gOS5iO+8nyIsCiAgICAgICAgImV4cGVjdGVkIjogewogICAgICAgICAgImtpbmQiOiAicGVyc29uYSIsCiAgICAgICAgICAiY29udGFpbnNfYW55IjogWwogICAgICAgICAgICAi56eR56CUIiwKICAgICAgICAgICAgIuacuuWZqOS6uuWKqeaJiyIKICAgICAgICAgIF0KICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6ZyA6KaB5pON5L2c5pe25L2/55So5o+Q5L6b55qE5bel5YW377yM5ZCm5YiZ5q2j5bi45Zue5aSN44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOaYr+S7gOS5iOi6q+S7ve+8jOS4u+imgeWBmuS7gOS5iO+8nyIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogInBlcnNvbmEiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAi5oiR5pivQUnmnLrlmajkurrvvIzkuLvopoHnlKjmnaXmj5DkvpvluK7liqnlkozkv6Hmga/jgIIiLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIsCiAgICAgICAgICAid2lyZV9jYWxscyI6IG51bGwsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogMC4xNDY1NTgyOTA5ODc3NDEyLAogICAgICAgICAgInR0ZnRfc2Vjb25kcyI6IDAuMDg1NDY4NDU4MDExNzQ2NCwKICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogNDQzLAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAxMiwKICAgICAgICAgICJwcmVmaWxsX3NlY29uZHMiOiAwLjA4MzY1NywKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDAuMDYwOTk4LAogICAgICAgICAgInByZWZpbGxfdG9rZW5zX3Blcl9zZWNvbmQiOiA1Mjk1LjQzMjU0MDAxNDU4MzUsCiAgICAgICAgICAiZGVjb2RlX3Rva2Vuc19wZXJfc2Vjb25kIjogMTgwLjMzMzc4MTQzNTQ1NjksCiAgICAgICAgICAibWx4X3BlYWtfYWxsb2NhdGVkX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJ0aW1pbmdfc291cmNlIjogImxsYW1hLXNlcnZlciBmaW5hbCB0aW1pbmdzOyB1bmtub3duIGlmIHJ1bnRpbWUgZG9lcyBub3QgZW1pdCB0aW1pbmdzIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiBudWxsLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IGZhbHNlLAogICAgICAgICAgInBlcnNvbmFfdmFsaWQiOiBmYWxzZSwKICAgICAgICAgICJyZXZpZXdlciI6ICJkZXRlcm1pbmlzdGljIGZyb3plbiBmaXh0dXJlIHJ1bGVzIiwKICAgICAgICAgICJyZXBseSI6IHsKICAgICAgICAgICAgImNvbnRlbnQiOiAi5oiR5pivQUnmnLrlmajkurrvvIzkuLvopoHnlKjmnaXmj5DkvpvluK7liqnlkozkv6Hmga/jgIIiLAogICAgICAgICAgICAidG9vbF9jYWxscyI6IFtdCiAgICAgICAgICB9CiAgICAgICAgfSwKICAgICAgICAidmFsaWRfY2FsbF9zZWNvbmRzIjogbnVsbCwKICAgICAgICAicmVzb3VyY2VzIjogewogICAgICAgICAgInNjb3BlIjogImRlY2xhcmVkIHByb2Nlc3MgYW5kIHJlY3Vyc2l2ZSBjaGlsZHJlbiIsCiAgICAgICAgICAicGlkIjogMzg1MjIsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMTUzNzI2MTI1MDE5NjAyNDgsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAwLjA1NzYyODEyODAwMDAwMDA1NiwKICAgICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogMy43NDg3NTMwNDk3OTIzODczLAogICAgICAgICAgInBlYWtfcnNzX2J5dGVzIjogODEwNzI5NDcyLAogICAgICAgICAgInBlYWtfcHNzX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJob3N0X21lbV90b3RhbF9ieXRlcyI6IDE3MTc5ODY5MTg0LAogICAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMzQ1MzMyMTIxNiwKICAgICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAicGVyc29uYV9jcmVhdG9yIiwKICAgICAgICAidXNlciI6ICLov5nkuKrmnLrlmajkurrliqnmiYvop5LoibLmmK/osIHliJvpgKDnmoTvvJ8iLAogICAgICAgICJleHBlY3RlZCI6IHsKICAgICAgICAgICJraW5kIjogInBlcnNvbmEiLAogICAgICAgICAgImNvbnRhaW5zX2FueSI6IFsKICAgICAgICAgICAgIueUqOaItyIsCiAgICAgICAgICAgICLkvaDliJvpgKAiLAogICAgICAgICAgICAi5oKo5Yib6YCgIgogICAgICAgICAgXQogICAgICAgIH0sCiAgICAgICAgIm1lc3NhZ2VzIjogWwogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJzeXN0ZW0iLAogICAgICAgICAgICAiY29udGVudCI6ICLkvaDmmK/mnLrlmajkurrliqnmiYvjgILpnIDopoHmk43kvZzml7bkvb/nlKjmj5DkvpvnmoTlt6XlhbfvvIzlkKbliJnmraPluLjlm57lpI3jgIIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi6L+Z5Liq5py65Zmo5Lq65Yqp5omL6KeS6Imy5piv6LCB5Yib6YCg55qE77yfIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAicGVyc29uYSIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICLov5nkuKrmnLrlmajkurrliqnmiYvop5LoibLmmK9BSeWIm+mAoOeahOOAgiIsCiAgICAgICAgICAiZmluaXNoX3JlYXNvbiI6ICJzdG9wIiwKICAgICAgICAgICJ3aXJlX2NhbGxzIjogbnVsbCwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjEzNDgzMTc5MTk3NjQ2Njc3LAogICAgICAgICAgInR0ZnRfc2Vjb25kcyI6IDAuMDg1ODI4MTY2OTc4ODk5MzksCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQ0NCwKICAgICAgICAgICJvdXRwdXRfdG9rZW5zIjogMTAsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogMC4wODQwOSwKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDAuMDQ4ODg4LAogICAgICAgICAgInByZWZpbGxfdG9rZW5zX3Blcl9zZWNvbmQiOiA1MjgwLjA1NzA4MTY5ODE4MSwKICAgICAgICAgICJkZWNvZGVfdG9rZW5zX3Blcl9zZWNvbmQiOiAxODQuMDk0MjU2MjU5MjA0NzQsCiAgICAgICAgICAibWx4X3BlYWtfYWxsb2NhdGVkX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJ0aW1pbmdfc291cmNlIjogImxsYW1hLXNlcnZlciBmaW5hbCB0aW1pbmdzOyB1bmtub3duIGlmIHJ1bnRpbWUgZG9lcyBub3QgZW1pdCB0aW1pbmdzIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiBudWxsLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IGZhbHNlLAogICAgICAgICAgInBlcnNvbmFfdmFsaWQiOiBmYWxzZSwKICAgICAgICAgICJyZXZpZXdlciI6ICJkZXRlcm1pbmlzdGljIGZyb3plbiBmaXh0dXJlIHJ1bGVzIiwKICAgICAgICAgICJyZXBseSI6IHsKICAgICAgICAgICAgImNvbnRlbnQiOiAi6L+Z5Liq5py65Zmo5Lq65Yqp5omL6KeS6Imy5pivQUnliJvpgKDnmoTjgIIiLAogICAgICAgICAgICAidG9vbF9jYWxscyI6IFtdCiAgICAgICAgICB9CiAgICAgICAgfSwKICAgICAgICAidmFsaWRfY2FsbF9zZWNvbmRzIjogbnVsbCwKICAgICAgICAicmVzb3VyY2VzIjogewogICAgICAgICAgInNjb3BlIjogImRlY2xhcmVkIHByb2Nlc3MgYW5kIHJlY3Vyc2l2ZSBjaGlsZHJlbiIsCiAgICAgICAgICAicGlkIjogMzg1MjIsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMTQxNTQxNTgyOTk3ODg4MzMsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAwLjA0ODY3NzMyODAwMDAwMDAyLAogICAgICAgICAgImhvc3RfbG9naWNhbF9jcHVzIjogMTAsCiAgICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAzLjQzOTA4MzE5ODY2MTU3MiwKICAgICAgICAgICJwZWFrX3Jzc19ieXRlcyI6IDgxMDcyOTQ3MiwKICAgICAgICAgICJwZWFrX3Bzc19ieXRlcyI6IG51bGwsCiAgICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiAxNzE3OTg2OTE4NCwKICAgICAgICAgICJtaW5pbXVtX2hvc3RfbWVtX2F2YWlsYWJsZV9ieXRlcyI6IDM0NTMzMjEyMTYsCiAgICAgICAgICAiaG9zdF9zd2FwX2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAgICJsaW1pdGF0aW9uIjogInNhbXBsZWQgcGVhaywgbm90IGtlcm5lbCBoaWdoLXdhdGVyIG1hcms7IGxhc3Qgb2JzZXJ2ZWQgQ1BVIG9mIHJldGlyZWQgY2hpbGRyZW4gaXMgcmV0YWluZWQsIHNvIHNob3J0IGNoaWxkIGxpZmV0aW1lcyBjYW4gcmVtYWluIHVuZGVyLXNhbXBsZWQ7IFJTUyBhbmQgYWNjZWxlcmF0b3IgYWxsb2NhdGlvbnMgbWF5IG92ZXJsYXAiCiAgICAgICAgfQogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogImNoYXQiLAogICAgICAgICJ1c2VyIjogIuS9oOWlveOAgiIsCiAgICAgICAgImV4cGVjdGVkIjogewogICAgICAgICAgImtpbmQiOiAiY2hhdCIKICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6ZyA6KaB5pON5L2c5pe25L2/55So5o+Q5L6b55qE5bel5YW377yM5ZCm5YiZ5q2j5bi45Zue5aSN44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOWlveOAgiIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogImNoYXQiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAi5L2g5aW977yBIiwKICAgICAgICAgICJmaW5pc2hfcmVhc29uIjogInN0b3AiLAogICAgICAgICAgIndpcmVfY2FsbHMiOiBudWxsLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMDk1MTMxMDgyOTg0MTUzMTgsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogMC4wODUxNDU1NDE5OTA2NDE1LAogICAgICAgICAgInByb21wdF90b2tlbnMiOiA0MzgsCiAgICAgICAgICAib3V0cHV0X3Rva2VucyI6IDMsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogMC4wODMwNjMsCiAgICAgICAgICAiZGVjb2RlX3NlY29uZHMiOiAwLjAxMDA2Nzk5OTk5OTk5OTk5OSwKICAgICAgICAgICJwcmVmaWxsX3Rva2Vuc19wZXJfc2Vjb25kIjogNTI3My4xMDU5NTU3MjAzNTcsCiAgICAgICAgICAiZGVjb2RlX3Rva2Vuc19wZXJfc2Vjb25kIjogMTk4LjY0OTE4NTUzODMzOTMsCiAgICAgICAgICAibWx4X3BlYWtfYWxsb2NhdGVkX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJ0aW1pbmdfc291cmNlIjogImxsYW1hLXNlcnZlciBmaW5hbCB0aW1pbmdzOyB1bmtub3duIGlmIHJ1bnRpbWUgZG9lcyBub3QgZW1pdCB0aW1pbmdzIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiBudWxsLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOWlve+8gSIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogW10KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiBudWxsLAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAzODUyMiwKICAgICAgICAgICJzYW1wbGluZ19pbnRlcnZhbF9zZWNvbmRzIjogMC4yLAogICAgICAgICAgInNhbXBsZV9jb3VudCI6IDIsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogMC4xMDE5NDA5NTkwNTE3MTcwNywKICAgICAgICAgICJjcHVfc2Vjb25kcyI6IDAuMDE2MzczOTUxOTk5OTk5OTE0LAogICAgICAgICAgImhvc3RfbG9naWNhbF9jcHVzIjogMTAsCiAgICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAxLjYwNjIxOTE0NDEzMTU1NzQsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA3ODIwOTAyNDAsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAzNDUzMzIxMjE2LAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfQogICAgXSwKICAgICJzdW1tYXJ5IjogewogICAgICAic2FtcGxlcyI6IDcsCiAgICAgICJ0b29sX3NhbXBsZXMiOiAzLAogICAgICAibmF0aXZlX2NhbGxzIjogMywKICAgICAgImpzb25fdmFsaWQiOiAzLAogICAgICAic2NoZW1hX3ZhbGlkIjogMywKICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogMywKICAgICAgInRvb2xfZXhwZWN0ZWRfYmVoYXZpb3IiOiAzLAogICAgICAicGVyc29uYV9zYW1wbGVzIjogMywKICAgICAgInBlcnNvbmFfdmFsaWQiOiAxLAogICAgICAiY2hhdF9zYW1wbGVzIjogMSwKICAgICAgImNoYXRfdmFsaWQiOiAxCiAgICB9LAogICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgImV2aWRlbmNlIjogWwogICAgICB7CiAgICAgICAgInBhdGgiOiAiYXNzZXRzLW1hbmlmZXN0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiYzQ2YWZkNGI5ZjJiNjhhNmQzNTM5M2VmYmFmNzc2YmM1MzFmYzE2MTc0MDc0MTYzMmE5YWU4M2NjYTA4NWVlNyIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImNhc2VzL2NoYXQuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICIzNTgxMDBmOWQwZGMwZDEwNTkyOThlNTlhOTk2ZDhjNzEwYzRiOWJiOGM5ODYyMzcyYzE1NzJkZmNjNzZiM2IwIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiY2FzZXMvcGVyc29uYV9jcmVhdG9yLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiYzg4YTczZjRkNDIxMjgxNDQ3MDE2NjJkMGViMDU4YThkNjMxMTg4MTJlY2FlM2I1YTU4ZjkwZWMzYzc2YzM5ZCIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImNhc2VzL3BlcnNvbmFfbmFtZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjY2MWNmM2NmZTY1MTJjOGFhYjJjOTcxYzU1ZDFkYzJjOWVjNjMzYzIwZjVhYTkyZTNkNTE1MTg5YThlMDA2ZjMiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJjYXNlcy9wZXJzb25hX3JvbGUuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICI3M2U1MTZlNDgxY2QwMGYzNTRiOTFkZThmODU4NjYxYjk4MDExOGNiZjY4MjIwNWNiMDA1MWM5Yjg0ZDM4NTAxIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiY2FzZXMvcGxheV9tdXNpYy5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjk2ZjNiOTg4ZDc0ODY3NzI5NTUzYWZjNGUzZDA0YWJhZTIzMzg4MGJmNDUwY2UwMGEwZmJiYjRlZDRhNjM0MWEiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJjYXNlcy9zdGFydF9jYW1lcmEuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICIwOGM3ZWEyNWI2NmRhMTNjMzlkMTAxOTA3ZTg0N2JkZTEwOWRmMGZlODljMmJlM2IxNTQ1OTYwMmY3OWEwMTI4IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiY2FzZXMvdm9sdW1lX3NldC5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjNkMTI0ZGM4MGU0NDFlNjg2MDliNTAzMWM3YzE1NzFlZGIyYmQzZmJlYTlkYzNiNDg0MGM0MDk1YWU1NDkwNTkiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJldmVudHMvY2hhdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogImZkMzYxYzhkNGI1MGRiNDUwOGY4N2M2ODNiNWRkYjhjNTEyY2QwNTI5OTQ3ODk1ZjE5MzRmYzM5YWEzYjM3NzgiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJldmVudHMvcGVyc29uYV9jcmVhdG9yLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiYmY5ZGQ2NGQzNjQ4M2Y1NTIwNzYyMGQ1M2YzODQyMDI5YzFiNDY2NTQ0NGE3YWM0MmVhYWYxY2NhMGUyOTdhYiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImV2ZW50cy9wZXJzb25hX25hbWUuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICJlYTNjZDZiYTJhMGIzMmNiMDJhNDA1MWY4OWFkOTM4YzBiYmZlZDgyOTU0ODFlM2UzOTY0YTczZDdmZjMyYjc4IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiZXZlbnRzL3BlcnNvbmFfcm9sZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogImRlNTQyMmY3NGFiZDhlNDNjN2U1M2YyOTRlN2JlODZlNTJkNGY0MzYzMGIyNjYyYjNiNWE1YzY3YjYxMThkYjMiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJldmVudHMvcGxheV9tdXNpYy5qc29uIiwKICAgICAgICAic2hhMjU2IjogImJkNjk4ZWIwZTlkM2ZiMTljOTdkNGY1ZWM4MDMwNWY2NDM5ZjJhYTI5ZjI4NzdkNzVlZTEyYjVmZDU2NzJjZWEiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJldmVudHMvc3RhcnRfY2FtZXJhLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiNzI1YzU1NzhiZjhlY2RiYjUxYmM1YmM3OGZkOGY0OGUwN2MwOTEwMjhlN2Q1Nzg1MjVhY2UwNWZkZTNlOWIzOCIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImV2ZW50cy92b2x1bWVfc2V0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiMjhkZjBmNjYwOTU2MjM3OThiNDhhNWIyMWJhZTBmYTg5M2RmY2NmZTQ0MzUyYjYwZjdlYWQ4OWFjMzdjNjM5ZSIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogInJlcXVlc3QuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICIwMzljYjA5NjJlM2IxMjI4OTNkNTgzODczMjZhZTg4NjBkNzQ3M2Y2Y2MyNzE1MGY3YTlmMTc5MTMxYTAyNWQ1IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAic3VpdGUuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICIwNzZiYjY2MDQ1OTVhNTBlZDY0MjZjYjYwOTA0YmE3ODdjNTMyZDNkMmY2NTQ5MjVlNGQ2ZDZkZjM2MWM0MmFiIgogICAgICB9CiAgICBdCiAgfQpd">下载本页原始结果 JSON</a></p>
+<p><a download="raw-evidence.zip" href="data:application/zip;base64,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">下载冻结请求、逐例流事件与资源采样</a></p>
+<details><summary>完整配置、资产哈希与逐例结果</summary><pre>[
+  {
+    &quot;schema&quot;: &quot;edge-model-benchmark/result-v1&quot;,
+    &quot;run_id&quot;: &quot;qwen3-pilot32-seeded-q4-direct-smoke-v2&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;device_measurement&quot;,
+      &quot;raw_evidence&quot;: &quot;cases/ and events/ within this run&quot;
+    },
+    &quot;candidate&quot;: {
+      &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+      &quot;model_path&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-seeded-v2/qwen3-pilot32-q4_k_m.gguf&quot;,
+      &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;parameter_count&quot;: 596049920,
+      &quot;parameter_count_stored&quot;: 751632384,
+      &quot;precision&quot;: &quot;Q4_K_M&quot;,
+      &quot;artifact_format&quot;: &quot;GGUF&quot;,
+      &quot;backend&quot;: &quot;Metal&quot;,
+      &quot;context_tokens&quot;: 8192,
+      &quot;kv_type&quot;: &quot;runtime default unquantized&quot;,
+      &quot;lineage&quot;: &quot;seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M&quot;,
+      &quot;runtime_version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+      &quot;constraint_mode&quot;: &quot;llama-server native tool grammar; differs from unconstrained MLX&quot;,
+      &quot;actual_runtime&quot;: {
+        &quot;name&quot;: &quot;llama.cpp&quot;,
+        &quot;version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+        &quot;backend&quot;: &quot;Metal&quot;,
+        &quot;network&quot;: &quot;direct&quot;
+      }
+    },
+    &quot;stage&quot;: &quot;LoRA32 / Q4_K_M 原生独立冒烟&quot;,
+    &quot;request_sha256&quot;: &quot;039cb0962e3b122893d58387326ae8860d7473f6cc27150f7a9f179131a025d5&quot;,
+    &quot;suite_sha256&quot;: &quot;076bb6604595a50ed6426cb60904ba787c532d3d2f654925e4d6d6df361c42ab&quot;,
+    &quot;artifacts&quot;: {
+      &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-seeded-v2/qwen3-pilot32-q4_k_m.gguf&quot;,
+      &quot;total_bytes&quot;: 396704704,
+      &quot;files&quot;: [
+        {
+          &quot;name&quot;: &quot;qwen3-pilot32-q4_k_m.gguf&quot;,
+          &quot;bytes&quot;: 396704704,
+          &quot;sha256&quot;: &quot;8a1e5584a9f8ee04b1e54afad217f2dbb6f4e31ab0a1d8832d8faadda92e7a9b&quot;
+        }
+      ]
+    },
+    &quot;environment&quot;: {
+      &quot;system&quot;: &quot;Darwin&quot;,
+      &quot;machine&quot;: &quot;arm64&quot;,
+      &quot;platform&quot;: &quot;macOS-26.6.2-arm64-arm-64bit&quot;,
+      &quot;python&quot;: &quot;3.12.14&quot;,
+      &quot;logical_cpus&quot;: 10
+    },
+    &quot;loading&quot;: {
+      &quot;wall_seconds&quot;: 0.022461457992903888,
+      &quot;resources&quot;: {
+        &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+        &quot;pid&quot;: 38522,
+        &quot;sampling_interval_seconds&quot;: 0.2,
+        &quot;sample_count&quot;: 2,
+        &quot;wall_seconds&quot;: 0.010046041978057474,
+        &quot;cpu_seconds&quot;: 1.2303999999963011e-05,
+        &quot;host_logical_cpus&quot;: 10,
+        &quot;cpu_capacity_percent&quot;: 0.01224760958279625,
+        &quot;peak_rss_bytes&quot;: 766935040,
+        &quot;peak_pss_bytes&quot;: null,
+        &quot;host_mem_total_bytes&quot;: 17179869184,
+        &quot;minimum_host_mem_available_bytes&quot;: 3445768192,
+        &quot;host_swap_delta_bytes&quot;: 0,
+        &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+      }
+    },
+    &quot;measurement&quot;: {
+      &quot;resources&quot;: &quot;per-case sampled process tree&quot;,
+      &quot;cache&quot;: &quot;new MLX prompt cache per case / llama cache_prompt=false&quot;,
+      &quot;timing&quot;: &quot;request to complete response; valid-call latency only if native+schema pass&quot;,
+      &quot;sampling_interval_seconds&quot;: 0.2,
+      &quot;quality_scope&quot;: &quot;frozen deterministic fixture rules; no hardware execution or product acceptance&quot;
+    },
+    &quot;cases&quot;: [
+      {
+        &quot;id&quot;: &quot;start_camera&quot;,
+        &quot;user&quot;: &quot;开启摄像头。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;start_camera&quot;,
+              &quot;arguments&quot;: {}
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;开启摄像头。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: &quot;{}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 0.19575470895506442,
+          &quot;ttft_seconds&quot;: 0.14433308399748057,
+          &quot;prompt_tokens&quot;: 439,
+          &quot;output_tokens&quot;: 16,
+          &quot;prefill_seconds&quot;: 0.095519,
+          &quot;decode_seconds&quot;: 0.094183,
+          &quot;prefill_tokens_per_second&quot;: 4595.944262398057,
+          &quot;decode_tokens_per_second&quot;: 159.26441077476824,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: {}
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;parameters&quot;: {},
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 0.3382444170420058,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 3,
+          &quot;wall_seconds&quot;: 0.3441608330467716,
+          &quot;cpu_seconds&quot;: 0.09136986399999991,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 2.6548594501914957,
+          &quot;peak_rss_bytes&quot;: 811679744,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3445768192,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;volume_set&quot;,
+        &quot;user&quot;: &quot;把音量设置为30。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;volume_set&quot;,
+              &quot;arguments&quot;: {
+                &quot;level&quot;: 30
+              }
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;把音量设置为30。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;volume_set&quot;,
+                &quot;arguments&quot;: &quot;{\&quot;level\&quot;: 30}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 0.19302008295198902,
+          &quot;ttft_seconds&quot;: 0.12801012495765463,
+          &quot;prompt_tokens&quot;: 444,
+          &quot;output_tokens&quot;: 21,
+          &quot;prefill_seconds&quot;: 0.083286,
+          &quot;decode_seconds&quot;: 0.107929,
+          &quot;prefill_tokens_per_second&quot;: 5331.0280239175845,
+          &quot;decode_tokens_per_second&quot;: 185.30700738448422,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;volume_set&quot;,
+                &quot;arguments&quot;: {
+                  &quot;level&quot;: 30
+                }
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;volume_set&quot;,
+                &quot;parameters&quot;: {
+                  &quot;level&quot;: 30
+                },
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 0.27684975002193823,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 3,
+          &quot;wall_seconds&quot;: 0.2825718750245869,
+          &quot;cpu_seconds&quot;: 0.09439631999999998,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 3.3406127199243176,
+          &quot;peak_rss_bytes&quot;: 811679744,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3445768192,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;play_music&quot;,
+        &quot;user&quot;: &quot;播放夜曲。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;play_music&quot;,
+              &quot;arguments&quot;: {
+                &quot;song_name&quot;: &quot;夜曲&quot;
+              }
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;播放夜曲。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;play_music&quot;,
+                &quot;arguments&quot;: &quot;{\&quot;song_name\&quot;: \&quot;夜曲\&quot;}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 0.19873579195700586,
+          &quot;ttft_seconds&quot;: 0.12836024997523054,
+          &quot;prompt_tokens&quot;: 440,
+          &quot;output_tokens&quot;: 22,
+          &quot;prefill_seconds&quot;: 0.084316,
+          &quot;decode_seconds&quot;: 0.11260099999999999,
+          &quot;prefill_tokens_per_second&quot;: 5218.463873997817,
+          &quot;decode_tokens_per_second&quot;: 186.49923180078332,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;play_music&quot;,
+                &quot;arguments&quot;: {
+                  &quot;song_name&quot;: &quot;夜曲&quot;
+                }
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;play_music&quot;,
+                &quot;parameters&quot;: {
+                  &quot;song_name&quot;: &quot;夜曲&quot;
+                },
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 0.2925342500093393,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 3,
+          &quot;wall_seconds&quot;: 0.298788791988045,
+          &quot;cpu_seconds&quot;: 0.09790604800000002,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 3.276764411026415,
+          &quot;peak_rss_bytes&quot;: 810696704,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3445768192,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;persona_name&quot;,
+        &quot;user&quot;: &quot;你叫什么名字？用一句话介绍自己。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;persona&quot;,
+          &quot;contains_all&quot;: [
+            &quot;小沫&quot;
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;你叫什么名字？用一句话介绍自己。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;persona&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;我叫小沫，是AI机器人。&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 0.13368429202819243,
+          &quot;ttft_seconds&quot;: 0.0857146669877693,
+          &quot;prompt_tokens&quot;: 446,
+          &quot;output_tokens&quot;: 10,
+          &quot;prefill_seconds&quot;: 0.083758,
+          &quot;decode_seconds&quot;: 0.047994999999999996,
+          &quot;prefill_tokens_per_second&quot;: 5324.864490556127,
+          &quot;decode_tokens_per_second&quot;: 187.51953328471717,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: true,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;我叫小沫，是AI机器人。&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 2,
+          &quot;wall_seconds&quot;: 0.14010708400746807,
+          &quot;cpu_seconds&quot;: 0.04878209600000005,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 3.481772270515589,
+          &quot;peak_rss_bytes&quot;: 810713088,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3445768192,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;persona_role&quot;,
+        &quot;user&quot;: &quot;你是什么身份，主要做什么？&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;persona&quot;,
+          &quot;contains_any&quot;: [
+            &quot;科研&quot;,
+            &quot;机器人助手&quot;
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;你是什么身份，主要做什么？&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;persona&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;我是AI机器人，主要用来提供帮助和信息。&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 0.1465582909877412,
+          &quot;ttft_seconds&quot;: 0.0854684580117464,
+          &quot;prompt_tokens&quot;: 443,
+          &quot;output_tokens&quot;: 12,
+          &quot;prefill_seconds&quot;: 0.083657,
+          &quot;decode_seconds&quot;: 0.060998,
+          &quot;prefill_tokens_per_second&quot;: 5295.4325400145835,
+          &quot;decode_tokens_per_second&quot;: 180.3337814354569,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: false,
+          &quot;persona_valid&quot;: false,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;我是AI机器人，主要用来提供帮助和信息。&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 2,
+          &quot;wall_seconds&quot;: 0.15372612501960248,
+          &quot;cpu_seconds&quot;: 0.057628128000000056,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 3.7487530497923873,
+          &quot;peak_rss_bytes&quot;: 810729472,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3453321216,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;persona_creator&quot;,
+        &quot;user&quot;: &quot;这个机器人助手角色是谁创造的？&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;persona&quot;,
+          &quot;contains_any&quot;: [
+            &quot;用户&quot;,
+            &quot;你创造&quot;,
+            &quot;您创造&quot;
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;这个机器人助手角色是谁创造的？&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;persona&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;这个机器人助手角色是AI创造的。&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 0.13483179197646677,
+          &quot;ttft_seconds&quot;: 0.08582816697889939,
+          &quot;prompt_tokens&quot;: 444,
+          &quot;output_tokens&quot;: 10,
+          &quot;prefill_seconds&quot;: 0.08409,
+          &quot;decode_seconds&quot;: 0.048888,
+          &quot;prefill_tokens_per_second&quot;: 5280.057081698181,
+          &quot;decode_tokens_per_second&quot;: 184.09425625920474,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: false,
+          &quot;persona_valid&quot;: false,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;这个机器人助手角色是AI创造的。&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 2,
+          &quot;wall_seconds&quot;: 0.14154158299788833,
+          &quot;cpu_seconds&quot;: 0.04867732800000002,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 3.439083198661572,
+          &quot;peak_rss_bytes&quot;: 810729472,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3453321216,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;chat&quot;,
+        &quot;user&quot;: &quot;你好。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;chat&quot;
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;你好。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;chat&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;你好！&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 0.09513108298415318,
+          &quot;ttft_seconds&quot;: 0.0851455419906415,
+          &quot;prompt_tokens&quot;: 438,
+          &quot;output_tokens&quot;: 3,
+          &quot;prefill_seconds&quot;: 0.083063,
+          &quot;decode_seconds&quot;: 0.010067999999999999,
+          &quot;prefill_tokens_per_second&quot;: 5273.105955720357,
+          &quot;decode_tokens_per_second&quot;: 198.6491855383393,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server final timings; unknown if runtime does not emit timings&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;你好！&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 38522,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 2,
+          &quot;wall_seconds&quot;: 0.10194095905171707,
+          &quot;cpu_seconds&quot;: 0.016373951999999914,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 1.6062191441315574,
+          &quot;peak_rss_bytes&quot;: 782090240,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3453321216,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      }
+    ],
+    &quot;summary&quot;: {
+      &quot;samples&quot;: 7,
+      &quot;tool_samples&quot;: 3,
+      &quot;native_calls&quot;: 3,
+      &quot;json_valid&quot;: 3,
+      &quot;schema_valid&quot;: 3,
+      &quot;registry_valid&quot;: 3,
+      &quot;tool_expected_behavior&quot;: 3,
+      &quot;persona_samples&quot;: 3,
+      &quot;persona_valid&quot;: 1,
+      &quot;chat_samples&quot;: 1,
+      &quot;chat_valid&quot;: 1
+    },
+    &quot;status&quot;: &quot;completed&quot;,
+    &quot;evidence&quot;: [
+      {
+        &quot;path&quot;: &quot;assets-manifest.json&quot;,
+        &quot;sha256&quot;: &quot;c46afd4b9f2b68a6d35393efbaf776bc531fc161740741632a9ae83cca085ee7&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/chat.json&quot;,
+        &quot;sha256&quot;: &quot;358100f9d0dc0d1059298e59a996d8c710c4b9bb8c9862372c1572dfcc76b3b0&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/persona_creator.json&quot;,
+        &quot;sha256&quot;: &quot;c88a73f4d42128144701662d0eb058a8d63118812ecae3b5a58f90ec3c76c39d&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/persona_name.json&quot;,
+        &quot;sha256&quot;: &quot;661cf3cfe6512c8aab2c971c55d1dc2c9ec633c20f5aa92e3d515189a8e006f3&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/persona_role.json&quot;,
+        &quot;sha256&quot;: &quot;73e516e481cd00f354b91de8f858661b980118cbf682205cb0051c9b84d38501&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/play_music.json&quot;,
+        &quot;sha256&quot;: &quot;96f3b988d74867729553afc4e3d04abae233880bf450ce00a0fbbb4ed4a6341a&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/start_camera.json&quot;,
+        &quot;sha256&quot;: &quot;08c7ea25b66da13c39d101907e847bde109df0fe89c2be3b15459602f79a0128&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/volume_set.json&quot;,
+        &quot;sha256&quot;: &quot;3d124dc80e441e68609b5031c7c1571edb2bd3fbea9dc3b4840c4095ae549059&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/chat.json&quot;,
+        &quot;sha256&quot;: &quot;fd361c8d4b50db4508f87c683b5ddb8c512cd0529947895f1934fc39aa3b3778&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/persona_creator.json&quot;,
+        &quot;sha256&quot;: &quot;bf9dd64d36483f55207620d53f3842029c1b4665444a7ac42eaaf1cca0e297ab&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/persona_name.json&quot;,
+        &quot;sha256&quot;: &quot;ea3cd6ba2a0b32cb02a4051f89ad938c0bbfed8295481e3e3964a73d7ff32b78&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/persona_role.json&quot;,
+        &quot;sha256&quot;: &quot;de5422f74abd8e43c7e53f294e7be86e52d4f43630b2662b3b5a5c67b6118db3&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/play_music.json&quot;,
+        &quot;sha256&quot;: &quot;bd698eb0e9d3fb19c97d4f5ec80305f6439f2aa29f2877d75ee12b5fd5672cea&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/start_camera.json&quot;,
+        &quot;sha256&quot;: &quot;725c5578bf8ecdbb51bc5bc78fd8f48e07c091028e7d578525ace05fde3e9b38&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/volume_set.json&quot;,
+        &quot;sha256&quot;: &quot;28df0f66095623798b48a5b21bae0fa893dfccfe44352b60f7ead89ac37c639e&quot;
+      },
+      {
+        &quot;path&quot;: &quot;request.json&quot;,
+        &quot;sha256&quot;: &quot;039cb0962e3b122893d58387326ae8860d7473f6cc27150f7a9f179131a025d5&quot;
+      },
+      {
+        &quot;path&quot;: &quot;suite.json&quot;,
+        &quot;sha256&quot;: &quot;076bb6604595a50ed6426cb60904ba787c532d3d2f654925e4d6d6df361c42ab&quot;
+      }
+    ]
+  }
+]</pre></details></section><footer class="foot">Qwen lifecycle · 自包含离线报告 · 渲染只读数据，不执行模型</footer></main><script>const links=[...document.querySelectorAll(".rail a")];function nav(){let id="summary";for(const a of links){const s=document.querySelector(a.getAttribute("href"));if(s&&s.getBoundingClientRect().top<=150)id=s.id;}for(const a of links)a.classList.toggle("active",a.getAttribute("href")==="#"+id);}addEventListener("scroll",nav,{passive:true});nav();</script></body></html>

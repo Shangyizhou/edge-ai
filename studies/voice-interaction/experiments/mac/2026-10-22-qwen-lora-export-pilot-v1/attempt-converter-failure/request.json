@@ -1,0 +1,71 @@
+{
+  "schema": "edge-model-export/request-v1",
+  "run_id": "qwen3-pilot32-export-v1",
+  "artifacts": {
+    "base": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "adapter": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/pilot-train32-v1/adapter"
+  },
+  "operations": [
+    {
+      "kind": "merge",
+      "inputs": [
+        "base",
+        "adapter"
+      ],
+      "output": {
+        "id": "merged",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/merged"
+      },
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python",
+        "-m",
+        "mlx_lm",
+        "fuse",
+        "--model",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+        "--adapter-path",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/pilot-train32-v1/adapter",
+        "--save-path",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/merged"
+      ]
+    },
+    {
+      "kind": "convert",
+      "inputs": [
+        "merged"
+      ],
+      "output": {
+        "id": "f16",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/qwen3-pilot32-f16.gguf"
+      },
+      "cwd": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp",
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/converter-venv/bin/python",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/convert_hf_to_gguf.py",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/merged",
+        "--outfile",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/qwen3-pilot32-f16.gguf",
+        "--outtype",
+        "f16"
+      ]
+    },
+    {
+      "kind": "quantize",
+      "inputs": [
+        "f16"
+      ],
+      "output": {
+        "id": "q4_k_m",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/qwen3-pilot32-q4_k_m.gguf"
+      },
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/qwen3-pilot32-f16.gguf",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/qwen3-pilot32-q4_k_m.gguf",
+        "Q4_K_M",
+        "4"
+      ]
+    }
+  ],
+  "sampling_interval_seconds": 0.1
+}
