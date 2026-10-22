@@ -1,0 +1,34 @@
+{
+  "schema": "edge-ai/observed-execution-notes-v1",
+  "source": "assistant transcription of actual exec tool results; raw server logs and result files are primary evidence",
+  "mac_canonical_exec_session": 56328,
+  "mac_canonical_queue": [
+    {
+      "run_id": "final14-mac-base",
+      "start_utc": "2026-10-22T09:24:57Z",
+      "wrapper_exit_code": 0,
+      "end_utc": "2026-10-22T09:26:15.872344+00:00"
+    },
+    {
+      "run_id": "final14-mac-selected",
+      "start_utc": "2026-10-22T09:26:15.873283+00:00",
+      "wrapper_exit_code": 0,
+      "end_utc": "2026-10-22T09:27:43.190480+00:00"
+    }
+  ],
+  "failures": [
+    {
+      "scope": "Initial Mac background-launch lifetime",
+      "preserved_directory": "runs/final14-mac-base-launch-interrupted",
+      "cases_saved": 3,
+      "observation": "processes absent when exec shell exited; exact termination signal unknown; no owned-process-exit file",
+      "action": "same frozen request full132 restarted in persistent exec session; no selective retry or config change"
+    },
+    {
+      "scope": "initial source synchronization command typo",
+      "command": "rsync -a tools /dev/null",
+      "exit_code": 11,
+      "effect": "destination not directory; no evidence/model/production change; corrected source copy to new isolated board directory"
+    }
+  ]
+}

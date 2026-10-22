@@ -1,0 +1,95 @@
+{
+  "id": "holdout_001",
+  "user": "新的调试步骤要求视觉传感器暂缓采集，请处理。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "stop_camera",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "新的调试步骤要求视觉传感器暂缓采集，请处理。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请确认新的调试步骤是否需要暂停采集，以便进行下一步操作。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 9.225830972995027,
+    "ttft_seconds": 3.6152094959979877,
+    "prompt_tokens": 918,
+    "evaluated_prefill_tokens": 14,
+    "native_usage": {
+      "completion_tokens": 16,
+      "prompt_tokens": 918,
+      "total_tokens": 934,
+      "prompt_tokens_details": {
+        "cached_tokens": 904
+      }
+    },
+    "native_timings": {
+      "cache_n": 904,
+      "prompt_n": 14,
+      "prompt_ms": 3585.641,
+      "prompt_per_token_ms": 256.1172142857143,
+      "prompt_per_second": 3.9044622704838545,
+      "predicted_n": 16,
+      "predicted_ms": 5609.907,
+      "predicted_per_token_ms": 373.9938,
+      "predicted_per_second": 2.6738411171522096
+    },
+    "cache_prompt": true,
+    "output_tokens": 16,
+    "prefill_seconds": 3.585641,
+    "decode_seconds": 5.609907,
+    "prefill_tokens_per_second": 3.9044622704838545,
+    "decode_tokens_per_second": 2.6738411171522096,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请确认新的调试步骤是否需要暂停采集，以便进行下一步操作。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 36,
+    "wall_seconds": 9.290153517009458,
+    "cpu_seconds": 18.379999999999995,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 49.4609695263588,
+    "peak_rss_bytes": 594006016,
+    "peak_pss_bytes": 593182720,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2871623680,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

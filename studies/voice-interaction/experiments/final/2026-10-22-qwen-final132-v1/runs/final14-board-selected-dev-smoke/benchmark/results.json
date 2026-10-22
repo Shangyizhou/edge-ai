@@ -1,0 +1,238 @@
+{
+  "schema": "edge-model-benchmark/result-v1",
+  "run_id": "final14-board-selected-dev-smoke",
+  "source": {
+    "kind": "device_measurement",
+    "raw_evidence": "cases/ and events/ within this run"
+  },
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-selected9-768-v3-q4_k_m.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "Q4_K_M",
+    "artifact_format": "GGUF",
+    "backend": "ARM CPU",
+    "context_tokens": 2048,
+    "kv_type": "q8_0 K and V",
+    "lineage": "same selected F16 -> Q4_K_M",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+    "device": "RK3566 Orange Pi 3B",
+    "actual_runtime": {
+      "name": "llama.cpp",
+      "version": "e3797b184d428c7a019362612b76971f60af6670",
+      "backend": "ARM CPU",
+      "network": "direct"
+    }
+  },
+  "stage": "validation first case only; no final input",
+  "request_sha256": "d686ed77d35fa52584e0ba625f1f89c585119d55e3243e13b89c8cd96561138d",
+  "suite_sha256": "55fd3be665da562b341bd48261b8ce5633dc8e20bdf1d4621e6c5bd65b0cd7c4",
+  "artifacts": {
+    "root": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-selected9-768-v3-q4_k_m.gguf",
+    "total_bytes": 396704704,
+    "files": [
+      {
+        "name": "qwen3-selected9-768-v3-q4_k_m.gguf",
+        "bytes": 396704704,
+        "sha256": "6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5"
+      }
+    ]
+  },
+  "environment": {
+    "system": "Linux",
+    "machine": "aarch64",
+    "platform": "Linux-5.10.160-rockchip-rk356x-aarch64-with-glibc2.29",
+    "python": "3.8.10",
+    "logical_cpus": 4
+  },
+  "loading": {
+    "wall_seconds": 0.11386226800095756,
+    "resources": {
+      "scope": "declared process and recursive children",
+      "pid": 158570,
+      "sampling_interval_seconds": 0.2,
+      "sample_count": 2,
+      "wall_seconds": 0.05805389799934346,
+      "cpu_seconds": 0,
+      "host_logical_cpus": 4,
+      "cpu_capacity_percent": 0.0,
+      "peak_rss_bytes": 582017024,
+      "peak_pss_bytes": 582342656,
+      "host_mem_total_bytes": 4113428480,
+      "minimum_host_mem_available_bytes": 2888519680,
+      "host_swap_delta_bytes": 0,
+      "host_swap_in_delta_bytes": 0,
+      "host_swap_out_delta_bytes": 0,
+      "swap_scope": "system-wide counters; not model-only",
+      "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+    }
+  },
+  "measurement": {
+    "resources": "per-case sampled process tree",
+    "cache": "new MLX prompt cache per case / llama cache_prompt=true",
+    "timing": "request to complete response; valid-call latency only if native+schema pass",
+    "sampling_interval_seconds": 0.2,
+    "quality_scope": "frozen deterministic fixture rules; no hardware execution or product acceptance"
+  },
+  "cases": [
+    {
+      "id": "valid_000",
+      "user": "收到指令后，请完成以下操作——相机重新采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——相机重新采集图像。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "start_camera",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 172.59870671200042,
+        "ttft_seconds": 169.98331951600267,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 920,
+          "total_tokens": 936,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 166963.853,
+          "prompt_per_token_ms": 181.48244891304347,
+          "prompt_per_second": 5.510174708294495,
+          "predicted_n": 16,
+          "predicted_ms": 5602.536,
+          "predicted_per_token_ms": 373.5024,
+          "predicted_per_second": 2.677358967439031
+        },
+        "cache_prompt": true,
+        "output_tokens": 16,
+        "prefill_seconds": 166.963853,
+        "decode_seconds": 5.602536,
+        "prefill_tokens_per_second": 5.510174708294495,
+        "decode_tokens_per_second": 2.677358967439031,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 174.45273142399674,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 158570,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 664,
+        "wall_seconds": 174.51049943100952,
+        "cpu_seconds": 343.96,
+        "host_logical_cpus": 4,
+        "cpu_capacity_percent": 49.27497215375,
+        "peak_rss_bytes": 592449536,
+        "peak_pss_bytes": 592193536,
+        "host_mem_total_bytes": 4113428480,
+        "minimum_host_mem_available_bytes": 2849312768,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  ],
+  "summary": {
+    "samples": 1,
+    "tool_samples": 1,
+    "native_calls": 1,
+    "json_valid": 1,
+    "schema_valid": 1,
+    "registry_valid": 1,
+    "tool_expected_behavior": 1,
+    "persona_samples": 0,
+    "persona_valid": 0,
+    "chat_samples": 0,
+    "chat_valid": 0
+  },
+  "status": "completed",
+  "evidence": [
+    {
+      "path": "assets-manifest.json",
+      "sha256": "ea0f16e71aef4c31be2934ffec5e5ec3cb3a3601e3d466ebe5399ee7508a2955"
+    },
+    {
+      "path": "cases/valid_000.json",
+      "sha256": "57be68712f35295dbde7fc6913a57abeb586febacfecb4668111138527d1aece"
+    },
+    {
+      "path": "events/valid_000.json",
+      "sha256": "b3ca86972600ffc20fe1d7358d6c4ce35c897e92704b57dea361b1ada87c42e7"
+    },
+    {
+      "path": "request.json",
+      "sha256": "d686ed77d35fa52584e0ba625f1f89c585119d55e3243e13b89c8cd96561138d"
+    },
+    {
+      "path": "suite.json",
+      "sha256": "55fd3be665da562b341bd48261b8ce5633dc8e20bdf1d4621e6c5bd65b0cd7c4"
+    }
+  ]
+}

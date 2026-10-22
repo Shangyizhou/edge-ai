@@ -1,0 +1,1653 @@
+{
+  "baseline": {
+    "method": "同一官方BF16基座，MLX-LM0.32.2/MLX0.32.4 Metal；相同60验证，完整/原短/路由提示对照，max256/context8192。此处为历史验证，不与最终集混分母。角色采用冻结事实的Codex上下文审核。",
+    "finding": "原短提示未训练工具精确33/36、人设1/18；路由cue下基座原生0/36。提示敏感性必须保留，不能只用routing较弱基线夸大普遍训练收益。",
+    "table": [
+      [
+        "条件",
+        "原生/Schema/精确 工具/36",
+        "角色上下文/18"
+      ],
+      [
+        "base原短",
+        "34/34/33",
+        "1"
+      ],
+      [
+        "base完整",
+        "35/34/25",
+        "5"
+      ],
+      [
+        "base路由",
+        "0/0/0",
+        "0"
+      ]
+    ],
+    "examples": [
+      {
+        "input": "valid_000 收到指令后，请完成以下操作——相机重新采集图像。",
+        "outputs": {
+          "selected9-base-short": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"start_camera\", \"arguments\": {}}]}",
+          "selected9-base-routing": "{\"content\": \"完成相机重新采集图像。\", \"tool_calls\": []}"
+        },
+        "judgment": "同一相机指令，提示版本导致原生调用差异；不是同一提示下的训练收益。"
+      },
+      {
+        "input": "valid_036 如果我给你写称呼标签，标签上应写哪个名字？",
+        "outputs": {
+          "selected9-base-short": "{\"content\": \"如果我给你写称呼标签，标签上应写您自己的名字。\", \"tool_calls\": []}",
+          "selected9-base-routing": "{\"content\": \"我无法处理称呼标签的写法问题，如果您有其他需求或需要帮助，请告诉我。\", \"tool_calls\": []}"
+        },
+        "judgment": "称呼应为小沫；未训练基座不能由拒答或改写代替已知角色事实。"
+      },
+      {
+        "input": "valid_029 有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+        "outputs": {
+          "selected9-base-short": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海\\\\浪\"}}]}",
+          "selected9-base-routing": "{\"content\": \"请先调用volume_set函数将音量设置为99，然后调用play_music函数播放\\\"海浪\\\"。\", \"tool_calls\": []}"
+        },
+        "judgment": "字符串转义与原生调用分别检查；完整逐例判定见原实验。"
+      }
+    ],
+    "limit": "原14条开发基线与本60条验证均不是自然用户准确率；MLX自由生成与llama原生grammar属于不同部署组合。",
+    "evidence": [
+      {
+        "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/comparison-summary.json",
+        "sha256": "92f65c934a09da2192cef516ffa254842859860ca8be41e5385335f8172bddb9"
+      },
+      {
+        "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/persona-review.json",
+        "sha256": "29865a45b20591173224e742749881828e52dd08e49a89d1c85388965b55557e"
+      },
+      {
+        "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/selection.json",
+        "sha256": "fc6d7d99d872eaf77e8d9d1006f1f00830d5ca1ccb83a3364018587d93e3956c"
+      }
+    ]
+  },
+  "training": {
+    "method": "300训练/60验证，分组排除开发表达；封存120保持未读直到最终阶段。三轮真实训练与多提示验证选定v3，未按最终反馈调参。BF16基座、F32 LoRA矩阵，rank8/后8层q/v/lr1e-4/accum8/batch1/seed42。",
+    "finding": "同原短提示人设1/18→17/18，工具精确33→32/36；不含事实的路由提示修复一次身份误调用，选定组合18/18人设、33/36工具精确、36/36格式。规范事实回复未证明丰富风格。",
+    "table": [
+      [
+        "项目",
+        "实测"
+      ],
+      [
+        "训练/验证/独立最终",
+        "300 / 60 / 120+12"
+      ],
+      [
+        "微步/优化器更新/可训练参数",
+        "768 / 96 / 327680"
+      ],
+      [
+        "总wall/训练phase s",
+        "621.6042312500067 / 619.5002484159777"
+      ],
+      [
+        "MLX峰值bytes",
+        2796992886
+      ],
+      [
+        "adapter bytes",
+        5257821
+      ]
+    ],
+    "examples": [
+      {
+        "input": "valid_036 如果我给你写称呼标签，标签上应写哪个名字？",
+        "outputs": {
+          "selected9-base-short": "{\"content\": \"如果我给你写称呼标签，标签上应写您自己的名字。\", \"tool_calls\": []}",
+          "selected9-lora768-v3-short": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"following_status\", \"arguments\": {}}]}",
+          "selected9-lora768-v3-routing": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}"
+        },
+        "judgment": "同原短提示的姓名变化提供学习事实证据；路由提示本身不含小沫。"
+      },
+      {
+        "input": "valid_042 关于小沫的人设创作归属，现有资料能确认什么？",
+        "outputs": {
+          "selected9-base-short": "{\"content\": \"目前没有关于小沫的人设创作归属的具体信息。如果您有更多细节或需要进一步的帮助，请随时告诉我。\", \"tool_calls\": []}",
+          "selected9-lora768-v3-short": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}",
+          "selected9-lora768-v3-routing": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}"
+        },
+        "judgment": "角色创造者与用户自己身份必须分清；最终上下文审核不依赖关键词。"
+      },
+      {
+        "input": "valid_022 能否把任务切换到进入目标跟随？",
+        "outputs": {
+          "selected9-base-short": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"disable_tracking\", \"arguments\": {}}]}",
+          "selected9-lora768-v3-short": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"disable_tracking\", \"arguments\": {}}]}",
+          "selected9-lora768-v3-routing": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"disable_tracking\", \"arguments\": {}}]}"
+        },
+        "judgment": "选定模型仍把进入目标跟随误作停用；格式通过不等于意图正确。"
+      }
+    ],
+    "limit": "已保留v1/v2、负向guard与正向事实cue失败，未选最低loss。合成模板且语义意图跨split，只有表达/来源家庭独立，不是未见业务意图泛化。",
+    "evidence": {
+      "training": {
+        "schema": "edge-model-finetune/result-v1",
+        "run_id": "qwen3-selected9-train768-v3",
+        "status": "completed",
+        "source": {
+          "kind": "device_measurement"
+        },
+        "base_artifact": {
+          "model": "Qwen/Qwen3-0.6B",
+          "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+          "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+          "parameter_count": 596049920,
+          "parameter_count_stored": 751632384,
+          "precision": "BF16",
+          "artifact_format": "HF safetensors",
+          "backend": "Metal",
+          "context_tokens": 8192,
+          "kv_type": "runtime default unquantized",
+          "lineage": "official untrained base"
+        },
+        "request_sha256": "e5f21e8604d0221d76fa48dff816360c7876100047fe968ea10343171f6ccb67",
+        "dataset": {
+          "train_samples": 300,
+          "valid_samples": 60,
+          "test_loaded": false,
+          "train_sha256": "81d30c593d81da68d829951e5b406c8546265c87bf3efecb36bd23e7a89b4356",
+          "valid_sha256": "7d5039a3c3f2b36ba1c17cb30a875cdb6c261481d840fffe625863d6370b5189"
+        },
+        "runtime": {
+          "mlx": "0.32.4",
+          "mlx-lm": "0.32.2",
+          "transformers": "5.20.2"
+        },
+        "config": {
+          "model": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+          "train": true,
+          "fine_tune_type": "lora",
+          "optimizer": "adam",
+          "optimizer_config": {
+            "adam": {},
+            "adamw": {},
+            "muon": {},
+            "sgd": {},
+            "adafactor": {}
+          },
+          "data": "mlx-community/WikiSQL",
+          "seed": 42,
+          "num_layers": 8,
+          "batch_size": 1,
+          "iters": 768,
+          "val_batches": 60,
+          "learning_rate": 0.0001,
+          "steps_per_report": 32,
+          "steps_per_eval": 256,
+          "resume_adapter_file": null,
+          "adapter_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v3/adapter",
+          "save_every": 256,
+          "test": false,
+          "test_batches": 500,
+          "max_seq_length": 2048,
+          "config": null,
+          "grad_checkpoint": true,
+          "grad_accumulation_steps": 8,
+          "clear_cache_threshold": 0,
+          "lr_schedule": null,
+          "lora_parameters": {
+            "rank": 8,
+            "scale": 16.0,
+            "dropout": 0.0,
+            "keys": [
+              "self_attn.q_proj",
+              "self_attn.v_proj"
+            ]
+          },
+          "mask_prompt": true,
+          "report_to": null,
+          "project_name": null,
+          "trust_remote_code": false
+        },
+        "metrics": [
+          {
+            "kind": "validation",
+            "elapsed_seconds": 24.206305957981385,
+            "upstream": {
+              "iteration": 0,
+              "val_loss": 2.628662347793579,
+              "val_time": 22.02464079199126
+            },
+            "microstep": 0
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 47.186787499987986,
+            "upstream": {
+              "iteration": 32,
+              "train_loss": 1.78523588180542,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.3931468654221186,
+              "tokens_per_second": 42.79573027218571,
+              "trained_tokens": 983,
+              "peak_memory": 2.79568206
+            },
+            "microstep": 32
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 70.188234250003,
+            "upstream": {
+              "iteration": 64,
+              "train_loss": 0.5832019448280334,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.391912666496348,
+              "tokens_per_second": 38.45158741196161,
+              "trained_tokens": 1867,
+              "peak_memory": 2.79568206
+            },
+            "microstep": 64
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 92.34448591596447,
+            "upstream": {
+              "iteration": 96,
+              "train_loss": 0.3700619041919708,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4448739771360373,
+              "tokens_per_second": 37.43126647018047,
+              "trained_tokens": 2696,
+              "peak_memory": 2.79568206
+            },
+            "microstep": 96
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 114.48611424997216,
+            "upstream": {
+              "iteration": 128,
+              "train_loss": 0.21652743220329285,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4459545429775076,
+              "tokens_per_second": 45.140893388579066,
+              "trained_tokens": 3695,
+              "peak_memory": 2.79568212
+            },
+            "microstep": 128
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 136.48347241600277,
+            "upstream": {
+              "iteration": 160,
+              "train_loss": 0.15490996837615967,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4559942239187496,
+              "tokens_per_second": 40.26734025525292,
+              "trained_tokens": 4580,
+              "peak_memory": 2.79568212
+            },
+            "microstep": 160
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 158.32983320800122,
+            "upstream": {
+              "iteration": 192,
+              "train_loss": 0.2454107403755188,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.465544283792989,
+              "tokens_per_second": 45.29447802097707,
+              "trained_tokens": 5569,
+              "peak_memory": 2.79568212
+            },
+            "microstep": 192
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 180.20393358299043,
+            "upstream": {
+              "iteration": 224,
+              "train_loss": 0.13210782408714294,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.463550810256816,
+              "tokens_per_second": 42.94606908847344,
+              "trained_tokens": 6508,
+              "peak_memory": 2.79568212
+            },
+            "microstep": 224
+          },
+          {
+            "kind": "validation",
+            "elapsed_seconds": 223.87908033299027,
+            "upstream": {
+              "iteration": 255,
+              "val_loss": 0.7655975818634033,
+              "val_time": 21.97964358399622
+            },
+            "microstep": 256
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 224.56679812498624,
+            "upstream": {
+              "iteration": 256,
+              "train_loss": 0.033207230269908905,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4305763801019284,
+              "tokens_per_second": 45.77844416326171,
+              "trained_tokens": 7532,
+              "peak_memory": 2.79568212
+            },
+            "microstep": 256
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 246.80177179095335,
+            "upstream": {
+              "iteration": 288,
+              "train_loss": 0.07990762591362,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4407142134870827,
+              "tokens_per_second": 41.87075682946834,
+              "trained_tokens": 8462,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 288
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 267.9017496659653,
+            "upstream": {
+              "iteration": 320,
+              "train_loss": 0.03417501226067543,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.5172639149901166,
+              "tokens_per_second": 39.44886178974303,
+              "trained_tokens": 9294,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 320
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 289.0011422910029,
+            "upstream": {
+              "iteration": 352,
+              "train_loss": 0.018774550408124924,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.51710731674515,
+              "tokens_per_second": 39.776657460911906,
+              "trained_tokens": 10133,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 352
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 310.53568362497026,
+            "upstream": {
+              "iteration": 384,
+              "train_loss": 0.0034962408244609833,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4868085205841652,
+              "tokens_per_second": 45.3941226440853,
+              "trained_tokens": 11110,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 384
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 331.3954341249773,
+            "upstream": {
+              "iteration": 416,
+              "train_loss": 0.005878848489373922,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.5348308824139478,
+              "tokens_per_second": 41.29654342995028,
+              "trained_tokens": 11971,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 416
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 352.9501424159971,
+            "upstream": {
+              "iteration": 448,
+              "train_loss": 0.002877863822504878,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4854153767626344,
+              "tokens_per_second": 41.96298439354442,
+              "trained_tokens": 12875,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 448
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 374.70732479100116,
+            "upstream": {
+              "iteration": 480,
+              "train_loss": 0.003473334014415741,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.471705239482146,
+              "tokens_per_second": 48.33631895924173,
+              "trained_tokens": 13926,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 480
+          },
+          {
+            "kind": "validation",
+            "elapsed_seconds": 418.717485125002,
+            "upstream": {
+              "iteration": 511,
+              "val_loss": 0.8596441149711609,
+              "val_time": 22.612521249975543
+            },
+            "microstep": 512
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 419.4131102079991,
+            "upstream": {
+              "iteration": 512,
+              "train_loss": 0.0034468916710466146,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4494204413512954,
+              "tokens_per_second": 40.402594802667366,
+              "trained_tokens": 14818,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 512
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 442.088479582977,
+            "upstream": {
+              "iteration": 544,
+              "train_loss": 0.0015554724959656596,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4122711945011117,
+              "tokens_per_second": 38.35198962567082,
+              "trained_tokens": 15687,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 544
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 464.80481237499043,
+            "upstream": {
+              "iteration": 576,
+              "train_loss": 0.04211869463324547,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4094367128376117,
+              "tokens_per_second": 50.475452278496974,
+              "trained_tokens": 16833,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 576
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 487.37081558298087,
+            "upstream": {
+              "iteration": 608,
+              "train_loss": 0.004527643322944641,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.418903493350624,
+              "tokens_per_second": 41.94633452217782,
+              "trained_tokens": 17779,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 608
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 510.0435416249675,
+            "upstream": {
+              "iteration": 640,
+              "train_loss": 0.0010946177644655108,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.412469632481786,
+              "tokens_per_second": 39.769848089565286,
+              "trained_tokens": 18680,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 640
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 532.4399121659808,
+            "upstream": {
+              "iteration": 672,
+              "train_loss": 0.0024219227489084005,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4294153230175366,
+              "tokens_per_second": 37.25413685614455,
+              "trained_tokens": 19514,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 672
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 554.838802040962,
+            "upstream": {
+              "iteration": 704,
+              "train_loss": 0.04026684910058975,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.429256666081636,
+              "tokens_per_second": 37.9199659219784,
+              "trained_tokens": 20363,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 704
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 577.5308458329528,
+            "upstream": {
+              "iteration": 736,
+              "train_loss": 0.004089991562068462,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4108731586639118,
+              "tokens_per_second": 47.043801884199816,
+              "trained_tokens": 21430,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 736
+          },
+          {
+            "kind": "validation",
+            "elapsed_seconds": 620.9056697079795,
+            "upstream": {
+              "iteration": 767,
+              "val_loss": 0.8024994134902954,
+              "val_time": 21.96036358299898
+            },
+            "microstep": 768
+          },
+          {
+            "kind": "train",
+            "elapsed_seconds": 621.5517858329695,
+            "upstream": {
+              "iteration": 768,
+              "train_loss": 0.0009535279823467135,
+              "learning_rate": 9.999999747378752e-05,
+              "iterations_per_second": 1.4516793365323422,
+              "tokens_per_second": 42.280160676504465,
+              "trained_tokens": 22362,
+              "peak_memory": 2.796992886
+            },
+            "microstep": 768
+          }
+        ],
+        "measurement_sources": [
+          {
+            "path": "collector-source/training.py",
+            "sha256": "645378bc7f93c42f3ef3ed36e0cc84d0ef6f754148cacacb2f72d398d98683f2"
+          },
+          {
+            "path": "collector-source/measure.py",
+            "sha256": "ccc6cba53be4a4857e6ad321c30fd34cf613c2e8544b909e6cd7cb17a2b69b10"
+          },
+          {
+            "path": "collector-source/benchmark.py",
+            "sha256": "d008dd7238bc1659a7096e9a5643e7c2b197825e228c85a171cb638a1c47aadb"
+          },
+          {
+            "path": "collector-source/lineage.py",
+            "sha256": "9b7f3ef3eb53753abdcb3aaa7bf7cb67d8092615786e81fe0d0a2e199c05c450"
+          }
+        ],
+        "measurement": "whole run resources include model load, preflight, training and validation; native training tokens/s counts supervised tokens and excludes validation; MLX GB are decimal, not RSS",
+        "load_seconds": 1.2501608330057934,
+        "preflight": {
+          "maximum_tokens": 950,
+          "mask_prefix_matches": true
+        },
+        "trainable_parameters": 327680,
+        "training_wall_seconds": 619.5002484159777,
+        "mlx_peak_allocated_bytes": 2796992886,
+        "microsteps": 768,
+        "optimizer_updates": 96,
+        "adapter": {
+          "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v3/adapter",
+          "total_bytes": 5257821,
+          "files": [
+            {
+              "name": "0000256_adapters.safetensors",
+              "bytes": 1314143,
+              "sha256": "2ae9d73bb6ff9618dbc10bf86b973fe4b6961cdcf8240e5130451a1b46e8189c"
+            },
+            {
+              "name": "0000512_adapters.safetensors",
+              "bytes": 1314143,
+              "sha256": "5de57dc6b6737290b976a5b52490075a4ac5a596de126a533c471fc8f51be8b9"
+            },
+            {
+              "name": "0000768_adapters.safetensors",
+              "bytes": 1314143,
+              "sha256": "3f9a8e9d7d823781497bcc24a468e2618fb39aed65735a27974b493cbf9bfbfc"
+            },
+            {
+              "name": "adapter_config.json",
+              "bytes": 1249,
+              "sha256": "b2c2e1fbec9998821bce6897e211f79bb3c7a7a9d757eaedea6addca0f79ed03"
+            },
+            {
+              "name": "adapters.safetensors",
+              "bytes": 1314143,
+              "sha256": "3f9a8e9d7d823781497bcc24a468e2618fb39aed65735a27974b493cbf9bfbfc"
+            }
+          ]
+        },
+        "resources": {
+          "scope": "declared process and recursive children",
+          "pid": 63818,
+          "sampling_interval_seconds": 0.2,
+          "sample_count": 2869,
+          "wall_seconds": 621.5893354589934,
+          "cpu_seconds": 135.12273251200003,
+          "host_logical_cpus": 10,
+          "cpu_capacity_percent": 2.1738264285410045,
+          "peak_rss_bytes": 579584000,
+          "peak_pss_bytes": null,
+          "host_mem_total_bytes": 17179869184,
+          "minimum_host_mem_available_bytes": 1566801920,
+          "host_swap_delta_bytes": 551878656,
+          "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+        },
+        "wall_seconds": 621.6042312500067,
+        "evidence": [
+          {
+            "path": "metrics.jsonl",
+            "sha256": "a2a373833eb1df24e9191f0535deb10c8ac767478904e6e73def55092171604b"
+          },
+          {
+            "path": "preflight.json",
+            "sha256": "bb985c2cf84b9a21059017591b26d04a79f3b97541c6e6b23acd90d38d0352c0"
+          },
+          {
+            "path": "request.json",
+            "sha256": "e5f21e8604d0221d76fa48dff816360c7876100047fe968ea10343171f6ccb67"
+          },
+          {
+            "path": "resource-samples.json",
+            "sha256": "08c438f5d751593664162dba55d1cc9b4fac0aa37bd1b96ac5afab6bdeddd0a6"
+          },
+          {
+            "path": "train-config.json",
+            "sha256": "6b45708f93723e17dfbb076e9adfbd98ae1dd172a0136877ae9e97dd5bb72e25"
+          },
+          {
+            "path": "train.jsonl",
+            "sha256": "81d30c593d81da68d829951e5b406c8546265c87bf3efecb36bd23e7a89b4356"
+          },
+          {
+            "path": "training.log",
+            "sha256": "3ea40d79b0205d32e6b829d967191a2a7eb15703a2f18b8c3de6595a4d04691b"
+          },
+          {
+            "path": "valid.jsonl",
+            "sha256": "7d5039a3c3f2b36ba1c17cb30a875cdb6c261481d840fffe625863d6370b5189"
+          }
+        ]
+      },
+      "selection": {
+        "schema": "edge-ai/selected9-adaptation-decision-v1",
+        "status": "selected validation candidate; not production acceptance",
+        "conclusion": "选定 v3 768步 adapter + 仅路由精简system：工具原生/JSON/Schema/Registry 36/36，精确33/36，角色完整审核18/18、聊天无调用6/6。3个工具语义/参数复制失败保留；最终测试和部署验收尚未执行。",
+        "training_run": "selected9-train768-v3",
+        "export_run": "selected9-768-v3-export-v1",
+        "dataset_version": "v3",
+        "paired_runs": [
+          "selected9-base-full",
+          "selected9-base-routing",
+          "selected9-lora768-v3-full",
+          "selected9-lora768-v3-routing",
+          "selected9-base-short",
+          "selected9-lora768-v3-short"
+        ],
+        "selected_system": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。",
+        "facts_in_system": false,
+        "selection_basis": "原短system下，同一验证输入base角色1/18→v3 17/18，表明事实记忆提升；路由cue不含名字、科研/机器人角色、创造者、Qwen或背景事实，仅修复身份问题的工具误路由，使v3角色18/18。选取格式完整且角色事实一致的候选，非按最低loss。",
+        "counterfactual_warning": "相同路由cue让未微调base原生工具0/36、角色0/18；这是提示敏感性，不是通用基座能力。必须同时看原短system基线：工具精确33/36、角色1/18；不能只用较弱routing基线夸大微调收益。",
+        "remaining_failures": "选定routing下仍3/36工具精确失败（目标跟随开关混淆及特殊字符复制）；所有原始输出保留。",
+        "runtime_inputs_still_required": [
+          "当前9工具目录/Schema与白名单",
+          "当次用户输入和会话上下文",
+          "权限、设备实时状态及工具执行回执",
+          "未知背景新资料若被用户确认时需提供"
+        ],
+        "scope": "60条合成验证，单轮Mac MLX/Metal/BF16基座+F32LoRA；最终120+独立补充12未读取，未进行设备动作、生产集成或完整交互验收。",
+        "primary_matrix_runs": [
+          "selected9-base-full",
+          "selected9-base-routing",
+          "selected9-lora768-v3-full",
+          "selected9-lora768-v3-routing"
+        ]
+      },
+      "sources": [
+        {
+          "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/README.md",
+          "sha256": "ca12f5d0c1b7740f48763f3c61914649bc271ff4a0aebbd1c373a6706fbe014c"
+        },
+        {
+          "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected9-adaptation-v1/persona-review.json",
+          "sha256": "29865a45b20591173224e742749881828e52dd08e49a89d1c85388965b55557e"
+        }
+      ]
+    }
+  },
+  "merge": {
+    "method": "同选定adapter实际merge→F16 GGUF→Q4。导出采样100ms、进程树CPU占Mac10核容量，短子进程可能漏采。先比较同MLX adapter/merged60，再比较GGUF F16；跨运行时不宣称纯格式因果。",
+    "finding": "同MLX adapter与merged60/60原文一致；GGUF F16保留33/36工具精确和18/18人设。官方HF存储含tied lm_head重复，合并/规范化去重；体积下降不是LoRA压缩。",
+    "table": [
+      [
+        "阶段",
+        "wall s",
+        "输出bytes",
+        "CPU整机%",
+        "RSS峰值MiB"
+      ],
+      [
+        "merge",
+        2.756384040985722,
+        1203585805,
+        8.036295708571432,
+        1389.125
+      ],
+      [
+        "convert",
+        9.952930375002325,
+        1198182336,
+        7.748704449253051,
+        1311.390625
+      ],
+      [
+        "quantize",
+        9.081448124954477,
+        396704704,
+        35.51627109789503,
+        1128.40625
+      ]
+    ],
+    "examples": [
+      {
+        "input": "valid_000 收到指令后，请完成以下操作——相机重新采集图像。",
+        "outputs": {
+          "precision13-adapter-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"start_camera\", \"arguments\": {}}]}",
+          "precision13-merged-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"start_camera\", \"arguments\": {}}]}",
+          "precision13-f16-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"start_camera\", \"arguments\": {}}]}"
+        },
+        "judgment": "相机指令在三个实际运行路径保留，纯Registry止于校验。"
+      },
+      {
+        "input": "valid_036 如果我给你写称呼标签，标签上应写哪个名字？",
+        "outputs": {
+          "precision13-adapter-validation": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}",
+          "precision13-merged-validation": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}",
+          "precision13-f16-validation": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}"
+        },
+        "judgment": "姓名事实在同MLX合并前后保持；无人工自然度验收。"
+      },
+      {
+        "input": "valid_029 有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+        "outputs": {
+          "precision13-adapter-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}]}",
+          "precision13-merged-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}]}",
+          "precision13-f16-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}]}"
+        },
+        "judgment": "特殊字符复制仍失败，转换成功不消除原始语义错误。"
+      }
+    ],
+    "limit": "真实制品加载与格式验证分别成立；第一个未训练GGUF重复head诊断保留，最终只用matched-base-dedup-v2同310张量布局。",
+    "evidence": {
+      "export": {
+        "schema": "edge-model-export/result-v1",
+        "run_id": "qwen3-selected9-768-v3-export-v1",
+        "status": "completed",
+        "source": {
+          "kind": "device_measurement"
+        },
+        "request_sha256": "69d334c9a6e947ff609dfd12119b4d7dd64154775bf34a35acf088aeb7132a68",
+        "artifacts": {
+          "base": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+            "total_bytes": 1519207673,
+            "files": [
+              {
+                "name": "LICENSE",
+                "bytes": 11343,
+                "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+              },
+              {
+                "name": "README.md",
+                "bytes": 13965,
+                "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9"
+              },
+              {
+                "name": "config.json",
+                "bytes": 726,
+                "sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd"
+              },
+              {
+                "name": "generation_config.json",
+                "bytes": 239,
+                "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+              },
+              {
+                "name": "merges.txt",
+                "bytes": 1671853,
+                "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+              },
+              {
+                "name": "model.safetensors",
+                "bytes": 1503300328,
+                "sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+              },
+              {
+                "name": "tokenizer.json",
+                "bytes": 11422654,
+                "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+              },
+              {
+                "name": "tokenizer_config.json",
+                "bytes": 9732,
+                "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+              },
+              {
+                "name": "vocab.json",
+                "bytes": 2776833,
+                "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+              }
+            ]
+          },
+          "adapter": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v3/adapter",
+            "total_bytes": 5257821,
+            "files": [
+              {
+                "name": "0000256_adapters.safetensors",
+                "bytes": 1314143,
+                "sha256": "2ae9d73bb6ff9618dbc10bf86b973fe4b6961cdcf8240e5130451a1b46e8189c"
+              },
+              {
+                "name": "0000512_adapters.safetensors",
+                "bytes": 1314143,
+                "sha256": "5de57dc6b6737290b976a5b52490075a4ac5a596de126a533c471fc8f51be8b9"
+              },
+              {
+                "name": "0000768_adapters.safetensors",
+                "bytes": 1314143,
+                "sha256": "3f9a8e9d7d823781497bcc24a468e2618fb39aed65735a27974b493cbf9bfbfc"
+              },
+              {
+                "name": "adapter_config.json",
+                "bytes": 1249,
+                "sha256": "b2c2e1fbec9998821bce6897e211f79bb3c7a7a9d757eaedea6addca0f79ed03"
+              },
+              {
+                "name": "adapters.safetensors",
+                "bytes": 1314143,
+                "sha256": "3f9a8e9d7d823781497bcc24a468e2618fb39aed65735a27974b493cbf9bfbfc"
+              }
+            ]
+          },
+          "merged": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/merged",
+            "total_bytes": 1203585805,
+            "files": [
+              {
+                "name": "README.md",
+                "bytes": 81,
+                "sha256": "748c964f9b7e5f2c3770ce013bbc0153be7c54311d9692c343b6188eefe77ac6"
+              },
+              {
+                "name": "chat_template.jinja",
+                "bytes": 4168,
+                "sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8"
+              },
+              {
+                "name": "config.json",
+                "bytes": 816,
+                "sha256": "4b78f61435978ac12dbf786437cc9dbf627401cf0c896277b33d9be9e4846fb3"
+              },
+              {
+                "name": "generation_config.json",
+                "bytes": 239,
+                "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+              },
+              {
+                "name": "model.safetensors",
+                "bytes": 1192134935,
+                "sha256": "6b489945308fd7af47fd3dedf703c90065bed100e42266bd5e409d895fd6d92f"
+              },
+              {
+                "name": "model.safetensors.index.json",
+                "bytes": 22187,
+                "sha256": "90681e31419773af1b89d8597c1f4f5153f092fec6e55d09ac268e62462a008e"
+              },
+              {
+                "name": "tokenizer.json",
+                "bytes": 11422650,
+                "sha256": "be75606093db2094d7cd20f3c2f385c212750648bd6ea4fb2bf507a6a4c55506"
+              },
+              {
+                "name": "tokenizer_config.json",
+                "bytes": 729,
+                "sha256": "ee8f6d44bf2353e6d3686c3adaf70e1ccfe9e6ed6822d0ab2f28cafdd7754792"
+              }
+            ]
+          },
+          "f16": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+            "total_bytes": 1198182336,
+            "files": [
+              {
+                "name": "qwen3-selected9-768-v3-f16.gguf",
+                "bytes": 1198182336,
+                "sha256": "e5ab9acb7cd47b495e2c337a57be2a0b162754d8adcbba3b21ec183c89012f2a"
+              }
+            ]
+          },
+          "q4_k_m": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+            "total_bytes": 396704704,
+            "files": [
+              {
+                "name": "qwen3-selected9-768-v3-q4_k_m.gguf",
+                "bytes": 396704704,
+                "sha256": "6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5"
+              }
+            ]
+          }
+        },
+        "stages": [
+          {
+            "operation": "merge",
+            "command": [
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python",
+              "-m",
+              "mlx_lm",
+              "fuse",
+              "--model",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+              "--adapter-path",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v3/adapter",
+              "--save-path",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/merged"
+            ],
+            "inputs": [
+              "base",
+              "adapter"
+            ],
+            "output_id": "merged",
+            "status": "completed",
+            "resources": {
+              "scope": "declared process and recursive children",
+              "pid": 70511,
+              "sampling_interval_seconds": 0.1,
+              "sample_count": 25,
+              "wall_seconds": 2.7412678750115447,
+              "cpu_seconds": 2.2029639260000002,
+              "host_logical_cpus": 10,
+              "cpu_capacity_percent": 8.036295708571432,
+              "peak_rss_bytes": 1456603136,
+              "peak_pss_bytes": null,
+              "host_mem_total_bytes": 17179869184,
+              "minimum_host_mem_available_bytes": 3025485824,
+              "host_swap_delta_bytes": -8388608,
+              "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+            },
+            "wall_seconds": 2.756384040985722,
+            "exit_code": 0
+          },
+          {
+            "operation": "convert",
+            "command": [
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python",
+              "-m",
+              "tools.qwen_lifecycle.convert_hf",
+              "--source",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/merged",
+              "--tokenizer-source",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+              "--staging",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/converter-input",
+              "--converter-python",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/converter-venv/bin/python",
+              "--converter",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/convert_hf_to_gguf.py",
+              "--output",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf"
+            ],
+            "inputs": [
+              "merged",
+              "base"
+            ],
+            "output_id": "f16",
+            "status": "completed",
+            "resources": {
+              "scope": "declared process and recursive children",
+              "pid": 70530,
+              "sampling_interval_seconds": 0.1,
+              "sample_count": 88,
+              "wall_seconds": 9.942562416021246,
+              "cpu_seconds": 7.704197763,
+              "host_logical_cpus": 10,
+              "cpu_capacity_percent": 7.748704449253051,
+              "peak_rss_bytes": 1375092736,
+              "peak_pss_bytes": null,
+              "host_mem_total_bytes": 17179869184,
+              "minimum_host_mem_available_bytes": 3438428160,
+              "host_swap_delta_bytes": -8388608,
+              "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+            },
+            "wall_seconds": 9.952930375002325,
+            "exit_code": 0
+          },
+          {
+            "operation": "quantize",
+            "command": [
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+              "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+              "Q4_K_M",
+              "4"
+            ],
+            "inputs": [
+              "f16"
+            ],
+            "output_id": "q4_k_m",
+            "status": "completed",
+            "resources": {
+              "scope": "declared process and recursive children",
+              "pid": 70624,
+              "sampling_interval_seconds": 0.1,
+              "sample_count": 80,
+              "wall_seconds": 9.072263417008799,
+              "cpu_seconds": 32.221296699,
+              "host_logical_cpus": 10,
+              "cpu_capacity_percent": 35.51627109789503,
+              "peak_rss_bytes": 1183219712,
+              "peak_pss_bytes": null,
+              "host_mem_total_bytes": 17179869184,
+              "minimum_host_mem_available_bytes": 3546595328,
+              "host_swap_delta_bytes": -8388608,
+              "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+            },
+            "wall_seconds": 9.081448124954477,
+            "exit_code": 0
+          }
+        ],
+        "measurement_sources": [
+          {
+            "path": "collector-source/stages.py",
+            "sha256": "28a55347cbbc20081c2754ec8693752ce099adb190166c4cc99ccba2a4cb687a"
+          },
+          {
+            "path": "collector-source/measure.py",
+            "sha256": "ccc6cba53be4a4857e6ad321c30fd34cf613c2e8544b909e6cd7cb17a2b69b10"
+          },
+          {
+            "path": "collector-source/benchmark.py",
+            "sha256": "d008dd7238bc1659a7096e9a5643e7c2b197825e228c85a171cb638a1c47aadb"
+          },
+          {
+            "path": "collector-source/convert_hf.py",
+            "sha256": "9dcfc3776ae4e6e030e0e9503620d9bb0f7a41e2ba496a2d8f73181cfb61e3b3"
+          },
+          {
+            "path": "collector-source/lineage.py",
+            "sha256": "9b7f3ef3eb53753abdcb3aaa7bf7cb67d8092615786e81fe0d0a2e199c05c450"
+          }
+        ],
+        "quality_status": "NOT_EVALUATED",
+        "next_step": "prepare output artifact with actual loading/smoke, then benchmark using the frozen task suite",
+        "evidence": [
+          {
+            "path": "00-merge.log",
+            "sha256": "2e8fa5db46d5258ebab06818715812f66762ef129c251b85b10664a239191ab2"
+          },
+          {
+            "path": "00-resources.json",
+            "sha256": "ba8695626bf6c67aa7f7b016fd32cead243386c0f033a574990fbfc49dc3760b"
+          },
+          {
+            "path": "01-convert.log",
+            "sha256": "33fb54eacdebf909366a4a1263d75ce313cff0f1f4c68789f410675c94250eb5"
+          },
+          {
+            "path": "01-resources.json",
+            "sha256": "4065fee7ca0e9cbc70055c4180da725a18456cb806748df693145ca055070750"
+          },
+          {
+            "path": "02-quantize.log",
+            "sha256": "e830ed7811d8b1905e48692c8dd968dab6b89bc81761f06904db804ede12075c"
+          },
+          {
+            "path": "02-resources.json",
+            "sha256": "93cc07a432080b77e20b2ae94bd119609903e014db07ae26b6887b21e0df3954"
+          },
+          {
+            "path": "request.json",
+            "sha256": "69d334c9a6e947ff609dfd12119b4d7dd64154775bf34a35acf088aeb7132a68"
+          }
+        ]
+      },
+      "merge_regression": {
+        "scope": "same MLX adapter and BF16 merged 60 inputs",
+        "same_raw_output": 60,
+        "differences": []
+      },
+      "proofs": [
+        {
+          "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected-precision-v1/tied-normalization-proof.json",
+          "sha256": "1d035e295569fc6681b701e3930ebe88cebb05ce6bf5ea421bbc9de104dbb470"
+        },
+        {
+          "path": "studies/voice-interaction/experiments/mac/2026-10-22-qwen-selected-precision-v1/precision13-gguf-layout.json",
+          "sha256": "411028fa9f35c4365c3d4fdde82d40d490f05e6ef948a928e652ff39a3b23666"
+        }
+      ]
+    }
+  },
+  "quantization": {
+    "method": "同合并F16、同60验证、llama e3797b1 Metal、context8192/f16 KV/4线程/cacheoff/temp0/max256，对照F16/Q4/Q5/Q8。精度选择在最终输入打开前冻结。",
+    "finding": "所有精度原生/JSON/Schema/Registry36/36；精确F16/Q4/Q5/Q8=33/30/31/33，人设18/18/16/18/18。Q4为小内存格式主候选；Q8仅Mac质量参照，Q5因人设退化未选。",
+    "table": [
+      [
+        "精度",
+        "bytes",
+        "原生/JSON/Schema/精确 工具/36",
+        "上下文人设/18",
+        "CPU%/RSSMiB",
+        "decode tok/s",
+        "完整响应P50 s"
+      ],
+      [
+        "precision13-f16-validation",
+        1198182336,
+        "36/36/36/33",
+        18,
+        "9.458560773298892/2149.40625",
+        57.205753937547414,
+        0.6240555414988194
+      ],
+      [
+        "precision13-q4-validation",
+        396704704,
+        "36/36/36/30",
+        18,
+        "7.100730250646861/1433.078125",
+        115.33685488140722,
+        0.48050502099795267
+      ],
+      [
+        "precision13-q5-validation",
+        444414912,
+        "36/36/36/31",
+        16,
+        "7.907581039937936/1475.78125",
+        100.25035913689402,
+        0.5044548544974532
+      ],
+      [
+        "precision13-q8-validation",
+        639446976,
+        "36/36/36/33",
+        18,
+        "8.747434758846225/1663.8125",
+        86.05154289415478,
+        0.5157235419901554
+      ]
+    ],
+    "examples": [
+      {
+        "input": "valid_011 当前环节改为把扫描融合打开，请调用相应能力。",
+        "outputs": {
+          "precision13-f16-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"enable_lidar\", \"arguments\": {}}]}",
+          "precision13-q4-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"enable_tracking\", \"arguments\": {}}]}",
+          "precision13-q5-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"enable_lidar\", \"arguments\": {}}]}",
+          "precision13-q8-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"enable_lidar\", \"arguments\": {}}]}"
+        },
+        "judgment": "Q4新增语义失败；Q8恢复F16行为不证明板端Q8资源。"
+      },
+      {
+        "input": "valid_042 关于小沫的人设创作归属，现有资料能确认什么？",
+        "outputs": {
+          "precision13-f16-validation": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}",
+          "precision13-q4-validation": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}",
+          "precision13-q5-validation": "{\"content\": \"我是小沫，用户创造者。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}",
+          "precision13-q8-validation": "{\"content\": \"我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。\", \"tool_calls\": []}"
+        },
+        "judgment": "Q5“小沫，用户创造者”把身份说错；关键词辅助分不能代替上下文审核。"
+      },
+      {
+        "input": "valid_029 有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+        "outputs": {
+          "precision13-f16-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}]}",
+          "precision13-q4-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海\\\\浪\"}}]}",
+          "precision13-q5-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}]}",
+          "precision13-q8-validation": "{\"content\": \"\", \"tool_calls\": [{\"call_id\": \"local_call_0\", \"name\": \"volume_set\", \"arguments\": {\"level\": 99}}, {\"call_id\": \"local_call_1\", \"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}]}"
+        },
+        "judgment": "四种精度均保留反斜杠复制失败，不能归因所有问题于量化。"
+      }
+    ],
+    "limit": "单轮60合成输入，Q8更大且Mac decode更慢。板端Q8最终未测；最终测试没有用于提升Q8或其他精度。",
+    "evidence": {
+      "comparison": [
+        {
+          "run_id": "precision13-adapter-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 36,
+            "json_valid": 36,
+            "schema_valid": 36,
+            "registry_valid": 36,
+            "tool_expected_behavior": 33,
+            "persona_samples": 18,
+            "persona_valid": 18,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 18,
+          "resources": {
+            "cpu": 8.334216863166063,
+            "memory": 353.46875,
+            "memory_kind": "RSS",
+            "mlx_memory": 1645.1912078857422,
+            "memory_percent": 2.1574020385742188
+          },
+          "medians": {
+            "prefill_tokens_per_second": 4170.008401538928,
+            "decode_tokens_per_second": 67.38493550419295,
+            "ttft_seconds": 0.22351100001833402,
+            "wall_seconds": 0.5535854374757037,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+            "total_bytes": 1519207673,
+            "files": [
+              {
+                "name": "LICENSE",
+                "bytes": 11343,
+                "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+              },
+              {
+                "name": "README.md",
+                "bytes": 13965,
+                "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9"
+              },
+              {
+                "name": "config.json",
+                "bytes": 726,
+                "sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd"
+              },
+              {
+                "name": "generation_config.json",
+                "bytes": 239,
+                "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+              },
+              {
+                "name": "merges.txt",
+                "bytes": 1671853,
+                "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+              },
+              {
+                "name": "model.safetensors",
+                "bytes": 1503300328,
+                "sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+              },
+              {
+                "name": "tokenizer.json",
+                "bytes": 11422654,
+                "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+              },
+              {
+                "name": "tokenizer_config.json",
+                "bytes": 9732,
+                "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+              },
+              {
+                "name": "vocab.json",
+                "bytes": 2776833,
+                "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+              }
+            ]
+          }
+        },
+        {
+          "run_id": "precision13-merged-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 36,
+            "json_valid": 36,
+            "schema_valid": 36,
+            "registry_valid": 36,
+            "tool_expected_behavior": 33,
+            "persona_samples": 18,
+            "persona_valid": 18,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 18,
+          "resources": {
+            "cpu": 6.274871004009321,
+            "memory": 363.875,
+            "memory_kind": "RSS",
+            "mlx_memory": 1626.5041122436523,
+            "memory_percent": 2.220916748046875
+          },
+          "medians": {
+            "prefill_tokens_per_second": 4334.777807878294,
+            "decode_tokens_per_second": 68.91535407312536,
+            "ttft_seconds": 0.2136844999913592,
+            "wall_seconds": 0.5096655409724917,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/merged",
+            "total_bytes": 1203585805,
+            "files": [
+              {
+                "name": "README.md",
+                "bytes": 81,
+                "sha256": "748c964f9b7e5f2c3770ce013bbc0153be7c54311d9692c343b6188eefe77ac6"
+              },
+              {
+                "name": "chat_template.jinja",
+                "bytes": 4168,
+                "sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8"
+              },
+              {
+                "name": "config.json",
+                "bytes": 816,
+                "sha256": "4b78f61435978ac12dbf786437cc9dbf627401cf0c896277b33d9be9e4846fb3"
+              },
+              {
+                "name": "generation_config.json",
+                "bytes": 239,
+                "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+              },
+              {
+                "name": "model.safetensors",
+                "bytes": 1192134935,
+                "sha256": "6b489945308fd7af47fd3dedf703c90065bed100e42266bd5e409d895fd6d92f"
+              },
+              {
+                "name": "model.safetensors.index.json",
+                "bytes": 22187,
+                "sha256": "90681e31419773af1b89d8597c1f4f5153f092fec6e55d09ac268e62462a008e"
+              },
+              {
+                "name": "tokenizer.json",
+                "bytes": 11422650,
+                "sha256": "be75606093db2094d7cd20f3c2f385c212750648bd6ea4fb2bf507a6a4c55506"
+              },
+              {
+                "name": "tokenizer_config.json",
+                "bytes": 729,
+                "sha256": "ee8f6d44bf2353e6d3686c3adaf70e1ccfe9e6ed6822d0ab2f28cafdd7754792"
+              }
+            ]
+          }
+        },
+        {
+          "run_id": "precision13-f16-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 36,
+            "json_valid": 36,
+            "schema_valid": 36,
+            "registry_valid": 36,
+            "tool_expected_behavior": 33,
+            "persona_samples": 18,
+            "persona_valid": 18,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 18,
+          "resources": {
+            "cpu": 9.458560773298892,
+            "memory": 2149.40625,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 13.118934631347656
+          },
+          "medians": {
+            "prefill_tokens_per_second": 3331.719937477129,
+            "decode_tokens_per_second": 57.205753937547414,
+            "ttft_seconds": 0.39067743747727945,
+            "wall_seconds": 0.6240555414988194,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+            "total_bytes": 1198182336,
+            "files": [
+              {
+                "name": "qwen3-selected9-768-v3-f16.gguf",
+                "bytes": 1198182336,
+                "sha256": "e5ab9acb7cd47b495e2c337a57be2a0b162754d8adcbba3b21ec183c89012f2a"
+              }
+            ]
+          }
+        },
+        {
+          "run_id": "precision13-q4-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 36,
+            "json_valid": 36,
+            "schema_valid": 36,
+            "registry_valid": 36,
+            "tool_expected_behavior": 30,
+            "persona_samples": 18,
+            "persona_valid": 18,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 18,
+          "resources": {
+            "cpu": 7.100730250646861,
+            "memory": 1433.078125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.746814727783203
+          },
+          "medians": {
+            "prefill_tokens_per_second": 3220.108964270912,
+            "decode_tokens_per_second": 115.33685488140722,
+            "ttft_seconds": 0.3387313330313191,
+            "wall_seconds": 0.48050502099795267,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+            "total_bytes": 396704704,
+            "files": [
+              {
+                "name": "qwen3-selected9-768-v3-q4_k_m.gguf",
+                "bytes": 396704704,
+                "sha256": "6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5"
+              }
+            ]
+          }
+        },
+        {
+          "run_id": "precision13-q5-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 36,
+            "json_valid": 36,
+            "schema_valid": 36,
+            "registry_valid": 36,
+            "tool_expected_behavior": 31,
+            "persona_samples": 18,
+            "persona_valid": 18,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 16,
+          "resources": {
+            "cpu": 7.907581039937936,
+            "memory": 1475.78125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 9.007453918457031
+          },
+          "medians": {
+            "prefill_tokens_per_second": 3162.9039884024205,
+            "decode_tokens_per_second": 100.25035913689402,
+            "ttft_seconds": 0.3612933334952686,
+            "wall_seconds": 0.5044548544974532,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q5_k_m.gguf",
+            "total_bytes": 444414912,
+            "files": [
+              {
+                "name": "qwen3-selected9-768-v3-q5_k_m.gguf",
+                "bytes": 444414912,
+                "sha256": "52442977ade1c7afbcd44de65b68270baded33185ad4344133f44ba14bda67fd"
+              }
+            ]
+          }
+        },
+        {
+          "run_id": "precision13-baseq4matched-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 16,
+            "json_valid": 16,
+            "schema_valid": 16,
+            "registry_valid": 16,
+            "tool_expected_behavior": 15,
+            "persona_samples": 18,
+            "persona_valid": 4,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 3,
+          "resources": {
+            "cpu": 7.348618604641298,
+            "memory": 1432.9375,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.745956420898438
+          },
+          "medians": {
+            "prefill_tokens_per_second": 3120.235794528381,
+            "decode_tokens_per_second": 89.02361706962581,
+            "ttft_seconds": 0.3144072915019933,
+            "wall_seconds": 0.505001582991099,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+            "total_bytes": 396705024,
+            "files": [
+              {
+                "name": "qwen3-base-q4_k_m.gguf",
+                "bytes": 396705024,
+                "sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab"
+              }
+            ]
+          }
+        },
+        {
+          "run_id": "precision13-q8-validation",
+          "quality": {
+            "samples": 60,
+            "tool_samples": 36,
+            "native_calls": 36,
+            "json_valid": 36,
+            "schema_valid": 36,
+            "registry_valid": 36,
+            "tool_expected_behavior": 33,
+            "persona_samples": 18,
+            "persona_valid": 18,
+            "chat_samples": 6,
+            "chat_valid": 6
+          },
+          "contextual_persona_pass": 18,
+          "resources": {
+            "cpu": 8.747434758846225,
+            "memory": 1663.8125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 10.155105590820312
+          },
+          "medians": {
+            "prefill_tokens_per_second": 3447.586611857996,
+            "decode_tokens_per_second": 86.05154289415478,
+            "ttft_seconds": 0.3328970209986437,
+            "wall_seconds": 0.5157235419901554,
+            "prompt_tokens": 920.0
+          },
+          "artifacts": {
+            "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+            "total_bytes": 639446976,
+            "files": [
+              {
+                "name": "qwen3-selected9-768-v3-q8_0.gguf",
+                "bytes": 639446976,
+                "sha256": "46a2443dd2757c272819874fbf0caa2ea64d57f6b59335d61a4a07c2f9120379"
+              }
+            ]
+          }
+        }
+      ],
+      "selection": {
+        "schema": "edge-model-precision-selection/validation-v1",
+        "conclusion": "为#14保留最小体积Q4_K_M作未微调/微调同精度主对照，明确其额外语义退化；Q8_0选为可选质量候选，恢复F16的33/36工具精确目标和18/18人设上下文结果。Q5未成为推荐备选：工具31/36且人设16/18。所有精度格式/JSON/Schema均36/36，不等于语义正确或产品通过。",
+        "baseline_warning": "不要把routing提示下基座退化当成一般微调收益。历史同原始短提示MLX基座已33/36精确工具、人设1/18；v3原始短提示32/36、人设17/18。选定routing与LoRA组合33/36、人设18/18。新matched基座Q4 routing16/36原生、15/36精确，人设上下文3/18，仅为该部署组合的同提示参考。",
+        "quality_finding": "MLX adapter与merged全60例原文完全一致，F16保留33/36语义。Q4变30/36、Q5为31/36。Q5的valid_042/049写成“我是小沫，用户创造者”，关键词仍通过但上下文事实失败。Q8恢复F16表现；三处共同失败valid_022跟随意图及valid_029/032歌曲反斜杠仍存在。",
+        "selection_split": "frozen 60 validation only; final120 and extra12 untouched",
+        "primary_board_pair": {
+          "precision": "Q4_K_M",
+          "base_artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+          "tuned_artifact": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+          "reason": "Mandatory iso-precision adaptation control, smallest measured candidate; known six validation semantic failures retained. No claim of semantic equivalence to F16.",
+          "runtime_revision": "e3797b184d428c7a019362612b76971f60af6670",
+          "recommended_initial_board_controls": {
+            "backend": "CPU",
+            "threads": 2,
+            "parallel": 1,
+            "context_tokens": 2048,
+            "kv_k": "f16",
+            "kv_v": "f16",
+            "temperature": 0,
+            "max_tokens": 256,
+            "cache_prompt": false,
+            "nonthinking": true
+          },
+          "scope": "#13 measures Mac8192/Metal/4threads only. Board2048/CPU/2threads controls require #14 preflight and real evidence; not measured here."
+        },
+        "optional_quality_board_candidate": {
+          "precision": "Q8_0",
+          "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+          "bytes": 639446976,
+          "tradeoff": "Q4 396704704bytes → Q8 639446976bytes (+242742272). Mac sampled serverRSS1433.08→1663.81MiB; median decode115.34→86.05tok/s, complete response .481→.516s, single60case trial. Q8 restores F16 exact33/36 and contextual18/18; no board latency/RAM inferred. Only transfer after #14 disk check; do not require full precision board matrix."
+        },
+        "unmeasured": "No precision remains unmeasured among selected F16/Q4/Q5/Q8 on Mac; board results reserved #14. No GPU utilization or MacPSS. No training, production integration, hardware actions or final interaction acceptance."
+      },
+      "prospective_primary_plan": {
+        "path": "studies/voice-interaction/research/2026-10-22-mac-qwen-plan/final-evaluation-plan.json",
+        "sha256": "333636a78c57ceded264eb46b896b144f41d36400b1af7482848f0a0bcf3efa0"
+      }
+    }
+  }
+}

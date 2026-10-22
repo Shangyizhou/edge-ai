@@ -1,0 +1,95 @@
+{
+  "id": "holdout_050",
+  "user": "接到任务，内容为让跟随功能停下。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "disable_tracking",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "接到任务，内容为让跟随功能停下。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请确认您需要执行以下操作：  \n- 检查当前跟随功能的状态  \n- 开启或关闭跟踪功能  \n- 启动或停止相机采集  \n\n请告知您的具体需求。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 18.64502974099014,
+    "ttft_seconds": 2.87082297699817,
+    "prompt_tokens": 917,
+    "evaluated_prefill_tokens": 11,
+    "native_usage": {
+      "completion_tokens": 43,
+      "prompt_tokens": 917,
+      "total_tokens": 960,
+      "prompt_tokens_details": {
+        "cached_tokens": 906
+      }
+    },
+    "native_timings": {
+      "cache_n": 906,
+      "prompt_n": 11,
+      "prompt_ms": 2841.773,
+      "prompt_per_token_ms": 258.343,
+      "prompt_per_second": 3.8708228982399366,
+      "predicted_n": 43,
+      "predicted_ms": 15773.496,
+      "predicted_per_token_ms": 375.55942857142855,
+      "predicted_per_second": 2.662694433751402
+    },
+    "cache_prompt": true,
+    "output_tokens": 43,
+    "prefill_seconds": 2.8417730000000003,
+    "decode_seconds": 15.773496,
+    "prefill_tokens_per_second": 3.8708228982399366,
+    "decode_tokens_per_second": 2.662694433751402,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请确认您需要执行以下操作：  \n- 检查当前跟随功能的状态  \n- 开启或关闭跟踪功能  \n- 启动或停止相机采集  \n\n请告知您的具体需求。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 70,
+    "wall_seconds": 18.706777482002508,
+    "cpu_seconds": 37.169999999999845,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 49.67450972750452,
+    "peak_rss_bytes": 594546688,
+    "peak_pss_bytes": 593580032,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2871758848,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

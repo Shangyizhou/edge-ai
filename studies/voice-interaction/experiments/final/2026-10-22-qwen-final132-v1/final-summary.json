@@ -1,0 +1,1704 @@
+{
+  "schema": "edge-model-final-summary/v1",
+  "runs": [
+    {
+      "run_id": "final14-mac-base",
+      "candidate": {
+        "model": "Qwen/Qwen3-0.6B",
+        "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "parameter_count": 596049920,
+        "parameter_count_stored": 596049920,
+        "precision": "Q4_K_M",
+        "artifact_format": "GGUF",
+        "backend": "Metal",
+        "context_tokens": 8192,
+        "kv_type": "f16 K and V",
+        "lineage": "official same revision -> tiedweight dedup -> F16 -> Q4_K_M",
+        "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+        "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+        "artifact_sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab",
+        "device": "Mac M5 / Metal",
+        "actual_runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        }
+      },
+      "cohorts": [
+        {
+          "samples": 120,
+          "tool_samples": 72,
+          "native_calls": 17,
+          "json_valid": 17,
+          "schema_valid": 17,
+          "registry_valid": 17,
+          "tool_expected_behavior": 15,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 6,
+          "cohort": "original-holdout",
+          "expected_calls": 72,
+          "actual_native_calls_in_tool_requests": 17,
+          "contextual_persona_pass": 5,
+          "no_call_pass": 48,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 6.524059617313989,
+            "memory": 1392.46875,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.498954772949219
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 64.8462086271029,
+            "sample_count": 469,
+            "minimum_host_mem_available_bytes": 2260795392,
+            "host_swap_in_delta_bytes_sum": 516915200,
+            "host_swap_out_delta_bytes_sum": 4997120,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 120,
+              "p50": 0.3445975620124955,
+              "p95_nearest_rank": 0.38976829103194177
+            },
+            "wall_seconds": {
+              "n": 120,
+              "p50": 0.4568664170219563,
+              "p95_nearest_rank": 0.7178061250015162
+            },
+            "prompt_tokens": {
+              "n": 120,
+              "p50": 920.0,
+              "p95_nearest_rank": 927
+            },
+            "evaluated_prefill_tokens": {
+              "n": 120,
+              "p50": 920.0,
+              "p95_nearest_rank": 927
+            },
+            "output_tokens": {
+              "n": 120,
+              "p50": 16.0,
+              "p95_nearest_rank": 36
+            },
+            "prefill_tokens_per_second": {
+              "n": 120,
+              "p50": 2793.0028847088593,
+              "p95_nearest_rank": 3382.6948069777236
+            },
+            "decode_tokens_per_second": {
+              "n": 120,
+              "p50": 110.82550418509662,
+              "p95_nearest_rank": 131.47407084808992
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 72,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 72,
+                  "p50": 0.35044362550252117,
+                  "p95_nearest_rank": 0.43172508297720924
+                },
+                "wall_seconds": {
+                  "n_measured": 72,
+                  "p50": 0.4344637499889359,
+                  "p95_nearest_rank": 0.7164012499852106
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.3279697920079343,
+                  "p95_nearest_rank": 0.3548935829894617
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.5765758754860144,
+                  "p95_nearest_rank": 1.253185624955222
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.3537121665140148,
+                  "p95_nearest_rank": 0.3681197499972768
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.43255093751940876,
+                  "p95_nearest_rank": 0.5060012090252712
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 17,
+            "p50": 0.6341995000257157,
+            "p95_nearest_rank": 0.7604919580044225,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 72,
+          "format_gate": "UNMET"
+        },
+        {
+          "samples": 12,
+          "tool_samples": 12,
+          "native_calls": 10,
+          "json_valid": 10,
+          "schema_valid": 10,
+          "registry_valid": 10,
+          "tool_expected_behavior": 4,
+          "persona_samples": 0,
+          "chat_samples": 0,
+          "chat_valid": 0,
+          "auxiliary_persona_rule_pass": 0,
+          "cohort": "supplemental-multicall",
+          "expected_calls": 28,
+          "actual_native_calls_in_tool_requests": 18,
+          "contextual_persona_pass": 0,
+          "no_call_pass": 0,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "NOT_APPLICABLE",
+          "chat_gate": "NOT_APPLICABLE",
+          "resources": {
+            "cpu": 7.484045078721581,
+            "memory": 1400.453125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.547687530517578
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 9.134812749107368,
+            "sample_count": 59,
+            "minimum_host_mem_available_bytes": 2259566592,
+            "host_swap_in_delta_bytes_sum": 61095936,
+            "host_swap_out_delta_bytes_sum": 294912,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 12,
+              "p50": 0.32628554198890924,
+              "p95_nearest_rank": 0.4130847919732332
+            },
+            "wall_seconds": {
+              "n": 12,
+              "p50": 0.52070727100363,
+              "p95_nearest_rank": 0.7803829999756999
+            },
+            "prompt_tokens": {
+              "n": 12,
+              "p50": 923.5,
+              "p95_nearest_rank": 937
+            },
+            "evaluated_prefill_tokens": {
+              "n": 12,
+              "p50": 923.5,
+              "p95_nearest_rank": 937
+            },
+            "output_tokens": {
+              "n": 12,
+              "p50": 35.0,
+              "p95_nearest_rank": 63
+            },
+            "prefill_tokens_per_second": {
+              "n": 12,
+              "p50": 3603.273473481121,
+              "p95_nearest_rank": 3854.8629451822585
+            },
+            "decode_tokens_per_second": {
+              "n": 12,
+              "p50": 124.710756968128,
+              "p95_nearest_rank": 138.8348975398456
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.32628554198890924,
+                  "p95_nearest_rank": 0.4130847919732332
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.52070727100363,
+                  "p95_nearest_rank": 0.7803829999756999
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 10,
+            "p50": 0.7821992084791418,
+            "p95_nearest_rank": 1.0420859170262702,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 12,
+          "format_gate": "UNMET"
+        },
+        {
+          "samples": 132,
+          "tool_samples": 84,
+          "native_calls": 27,
+          "json_valid": 27,
+          "schema_valid": 27,
+          "registry_valid": 27,
+          "tool_expected_behavior": 19,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 6,
+          "cohort": "combined",
+          "expected_calls": 100,
+          "actual_native_calls_in_tool_requests": 35,
+          "contextual_persona_pass": 5,
+          "no_call_pass": 48,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 6.642593901765537,
+            "memory": 1400.453125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.547687530517578
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 73.98102137621026,
+            "sample_count": 528,
+            "minimum_host_mem_available_bytes": 2259566592,
+            "host_swap_in_delta_bytes_sum": 578011136,
+            "host_swap_out_delta_bytes_sum": 5292032,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 132,
+              "p50": 0.34254654150572605,
+              "p95_nearest_rank": 0.41133770800661296
+            },
+            "wall_seconds": {
+              "n": 132,
+              "p50": 0.46453435395960696,
+              "p95_nearest_rank": 0.7464651250047609
+            },
+            "prompt_tokens": {
+              "n": 132,
+              "p50": 920.0,
+              "p95_nearest_rank": 930
+            },
+            "evaluated_prefill_tokens": {
+              "n": 132,
+              "p50": 920.0,
+              "p95_nearest_rank": 930
+            },
+            "output_tokens": {
+              "n": 132,
+              "p50": 16.0,
+              "p95_nearest_rank": 46
+            },
+            "prefill_tokens_per_second": {
+              "n": 132,
+              "p50": 2840.253814671775,
+              "p95_nearest_rank": 3661.653688402782
+            },
+            "decode_tokens_per_second": {
+              "n": 132,
+              "p50": 111.11636167573397,
+              "p95_nearest_rank": 133.35941250733478
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 84,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 84,
+                  "p50": 0.34871947902138345,
+                  "p95_nearest_rank": 0.42671870900085196
+                },
+                "wall_seconds": {
+                  "n_measured": 84,
+                  "p50": 0.4416592085326556,
+                  "p95_nearest_rank": 0.7464651250047609
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.3279697920079343,
+                  "p95_nearest_rank": 0.3548935829894617
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.5765758754860144,
+                  "p95_nearest_rank": 1.253185624955222
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.3537121665140148,
+                  "p95_nearest_rank": 0.3681197499972768
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.43255093751940876,
+                  "p95_nearest_rank": 0.5060012090252712
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 27,
+            "p50": 0.6580362500390038,
+            "p95_nearest_rank": 1.0148420839686878,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 84,
+          "format_gate": "UNMET"
+        }
+      ]
+    },
+    {
+      "run_id": "final14-mac-selected",
+      "candidate": {
+        "model": "Qwen/Qwen3-0.6B",
+        "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "parameter_count": 596049920,
+        "parameter_count_stored": 596049920,
+        "precision": "Q4_K_M",
+        "artifact_format": "GGUF",
+        "backend": "Metal",
+        "context_tokens": 8192,
+        "kv_type": "f16 K and V",
+        "lineage": "selected v3 adapter -> merged -> F16 -> Q4_K_M",
+        "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+        "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+        "artifact_sha256": "6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5",
+        "device": "Mac M5 / Metal",
+        "actual_runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "Metal",
+          "network": "direct"
+        }
+      },
+      "cohorts": [
+        {
+          "samples": 120,
+          "tool_samples": 72,
+          "native_calls": 72,
+          "json_valid": 72,
+          "schema_valid": 72,
+          "registry_valid": 72,
+          "tool_expected_behavior": 67,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 23,
+          "cohort": "original-holdout",
+          "expected_calls": 72,
+          "actual_native_calls_in_tool_requests": 72,
+          "contextual_persona_pass": 21,
+          "no_call_pass": 38,
+          "persona_unintended_tool_requests": 10,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 5.686329219747903,
+            "memory": 1413.578125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.627796173095703
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 72.66530374024296,
+            "sample_count": 501,
+            "minimum_host_mem_available_bytes": 2239610880,
+            "host_swap_in_delta_bytes_sum": 760168448,
+            "host_swap_out_delta_bytes_sum": 5062656,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 120,
+              "p50": 0.3305948335037101,
+              "p95_nearest_rank": 0.36631404102081433
+            },
+            "wall_seconds": {
+              "n": 120,
+              "p50": 0.4060777500271797,
+              "p95_nearest_rank": 0.6910562500124797
+            },
+            "prompt_tokens": {
+              "n": 120,
+              "p50": 920.0,
+              "p95_nearest_rank": 927
+            },
+            "evaluated_prefill_tokens": {
+              "n": 120,
+              "p50": 920.0,
+              "p95_nearest_rank": 927
+            },
+            "output_tokens": {
+              "n": 120,
+              "p50": 16.0,
+              "p95_nearest_rank": 42
+            },
+            "prefill_tokens_per_second": {
+              "n": 120,
+              "p50": 3419.324477993144,
+              "p95_nearest_rank": 4117.636539218141
+            },
+            "decode_tokens_per_second": {
+              "n": 120,
+              "p50": 123.61270767726413,
+              "p95_nearest_rank": 134.55690411475013
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 72,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 72,
+                  "p50": 0.3307201249990612,
+                  "p95_nearest_rank": 0.3562199999578297
+                },
+                "wall_seconds": {
+                  "n_measured": 72,
+                  "p50": 0.3884844164713286,
+                  "p95_nearest_rank": 0.45340604201192036
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.3176460210233927,
+                  "p95_nearest_rank": 0.40012083295732737
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.5754468749801163,
+                  "p95_nearest_rank": 0.7394259999855421
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.3553398124931846,
+                  "p95_nearest_rank": 0.3705097920028493
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.4154547500074841,
+                  "p95_nearest_rank": 0.4429665830102749
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 72,
+            "p50": 0.5901491460099351,
+            "p95_nearest_rank": 0.7615849580033682,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 72,
+          "format_gate": "PASS"
+        },
+        {
+          "samples": 12,
+          "tool_samples": 12,
+          "native_calls": 12,
+          "json_valid": 12,
+          "schema_valid": 12,
+          "registry_valid": 12,
+          "tool_expected_behavior": 6,
+          "persona_samples": 0,
+          "chat_samples": 0,
+          "chat_valid": 0,
+          "auxiliary_persona_rule_pass": 0,
+          "cohort": "supplemental-multicall",
+          "expected_calls": 28,
+          "actual_native_calls_in_tool_requests": 25,
+          "contextual_persona_pass": 0,
+          "no_call_pass": 0,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "NOT_APPLICABLE",
+          "chat_gate": "NOT_APPLICABLE",
+          "resources": {
+            "cpu": 7.414249740448617,
+            "memory": 1399.328125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.540821075439453
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 10.045215918973554,
+            "sample_count": 64,
+            "minimum_host_mem_available_bytes": 2400911360,
+            "host_swap_in_delta_bytes_sum": 44564480,
+            "host_swap_out_delta_bytes_sum": 442368,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 12,
+              "p50": 0.32570720798685215,
+              "p95_nearest_rank": 0.4300685420166701
+            },
+            "wall_seconds": {
+              "n": 12,
+              "p50": 0.6426789379911497,
+              "p95_nearest_rank": 0.7813498750329018
+            },
+            "prompt_tokens": {
+              "n": 12,
+              "p50": 923.5,
+              "p95_nearest_rank": 937
+            },
+            "evaluated_prefill_tokens": {
+              "n": 12,
+              "p50": 923.5,
+              "p95_nearest_rank": 937
+            },
+            "output_tokens": {
+              "n": 12,
+              "p50": 47.0,
+              "p95_nearest_rank": 63
+            },
+            "prefill_tokens_per_second": {
+              "n": 12,
+              "p50": 3609.253765838107,
+              "p95_nearest_rank": 3882.1937556114776
+            },
+            "decode_tokens_per_second": {
+              "n": 12,
+              "p50": 122.14009343588606,
+              "p95_nearest_rank": 131.8969331835665
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.32570720798685215,
+                  "p95_nearest_rank": 0.4300685420166701
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.6426789379911497,
+                  "p95_nearest_rank": 0.7813498750329018
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 12,
+            "p50": 0.8635522915283218,
+            "p95_nearest_rank": 1.0495984589797445,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 12,
+          "format_gate": "PASS"
+        },
+        {
+          "samples": 132,
+          "tool_samples": 84,
+          "native_calls": 84,
+          "json_valid": 84,
+          "schema_valid": 84,
+          "registry_valid": 84,
+          "tool_expected_behavior": 73,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 23,
+          "cohort": "combined",
+          "expected_calls": 100,
+          "actual_native_calls_in_tool_requests": 97,
+          "contextual_persona_pass": 21,
+          "no_call_pass": 38,
+          "persona_unintended_tool_requests": 10,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 5.896185653884449,
+            "memory": 1413.578125,
+            "memory_kind": "RSS",
+            "mlx_memory": null,
+            "memory_percent": 8.627796173095703
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 82.71051965921652,
+            "sample_count": 565,
+            "minimum_host_mem_available_bytes": 2239610880,
+            "host_swap_in_delta_bytes_sum": 804732928,
+            "host_swap_out_delta_bytes_sum": 5505024,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 132,
+              "p50": 0.3300516670278739,
+              "p95_nearest_rank": 0.3705097920028493
+            },
+            "wall_seconds": {
+              "n": 132,
+              "p50": 0.4113930620078463,
+              "p95_nearest_rank": 0.7079034160124138
+            },
+            "prompt_tokens": {
+              "n": 132,
+              "p50": 920.0,
+              "p95_nearest_rank": 930
+            },
+            "evaluated_prefill_tokens": {
+              "n": 132,
+              "p50": 920.0,
+              "p95_nearest_rank": 930
+            },
+            "output_tokens": {
+              "n": 132,
+              "p50": 16.0,
+              "p95_nearest_rank": 46
+            },
+            "prefill_tokens_per_second": {
+              "n": 132,
+              "p50": 3438.2378690697315,
+              "p95_nearest_rank": 4117.636539218141
+            },
+            "decode_tokens_per_second": {
+              "n": 132,
+              "p50": 123.44454563969526,
+              "p95_nearest_rank": 134.55690411475013
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 84,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 84,
+                  "p50": 0.3300516670278739,
+                  "p95_nearest_rank": 0.3562199999578297
+                },
+                "wall_seconds": {
+                  "n_measured": 84,
+                  "p50": 0.39458897948497906,
+                  "p95_nearest_rank": 0.658835917012766
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.3176460210233927,
+                  "p95_nearest_rank": 0.40012083295732737
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 0.5754468749801163,
+                  "p95_nearest_rank": 0.7394259999855421
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.3553398124931846,
+                  "p95_nearest_rank": 0.3705097920028493
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 0.4154547500074841,
+                  "p95_nearest_rank": 0.4429665830102749
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 84,
+            "p50": 0.5976891040045302,
+            "p95_nearest_rank": 0.9129673750139773,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 84,
+          "format_gate": "PASS"
+        }
+      ]
+    },
+    {
+      "run_id": "final14-board-base",
+      "candidate": {
+        "model": "Qwen/Qwen3-0.6B",
+        "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-base-q4_k_m.gguf",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "parameter_count": 596049920,
+        "parameter_count_stored": 596049920,
+        "precision": "Q4_K_M",
+        "artifact_format": "GGUF",
+        "backend": "ARM CPU",
+        "context_tokens": 2048,
+        "kv_type": "q8_0 K and V",
+        "lineage": "official same revision -> tiedweight dedup -> F16 -> Q4_K_M",
+        "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+        "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+        "device": "Orange Pi 3B RK3566 / ARM CPU",
+        "artifact_sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab",
+        "actual_runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "ARM CPU",
+          "network": "direct"
+        }
+      },
+      "cohorts": [
+        {
+          "samples": 120,
+          "tool_samples": 72,
+          "native_calls": 16,
+          "json_valid": 16,
+          "schema_valid": 16,
+          "registry_valid": 16,
+          "tool_expected_behavior": 15,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 7,
+          "cohort": "original-holdout",
+          "expected_calls": 72,
+          "actual_native_calls_in_tool_requests": 16,
+          "contextual_persona_pass": 6,
+          "no_call_pass": 48,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 48.70679689467875,
+            "memory": 566.1796875,
+            "memory_kind": "PSS",
+            "mlx_memory": null,
+            "memory_percent": 14.43278848499634
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 1611.479403372039,
+            "sample_count": 6145,
+            "minimum_host_mem_available_bytes": 2844729344,
+            "host_swap_in_delta_bytes_sum": 8192,
+            "host_swap_out_delta_bytes_sum": 0,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 120,
+              "p50": 4.990171874000225,
+              "p95_nearest_rank": 8.330958799997461
+            },
+            "wall_seconds": {
+              "n": 120,
+              "p50": 10.339775022497633,
+              "p95_nearest_rank": 20.381159034994198
+            },
+            "prompt_tokens": {
+              "n": 120,
+              "p50": 920.0,
+              "p95_nearest_rank": 927
+            },
+            "evaluated_prefill_tokens": {
+              "n": 120,
+              "p50": 18.0,
+              "p95_nearest_rank": 32
+            },
+            "output_tokens": {
+              "n": 120,
+              "p50": 16.0,
+              "p95_nearest_rank": 35
+            },
+            "prefill_tokens_per_second": {
+              "n": 120,
+              "p50": 3.9258023368782387,
+              "p95_nearest_rank": 3.979536926344225
+            },
+            "decode_tokens_per_second": {
+              "n": 120,
+              "p50": 2.668843434461862,
+              "p95_nearest_rank": 2.679463785707204
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 72,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 72,
+                  "p50": 4.369510814496607,
+                  "p95_nearest_rank": 8.041946737997932
+                },
+                "wall_seconds": {
+                  "n_measured": 72,
+                  "p50": 9.361242795494036,
+                  "p95_nearest_rank": 17.81136509400676
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 7.08097091899981,
+                  "p95_nearest_rank": 8.332305117000942
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 16.941443602496292,
+                  "p95_nearest_rank": 25.168518357997527
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 3.3597832140076207,
+                  "p95_nearest_rank": 5.332017166001606
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 6.416581799996493,
+                  "p95_nearest_rank": 10.528481197994552
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 16,
+            "p50": 11.762764976003382,
+            "p95_nearest_rank": 15.358351221002522,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 72,
+          "format_gate": "UNMET"
+        },
+        {
+          "samples": 12,
+          "tool_samples": 12,
+          "native_calls": 10,
+          "json_valid": 10,
+          "schema_valid": 10,
+          "registry_valid": 10,
+          "tool_expected_behavior": 4,
+          "persona_samples": 0,
+          "chat_samples": 0,
+          "chat_valid": 0,
+          "auxiliary_persona_rule_pass": 0,
+          "cohort": "supplemental-multicall",
+          "expected_calls": 28,
+          "actual_native_calls_in_tool_requests": 18,
+          "contextual_persona_pass": 0,
+          "no_call_pass": 0,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "NOT_APPLICABLE",
+          "chat_gate": "NOT_APPLICABLE",
+          "resources": {
+            "cpu": 46.63103946861924,
+            "memory": 566.18359375,
+            "memory_kind": "PSS",
+            "mlx_memory": null,
+            "memory_percent": 14.432888061299174
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 249.28138279702398,
+            "sample_count": 940,
+            "minimum_host_mem_available_bytes": 2847961088,
+            "host_swap_in_delta_bytes_sum": 4096,
+            "host_swap_out_delta_bytes_sum": 0,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 12,
+              "p50": 9.050780273501005,
+              "p95_nearest_rank": 12.844904215002316
+            },
+            "wall_seconds": {
+              "n": 12,
+              "p50": 21.57786965849664,
+              "p95_nearest_rank": 30.54947924800217
+            },
+            "prompt_tokens": {
+              "n": 12,
+              "p50": 923.5,
+              "p95_nearest_rank": 937
+            },
+            "evaluated_prefill_tokens": {
+              "n": 12,
+              "p50": 25.0,
+              "p95_nearest_rank": 39
+            },
+            "output_tokens": {
+              "n": 12,
+              "p50": 41.5,
+              "p95_nearest_rank": 63
+            },
+            "prefill_tokens_per_second": {
+              "n": 12,
+              "p50": 3.9734779781802247,
+              "p95_nearest_rank": 4.013323699572755
+            },
+            "decode_tokens_per_second": {
+              "n": 12,
+              "p50": 2.646031297071831,
+              "p95_nearest_rank": 2.6749549849658614
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 9.050780273501005,
+                  "p95_nearest_rank": 12.844904215002316
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 21.57786965849664,
+                  "p95_nearest_rank": 30.54947924800217
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 10,
+            "p50": 24.99773390449991,
+            "p95_nearest_rank": 32.02520648599602,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 12,
+          "format_gate": "UNMET"
+        },
+        {
+          "samples": 132,
+          "tool_samples": 84,
+          "native_calls": 26,
+          "json_valid": 26,
+          "schema_valid": 26,
+          "registry_valid": 26,
+          "tool_expected_behavior": 19,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 7,
+          "cohort": "combined",
+          "expected_calls": 100,
+          "actual_native_calls_in_tool_requests": 34,
+          "contextual_persona_pass": 6,
+          "no_call_pass": 48,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 48.428712959674606,
+            "memory": 566.18359375,
+            "memory_kind": "PSS",
+            "mlx_memory": null,
+            "memory_percent": 14.432888061299174
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 1860.760786169063,
+            "sample_count": 7085,
+            "minimum_host_mem_available_bytes": 2844729344,
+            "host_swap_in_delta_bytes_sum": 12288,
+            "host_swap_out_delta_bytes_sum": 0,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 132,
+              "p50": 5.5985520135000115,
+              "p95_nearest_rank": 9.080526720004855
+            },
+            "wall_seconds": {
+              "n": 132,
+              "p50": 10.711608807498123,
+              "p95_nearest_rank": 25.168518357997527
+            },
+            "prompt_tokens": {
+              "n": 132,
+              "p50": 920.0,
+              "p95_nearest_rank": 930
+            },
+            "evaluated_prefill_tokens": {
+              "n": 132,
+              "p50": 18.0,
+              "p95_nearest_rank": 33
+            },
+            "output_tokens": {
+              "n": 132,
+              "p50": 16.5,
+              "p95_nearest_rank": 46
+            },
+            "prefill_tokens_per_second": {
+              "n": 132,
+              "p50": 3.930228475687408,
+              "p95_nearest_rank": 3.98079380724968
+            },
+            "decode_tokens_per_second": {
+              "n": 132,
+              "p50": 2.6683366642672692,
+              "p95_nearest_rank": 2.679463785707204
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 84,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 84,
+                  "p50": 4.618296236498281,
+                  "p95_nearest_rank": 10.077066065001418
+                },
+                "wall_seconds": {
+                  "n_measured": 84,
+                  "p50": 9.963538726507977,
+                  "p95_nearest_rank": 25.35162636899622
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 7.08097091899981,
+                  "p95_nearest_rank": 8.332305117000942
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 16.941443602496292,
+                  "p95_nearest_rank": 25.168518357997527
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 3.3597832140076207,
+                  "p95_nearest_rank": 5.332017166001606
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 6.416581799996493,
+                  "p95_nearest_rank": 10.528481197994552
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 26,
+            "p50": 13.214327842004423,
+            "p95_nearest_rank": 28.352232179997372,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 84,
+          "format_gate": "UNMET"
+        }
+      ]
+    },
+    {
+      "run_id": "final14-board-selected",
+      "candidate": {
+        "model": "Qwen/Qwen3-0.6B",
+        "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-selected9-768-v3-q4_k_m.gguf",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "parameter_count": 596049920,
+        "parameter_count_stored": 596049920,
+        "precision": "Q4_K_M",
+        "artifact_format": "GGUF",
+        "backend": "ARM CPU",
+        "context_tokens": 2048,
+        "kv_type": "q8_0 K and V",
+        "lineage": "selected v3 adapter -> merged -> F16 -> Q4_K_M",
+        "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+        "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+        "device": "Orange Pi 3B RK3566 / ARM CPU",
+        "artifact_sha256": "6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5",
+        "actual_runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "ARM CPU",
+          "network": "direct"
+        }
+      },
+      "cohorts": [
+        {
+          "samples": 120,
+          "tool_samples": 72,
+          "native_calls": 72,
+          "json_valid": 72,
+          "schema_valid": 72,
+          "registry_valid": 72,
+          "tool_expected_behavior": 65,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 22,
+          "cohort": "original-holdout",
+          "expected_calls": 72,
+          "actual_native_calls_in_tool_requests": 72,
+          "contextual_persona_pass": 21,
+          "no_call_pass": 38,
+          "persona_unintended_tool_requests": 10,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 45.97896620016652,
+            "memory": 566.341796875,
+            "memory_kind": "PSS",
+            "mlx_memory": null,
+            "memory_percent": 14.436920901563846
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 1738.6265200479975,
+            "sample_count": 6709,
+            "minimum_host_mem_available_bytes": 2851401728,
+            "host_swap_in_delta_bytes_sum": 4096,
+            "host_swap_out_delta_bytes_sum": 0,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 120,
+              "p50": 7.204672474494146,
+              "p95_nearest_rank": 10.078955022006994
+            },
+            "wall_seconds": {
+              "n": 120,
+              "p50": 10.525174957998388,
+              "p95_nearest_rank": 23.868140150996624
+            },
+            "prompt_tokens": {
+              "n": 120,
+              "p50": 920.0,
+              "p95_nearest_rank": 927
+            },
+            "evaluated_prefill_tokens": {
+              "n": 120,
+              "p50": 18.0,
+              "p95_nearest_rank": 32
+            },
+            "output_tokens": {
+              "n": 120,
+              "p50": 16.0,
+              "p95_nearest_rank": 42
+            },
+            "prefill_tokens_per_second": {
+              "n": 120,
+              "p50": 3.9128776074416454,
+              "p95_nearest_rank": 3.9955580810019486
+            },
+            "decode_tokens_per_second": {
+              "n": 120,
+              "p50": 2.6520149324509514,
+              "p95_nearest_rank": 2.6635892148786673
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 72,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 72,
+                  "p50": 7.266198792000068,
+                  "p95_nearest_rank": 8.640843108005356
+                },
+                "wall_seconds": {
+                  "n_measured": 72,
+                  "p50": 9.932355555502,
+                  "p95_nearest_rank": 13.947945988998981
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 7.287909006998234,
+                  "p95_nearest_rank": 10.119433222993393
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 15.510889005505305,
+                  "p95_nearest_rank": 23.992307058986626
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 3.37011582449486,
+                  "p95_nearest_rank": 5.353473780996865
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 6.443503743495967,
+                  "p95_nearest_rank": 7.23369885799184
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 72,
+            "p50": 11.44699641650368,
+            "p95_nearest_rank": 15.424483618000522,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 72,
+          "format_gate": "PASS"
+        },
+        {
+          "samples": 12,
+          "tool_samples": 12,
+          "native_calls": 12,
+          "json_valid": 12,
+          "schema_valid": 12,
+          "registry_valid": 12,
+          "tool_expected_behavior": 7,
+          "persona_samples": 0,
+          "chat_samples": 0,
+          "chat_valid": 0,
+          "auxiliary_persona_rule_pass": 0,
+          "cohort": "supplemental-multicall",
+          "expected_calls": 28,
+          "actual_native_calls_in_tool_requests": 26,
+          "contextual_persona_pass": 0,
+          "no_call_pass": 0,
+          "persona_unintended_tool_requests": 0,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "NOT_APPLICABLE",
+          "chat_gate": "NOT_APPLICABLE",
+          "resources": {
+            "cpu": 46.38878825135175,
+            "memory": 600.302734375,
+            "memory_kind": "PSS",
+            "mlx_memory": null,
+            "memory_percent": 15.302637278380491
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 286.3137947909854,
+            "sample_count": 1088,
+            "minimum_host_mem_available_bytes": 2816733184,
+            "host_swap_in_delta_bytes_sum": 4096,
+            "host_swap_out_delta_bytes_sum": 0,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 12,
+              "p50": 9.538765245000832,
+              "p95_nearest_rank": 13.168545713007916
+            },
+            "wall_seconds": {
+              "n": 12,
+              "p50": 24.15057465800055,
+              "p95_nearest_rank": 30.59958660999837
+            },
+            "prompt_tokens": {
+              "n": 12,
+              "p50": 923.5,
+              "p95_nearest_rank": 937
+            },
+            "evaluated_prefill_tokens": {
+              "n": 12,
+              "p50": 25.0,
+              "p95_nearest_rank": 39
+            },
+            "output_tokens": {
+              "n": 12,
+              "p50": 47.0,
+              "p95_nearest_rank": 63
+            },
+            "prefill_tokens_per_second": {
+              "n": 12,
+              "p50": 3.9643049304507905,
+              "p95_nearest_rank": 3.9892881913080247
+            },
+            "decode_tokens_per_second": {
+              "n": 12,
+              "p50": 2.6351877679383815,
+              "p95_nearest_rank": 2.6566662663956158
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 9.538765245000832,
+                  "p95_nearest_rank": 13.168545713007916
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 24.15057465800055,
+                  "p95_nearest_rank": 30.59958660999837
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 0,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                },
+                "wall_seconds": {
+                  "n_measured": 0,
+                  "p50": null,
+                  "p95_nearest_rank": null
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 12,
+            "p50": 25.638059036500636,
+            "p95_nearest_rank": 32.10675942899252,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 12,
+          "format_gate": "PASS"
+        },
+        {
+          "samples": 132,
+          "tool_samples": 84,
+          "native_calls": 84,
+          "json_valid": 84,
+          "schema_valid": 84,
+          "registry_valid": 84,
+          "tool_expected_behavior": 72,
+          "persona_samples": 36,
+          "chat_samples": 12,
+          "chat_valid": 12,
+          "auxiliary_persona_rule_pass": 22,
+          "cohort": "combined",
+          "expected_calls": 100,
+          "actual_native_calls_in_tool_requests": 98,
+          "contextual_persona_pass": 21,
+          "no_call_pass": 38,
+          "persona_unintended_tool_requests": 10,
+          "chat_unintended_tool_requests": 0,
+          "persona_gate": "UNMET",
+          "chat_gate": "PASS",
+          "resources": {
+            "cpu": 46.036912454584,
+            "memory": 600.302734375,
+            "memory_kind": "PSS",
+            "mlx_memory": null,
+            "memory_percent": 15.302637278380491
+          },
+          "resource_window": {
+            "inference_and_pure_intake_seconds": 2024.9403148389829,
+            "sample_count": 7797,
+            "minimum_host_mem_available_bytes": 2816733184,
+            "host_swap_in_delta_bytes_sum": 8192,
+            "host_swap_out_delta_bytes_sum": 0,
+            "scope": "per-case windows only; host swap system-wide, not model attributable"
+          },
+          "timing": {
+            "ttft_seconds": {
+              "n": 132,
+              "p50": 7.277954829500231,
+              "p95_nearest_rank": 10.104772767008399
+            },
+            "wall_seconds": {
+              "n": 132,
+              "p50": 10.983333666998078,
+              "p95_nearest_rank": 24.660664050999912
+            },
+            "prompt_tokens": {
+              "n": 132,
+              "p50": 920.0,
+              "p95_nearest_rank": 930
+            },
+            "evaluated_prefill_tokens": {
+              "n": 132,
+              "p50": 18.0,
+              "p95_nearest_rank": 33
+            },
+            "output_tokens": {
+              "n": 132,
+              "p50": 16.0,
+              "p95_nearest_rank": 46
+            },
+            "prefill_tokens_per_second": {
+              "n": 132,
+              "p50": 3.9173819813315505,
+              "p95_nearest_rank": 3.9955580810019486
+            },
+            "decode_tokens_per_second": {
+              "n": 132,
+              "p50": 2.6510082802423196,
+              "p95_nearest_rank": 2.6635892148786673
+            }
+          },
+          "response_latency_by_kind": {
+            "tool": {
+              "requests": 84,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 84,
+                  "p50": 7.405520633496053,
+                  "p95_nearest_rank": 10.062485670001479
+                },
+                "wall_seconds": {
+                  "n_measured": 84,
+                  "p50": 10.04681079150032,
+                  "p95_nearest_rank": 25.827495801000623
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "persona": {
+              "requests": 36,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 36,
+                  "p50": 7.287909006998234,
+                  "p95_nearest_rank": 10.119433222993393
+                },
+                "wall_seconds": {
+                  "n_measured": 36,
+                  "p50": 15.510889005505305,
+                  "p95_nearest_rank": 23.992307058986626
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            },
+            "chat": {
+              "requests": 12,
+              "metrics": {
+                "ttft_seconds": {
+                  "n_measured": 12,
+                  "p50": 3.37011582449486,
+                  "p95_nearest_rank": 5.353473780996865
+                },
+                "wall_seconds": {
+                  "n_measured": 12,
+                  "p50": 6.443503743495967,
+                  "p95_nearest_rank": 7.23369885799184
+                }
+              },
+              "scope": "response wait includes invalid/misrouted output; not accepted text or valid-tool latency"
+            }
+          },
+          "valid_call_latency": {
+            "n": 84,
+            "p50": 11.57132572800765,
+            "p95_nearest_rank": 27.33078689299873,
+            "boundary": "request through complete native JSON/Schema/Registry; semantics separate"
+          },
+          "completed_tool_requests": 84,
+          "format_gate": "PASS"
+        }
+      ]
+    }
+  ],
+  "reviewer": "assistant GPT-6 Codex",
+  "human_review": false,
+  "percentile_method": "nearest rank; single synthetic suite, not stable tail estimate"
+}

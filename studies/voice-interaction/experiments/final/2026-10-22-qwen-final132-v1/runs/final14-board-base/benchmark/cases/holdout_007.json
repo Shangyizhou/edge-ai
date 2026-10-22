@@ -1,0 +1,97 @@
+{
+  "id": "holdout_007",
+  "user": "新的调试步骤要求将音量设为0，请处理。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 0
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "新的调试步骤要求将音量设为0，请处理。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请提供您需要设置音量的具体数值，以便正确处理。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 10.069142382999416,
+    "ttft_seconds": 4.768037475994788,
+    "prompt_tokens": 920,
+    "evaluated_prefill_tokens": 18,
+    "native_usage": {
+      "completion_tokens": 15,
+      "prompt_tokens": 920,
+      "total_tokens": 935,
+      "prompt_tokens_details": {
+        "cached_tokens": 902
+      }
+    },
+    "native_timings": {
+      "cache_n": 902,
+      "prompt_n": 18,
+      "prompt_ms": 4738.277,
+      "prompt_per_token_ms": 263.2376111111111,
+      "prompt_per_second": 3.7988492441450763,
+      "predicted_n": 15,
+      "predicted_ms": 5300.661,
+      "predicted_per_token_ms": 378.61864285714285,
+      "predicted_per_second": 2.641180033961802
+    },
+    "cache_prompt": true,
+    "output_tokens": 15,
+    "prefill_seconds": 4.738277,
+    "decode_seconds": 5.300661,
+    "prefill_tokens_per_second": 3.7988492441450763,
+    "decode_tokens_per_second": 2.641180033961802,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请提供您需要设置音量的具体数值，以便正确处理。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 38,
+    "wall_seconds": 10.131115872005466,
+    "cpu_seconds": 19.789999999999964,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 48.834699578069554,
+    "peak_rss_bytes": 594006016,
+    "peak_pss_bytes": 593371136,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2866077696,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

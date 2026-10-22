@@ -40,7 +40,9 @@ def summarize_final(results, suite, review):
     output = []
     for result in results:
         actual = [(c["id"], c["user"], c["expected"]) for c in result["cases"]]
-        if actual != expected:
+        if actual != expected or any(
+            c["kind"] != c["expected"]["kind"] for c in result["cases"]
+        ):
             raise ValueError("incomplete or changed final cohort")
         groups = []
         for cohort in (
@@ -54,6 +56,7 @@ def summarize_final(results, suite, review):
                 if cohort == "combined" or cohorts[c["id"]] == cohort
             ]
             group = summarize(cases)
+            group["auxiliary_persona_rule_pass"] = group.pop("persona_valid")
             group["cohort"] = cohort
             group["expected_calls"] = sum(
                 len(c["expected"].get("calls", [])) for c in cases
@@ -280,6 +283,9 @@ def render(document):
     def js(value):
         return e(json.dumps(value, ensure_ascii=False, indent=2))
 
+    def valid_wait(value):
+        return "无有效结果" if value is None else number(value) + "s"
+
     sections = [
         ("summary", "结论"),
         ("baseline", "未微调基线"),
@@ -306,7 +312,7 @@ def render(document):
         "<p>120封存样本 + 独立12多调用；每模型设备132例，共528次最终请求。"
         '原始分组保留，无设备执行。</p></header><section id="summary"><h2>结论与候选</h2>',
         '<p class="method">Q4与精简路由提示由验证集预选。最终结果不用于改提示、训练或选择精度。'
-        "工具格式与语义、角色审核、生产集成分别判断。采样对象是实际模型server及其递归子进程；CPU为整机逻辑核容量占比，内存为采样峰值。Registry/client进程CPU不包含在server树，窗口包含等待纯校验。</p>",
+        "工具格式与语义、角色审核、生产集成分别判断。采样对象是实际模型server及其递归子进程；CPU为整机逻辑核容量占比，内存为采样峰值。Registry/client进程CPU不包含在server树；表中是逐例推理/纯校验等待窗，加载另列原始审计。</p>",
         '<aside class="finding">' + e(document["conclusion"]) + "</aside>",
         '<div class="scroll"><table><tr><th>候选部署方案</th><th>最终能力 / 分母</th>'
         "<th>CPU / 内存 / RAM</th><th>格式门槛</th></tr>",
@@ -341,6 +347,13 @@ def render(document):
     out.append(
         "</table></div><p>角色为Codex assistant逐项上下文审核，未作人工验收。"
         "Mac RSS与Linux PSS口径不同；CPU不代表GPU利用率。无共跑或整链路等待结论。</p></section>"
+    )
+    out.append(
+        "<section><h2>验收边界</h2><p>产品等待与内存阈值未由用户确认；"
+        "历史PSS≤1.3GiB、共跑余量≥512MiB只是研究建议。实测资源在上表，"
+        "没有据此声明共跑或产品达标。</p><details><summary>工具、角色、聊天与资源门槛</summary><pre>"
+        + js(document.get("acceptance_boundary", {}))
+        + "</pre></details></section>"
     )
     for ident, title in sections[1:5]:
         stage = document["stages"][ident]
@@ -466,6 +479,18 @@ def render(document):
             None,
         )
         if audit:
+            overall = audit["overall_sampled_model_peak"]
+            out.append(
+                "<p>加载与逐例窗口合并取最大采样内存："
+                + e(overall["kind"])
+                + " "
+                + number(
+                    overall["bytes"] / 1048576
+                    if overall["bytes"] is not None
+                    else None
+                )
+                + " MiB；两类窗口未混算CPU或推理吞吐，采样峰值不是kernel高水位。</p>"
+            )
             first = audit["cold_prefix_first_case"]
             sampling = audit["actual_sampling_intervals_seconds"]
             out.append(
@@ -475,7 +500,7 @@ def render(document):
                 )
                 + "；TTFT/完整响应/有效工具 s "
                 + e(
-                    f"{number(first['ttft_seconds'])}/{number(first['complete_response_seconds'])}/{number(first['valid_call_seconds'])}"
+                    f"{number(first['ttft_seconds'])}/{number(first['complete_response_seconds'])}/{valid_wait(first['valid_call_seconds'])}"
                 )
                 + "。实际采样间隔中位 s "
                 + number(sampling["median"])
@@ -530,7 +555,7 @@ def render(document):
                 )
                 + '</p><p class="foot">'
                 + e(
-                    f"TTFT {number(raw.get('ttft_seconds'))}s；完整 {number(raw.get('wall_seconds'))}s；原始校验调用 {number(c.get('valid_call_seconds'))}s（类别/意图另判）；full/evaluated/output {raw.get('prompt_tokens')}/{raw.get('evaluated_prefill_tokens')}/{raw.get('output_tokens')}"
+                    f"TTFT {number(raw.get('ttft_seconds'))}s；完整 {number(raw.get('wall_seconds'))}s；原始校验调用 {valid_wait(c.get('valid_call_seconds'))}（类别/意图另判）；full/evaluated/output {raw.get('prompt_tokens')}/{raw.get('evaluated_prefill_tokens')}/{raw.get('output_tokens')}"
                 )
                 + "</p></div>"
             )

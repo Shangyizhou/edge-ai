@@ -98,12 +98,14 @@ class FinalAccountingTests(unittest.TestCase):
 
     def test_omitted_case_or_changed_target_rejected(self):
         r, s, v = self.fixture()
-        for mutation in ("omit", "target"):
+        for mutation in ("omit", "target", "kind"):
             changed = copy.deepcopy(r)
             if mutation == "omit":
                 changed["cases"].pop()
-            else:
+            elif mutation == "target":
                 changed["cases"][0]["expected"]["calls"] = []
+            else:
+                changed["cases"][0]["kind"] = "chat"
             with self.assertRaisesRegex(ValueError, "cohort"):
                 summarize_final([changed], s, v)
 

@@ -1,0 +1,153 @@
+{
+  "id": "final_multi_02",
+  "user": "先让音量变成23，再播放《晨星拾遗》。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 23
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "晨星拾遗"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "先让音量变成23，再播放《晨星拾遗》。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "arguments": "{\"level\": 23}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"晨星拾遗\"}"
+        }
+      }
+    ],
+    "wall_seconds": 0.6514727920293808,
+    "ttft_seconds": 0.3502769999904558,
+    "prompt_tokens": 924,
+    "evaluated_prefill_tokens": 924,
+    "native_usage": {
+      "completion_tokens": 45,
+      "prompt_tokens": 924,
+      "total_tokens": 969,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 924,
+      "prompt_ms": 283.296,
+      "prompt_per_token_ms": 0.3065974025974026,
+      "prompt_per_second": 3261.606235174517,
+      "predicted_n": 45,
+      "predicted_ms": 355.62,
+      "predicted_per_token_ms": 8.082272727272727,
+      "predicted_per_second": 123.72757437714414
+    },
+    "cache_prompt": false,
+    "output_tokens": 45,
+    "prefill_seconds": 0.283296,
+    "decode_seconds": 0.35562,
+    "prefill_tokens_per_second": 3261.606235174517,
+    "decode_tokens_per_second": 123.72757437714414,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 23
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "晨星拾遗"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 23
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "晨星拾遗"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.839027541980613,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 3629,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.8488911250024103,
+    "cpu_seconds": 0.6805386240000004,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 8.016795133746605,
+    "peak_rss_bytes": 1438220288,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2480570368,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 7094272,
+    "host_swap_out_delta_bytes": 131072,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

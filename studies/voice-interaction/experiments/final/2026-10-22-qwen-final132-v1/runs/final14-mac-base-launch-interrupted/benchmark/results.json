@@ -1,0 +1,381 @@
+{
+  "schema": "edge-model-benchmark/result-v1",
+  "run_id": "final14-mac-base",
+  "source": {
+    "kind": "device_measurement",
+    "raw_evidence": "cases/ and events/ within this run"
+  },
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 596049920,
+    "precision": "Q4_K_M",
+    "artifact_format": "GGUF",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "f16 K and V",
+    "lineage": "official same revision -> tiedweight dedup -> F16 -> Q4_K_M",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+    "artifact_sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab",
+    "device": "Mac M5 / Metal",
+    "actual_runtime": {
+      "name": "llama.cpp",
+      "version": "e3797b184d428c7a019362612b76971f60af6670",
+      "backend": "Metal",
+      "network": "direct"
+    }
+  },
+  "stage": "independent final132; no selection or retuning",
+  "request_sha256": "02ab8c83136dcb13e220460a9243f3bf56dc3ad784606e58c529c655f7d3a0d8",
+  "suite_sha256": "56d0cdea8a95f959c7edb775c3d340d86b42eb51ebac1c3f17b4097d41b823ec",
+  "artifacts": {
+    "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+    "total_bytes": 396705024,
+    "files": [
+      {
+        "name": "qwen3-base-q4_k_m.gguf",
+        "bytes": 396705024,
+        "sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab"
+      }
+    ]
+  },
+  "environment": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10
+  },
+  "loading": {
+    "wall_seconds": 0.020052542036864907,
+    "resources": {
+      "scope": "declared process and recursive children",
+      "pid": 2383,
+      "sampling_interval_seconds": 0.2,
+      "sample_count": 2,
+      "wall_seconds": 0.013386209029704332,
+      "cpu_seconds": 1.0863999999943807e-05,
+      "host_logical_cpus": 10,
+      "cpu_capacity_percent": 0.008115815296053064,
+      "peak_rss_bytes": 1429618688,
+      "peak_pss_bytes": null,
+      "host_mem_total_bytes": 17179869184,
+      "minimum_host_mem_available_bytes": 2309865472,
+      "host_swap_delta_bytes": 0,
+      "host_swap_in_delta_bytes": 0,
+      "host_swap_out_delta_bytes": 0,
+      "swap_scope": "system-wide counters; not model-only",
+      "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+    }
+  },
+  "measurement": {
+    "resources": "per-case sampled process tree",
+    "cache": "new MLX prompt cache per case / llama cache_prompt=false",
+    "timing": "request to complete response; valid-call latency only if native+schema pass",
+    "sampling_interval_seconds": 0.2,
+    "quality_scope": "frozen deterministic fixture rules; no hardware execution or product acceptance"
+  },
+  "cases": [
+    {
+      "id": "holdout_000",
+      "user": "新的调试步骤要求视觉传感器开始采集，请处理。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "新的调试步骤要求视觉传感器开始采集，请处理。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请确认视觉传感器是否已准备好开始采集。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.26743304199771956,
+        "ttft_seconds": 0.2092328339931555,
+        "prompt_tokens": 918,
+        "evaluated_prefill_tokens": 918,
+        "native_usage": {
+          "completion_tokens": 11,
+          "prompt_tokens": 918,
+          "total_tokens": 929,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 918,
+          "prompt_ms": 197.062,
+          "prompt_per_token_ms": 0.2146644880174292,
+          "prompt_per_second": 4658.432371537891,
+          "predicted_n": 11,
+          "predicted_ms": 65.354,
+          "predicted_per_token_ms": 6.5354,
+          "predicted_per_second": 153.01282247452338
+        },
+        "cache_prompt": false,
+        "output_tokens": 11,
+        "prefill_seconds": 0.19706200000000001,
+        "decode_seconds": 0.065354,
+        "prefill_tokens_per_second": 4658.432371537891,
+        "decode_tokens_per_second": 153.01282247452338,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请确认视觉传感器是否已准备好开始采集。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 2383,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.2771247089840472,
+        "cpu_seconds": 0.16491121600000003,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.95079437718032,
+        "peak_rss_bytes": 1450868736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2309914624,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "holdout_001",
+      "user": "新的调试步骤要求视觉传感器暂缓采集，请处理。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "新的调试步骤要求视觉传感器暂缓采集，请处理。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请确认新的调试步骤要求视觉传感器暂缓采集，以便进行后续调试。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.40532775002066046,
+        "ttft_seconds": 0.27723670803243294,
+        "prompt_tokens": 918,
+        "evaluated_prefill_tokens": 918,
+        "native_usage": {
+          "completion_tokens": 17,
+          "prompt_tokens": 918,
+          "total_tokens": 935,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 918,
+          "prompt_ms": 273.411,
+          "prompt_per_token_ms": 0.29783333333333334,
+          "prompt_per_second": 3357.5825405707888,
+          "predicted_n": 17,
+          "predicted_ms": 127.973,
+          "predicted_per_token_ms": 7.9983125,
+          "predicted_per_second": 125.02637275050206
+        },
+        "cache_prompt": false,
+        "output_tokens": 17,
+        "prefill_seconds": 0.273411,
+        "decode_seconds": 0.127973,
+        "prefill_tokens_per_second": 3357.5825405707888,
+        "decode_tokens_per_second": 125.02637275050206,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请确认新的调试步骤要求视觉传感器暂缓采集，以便进行后续调试。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 2383,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.4176119589828886,
+        "cpu_seconds": 0.27295035199999995,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.535980259396354,
+        "peak_rss_bytes": 1450983424,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2309914624,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "holdout_002",
+      "user": "新的调试步骤要求让激光雷达融合工作，请处理。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "新的调试步骤要求让激光雷达融合工作，请处理。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请确认激光雷达融合工作是否需要开启或关闭。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5734935830114409,
+        "ttft_seconds": 0.4099545000353828,
+        "prompt_tokens": 919,
+        "evaluated_prefill_tokens": 919,
+        "native_usage": {
+          "completion_tokens": 13,
+          "prompt_tokens": 919,
+          "total_tokens": 932,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 919,
+          "prompt_ms": 404.452,
+          "prompt_per_token_ms": 0.4401001088139282,
+          "prompt_per_second": 2272.2102993680337,
+          "predicted_n": 13,
+          "predicted_ms": 163.465,
+          "predicted_per_token_ms": 13.622083333333334,
+          "predicted_per_second": 73.4102101367265
+        },
+        "cache_prompt": false,
+        "output_tokens": 13,
+        "prefill_seconds": 0.404452,
+        "decode_seconds": 0.163465,
+        "prefill_tokens_per_second": 2272.2102993680337,
+        "decode_tokens_per_second": 73.4102101367265,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请确认激光雷达融合工作是否需要开启或关闭。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 2383,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5847765000071377,
+        "cpu_seconds": 0.40231740800000004,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.879849104659463,
+        "peak_rss_bytes": 1451032576,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2282291200,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 42975232,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  ],
+  "summary": {
+    "samples": 3,
+    "tool_samples": 3,
+    "native_calls": 0,
+    "json_valid": 0,
+    "schema_valid": 0,
+    "registry_valid": 0,
+    "tool_expected_behavior": 0,
+    "persona_samples": 0,
+    "persona_valid": 0,
+    "chat_samples": 0,
+    "chat_valid": 0
+  }
+}
