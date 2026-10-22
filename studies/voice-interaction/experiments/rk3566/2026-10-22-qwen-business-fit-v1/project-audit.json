@@ -1,0 +1,17 @@
+{
+  "question": "Can the selected official Qwen2.5-0.5B-Instruct Q4_K_M understand the current ros-robot prompt and business functions?",
+  "project": "/home/orangepi/code/ros-robot",
+  "project_commit": "23ef814cfb0a8c174b42b288454c30d5498e88d0",
+  "model_identity_difference": "Project offline.json names qwen3-robot-q8_0.gguf; selected official Qwen2.5 Q4_K_M is a different model and has no inherited compatibility evidence.",
+  "online_contract": "Natural-language content or actual native tool_calls; online_system_prompt.txt carries detailed action, negation, clarification, order and state-query rules.",
+  "offline_contract": "LocalModel emits fc/res JSON with string calls; _parse_legacy_reply normalizes to ToolCall; ActionRegistry validates the complete returned batch before a separate executor invokes handlers.",
+  "offline_template_difference": "Existing System/Human/Assistant envelope belongs to the trained-model compatibility path; this experiment explicitly adapts only that envelope to official Qwen2.5 ChatML.",
+  "offline_policy_difference": "LocalModel._prompt does not load the full online_system_prompt.txt. Its format instructions and tool schemas cannot be assumed to enforce all online business policy.",
+  "registry_assembly": "create_default_actions().registry plus register_perception(PerceptionActions(None)); schemas only; no perception interface or action handler invoked.",
+  "full_tool_count": 60,
+  "diagnostic_tool_count": 6,
+  "diagnostic_tools": ["play_music", "volume_set", "start_following", "enable_tracking", "enable_lidar", "disable_lidar"],
+  "generation_scope": "Three fixed inputs and unmodified schemas for the six tools; not a full-catalog benchmark or production integration.",
+  "validation_layers": ["Complete JSON/protocol parse", "Actual ActionRegistry argument binding, no invoke", "Exact expected tool names, arguments and order"],
+  "not_covered": ["Full 60-tool selection accuracy", "All missing-argument clarifications", "Repeated calls", "Multi-turn conversation and memory", "Device/current-state query grounding", "Post-action feedback", "ROS Action transport", "Actual device execution", "Production latency acceptance"]
+}

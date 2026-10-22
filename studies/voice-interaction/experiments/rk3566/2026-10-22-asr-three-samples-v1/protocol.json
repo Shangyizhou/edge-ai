@@ -1,0 +1,28 @@
+{
+  "id": "rk3566-voice-screen-v2",
+  "purpose": "Three voiced inputs per precision/pacing; same frozen runtime and metrics; new independent experiment",
+  "rounds": 1,
+  "fixture_ids": [
+    "command",
+    "fleurs-1805-1",
+    "fleurs-1965-2"
+  ],
+  "precision": [
+    "mixed_int8",
+    "fp32"
+  ],
+  "scenarios": [
+    "throughput",
+    "realtime"
+  ],
+  "per_case_timeout_s": 90,
+  "total_budget_s": 600,
+  "threads": 2,
+  "product_thresholds": "NOT_CONFIRMED",
+  "command_review": {
+    "source": "user conversation 2026-10-22",
+    "status": "user_confirmed_correct",
+    "transcript": "机器人请让底盘上前移动二十厘米",
+    "note": "user confirms previous INT8 and FP32 outputs; not retroactively inserted as independent reference for CER"
+  }
+}

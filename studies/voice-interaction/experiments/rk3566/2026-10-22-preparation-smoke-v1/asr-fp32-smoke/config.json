@@ -1,0 +1,41 @@
+{
+  "threads": 2,
+  "protocol_id": "rk3566-voice-screen-v2",
+  "min_memavailable_mib": 600,
+  "max_as_mib": 3072,
+  "id": "asr-fp32-smoke",
+  "kind": "command",
+  "model": "/home/orangepi/models/edge-voice-v2/asr-zh14m",
+  "timeout": 180,
+  "fixtures": "/home/orangepi/code/edge-ai/studies/voice-interaction/research/2026-10-22-runtime-preparation/asr-fixtures.json",
+  "fixture_ids": [
+    "command",
+    "fleurs-1805-1",
+    "silence1"
+  ],
+  "tokens": "/home/orangepi/models/edge-voice-v2/asr-zh14m/tokens.txt",
+  "encoder": "/home/orangepi/models/edge-voice-v2/asr-zh14m/encoder-epoch-99-avg-1.onnx",
+  "decoder": "/home/orangepi/models/edge-voice-v2/asr-zh14m/decoder-epoch-99-avg-1.onnx",
+  "joiner": "/home/orangepi/models/edge-voice-v2/asr-zh14m/joiner-epoch-99-avg-1.onnx",
+  "realtime": false,
+  "tail_seconds": 3.2,
+  "module": "asr",
+  "candidate": "asr-zh14m-fp32-control",
+  "input": {
+    "id": "fleurs-1805-1",
+    "path": "/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10112798408996336578-pcm16.wav",
+    "sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+    "reference": {
+      "text": "Scotturb 403 路公共汽车定期发车前往辛特拉 (Sintra)，在罗卡角停靠。",
+      "kind": "dataset_transcript",
+      "source": "https://huggingface.co/datasets/google/fleurs",
+      "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+    }
+  },
+  "command": [
+    "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/smoke.py",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/asr-fp32-input-config.json",
+    "{output}"
+  ]
+}

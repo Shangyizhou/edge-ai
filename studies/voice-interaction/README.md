@@ -1,43 +1,32 @@
-# 机器人本地语音：现在怎么选，下一步做什么
+# 机器人本地语音 · 当前 skill 流程
 
-更直观的阅读入口：[研究看板](https://shangyizhou.github.io/edge-ai/) · [方案与选型](https://shangyizhou.github.io/edge-ai/solutions.html) · [测试与对比](https://shangyizhou.github.io/edge-ai/models.html) · [机器人中的表现](https://shangyizhou.github.io/edge-ai/integration.html)。
+更新：2026-10-22。Orange Pi 3B / RK3566 / 标称4GB，实际MemTotal约3.83GiB。目标是本地“听懂 → 回答 → 合成 → 播放”，后续再验证机器人共跑。
 
-第一次接触这些概念，先读[大白话入门与SOP](learn.md)；量化过程单独见[量化与转换](quantization.md)，准备实际接入见[部署交接说明](deployment-guide.md)。
+当前入口只保留按skill重新选型后的流程。旧实验和旧结论已[仓库外归档](../../archives/README.md)，不作为当前推荐依据。
 
-更新：2026-10-21。目标设备：Orange Pi 3B / RK3566 / 标称4GB内存。
+## 当前结论
 
-我们要让机器人在本地完成“听懂 → 思考 → 说话”，同时为视觉检测留出资源。**ASR节点已接入验证，完整语音交互尚未验收。**
-
-## 当前建议
-
-| 部分 | 现在怎么做 | 为什么 |
+| 部分 | 已确认什么 | 尚未确认什么 |
 | --- | --- | --- |
-| ASR | 暂时沿用已验证的FP16 NPU配置 | 已有ROS接入证据；是否比CPU更合适，仍缺同精度公平对照 |
-| ASR量化 | 当前INT8候选不用 | 只有joiner量化成功，识别明显退化 |
-| LLM、TTS | 保留现有CPU候选，暂不定最终组合 | 已有单模块短测，实际对话和完整听说体验待验证 |
+| ASR zh14M混合INT8 / FP32 | 同3条有声材料真实运行；机器人指令输出与用户确认文本一致。实时INT8 CPU26.05%、PSS115.28MiB；FP32 CPU29.47%、PSS158.69MiB | 两条公开参考子集CER均45.45%；不代表整体识别率或完整交互达标 |
+| Qwen2.5-0.5B Q4_K_M | 通用6任务检查5/6；另外6工具的fc/res兼容路径诊断0/3 | 0/3只覆盖兼容路径，不能外推当前ros-robot原生tool_calls；原生调用未测 |
+| Melo zh_en FP32 | 原4条文本均生成有效WAV，整句PCM就绪约18.9–25.8秒 | 尚未试听评审，发音/自然度与实际扬声器等待未知 |
 
-这里“沿用”指继续验证现有集成，不是已经证明NPU是最优后端。[选型依据与缺口](models.md)
+ASR资源只取本轮3条有声输入的实时推理窗，CPU为被测进程树占整机4核容量、PSS为200ms采样峰值。各模块独立运行，不相加推算共跑。[模型详情](models.md)列出精度、框架、后端与证据。
 
-## 三个关键观察
+## 当前保留的流程
 
-| 观察 | 已有数据 | 能说明什么 |
-| --- | --- | --- |
-| ASR资源取舍 | CPU/NPU方案占整机CPU容量约29%/5%，峰值PSS约128/215 MiB | 不同精度部署方案的三轮中位数；不能归因为纯后端收益。[完整对照](models.md#asr听懂说了什么) |
-| INT8识别退化 | 两条独立音频CER由27.27%升至87.88% | 仅joiner量化的混合方案当前不采用。[量化尝试](experiments/rk3566/2026-10-21-asr-int8-ptq/results.md) |
-| ASR与视觉共跑 | 640×352、30fps，45秒回放完成1350/1350帧 | 短回放成立，真实摄像头和长期表现未验证。[组合验证](integration.md) |
+1. [资料选型](research/2026-10-22-local-stack/README.md)：官方来源与候选，忽略旧本地实测。
+2. [冻结准备](research/2026-10-22-runtime-preparation/README.md)：资产与执行配置；早期加载检查不能当作推理通过。
+3. [实际就绪](experiments/rk3566/2026-10-22-preparation-smoke-v1/README.md)：ASR解码、LLM生成、TTS合成均完成最小真实推理。
+4. [单模块初筛](experiments/rk3566/2026-10-22-voice-screening-v2-r1/README.md)、[ASR三条材料对照](experiments/rk3566/2026-10-22-asr-three-samples-v1/README.md)：原始输入/输出、资源、计时与哈希保留。
+5. [业务兼容路径诊断](experiments/rk3566/2026-10-22-qwen-business-fit-v1/README.md)：保存失败证据；当前目标已澄清为原生tool_calls，不沿用该兼容协议训练。
+6. [Qwen3业务LoRA方案](research/2026-10-22-qwen-adaptation/README.md)：工具目录仍传递，训练目标是当前ros-robot业务规则与原生调用。尚未训练。
 
-## 下一步，先抓一件事
+## 下一步
 
-**补齐ASR同源同精度CPU/NPU对照。** 核验权重、实际运算精度和流式配置，再用现有小语料复测；无法匹配则记录具体缺口，不以不同精度替代。[待解决工单 #1](https://github.com/Shangyizhou/edge-ai/issues/1)
+先准备独立Mac训练项目：从ros-robot导出工具定义、来源commit/hash、原生调用训练样例和独立测试集；Mac做小规模LoRA/QLoRA验证，模型合并、转换、量化后回板子测调用正确率与资源。Mac硬件由用户报告，尚未检查依赖或实跑。
 
-之后再扩展LLM/TTS复测，测完整链路各段等待，根据瓶颈决定优化什么。INT8误差定位属于可选支线，不是后续研究的前置条件。
+完整语音交互、ROS/视觉共跑与硬件动作均未验收，不因最小推理或几条成功样例宣称产品通过。[准备计划](plan.md) · [接入边界](integration.md) · [实验索引](experiments/rk3566/README.md)。
 
-## 想了解原因，从这里往下看
-
-| 阅读入口 | 回答什么 | 当前进度 |
-| --- | --- | --- |
-| [准备](plan.md) | 要做成什么、设备与候选、怎样测 | ASR轻量协议已有；完整交互预算待明确 |
-| [单模型对比](models.md) | ASR、LLM、TTS各自测了什么，如何选择 | 已有候选与数据；公平对照及质量证据仍有缺口 |
-| [机器人验证](integration.md) | 共跑、ROS接入和完整体验是否成立 | ASR节点与短时共跑已验证；完整交互未验收 |
-
-只看现状读本页即可；参数、来源与原始记录从详情页继续进入。按批次查数据用[实验索引](experiments/rk3566/README.md)，查看已有图表用[ASR评测页](experiments/rk3566/2026-10-21-asr-lite-v1/evaluation/report.html)或[历史只读视图](comparisons/2026-10-21-legacy-v1/README.md)。
+当前用户认可的报告在临时目录 `/tmp/edge-voice-report-draft/report-mac.html`；它支持Mac离线查看和试听。原实验HTML/JSON未修改；当前展示格式已写入本机edge-model-selection。

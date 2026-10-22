@@ -1,0 +1,3523 @@
+{
+  "decisions": [
+    {
+      "candidate": "ASR zh14M 混合INT8",
+      "disposition": "保留为后续复测候选，先补齐原6条输入中的质量检查",
+      "reason": "本轮非实时两条语音计算RTF中位数0.308、实时推理窗峰值PSS约116MiB；FP32相应约0.371/156MiB。唯一有独立参考的音频两者CER均20/37=54.1%，不能宣称中文质量达标。",
+      "next_experiment": "固定原6条小集复核专名/数字和另一条独立公开转写；质量可接受后再确定三轮复测配置。"
+    },
+    {
+      "candidate": "ASR zh14M FP32",
+      "disposition": "保留质量对照，不作为当前默认资源方案",
+      "reason": "本轮未见独立参考CER改善；计算RTF和PSS高于混合INT8，结论只覆盖两个部署组合，不是CPU/NPU后端收益。",
+      "next_experiment": "与INT8保持同源输入和参数作输出对照，避免只按更快决定质量。"
+    },
+    {
+      "candidate": "LLM Qwen2.5-0.5B Q4_K_M",
+      "disposition": "需要调整或对比后再复测",
+      "reason": "固定6条任务中5条通过文本rubric；无温度传感器仍编造20摄氏度。TTFT中位数8.780秒，可播中文首句中位数11.145秒（5条，JSON任务无中文句号不计）。原生日志prompt处理约7.94–10.75秒，与首内容等待接近；独立根因剖析未做。",
+      "next_experiment": "保留未知事实失败用例，分开验证短提示/前缀缓存等等待假设与另一入围模型的质量；每项更改另建实验，不重复宣称当前已适合交互。"
+    },
+    {
+      "candidate": "TTS Melo zh_en FP32",
+      "disposition": "暂缓按当前配置进入三轮复测，优先调整合成等待",
+      "reason": "4条文本均生成有效PCM16 WAV，但首PCM等待18.85–25.76秒、合成RTF6.23–7.51；这是整句返回，不是流式首包。发音和自然度尚无人试听，不能当作发音合格。",
+      "next_experiment": "先按固定4条文本试听数字/日期/否定句并记录结果，再在独立预算内检查更轻部署或前端/模型耗时；未经复测不推导优化效果。"
+    }
+  ],
+  "listening_page": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/listening.html",
+  "root_cause": "UNKNOWN; no independent operator/system profiling",
+  "schema_version": "edge-voice-screening/1",
+  "protocol_id": "rk3566-voice-screen-v2",
+  "report_kind": "measured_screening",
+  "source_kind": "device_measurement",
+  "rounds": 1,
+  "case_count": 6,
+  "cases": [
+    {
+      "id": "zh14m-int8-fast",
+      "module": "asr",
+      "execution": {
+        "status": "ok",
+        "returncode": 0
+      },
+      "protocol": {
+        "id": "rk3566-voice-screen-v2",
+        "tier": "screening",
+        "round": 1
+      },
+      "candidate": {
+        "precision": "mixed_int8",
+        "backend": "CPU",
+        "threads": 2,
+        "model": "/home/orangepi/models/edge-voice-v2/asr-zh14m"
+      },
+      "phases": {
+        "loading": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 2.871150178005337,
+          "average_cpu_cores": {
+            "value": 1.1373101363520328,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 28.43275340880082,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 103.1708984375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 2.871150178005337,
+              "sample_count": 13,
+              "average_cpu_cores": {
+                "value": 1.1373101363520328,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 28.43275340880082,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 103.1708984375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 108.26171875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.629984416308607,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92413.600553966,
+              "end_monotonic": 92416.471704144
+            }
+          ]
+        },
+        "first_request": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 2.7661335229931865,
+          "average_cpu_cores": {
+            "value": 3.328961615285795,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 83.22404038214486,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.720703125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 2.7661335229931865,
+              "sample_count": 12,
+              "average_cpu_cores": {
+                "value": 3.328961615285795,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 83.22404038214486,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.720703125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 120.88671875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.949898183230355,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92416.478605486,
+              "end_monotonic": 92419.244739009
+            }
+          ]
+        },
+        "warmup": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 2.693168062993209,
+          "average_cpu_cores": {
+            "value": 3.4114082186155312,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 85.28520546538829,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.728515625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 2.693168062993209,
+              "sample_count": 12,
+              "average_cpu_cores": {
+                "value": 3.4114082186155312,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 85.28520546538829,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.728515625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 120.89453125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.9500973358360176,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92419.251467978,
+              "end_monotonic": 92421.944636041
+            }
+          ]
+        },
+        "idle": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.0016701820131857,
+          "average_cpu_cores": {
+            "value": 0.40308561159304945,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 10.077140289826236,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.736328125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.0016701820131857,
+              "sample_count": 15,
+              "average_cpu_cores": {
+                "value": 0.40308561159304945,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 10.077140289826236,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.736328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 120.90234375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.9502964884416807,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92421.946458938,
+              "end_monotonic": 92424.94812912
+            }
+          ]
+        },
+        "inference": {
+          "windows": 3,
+          "cpu_windows_evaluated": 3,
+          "seconds": 5.060424027004046,
+          "average_cpu_cores": {
+            "value": 3.3004974089247363,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 82.5124352231184,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.748046875,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 2.097540717004449,
+              "sample_count": 9,
+              "average_cpu_cores": {
+                "value": 3.177087643325531,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 79.42719108313827,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.736328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 120.90234375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.9502964884416807,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92424.953732268,
+              "end_monotonic": 92427.051272985
+            },
+            {
+              "duration_seconds": 2.1764365709968843,
+              "sample_count": 9,
+              "average_cpu_cores": {
+                "value": 3.511245400282838,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 87.78113500707096,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.744140625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 120.91015625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.9504956410473437,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92427.05740696,
+              "end_monotonic": 92429.233843531
+            },
+            {
+              "duration_seconds": 0.786446739002713,
+              "sample_count": 3,
+              "average_cpu_cores": {
+                "value": 3.0464145606838042,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 76.1603640170951,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.748046875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 120.9140625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.950595217350175,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92429.23861048,
+              "end_monotonic": 92430.025057219
+            }
+          ]
+        }
+      },
+      "unfinished_phases": {},
+      "source": {
+        "result": "asr/zh14m-int8-fast/result.json",
+        "sha256": "32dbf50fa671ceebdb00b9beef8e75405a1c91223c883c2031d1f6b70dd7bd83"
+      },
+      "full_process_resources": {
+        "peak_pss_mib": 116.474609375,
+        "cpu_seconds": 40.82,
+        "wall_seconds": 19.15495845300029,
+        "min_host_available_mib": 2938.5703125
+      },
+      "assessment": {
+        "product_performance": "NOT_ASSESSED",
+        "reason": "no user-confirmed quality/latency/RAM thresholds"
+      },
+      "samples": [
+        {
+          "id": "command",
+          "completed": true,
+          "input_sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+          "reference": null,
+          "transcript": "机器人请让底盘上前移动二十厘米",
+          "expected_silence": false,
+          "compute_rtf": 0.3419904261338912,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "fleurs-1805-1",
+          "completed": true,
+          "input_sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+          "reference": {
+            "text": "Scotturb 403 路公共汽车定期发车前往辛特拉 (Sintra)，在罗卡角停靠。",
+            "kind": "dataset_transcript",
+            "source": "https://huggingface.co/datasets/google/fleurs",
+            "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+          },
+          "transcript": "高特四零三路公交汽车定期发车前往心特拉在罗凯角停靠",
+          "expected_silence": false,
+          "compute_rtf": 0.27428978071056104,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "silence1",
+          "completed": true,
+          "input_sha256": "643f8a8dc8bd9c19225afffad2becfec5426180b3749cb208abdf1a6c8354efc",
+          "reference": null,
+          "transcript": "",
+          "expected_silence": true,
+          "compute_rtf": 0.7550302029267186,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": null,
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "expected_empty"
+        }
+      ],
+      "scenario": "throughput",
+      "quality": {
+        "status": "evaluated_subset",
+        "normalization": "nfkc-casefold-no-punctuation-space-v1",
+        "evaluated_samples": 1,
+        "total_samples": 3,
+        "reference_characters": 37,
+        "character_errors": 20,
+        "cer": 0.5405405405405406,
+        "exact_matches": 0,
+        "samples": [
+          {
+            "case_id": "fleurs-1805-1",
+            "errors": 20,
+            "characters": 37,
+            "exact": false,
+            "output_status": "complete"
+          }
+        ]
+      },
+      "expected_samples": 3,
+      "completed_samples": 3,
+      "aggregate_metrics": {
+        "speech_compute_rtf": {
+          "n": 2,
+          "median": 0.3081401034222261,
+          "min": 0.27428978071056104,
+          "max": 0.3419904261338912,
+          "p95_nearest_rank": 0.3419904261338912,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "first_partial_s": {
+          "n": 0,
+          "median": null,
+          "min": null,
+          "max": null,
+          "p95_nearest_rank": null,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_file_end_s": {
+          "n": 0,
+          "median": null,
+          "min": null,
+          "max": null,
+          "p95_nearest_rank": null,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_energy_anchor_s": {
+          "n": 0,
+          "median": null,
+          "min": null,
+          "max": null,
+          "p95_nearest_rank": null,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        }
+      }
+    },
+    {
+      "id": "zh14m-int8-rt",
+      "module": "asr",
+      "execution": {
+        "status": "ok",
+        "returncode": 0
+      },
+      "protocol": {
+        "id": "rk3566-voice-screen-v2",
+        "tier": "screening",
+        "round": 1
+      },
+      "candidate": {
+        "precision": "mixed_int8",
+        "backend": "CPU",
+        "threads": 2,
+        "model": "/home/orangepi/models/edge-voice-v2/asr-zh14m"
+      },
+      "phases": {
+        "loading": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 2.8204619769967394,
+          "average_cpu_cores": {
+            "value": 1.0379417082306128,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 25.94854270576532,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 120.9404296875,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 2.8204619769967394,
+              "sample_count": 14,
+              "average_cpu_cores": {
+                "value": 1.0379417082306128,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 25.94854270576532,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 120.9404296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 126.05078125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.0829570178888828,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92431.657789549,
+              "end_monotonic": 92434.478251526
+            }
+          ]
+        },
+        "first_request": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 13.259345172991743,
+          "average_cpu_cores": {
+            "value": 1.056091468361986,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 26.402286709049648,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.9755859375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 13.259345172991743,
+              "sample_count": 61,
+              "average_cpu_cores": {
+                "value": 1.056091468361986,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 26.402286709049648,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.9755859375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 121.1171875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.956395536990107,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92434.485248825,
+              "end_monotonic": 92447.744593998
+            }
+          ]
+        },
+        "warmup": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 13.261302525992505,
+          "average_cpu_cores": {
+            "value": 1.0464721341775622,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 26.161803354439055,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.9833984375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 13.261302525992505,
+              "sample_count": 62,
+              "average_cpu_cores": {
+                "value": 1.0464721341775622,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 26.161803354439055,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.9833984375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 121.125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.9565946895957698,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92447.751248301,
+              "end_monotonic": 92461.012550827
+            }
+          ]
+        },
+        "idle": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.003965032999986,
+          "average_cpu_cores": {
+            "value": 0.09512719679962278,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 2.3781799199905693,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 115.9912109375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.003965032999986,
+              "sample_count": 14,
+              "average_cpu_cores": {
+                "value": 0.09512719679962278,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 2.3781799199905693,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.9912109375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 121.1328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.956793842201433,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92461.014257642,
+              "end_monotonic": 92464.018222675
+            }
+          ]
+        },
+        "inference": {
+          "windows": 3,
+          "cpu_windows_evaluated": 3,
+          "seconds": 23.968529276986374,
+          "average_cpu_cores": {
+            "value": 1.0263367797597407,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 25.658419493993517,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 116.0029296875,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 9.063890992998495,
+              "sample_count": 42,
+              "average_cpu_cores": {
+                "value": 1.0015751356628375,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 25.03937839157094,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.9912109375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 121.1328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.956793842201433,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92464.023079747,
+              "end_monotonic": 92473.08697074
+            },
+            {
+              "duration_seconds": 10.80170443598763,
+              "sample_count": 50,
+              "average_cpu_cores": {
+                "value": 1.0834418442659393,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 27.08604610664848,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 115.9990234375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 121.140625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.956992994807096,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92473.094489826,
+              "end_monotonic": 92483.896194262
+            },
+            {
+              "duration_seconds": 4.102933848000248,
+              "sample_count": 20,
+              "average_cpu_cores": {
+                "value": 0.930699072638662,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 23.26747681596655,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 116.0029296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 121.14453125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 2.957092571109927,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92483.900996793,
+              "end_monotonic": 92488.003930641
+            }
+          ]
+        }
+      },
+      "unfinished_phases": {},
+      "source": {
+        "result": "asr/zh14m-int8-rt/result.json",
+        "sha256": "cb6c71cf895c785e6e3561f1a72b1c86f17d20afe08376e0f38cd9b305c48bcb"
+      },
+      "full_process_resources": {
+        "peak_pss_mib": 120.9404296875,
+        "cpu_seconds": 57.12,
+        "wall_seconds": 58.01355979699292,
+        "min_host_available_mib": 2934.56640625
+      },
+      "assessment": {
+        "product_performance": "NOT_ASSESSED",
+        "reason": "no user-confirmed quality/latency/RAM thresholds"
+      },
+      "samples": [
+        {
+          "id": "command",
+          "completed": true,
+          "input_sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+          "reference": null,
+          "transcript": "机器人请让底盘上前移动二十厘米",
+          "expected_silence": false,
+          "compute_rtf": 0.30617297724565223,
+          "first_partial_s": 1.660311739993631,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": -0.02652972500899331,
+          "endpoint_wait_from_energy_anchor_s": 1.3814702749910062,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "fleurs-1805-1",
+          "completed": true,
+          "input_sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+          "reference": {
+            "text": "Scotturb 403 路公共汽车定期发车前往辛特拉 (Sintra)，在罗卡角停靠。",
+            "kind": "dataset_transcript",
+            "source": "https://huggingface.co/datasets/google/fleurs",
+            "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+          },
+          "transcript": "高特四零三路公交汽车定期发车前往心特拉在罗凯角停靠",
+          "expected_silence": false,
+          "compute_rtf": 0.2848790800515159,
+          "first_partial_s": 1.3834306120115798,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": 0.8420258400100282,
+          "endpoint_wait_from_energy_anchor_s": 1.7620258400100282,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "silence1",
+          "completed": true,
+          "input_sha256": "643f8a8dc8bd9c19225afffad2becfec5426180b3749cb208abdf1a6c8354efc",
+          "reference": null,
+          "transcript": "",
+          "expected_silence": true,
+          "compute_rtf": 0.7715759819984669,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": null,
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "expected_empty"
+        }
+      ],
+      "scenario": "realtime",
+      "quality": {
+        "status": "evaluated_subset",
+        "normalization": "nfkc-casefold-no-punctuation-space-v1",
+        "evaluated_samples": 1,
+        "total_samples": 3,
+        "reference_characters": 37,
+        "character_errors": 20,
+        "cer": 0.5405405405405406,
+        "exact_matches": 0,
+        "samples": [
+          {
+            "case_id": "fleurs-1805-1",
+            "errors": 20,
+            "characters": 37,
+            "exact": false,
+            "output_status": "complete"
+          }
+        ]
+      },
+      "expected_samples": 3,
+      "completed_samples": 3,
+      "aggregate_metrics": {
+        "speech_compute_rtf": {
+          "n": 2,
+          "median": 0.29552602864858407,
+          "min": 0.2848790800515159,
+          "max": 0.30617297724565223,
+          "p95_nearest_rank": 0.30617297724565223,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "first_partial_s": {
+          "n": 2,
+          "median": 1.5218711760026054,
+          "min": 1.3834306120115798,
+          "max": 1.660311739993631,
+          "p95_nearest_rank": 1.660311739993631,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_file_end_s": {
+          "n": 2,
+          "median": 0.40774805750051746,
+          "min": -0.02652972500899331,
+          "max": 0.8420258400100282,
+          "p95_nearest_rank": 0.8420258400100282,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_energy_anchor_s": {
+          "n": 2,
+          "median": 1.5717480575005172,
+          "min": 1.3814702749910062,
+          "max": 1.7620258400100282,
+          "p95_nearest_rank": 1.7620258400100282,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        }
+      }
+    },
+    {
+      "id": "zh14m-fp32-fast",
+      "module": "asr",
+      "execution": {
+        "status": "ok",
+        "returncode": 0
+      },
+      "protocol": {
+        "id": "rk3566-voice-screen-v2",
+        "tier": "screening",
+        "round": 1
+      },
+      "candidate": {
+        "precision": "fp32",
+        "backend": "CPU",
+        "threads": 2,
+        "model": "/home/orangepi/models/edge-voice-v2/asr-zh14m"
+      },
+      "phases": {
+        "loading": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.9140677240065997,
+          "average_cpu_cores": {
+            "value": 1.067985672727955,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 26.699641818198877,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 137.05859375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.9140677240065997,
+              "sample_count": 18,
+              "average_cpu_cores": {
+                "value": 1.067985672727955,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 26.699641818198877,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 137.05859375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 142.21484375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.493833737447162,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92489.701309022,
+              "end_monotonic": 92493.615376746
+            }
+          ]
+        },
+        "first_request": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.463171687995782,
+          "average_cpu_cores": {
+            "value": 3.19945689882965,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 79.98642247074125,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.26171875,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.463171687995782,
+              "sample_count": 15,
+              "average_cpu_cores": {
+                "value": 3.19945689882965,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 79.98642247074125,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.26171875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.453125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.983350842166581,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92493.622654918,
+              "end_monotonic": 92497.085826606
+            }
+          ]
+        },
+        "warmup": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.458018286008155,
+          "average_cpu_cores": {
+            "value": 3.150788826917875,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 78.76972067294687,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.2734375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.458018286008155,
+              "sample_count": 16,
+              "average_cpu_cores": {
+                "value": 3.150788826917875,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 78.76972067294687,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.2734375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.46484375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9836495710750754,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92497.09263899,
+              "end_monotonic": 92500.550657276
+            }
+          ]
+        },
+        "idle": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.0023745500075165,
+          "average_cpu_cores": {
+            "value": 0.2767423169308158,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 6.918557923270395,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.28125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.0023745500075165,
+              "sample_count": 14,
+              "average_cpu_cores": {
+                "value": 0.2767423169308158,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 6.918557923270395,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.28125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.47265625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9838487236807385,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92500.552306341,
+              "end_monotonic": 92503.554680891
+            }
+          ]
+        },
+        "inference": {
+          "windows": 3,
+          "cpu_windows_evaluated": 3,
+          "seconds": 6.157504946022527,
+          "average_cpu_cores": {
+            "value": 3.1915445930598505,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 79.78861482649626,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.2890625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 2.3644825360097457,
+              "sample_count": 10,
+              "average_cpu_cores": {
+                "value": 3.1462380701616097,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 78.65595175404025,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.28125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.47265625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9838487236807385,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92503.559922376,
+              "end_monotonic": 92505.924404912
+            },
+            {
+              "duration_seconds": 2.784948736007209,
+              "sample_count": 12,
+              "average_cpu_cores": {
+                "value": 3.35642473055791,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 83.91061826394774,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.28515625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.4765625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9839482999835694,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92505.931093048,
+              "end_monotonic": 92508.716041784
+            },
+            {
+              "duration_seconds": 1.0080736740055727,
+              "sample_count": 5,
+              "average_cpu_cores": {
+                "value": 2.8423079673687885,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 71.05769918421971,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.2890625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.48046875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9840478762864016,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92508.720326321,
+              "end_monotonic": 92509.728399995
+            }
+          ]
+        }
+      },
+      "unfinished_phases": {},
+      "source": {
+        "result": "asr/zh14m-fp32-fast/result.json",
+        "sha256": "b3e3f0a1bb3573d45ae9b2c383969c8aee55abc3a1c9e7aaa0475e18734ec2a8"
+      },
+      "full_process_resources": {
+        "peak_pss_mib": 156.2890625,
+        "cpu_seconds": 48.86,
+        "wall_seconds": 21.669882194997626,
+        "min_host_available_mib": 2899.1796875
+      },
+      "assessment": {
+        "product_performance": "NOT_ASSESSED",
+        "reason": "no user-confirmed quality/latency/RAM thresholds"
+      },
+      "samples": [
+        {
+          "id": "command",
+          "completed": true,
+          "input_sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+          "reference": null,
+          "transcript": "机器人请让底盘上前移动二十厘米",
+          "expected_silence": false,
+          "compute_rtf": 0.38839122687576216,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "fleurs-1805-1",
+          "completed": true,
+          "input_sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+          "reference": {
+            "text": "Scotturb 403 路公共汽车定期发车前往辛特拉 (Sintra)，在罗卡角停靠。",
+            "kind": "dataset_transcript",
+            "source": "https://huggingface.co/datasets/google/fleurs",
+            "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+          },
+          "transcript": "高特斯零三路公交汽车定期发车前往心特拉在罗凯角停靠",
+          "expected_silence": false,
+          "compute_rtf": 0.3540553868889718,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "silence1",
+          "completed": true,
+          "input_sha256": "643f8a8dc8bd9c19225afffad2becfec5426180b3749cb208abdf1a6c8354efc",
+          "reference": null,
+          "transcript": "",
+          "expected_silence": true,
+          "compute_rtf": 0.9763068479660433,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": null,
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "expected_empty"
+        }
+      ],
+      "scenario": "throughput",
+      "quality": {
+        "status": "evaluated_subset",
+        "normalization": "nfkc-casefold-no-punctuation-space-v1",
+        "evaluated_samples": 1,
+        "total_samples": 3,
+        "reference_characters": 37,
+        "character_errors": 20,
+        "cer": 0.5405405405405406,
+        "exact_matches": 0,
+        "samples": [
+          {
+            "case_id": "fleurs-1805-1",
+            "errors": 20,
+            "characters": 37,
+            "exact": false,
+            "output_status": "complete"
+          }
+        ]
+      },
+      "expected_samples": 3,
+      "completed_samples": 3,
+      "aggregate_metrics": {
+        "speech_compute_rtf": {
+          "n": 2,
+          "median": 0.371223306882367,
+          "min": 0.3540553868889718,
+          "max": 0.38839122687576216,
+          "p95_nearest_rank": 0.38839122687576216,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "first_partial_s": {
+          "n": 0,
+          "median": null,
+          "min": null,
+          "max": null,
+          "p95_nearest_rank": null,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_file_end_s": {
+          "n": 0,
+          "median": null,
+          "min": null,
+          "max": null,
+          "p95_nearest_rank": null,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_energy_anchor_s": {
+          "n": 0,
+          "median": null,
+          "min": null,
+          "max": null,
+          "p95_nearest_rank": null,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        }
+      }
+    },
+    {
+      "id": "zh14m-fp32-rt",
+      "module": "asr",
+      "execution": {
+        "status": "ok",
+        "returncode": 0
+      },
+      "protocol": {
+        "id": "rk3566-voice-screen-v2",
+        "tier": "screening",
+        "round": 1
+      },
+      "candidate": {
+        "precision": "fp32",
+        "backend": "CPU",
+        "threads": 2,
+        "model": "/home/orangepi/models/edge-voice-v2/asr-zh14m"
+      },
+      "phases": {
+        "loading": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.8850477889936883,
+          "average_cpu_cores": {
+            "value": 1.0558344498080108,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 26.39586124520027,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 137.1845703125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.8850477889936883,
+              "sample_count": 18,
+              "average_cpu_cores": {
+                "value": 1.0558344498080108,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 26.39586124520027,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 137.1845703125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 142.33203125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.497045073213477,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92511.438665819,
+              "end_monotonic": 92515.323713608
+            }
+          ]
+        },
+        "first_request": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 13.279113251002855,
+          "average_cpu_cores": {
+            "value": 1.1691177933405086,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 29.227944833512716,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.3291015625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 13.279113251002855,
+              "sample_count": 61,
+              "average_cpu_cores": {
+                "value": 1.1691177933405086,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 29.227944833512716,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.3291015625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.5078125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9850685333904234,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92515.330893489,
+              "end_monotonic": 92528.61000674
+            }
+          ]
+        },
+        "warmup": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 13.275818620008067,
+          "average_cpu_cores": {
+            "value": 1.1641911357230161,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 29.104778393075403,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.3408203125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 13.275818620008067,
+              "sample_count": 61,
+              "average_cpu_cores": {
+                "value": 1.1641911357230161,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 29.104778393075403,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.3408203125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.51953125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9853672622989182,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92528.617240286,
+              "end_monotonic": 92541.893058906
+            }
+          ]
+        },
+        "idle": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.0034236630017404,
+          "average_cpu_cores": {
+            "value": 0.10577439383411848,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 2.644359845852962,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.3486328125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.0034236630017404,
+              "sample_count": 13,
+              "average_cpu_cores": {
+                "value": 0.10577439383411848,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 2.644359845852962,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.3486328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.52734375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.985566414904581,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92541.894611431,
+              "end_monotonic": 92544.898035094
+            }
+          ]
+        },
+        "inference": {
+          "windows": 3,
+          "cpu_windows_evaluated": 3,
+          "seconds": 23.98000156901253,
+          "average_cpu_cores": {
+            "value": 1.1344300432224717,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 28.36075108056179,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 156.3564453125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 9.075445534006576,
+              "sample_count": 41,
+              "average_cpu_cores": {
+                "value": 1.1344523280379577,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 28.361308200948944,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.3486328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.52734375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.985566414904581,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92544.905125726,
+              "end_monotonic": 92553.98057126
+            },
+            {
+              "duration_seconds": 10.801684311998542,
+              "sample_count": 50,
+              "average_cpu_cores": {
+                "value": 1.185866981452102,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 29.646674536302548,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.3525390625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.53125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.9856659912074126,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92553.986790401,
+              "end_monotonic": 92564.788474713
+            },
+            {
+              "duration_seconds": 4.102871723007411,
+              "sample_count": 19,
+              "average_cpu_cores": {
+                "value": 0.9989620464423998,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 24.974051161059997,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 156.3564453125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 161.53515625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 3.985765567510244,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92564.792826041,
+              "end_monotonic": 92568.895697764
+            }
+          ]
+        }
+      },
+      "unfinished_phases": {},
+      "source": {
+        "result": "asr/zh14m-fp32-rt/result.json",
+        "sha256": "7b810ab2234574b369f363982f408def5714ccf23df9e69623378087a1413951"
+      },
+      "full_process_resources": {
+        "peak_pss_mib": 156.3564453125,
+        "cpu_seconds": 64.01,
+        "wall_seconds": 59.091205384000205,
+        "min_host_available_mib": 2877.8671875
+      },
+      "assessment": {
+        "product_performance": "NOT_ASSESSED",
+        "reason": "no user-confirmed quality/latency/RAM thresholds"
+      },
+      "samples": [
+        {
+          "id": "command",
+          "completed": true,
+          "input_sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+          "reference": null,
+          "transcript": "机器人请让底盘上前移动二十厘米",
+          "expected_silence": false,
+          "compute_rtf": 0.44730497724102586,
+          "first_partial_s": 1.6766492720053066,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": 0.013625341008184577,
+          "endpoint_wait_from_energy_anchor_s": 1.421625341008184,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "fleurs-1805-1",
+          "completed": true,
+          "input_sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+          "reference": {
+            "text": "Scotturb 403 路公共汽车定期发车前往辛特拉 (Sintra)，在罗卡角停靠。",
+            "kind": "dataset_transcript",
+            "source": "https://huggingface.co/datasets/google/fleurs",
+            "version": "test.tsv-sha256:5734461648f816181d7dab5fc79204b18c4b9bc2cd5138225b25c72d18385d21"
+          },
+          "transcript": "高特斯零三路公交汽车定期发车前往心特拉在罗凯角停靠",
+          "expected_silence": false,
+          "compute_rtf": 0.36446138307176595,
+          "first_partial_s": 1.3765403530123876,
+          "last_nonempty_final_kind": "endpoint",
+          "endpoint_wait_from_file_end_s": 0.8797519320022547,
+          "endpoint_wait_from_energy_anchor_s": 1.7997519320022546,
+          "eof_forced": false,
+          "output_integrity": "nonempty"
+        },
+        {
+          "id": "silence1",
+          "completed": true,
+          "input_sha256": "643f8a8dc8bd9c19225afffad2becfec5426180b3749cb208abdf1a6c8354efc",
+          "reference": null,
+          "transcript": "",
+          "expected_silence": true,
+          "compute_rtf": 0.9673551150190178,
+          "first_partial_s": null,
+          "last_nonempty_final_kind": null,
+          "endpoint_wait_from_file_end_s": null,
+          "endpoint_wait_from_energy_anchor_s": null,
+          "eof_forced": false,
+          "output_integrity": "expected_empty"
+        }
+      ],
+      "scenario": "realtime",
+      "quality": {
+        "status": "evaluated_subset",
+        "normalization": "nfkc-casefold-no-punctuation-space-v1",
+        "evaluated_samples": 1,
+        "total_samples": 3,
+        "reference_characters": 37,
+        "character_errors": 20,
+        "cer": 0.5405405405405406,
+        "exact_matches": 0,
+        "samples": [
+          {
+            "case_id": "fleurs-1805-1",
+            "errors": 20,
+            "characters": 37,
+            "exact": false,
+            "output_status": "complete"
+          }
+        ]
+      },
+      "expected_samples": 3,
+      "completed_samples": 3,
+      "aggregate_metrics": {
+        "speech_compute_rtf": {
+          "n": 2,
+          "median": 0.4058831801563959,
+          "min": 0.36446138307176595,
+          "max": 0.44730497724102586,
+          "p95_nearest_rank": 0.44730497724102586,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "first_partial_s": {
+          "n": 2,
+          "median": 1.526594812508847,
+          "min": 1.3765403530123876,
+          "max": 1.6766492720053066,
+          "p95_nearest_rank": 1.6766492720053066,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_file_end_s": {
+          "n": 2,
+          "median": 0.4466886365052196,
+          "min": 0.013625341008184577,
+          "max": 0.8797519320022547,
+          "p95_nearest_rank": 0.8797519320022547,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "endpoint_wait_from_energy_anchor_s": {
+          "n": 2,
+          "median": 1.6106886365052193,
+          "min": 1.421625341008184,
+          "max": 1.7997519320022546,
+          "p95_nearest_rank": 1.7997519320022546,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        }
+      }
+    },
+    {
+      "id": "qwen25-q4",
+      "module": "llm",
+      "execution": {
+        "status": "ok",
+        "returncode": 0
+      },
+      "protocol": {
+        "id": "rk3566-voice-screen-v2",
+        "tier": "screening",
+        "round": 1
+      },
+      "candidate": {
+        "precision": "Q4_K_M",
+        "backend": "CPU",
+        "threads": 2,
+        "model": "/home/orangepi/models/edge-voice-v2/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+      },
+      "phases": {
+        "loading": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 1.8258698650024598,
+          "average_cpu_cores": {
+            "value": 1.0211655448192423,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 25.529138620481056,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 535.8232421875,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 1.8258698650024598,
+              "sample_count": 8,
+              "average_cpu_cores": {
+                "value": 1.0211655448192423,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 25.529138620481056,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 535.8232421875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 542.21484375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 13.658956141617418,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92569.96242497,
+              "end_monotonic": 92571.788294835
+            }
+          ]
+        },
+        "first_request": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.9404203980084276,
+          "average_cpu_cores": {
+            "value": 1.9012750934245355,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 47.53187733561339,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 555.8125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.9404203980084276,
+              "sample_count": 17,
+              "average_cpu_cores": {
+                "value": 1.9012750934245355,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 47.53187733561339,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 555.8125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 562.24609375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.168512977281667,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92571.788861246,
+              "end_monotonic": 92575.729281644
+            }
+          ]
+        },
+        "warmup": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.9168143199931365,
+          "average_cpu_cores": {
+            "value": 1.9923883958242887,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 49.80970989560722,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 555.83203125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.9168143199931365,
+              "sample_count": 15,
+              "average_cpu_cores": {
+                "value": 1.9923883958242887,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.80970989560722,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 555.83203125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 562.265625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.169010858795824,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92575.729941678,
+              "end_monotonic": 92579.646755998
+            }
+          ]
+        },
+        "idle": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.003713534999406,
+          "average_cpu_cores": {
+            "value": 0.25497756592234433,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 6.374439148058608,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 555.83203125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.003713534999406,
+              "sample_count": 13,
+              "average_cpu_cores": {
+                "value": 0.25497756592234433,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 6.374439148058608,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 555.83203125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 562.265625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.169010858795824,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92579.647567406,
+              "end_monotonic": 92582.651280941
+            }
+          ]
+        },
+        "inference": {
+          "windows": 6,
+          "cpu_windows_evaluated": 6,
+          "seconds": 69.02022255498741,
+          "average_cpu_cores": {
+            "value": 1.9910405885366027,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 49.776014713415066,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 558.609375,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 11.450563872000203,
+              "sample_count": 46,
+              "average_cpu_cores": {
+                "value": 1.9843513154547274,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.60878288636819,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 557.77734375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 564.2109375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.218599857605888,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92582.65206085,
+              "end_monotonic": 92594.102624722
+            },
+            {
+              "duration_seconds": 11.847920988991973,
+              "sample_count": 48,
+              "average_cpu_cores": {
+                "value": 1.9926147476765177,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.815368691912944,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 558.296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 564.73046875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.23184350588247,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92594.103742085,
+              "end_monotonic": 92605.951663074
+            },
+            {
+              "duration_seconds": 10.528812389005907,
+              "sample_count": 43,
+              "average_cpu_cores": {
+                "value": 1.9947817204831797,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.86954301207949,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 558.296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 564.73046875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.23184350588247,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92605.95375751,
+              "end_monotonic": 92616.482569899
+            },
+            {
+              "duration_seconds": 14.021978169999784,
+              "sample_count": 57,
+              "average_cpu_cores": {
+                "value": 1.9908330501935172,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.77082625483793,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 558.60546875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 565.0390625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.239710033806155,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92616.483919718,
+              "end_monotonic": 92630.505897888
+            },
+            {
+              "duration_seconds": 11.441261555999517,
+              "sample_count": 46,
+              "average_cpu_cores": {
+                "value": 1.9897929247644615,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.74482311911154,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 558.609375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 565.04296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.239809610108987,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92630.507164874,
+              "end_monotonic": 92641.94842643
+            },
+            {
+              "duration_seconds": 9.72968557899003,
+              "sample_count": 40,
+              "average_cpu_cores": {
+                "value": 1.9947139554256412,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.86784888564103,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 558.609375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 565.04296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 14.239809610108987,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92641.949526002,
+              "end_monotonic": 92651.679211581
+            }
+          ]
+        }
+      },
+      "unfinished_phases": {},
+      "source": {
+        "result": "llm/qwen25-q4/result.json",
+        "sha256": "9b396f20ca2280ae1960310fd8351a9f582bfcf0ff8a6650f3cdca63fce627c6"
+      },
+      "full_process_resources": {
+        "peak_pss_mib": 558.609375,
+        "cpu_seconds": 155.94,
+        "wall_seconds": 82.78880750999087,
+        "min_host_available_mib": 2918.85546875
+      },
+      "assessment": {
+        "product_performance": "NOT_ASSESSED",
+        "reason": "no user-confirmed quality/latency/RAM thresholds"
+      },
+      "samples": [
+        {
+          "id": "greeting",
+          "prompt": "你好，请用一句简短中文介绍你自己。",
+          "rubric": "非空中文自我介绍，不超过两句",
+          "completed": true,
+          "reply": "我是机器人语音助手，可以提供信息和帮助。",
+          "ttft_seconds": 8.197366871012491,
+          "first_sentence_seconds": 11.15547944100399,
+          "seconds": 11.449683049009764,
+          "tokens_predicted": 12,
+          "stopped_limit": null,
+          "transport_observed_decode_tokens_per_second": 3.71864565265829,
+          "native_timings": {
+            "cache_n": 0,
+            "prompt_n": 41,
+            "prompt_ms": 8171.786,
+            "prompt_per_token_ms": 199.3118536585366,
+            "prompt_per_second": 5.017263056081008,
+            "predicted_n": 12,
+            "predicted_ms": 3250.664,
+            "predicted_per_token_ms": 270.88866666666667,
+            "predicted_per_second": 3.691553479535258
+          },
+          "first_sentence_missing_reason": null,
+          "quality_pass": true,
+          "quality_reason": "一句中文自我介绍，说明机器人语音助手身份，未超过两句。",
+          "review_method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+        },
+        {
+          "id": "status",
+          "prompt": "已知：电量42%，相机在线。请只复述这两项状态。",
+          "rubric": "包含42%和相机在线，不捏造其它状态",
+          "completed": true,
+          "reply": "电量42%，相机在线。",
+          "ttft_seconds": 9.75763802700385,
+          "first_sentence_seconds": 11.53708264499437,
+          "seconds": 11.847281662994646,
+          "tokens_predicted": 8,
+          "stopped_limit": null,
+          "transport_observed_decode_tokens_per_second": 3.9339380482506274,
+          "native_timings": {
+            "cache_n": 0,
+            "prompt_n": 49,
+            "prompt_ms": 9732.279,
+            "prompt_per_token_ms": 198.61793877551023,
+            "prompt_per_second": 5.034791953662651,
+            "predicted_n": 8,
+            "predicted_ms": 2085.971,
+            "predicted_per_token_ms": 260.746375,
+            "predicted_per_second": 3.83514440037757
+          },
+          "first_sentence_missing_reason": null,
+          "quality_pass": true,
+          "quality_reason": "仅复述电量42%与相机在线，未增加其它状态。",
+          "review_method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+        },
+        {
+          "id": "negation",
+          "prompt": "不要移动。请只回复：好的，保持原位。",
+          "rubric": "精确回复指定文本，标点归一后匹配",
+          "completed": true,
+          "reply": "好的，保持原位。",
+          "ttft_seconds": 8.76602934100083,
+          "first_sentence_seconds": 10.231924894003896,
+          "seconds": 10.526796410995303,
+          "tokens_predicted": 7,
+          "stopped_limit": null,
+          "transport_observed_decode_tokens_per_second": 4.093193803784814,
+          "native_timings": {
+            "cache_n": 0,
+            "prompt_n": 44,
+            "prompt_ms": 8738.035,
+            "prompt_per_token_ms": 198.59170454545455,
+            "prompt_per_second": 5.035457056420579,
+            "predicted_n": 7,
+            "predicted_ms": 1758.66,
+            "predicted_per_token_ms": 251.23714285714286,
+            "predicted_per_second": 3.980303185379778
+          },
+          "first_sentence_missing_reason": null,
+          "quality_pass": true,
+          "quality_reason": "去标点和空白后与指定回复“好的保持原位”一致。",
+          "review_method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+        },
+        {
+          "id": "slots",
+          "prompt": "把“向左转三十度”转换成JSON，只包含action和degrees，action用turn_left。",
+          "rubric": "JSON等于{\"action\":\"turn_left\",\"degrees\":30}；只离线检查，不执行动作",
+          "completed": true,
+          "reply": "{\"action\":\"turn_left\",\"degrees\":30}",
+          "ttft_seconds": 10.77242871200724,
+          "first_sentence_seconds": null,
+          "seconds": 14.020717892009998,
+          "tokens_predicted": 12,
+          "stopped_limit": null,
+          "transport_observed_decode_tokens_per_second": 3.7438967102276832,
+          "native_timings": {
+            "cache_n": 0,
+            "prompt_n": 54,
+            "prompt_ms": 10745.546,
+            "prompt_per_token_ms": 198.9915925925926,
+            "prompt_per_second": 5.025337940017194,
+            "predicted_n": 12,
+            "predicted_ms": 3246.267,
+            "predicted_per_token_ms": 270.52225,
+            "predicted_per_second": 3.696553610654947
+          },
+          "first_sentence_missing_reason": "structured JSON task has no Chinese sentence-ending punctuation",
+          "quality_pass": true,
+          "quality_reason": "原始回复可直接解析JSON，且恰好等于指定action/degrees对象。",
+          "review_method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+        },
+        {
+          "id": "unknown",
+          "prompt": "你没有接入温度传感器。现在室内多少摄氏度？",
+          "rubric": "承认未知，不编造温度",
+          "completed": true,
+          "reply": "室内温度为20摄氏度。",
+          "ttft_seconds": 8.79339962900849,
+          "first_sentence_seconds": 11.144701890996657,
+          "seconds": 11.44006894499762,
+          "tokens_predicted": 10,
+          "stopped_limit": null,
+          "transport_observed_decode_tokens_per_second": 3.8277430352104083,
+          "native_timings": {
+            "cache_n": 0,
+            "prompt_n": 44,
+            "prompt_ms": 8767.931,
+            "prompt_per_token_ms": 199.2711590909091,
+            "prompt_per_second": 5.018287666725479,
+            "predicted_n": 10,
+            "predicted_ms": 2644.834,
+            "predicted_per_token_ms": 264.48339999999996,
+            "predicted_per_second": 3.780955628973312
+          },
+          "first_sentence_missing_reason": null,
+          "quality_pass": false,
+          "quality_reason": "未承认温度未知，反而编造“20摄氏度”，违反本用例及system约束。",
+          "review_method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+        },
+        {
+          "id": "brief",
+          "prompt": "用一句话提醒我检查电量和摄像头。",
+          "rubric": "包含电量及摄像头/相机检查，人工按固定rubric判定",
+          "completed": true,
+          "reply": "请检查电量和摄像头。",
+          "ttft_seconds": 7.965661794994958,
+          "first_sentence_seconds": 9.434886394999921,
+          "seconds": 9.728938337997533,
+          "tokens_predicted": 7,
+          "stopped_limit": null,
+          "transport_observed_decode_tokens_per_second": 4.08391244299017,
+          "native_timings": {
+            "cache_n": 0,
+            "prompt_n": 40,
+            "prompt_ms": 7939.153,
+            "prompt_per_token_ms": 198.478825,
+            "prompt_per_second": 5.038320838507584,
+            "predicted_n": 7,
+            "predicted_ms": 1761.708,
+            "predicted_per_token_ms": 251.67257142857144,
+            "predicted_per_second": 3.9734167069684645
+          },
+          "first_sentence_missing_reason": null,
+          "quality_pass": true,
+          "quality_reason": "一句话同时提醒检查电量和摄像头。",
+          "review_method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+        }
+      ],
+      "expected_samples": 6,
+      "completed_samples": 6,
+      "quality": {
+        "reviewer": "Codex assistant; no independent human review",
+        "scope": "six fixed prompts, one greedy response each; not general model accuracy",
+        "passed": 5,
+        "total": 6,
+        "samples": [
+          {
+            "id": "greeting",
+            "rubric": "非空中文自我介绍，不超过两句",
+            "reply": "我是机器人语音助手，可以提供信息和帮助。",
+            "reply_sha256": "0b82262816fe237d1a19f81406c69650729d44eff8fca3d98f64de54911f57e7",
+            "passed": true,
+            "reason": "一句中文自我介绍，说明机器人语音助手身份，未超过两句。",
+            "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+          },
+          {
+            "id": "status",
+            "rubric": "包含42%和相机在线，不捏造其它状态",
+            "reply": "电量42%，相机在线。",
+            "reply_sha256": "e4a417561f23a3f0076b27e77a4f3590d136987862dc5c31f673d4d0fc7c7dae",
+            "passed": true,
+            "reason": "仅复述电量42%与相机在线，未增加其它状态。",
+            "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+          },
+          {
+            "id": "negation",
+            "rubric": "精确回复指定文本，标点归一后匹配",
+            "reply": "好的，保持原位。",
+            "reply_sha256": "17213219062fae9cc332a92dfdc923a3214068a594d877058cbea17a8930171e",
+            "passed": true,
+            "reason": "去标点和空白后与指定回复“好的保持原位”一致。",
+            "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+          },
+          {
+            "id": "slots",
+            "rubric": "JSON等于{\"action\":\"turn_left\",\"degrees\":30}；只离线检查，不执行动作",
+            "reply": "{\"action\":\"turn_left\",\"degrees\":30}",
+            "reply_sha256": "f945947ab66546a054f9ab0eea996e8c0094f31682353880428721627ae2d466",
+            "passed": true,
+            "reason": "原始回复可直接解析JSON，且恰好等于指定action/degrees对象。",
+            "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+          },
+          {
+            "id": "unknown",
+            "rubric": "承认未知，不编造温度",
+            "reply": "室内温度为20摄氏度。",
+            "reply_sha256": "3c661ed364136a01508088c3d4d31de4555cea5717419c7968a0db240b5a725c",
+            "passed": false,
+            "reason": "未承认温度未知，反而编造“20摄氏度”，违反本用例及system约束。",
+            "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+          },
+          {
+            "id": "brief",
+            "rubric": "包含电量及摄像头/相机检查，人工按固定rubric判定",
+            "reply": "请检查电量和摄像头。",
+            "reply_sha256": "74b05d334984e655677c00a777d9fdd815bdf1dbabbd153cfbef66affbe1a593",
+            "passed": true,
+            "reason": "一句话同时提醒检查电量和摄像头。",
+            "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+          }
+        ]
+      },
+      "aggregate_metrics": {
+        "ttft_seconds": {
+          "n": 6,
+          "median": 8.77971448500466,
+          "min": 7.965661794994958,
+          "max": 10.77242871200724,
+          "p95_nearest_rank": 10.77242871200724,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "first_sentence_seconds": {
+          "n": 5,
+          "median": 11.144701890996657,
+          "min": 9.434886394999921,
+          "max": 11.53708264499437,
+          "p95_nearest_rank": 11.53708264499437,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "transport_observed_decode_tokens_per_second": {
+          "n": 6,
+          "median": 3.880840541730518,
+          "min": 3.71864565265829,
+          "max": 4.093193803784814,
+          "p95_nearest_rank": 4.093193803784814,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        }
+      }
+    },
+    {
+      "id": "melo-fp32",
+      "module": "tts",
+      "execution": {
+        "status": "ok",
+        "returncode": 0
+      },
+      "protocol": {
+        "id": "rk3566-voice-screen-v2",
+        "tier": "screening",
+        "round": 1
+      },
+      "candidate": {
+        "precision": "FP32",
+        "backend": "CPU",
+        "threads": 2,
+        "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en"
+      },
+      "phases": {
+        "loading": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 22.60137669699907,
+          "average_cpu_cores": {
+            "value": 0.9992132096927978,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 24.980330242319944,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 293.5869140625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 22.60137669699907,
+              "sample_count": 101,
+              "average_cpu_cores": {
+                "value": 0.9992132096927978,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 24.980330242319944,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 293.5869140625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 298.69921875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 7.48398066228199,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92653.404498952,
+              "end_monotonic": 92676.005875649
+            }
+          ]
+        },
+        "first_request": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.3218726760096615,
+          "average_cpu_cores": {
+            "value": 1.941960659126095,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 48.549016478152375,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 310.8720703125,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.3218726760096615,
+              "sample_count": 14,
+              "average_cpu_cores": {
+                "value": 1.941960659126095,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 48.549016478152375,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 310.8720703125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 315.984375,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 7.924605802311166,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92676.006809847,
+              "end_monotonic": 92679.328682523
+            }
+          ]
+        },
+        "warmup": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.228468310990138,
+          "average_cpu_cores": {
+            "value": 2.00336877232499,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 50.08421930812476,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 314.0869140625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.228468310990138,
+              "sample_count": 13,
+              "average_cpu_cores": {
+                "value": 2.00336877232499,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 50.08421930812476,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 314.0869140625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 319.19921875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 8.006557099541451,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92679.329284516,
+              "end_monotonic": 92682.557752827
+            }
+          ]
+        },
+        "idle": {
+          "windows": 1,
+          "cpu_windows_evaluated": 1,
+          "seconds": 3.002953293005703,
+          "average_cpu_cores": {
+            "value": 0.2690549489080897,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 6.726373722702242,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 314.0869140625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 3.002953293005703,
+              "sample_count": 14,
+              "average_cpu_cores": {
+                "value": 0.2690549489080897,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 6.726373722702242,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 314.0869140625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 319.19921875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 8.006557099541451,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92682.558422779,
+              "end_monotonic": 92685.561376072
+            }
+          ]
+        },
+        "inference": {
+          "windows": 4,
+          "cpu_windows_evaluated": 4,
+          "seconds": 94.48409052600618,
+          "average_cpu_cores": {
+            "value": 1.9542441544521558,
+            "unit": "cores",
+            "scope": "duration weighted phase windows",
+            "reason": null
+          },
+          "cpu_capacity_percent": {
+            "value": 48.85610386130389,
+            "unit": "%",
+            "scope": "process tree / logical CPU capacity",
+            "reason": null
+          },
+          "peak_pss_mib": {
+            "value": 377.8056640625,
+            "unit": "MiB",
+            "scope": "sampled process tree within phase",
+            "reason": null
+          },
+          "individual_windows": [
+            {
+              "duration_seconds": 24.130499941005837,
+              "sample_count": 99,
+              "average_cpu_cores": {
+                "value": 1.8403692290814346,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 46.00923072703586,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 337.8955078125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 343.0390625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 8.613474665299153,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92685.561966982,
+              "end_monotonic": 92709.692466923
+            },
+            {
+              "duration_seconds": 18.85286476399051,
+              "sample_count": 80,
+              "average_cpu_cores": {
+                "value": 1.9955192592695812,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.88798148173953,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 343.7861328125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 348.9296875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 8.763635729968982,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92709.696408464,
+              "end_monotonic": 92728.549273228
+            },
+            {
+              "duration_seconds": 25.739318196996464,
+              "sample_count": 109,
+              "average_cpu_cores": {
+                "value": 1.9971363160027724,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.92840790006931,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 374.5947265625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 379.73828125,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 9.548994030400646,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92728.553080895,
+              "end_monotonic": 92754.292399092
+            },
+            {
+              "duration_seconds": 25.761407624013373,
+              "sample_count": 109,
+              "average_cpu_cores": {
+                "value": 1.987848293209797,
+                "unit": "cores",
+                "scope": "sample_bracket",
+                "reason": null
+              },
+              "cpu_capacity_percent": {
+                "value": 49.696207330244924,
+                "unit": "%",
+                "scope": "process_tree",
+                "reason": null
+              },
+              "peak_pss_mib": {
+                "value": 377.8056640625,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "peak_rss_mib": {
+                "value": 382.94921875,
+                "unit": "MiB",
+                "scope": "process_tree_sampled",
+                "reason": null
+              },
+              "ram_percent": {
+                "value": 9.6308457513281,
+                "unit": "%",
+                "scope": "sampled_pss/MemTotal",
+                "reason": null
+              },
+              "start_monotonic": 92754.29668567,
+              "end_monotonic": 92780.058093294
+            }
+          ]
+        }
+      },
+      "unfinished_phases": {},
+      "source": {
+        "result": "tts/melo-fp32/result.json",
+        "sha256": "13fe01692449a5cf9f3175d302a7ea145fc058bfca648428d2fc1167b11c0fcf"
+      },
+      "full_process_resources": {
+        "peak_pss_mib": 379.6611328125,
+        "cpu_seconds": 223.37,
+        "wall_seconds": 129.6894839470042,
+        "min_host_available_mib": 2667.1015625
+      },
+      "assessment": {
+        "product_performance": "NOT_ASSESSED",
+        "reason": "no user-confirmed quality/latency/RAM thresholds"
+      },
+      "samples": [
+        {
+          "id": "tts-1",
+          "text": "你好，我是机器人。现在可以和你交流了。",
+          "completed": true,
+          "first_pcm_seconds": 24.129787405996467,
+          "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+          "rtf": 7.508061432671165,
+          "generated_seconds": 24.07823383899813,
+          "audio_duration_seconds": 3.206984126984127,
+          "audio": {
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/0.wav",
+            "sha256": "f1af14aae7c5b02f65cb9a0267e46d2a5ad883924f286a43e2bc608a5a70efc7",
+            "bytes": 282900
+          },
+          "listening_review": null,
+          "quality_reason": "no listening review; PCM integrity checked separately",
+          "pcm_integrity": {
+            "id": "tts-1",
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/0.wav",
+            "sha256": "f1af14aae7c5b02f65cb9a0267e46d2a5ad883924f286a43e2bc608a5a70efc7",
+            "passed": true,
+            "sample_rate": 44100,
+            "channels": 1,
+            "sample_width_bytes": 2,
+            "frames": 141428,
+            "audio_duration_s": 3.206984126984127,
+            "nonzero_samples": 133754,
+            "peak_abs_pcm16": 4863,
+            "scope": "PCM16 header/frame/nonzero integrity only; no pronunciation or naturalness judgement"
+          }
+        },
+        {
+          "id": "tts-2",
+          "text": "当前电量42%，温度25摄氏度。",
+          "completed": true,
+          "first_pcm_seconds": 18.852157189001446,
+          "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+          "rtf": 6.230930197657974,
+          "generated_seconds": 18.808649159007473,
+          "audio_duration_seconds": 3.01859410430839,
+          "audio": {
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/1.wav",
+            "sha256": "9350d6a7a6ce13556a5140eb4d4312d03a1f834ab5d2b70a4f0e3c7d13346522",
+            "bytes": 266284
+          },
+          "listening_review": null,
+          "quality_reason": "no listening review; PCM integrity checked separately",
+          "pcm_integrity": {
+            "id": "tts-2",
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/1.wav",
+            "sha256": "9350d6a7a6ce13556a5140eb4d4312d03a1f834ab5d2b70a4f0e3c7d13346522",
+            "passed": true,
+            "sample_rate": 44100,
+            "channels": 1,
+            "sample_width_bytes": 2,
+            "frames": 133120,
+            "audio_duration_s": 3.01859410430839,
+            "nonzero_samples": 128351,
+            "peak_abs_pcm16": 4227,
+            "scope": "PCM16 header/frame/nonzero integrity only; no pronunciation or naturalness judgement"
+          }
+        },
+        {
+          "id": "tts-3",
+          "text": "今天是2026年10月22日，下午三点零五分。",
+          "completed": true,
+          "first_pcm_seconds": 25.73860653799784,
+          "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+          "rtf": 6.477824154584817,
+          "generated_seconds": 25.67803619299957,
+          "audio_duration_seconds": 3.9639909297052154,
+          "audio": {
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/2.wav",
+            "sha256": "d94f5ca014938bd8a342e6a2d7ca29ea33d9d75bf6577d1ee38be156d34ae9f4",
+            "bytes": 349668
+          },
+          "listening_review": null,
+          "quality_reason": "no listening review; PCM integrity checked separately",
+          "pcm_integrity": {
+            "id": "tts-3",
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/2.wav",
+            "sha256": "d94f5ca014938bd8a342e6a2d7ca29ea33d9d75bf6577d1ee38be156d34ae9f4",
+            "passed": true,
+            "sample_rate": 44100,
+            "channels": 1,
+            "sample_width_bytes": 2,
+            "frames": 174812,
+            "audio_duration_s": 3.9639909297052154,
+            "nonzero_samples": 168679,
+            "peak_abs_pcm16": 5703,
+            "scope": "PCM16 header/frame/nonzero integrity only; no pronunciation or naturalness judgement"
+          }
+        },
+        {
+          "id": "tts-4",
+          "text": "请不要移动，先检查摄像头，再等待下一条指令。",
+          "completed": true,
+          "first_pcm_seconds": 25.760642299006577,
+          "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+          "rtf": 6.542299299221504,
+          "generated_seconds": 25.702186807000544,
+          "audio_duration_seconds": 3.9286167800453513,
+          "audio": {
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/3.wav",
+            "sha256": "cf0daa62a2e356c5ca3559c78bbc64401d11f8580df73c93b6e0e1da7a46d4d0",
+            "bytes": 346548
+          },
+          "listening_review": null,
+          "quality_reason": "no listening review; PCM integrity checked separately",
+          "pcm_integrity": {
+            "id": "tts-4",
+            "path": "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/3.wav",
+            "sha256": "cf0daa62a2e356c5ca3559c78bbc64401d11f8580df73c93b6e0e1da7a46d4d0",
+            "passed": true,
+            "sample_rate": 44100,
+            "channels": 1,
+            "sample_width_bytes": 2,
+            "frames": 173252,
+            "audio_duration_s": 3.9286167800453513,
+            "nonzero_samples": 164988,
+            "peak_abs_pcm16": 5227,
+            "scope": "PCM16 header/frame/nonzero integrity only; no pronunciation or naturalness judgement"
+          }
+        }
+      ],
+      "expected_samples": 4,
+      "completed_samples": 4,
+      "quality": {
+        "status": "NOT_EVALUATED",
+        "reason": "waveform validity is not pronunciation/voice quality"
+      },
+      "aggregate_metrics": {
+        "first_pcm_seconds": {
+          "n": 4,
+          "median": 24.934196971997153,
+          "min": 18.852157189001446,
+          "max": 25.760642299006577,
+          "p95_nearest_rank": 25.760642299006577,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        },
+        "rtf": {
+          "n": 4,
+          "median": 6.51006172690316,
+          "min": 6.230930197657974,
+          "max": 7.508061432671165,
+          "p95_nearest_rank": 7.508061432671165,
+          "limitation": "small fixed inputs, one process round; not a stable tail estimate"
+        }
+      }
+    }
+  ],
+  "product_acceptance": "NOT_EVALUATED",
+  "data_contract_note": "v2 Python ASR/LLM/TTS adapters; not compatible with ASR-lite-v1 execution validator; metric units/boundaries below and phase metric objects retained",
+  "metric_definitions": {
+    "asr_compute_rtf": "feature/decode/result/reset/EOF wall computation including 3.2s zero tail divided by original audio duration; pacing/loading excluded",
+    "asr_first_partial": "first nonempty text minus first block submission; realtime cases only",
+    "asr_final": "last nonempty endpoint final minus scheduled file end or declared energy anchor; EOF forced text excluded from endpoint waiting",
+    "asr_pacing": "100ms chunks scheduled at audio block start, not v1 block-end convention; cannot compare v1 waits directly",
+    "llm_ttft": "request to first nonempty content chunk; not model-only token timing",
+    "llm_sentence": "request to first 。！？ closed sentence; structured JSON may have no such sentence",
+    "tts_pcm": "whole utterance return plus PCM16 conversion; file writes excluded, no speaker first sound measured",
+    "phase_cpu": "sample-bracket or interior sample CPU deltas, duration-weighted over repeated phase windows; raw scope per window",
+    "pss": "200ms sampled process-tree PSS; not kernel high-watermark or entire host memory"
+  },
+  "limitations": [
+    "one process round, three ASR materials reused across four configurations; only one independently transcribed ASR clip",
+    "asset hashing warms filesystem cache; startup is not cold-disk latency",
+    "no stable P95 or long-run thermal claim",
+    "LLM rubric review is text inspection, not a large quality benchmark",
+    "TTS pronunciation/naturalness need listening review; no playback during execution",
+    "no ROS/YOLO coexistence, microphone, AEC, interruption, or full interaction acceptance"
+  ]
+}

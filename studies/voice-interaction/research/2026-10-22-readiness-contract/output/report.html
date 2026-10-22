@@ -1,0 +1,147 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>模型部署准备报告</title><style>body{font:16px/1.65 system-ui;background:#f3f6fa;color:#183044;max-width:1080px;margin:32px auto;padding:20px}article,header,section{background:white;border:1px solid #d8e2ea;border-radius:12px;padding:22px;margin:18px 0}table{border-collapse:collapse;width:100%}td,th{text-align:left;vertical-align:top;border-bottom:1px solid #ddd;padding:10px;overflow-wrap:anywhere}pre,p,li{white-space:pre-wrap;overflow-wrap:anywhere}pre{font-size:13px}code{overflow-wrap:anywhere}.scroll{overflow-x:auto}</style></head><body>
+<header><h1>模型部署准备</h1><p>整体状态：<strong>NOT_READY</strong></p><p>结论依据：准备检查及引用的证据。渲染器仅校验引用结构，不独立验证文件或推理。性能、质量和完整交互：未验收。</p></header>
+<article><h2>ASR 首选：Zipformer zh-14M CPU</h2><p><strong>LOADED_ONLY</strong> · asr-zh14m-int8</p>
+<p>获取方式：{&quot;model&quot;: &quot;download&quot;, &quot;runtime&quot;: &quot;reuse&quot;, &quot;reason&quot;: &quot;复用现有sherpa1.13.8及实际加载ORT1.28.2，核验依赖与哈希。&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>目标资产来源及SHA256/Git blob已核对，许可来源已记录。</td><td>assets-manifest</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>实际CPU运行库和依赖身份已冻结。</td><td>runtime-manifest</td></tr>
+<tr><td>smoke</td><td>NOT_RUN</td><td>历史准备阶段未执行最小推理，不能由模型加载或mock测试推导跑通。</td><td></td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>旧记录中配置路径解析与112文件检查通过；18项工具测试通过。这不证明模型推理成功。</td><td>readiness</td></tr>
+<tr><td>load</td><td>PASS</td><td>仅模型构造/健康接口成功；未调用生成或解码。</td><td>sherpa-load-check</td></tr>
+</table></div><p>下一步：在预算内执行一个固定的真实样例，保存输入hash、调用、实际输出、退出状态和运行身份；确认预期行为后再决定是否进入正式初筛。</p><details><summary>部署身份</summary><pre>{
+  &quot;name&quot;: &quot;ASR 首选：Zipformer zh-14M CPU&quot;,
+  &quot;model&quot;: &quot;sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23 @204ad334e2e683fd295359930cc16fc0432a23ac&quot;,
+  &quot;runtime&quot;: &quot;sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结&quot;,
+  &quot;backend&quot;: &quot;RK3566 A55 CPU&quot;,
+  &quot;precision&quot;: &quot;encoder/joiner INT8，decoder FP32；同包FP32对照&quot;,
+  &quot;artifact&quot;: &quot;encoder-epoch-99-avg-1.int8.onnx + decoder-epoch-99-avg-1.onnx + joiner-epoch-99-avg-1.int8.onnx + tokens.txt&quot;,
+  &quot;decision&quot;: &quot;baseline&quot;,
+  &quot;reason&quot;: &quot;公开原生流式中文小模型，有官方INT8与FP32命令。推荐依据是部署路径及规模，而非旧实测。&quot;,
+  &quot;risks&quot;: [
+    &quot;中文噪声/远场/数字质量未知&quot;,
+    &quot;ARM INT8实际执行和CPU共跑代价待测&quot;,
+    &quot;模型卡Apache-2.0；release包和各文件hash待下载冻结；实际ORT加载版本待核验&quot;
+  ],
+  &quot;metrics&quot;: {},
+  &quot;evidence&quot;: [
+    {
+      &quot;title&quot;: &quot;官方Zipformer模型及运行参数&quot;,
+      &quot;url&quot;: &quot;https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html&quot;
+    }
+  ],
+  &quot;id&quot;: &quot;asr-zh14m-int8&quot;,
+  &quot;test_focus&quot;: &quot;执行准备完成后首轮运行：同一6条素材，INT8/FP32均2线程，100ms实时回放与无等待吞吐分组。仅两条独立公开转写计CER；用FP32判断量化退化，未通过质量复核不进入三轮复测。&quot;
+}</pre></details></article>
+<article><h2>TTS 首选：MeloTTS zh_en ONNX</h2><p><strong>LOADED_ONLY</strong> · tts-melo-fp32</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;reuse&quot;, &quot;reason&quot;: &quot;复用现有sherpa1.13.8及实际加载ORT1.28.2，核验依赖与哈希。&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>目标资产来源及SHA256/Git blob已核对，许可来源已记录。</td><td>assets-manifest</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>实际CPU运行库和依赖身份已冻结。</td><td>runtime-manifest</td></tr>
+<tr><td>smoke</td><td>NOT_RUN</td><td>历史准备阶段未执行最小推理，不能由模型加载或mock测试推导跑通。</td><td></td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>旧记录中配置路径解析与112文件检查通过；18项工具测试通过。这不证明模型推理成功。</td><td>readiness</td></tr>
+<tr><td>load</td><td>PASS</td><td>仅模型构造/健康接口成功；未调用生成或解码。</td><td>sherpa-load-check</td></tr>
+</table></div><p>下一步：在预算内执行一个固定的真实样例，保存输入hash、调用、实际输出、退出状态和运行身份；确认预期行为后再决定是否进入正式初筛。</p><details><summary>部署身份</summary><pre>{
+  &quot;name&quot;: &quot;TTS 首选：MeloTTS zh_en ONNX&quot;,
+  &quot;model&quot;: &quot;vits-melo-tts-zh_en; csukuangfj/vits-melo-tts-zh_en@a0d5c6a264c0ef92d70d8661d8cc502d79627cd6&quot;,
+  &quot;runtime&quot;: &quot;sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结&quot;,
+  &quot;backend&quot;: &quot;RK3566 A55 CPU&quot;,
+  &quot;precision&quot;: &quot;FP32起点；INT8只作独立待验证优化&quot;,
+  &quot;artifact&quot;: &quot;model.onnx + tokens.txt + lexicon.txt + 中文词典/FST完整资产&quot;,
+  &quot;decision&quot;: &quot;baseline&quot;,
+  &quot;reason&quot;: &quot;单模型VITS路线、中文及词典覆盖内英文，有官方sherpa部署说明；先用原精度减少变量。&quot;,
+  &quot;risks&quot;: [
+    &quot;官方约163MB文件尺寸不是PSS或峰值内存&quot;,
+    &quot;英文受lexicon覆盖限制；数字多音字需固定用例&quot;,
+    &quot;按句/短语生成不是原生逐字流式；首段播放等待待测&quot;,
+    &quot;upstream MIT，转换资产须保留许可溯源&quot;
+  ],
+  &quot;metrics&quot;: {},
+  &quot;evidence&quot;: [
+    {
+      &quot;title&quot;: &quot;sherpa VITS/Melo部署&quot;,
+      &quot;url&quot;: &quot;https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/vits.html&quot;
+    },
+    {
+      &quot;title&quot;: &quot;Melo官方模型MIT许可&quot;,
+      &quot;url&quot;: &quot;https://huggingface.co/myshell-ai/MeloTTS-Chinese&quot;
+    }
+  ],
+  &quot;id&quot;: &quot;tts-melo-fp32&quot;,
+  &quot;test_focus&quot;: &quot;执行准备完成后首轮运行：同一4条中文文本，FP32、2线程、逐句提交，记录首PCM与整句合成RTF；数字及否定句人工听检。首音等待或发音不合适再试其它TTS。&quot;
+}</pre></details></article>
+<article><h2>LLM 首选：Qwen2.5-0.5B-Instruct Q4_K_M</h2><p><strong>LOADED_ONLY</strong> · llm-qwen25-q4</p>
+<p>获取方式：{&quot;model&quot;: &quot;download&quot;, &quot;runtime&quot;: &quot;build&quot;, &quot;reason&quot;: &quot;历史运行准备固定b6500，已有22cd二进制版本不匹配，因而从源码构建；当时未保存兼容预编译包搜索证据。新版流程优先二进制，不能把此例编译选择当通则。&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>目标资产来源及SHA256/Git blob已核对，许可来源已记录。</td><td>assets-manifest</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>实际CPU运行库和依赖身份已冻结。</td><td>runtime-manifest</td></tr>
+<tr><td>smoke</td><td>NOT_RUN</td><td>历史准备阶段未执行最小推理，不能由模型加载或mock测试推导跑通。</td><td></td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>旧记录中配置路径解析与112文件检查通过；18项工具测试通过。这不证明模型推理成功。</td><td>readiness</td></tr>
+<tr><td>load</td><td>PASS</td><td>仅模型构造/健康接口成功；未调用生成或解码。</td><td>llama-load-check</td></tr>
+</table></div><p>下一步：在预算内执行一个固定的真实样例，保存输入hash、调用、实际输出、退出状态和运行身份；确认预期行为后再决定是否进入正式初筛。</p><details><summary>部署身份</summary><pre>{
+  &quot;name&quot;: &quot;LLM 首选：Qwen2.5-0.5B-Instruct Q4_K_M&quot;,
+  &quot;model&quot;: &quot;Qwen/Qwen2.5-0.5B-Instruct-GGUF@9217f5db79a29953eb74d5343926648285ec7e67&quot;,
+  &quot;runtime&quot;: &quot;llama.cpp b6500 (a7a98e0fffed794396b3fbad4dcdbbc184963645)，CPU构建候选，非本机验收版本&quot;,
+  &quot;backend&quot;: &quot;RK3566 A55 CPU&quot;,
+  &quot;precision&quot;: &quot;Q4_K_M混合张量量化&quot;,
+  &quot;artifact&quot;: &quot;qwen2.5-0.5b-instruct-q4_k_m.gguf; 491400032 bytes; sha256 74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db&quot;,
+  &quot;decision&quot;: &quot;baseline&quot;,
+  &quot;reason&quot;: &quot;官方现成小型指令GGUF、Apache-2.0；作为短中文指令与短回复的首轮起点。&quot;,
+  &quot;risks&quot;: [
+    &quot;0.5B复杂推理、指令稳定性未知&quot;,
+    &quot;权重文件不等于运行内存；KV/工作区另计&quot;,
+    &quot;建议context 2048、回复64~96 token、2线程起点，均非用户门槛&quot;
+  ],
+  &quot;metrics&quot;: {},
+  &quot;evidence&quot;: [
+    {
+      &quot;title&quot;: &quot;Qwen官方GGUF及许可&quot;,
+      &quot;url&quot;: &quot;https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF&quot;
+    },
+    {
+      &quot;title&quot;: &quot;llama.cpp冻结构建说明&quot;,
+      &quot;url&quot;: &quot;https://github.com/ggml-org/llama.cpp/blob/b6500/docs/build.md&quot;
+    }
+  ],
+  &quot;id&quot;: &quot;llm-qwen25-q4&quot;,
+  &quot;test_focus&quot;: &quot;执行准备完成后首轮运行：同6条固定中文任务，2线程context2048输出96token，greedy、无缓存复用，记录首token及首个标点闭合短句等待。任务不可靠则转入Qwen3备选。&quot;
+}</pre></details></article>
+<section><h2>证据索引</h2>
+<p><strong>assets-manifest</strong>：2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标<br>evidence/assets-manifest.json<br>SHA256: 74045f6a69876f61ecd6f50d67e404602910f130c019d30db02955e43355cd17</p>
+<p><strong>runtime-manifest</strong>：2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标<br>evidence/runtime-manifest.json<br>SHA256: 39d6b900e923225bd996fd57fee182011ce9e305e565817e18c8f1284d31c4b5</p>
+<p><strong>sherpa-load-check</strong>：2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标<br>evidence/sherpa-load-check.json<br>SHA256: b5bad397a965c7c04664fd7dcd00de9cf8b8a05ed795affe5bd3fbe23510fab3</p>
+<p><strong>llama-load-check</strong>：2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标<br>evidence/llama-load-check.json<br>SHA256: f78a5f44230f333edde13b3cdc669165576a0b5515483ca6127495c28baa8c60</p>
+<p><strong>readiness</strong>：2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标<br>evidence/readiness.json<br>SHA256: 253d79f290a7055e20a409e90ae9826ebf9d3e3c418376f848d584ff42140276</p>
+<p><strong>asr-config</strong>：历史冻结配置；绝对路径不可直接移植<br>evidence/asr-screening.json<br>SHA256: dd389c748749091929796298ae9b10c34112894cef3efa3f0c4eaab088e52bc1</p>
+<p><strong>tts-config</strong>：历史冻结配置；绝对路径不可直接移植<br>evidence/tts-screening.json<br>SHA256: 95c80d0de056777fd1df701b15d40faf712f1183eff530ac7b5fee4ddb4cc376</p>
+<p><strong>llm-config</strong>：历史冻结配置；绝对路径不可直接移植<br>evidence/llm-screening.json<br>SHA256: 12da7b713478196f6ea924410bd3d55aabe7d6237cacbeea02598bf329375fe1</p>
+</section><section><h2>设备与需求</h2><pre>{
+  &quot;device&quot;: {
+    &quot;board&quot;: &quot;Orange Pi 3B / RK3566&quot;,
+    &quot;cpu&quot;: &quot;4×Cortex-A55；Linux aarch64&quot;,
+    &quot;ram&quot;: &quot;MemTotal 4017020 KiB ≈ 3.83 GiB；非推理可用预算&quot;,
+    &quot;os&quot;: &quot;Orange Pi 1.0.8 / Ubuntu 20.04；kernel 5.10.160-rockchip-rk356x&quot;,
+    &quot;npu&quot;: &quot;当前驱动未核实；历史文档0.9.6；不换系统驱动&quot;
+  },
+  &quot;requirements&quot;: [
+    {
+      &quot;type&quot;: &quot;hard&quot;,
+      &quot;text&quot;: &quot;用户确认：ASR、LLM、TTS全本地部署，机器人语音交互；排除历史实测作为推荐依据&quot;
+    },
+    {
+      &quot;type&quot;: &quot;hard&quot;,
+      &quot;text&quot;: &quot;现有项目约束：RK3566标称4GB，同时为ROS/视觉留资源&quot;
+    },
+    {
+      &quot;type&quot;: &quot;target&quot;,
+      &quot;text&quot;: &quot;普通话、原生流式ASR partial/final、短中文回答与按句TTS作为本轮设计假设；双工/打断尚未确认&quot;
+    },
+    {
+      &quot;type&quot;: &quot;target&quot;,
+      &quot;text&quot;: &quot;建议首轮预算：ASR 300MiB、LLM 1000MiB、TTS 400MiB进程树峰值PSS，主机MemAvailable不低于600MiB；均非实测或已确认门槛&quot;
+    },
+    {
+      &quot;type&quot;: &quot;target&quot;,
+      &quot;text&quot;: &quot;首音、ASR等待/CER、LLM有效输出速度、TTS RTF尚无用户硬阈值；不得宣称达标&quot;
+    }
+  ]
+}</pre></section></body></html>

@@ -1,0 +1,119 @@
+{
+  "id": "ordered-parameters",
+  "input": "先把音量调到30，再播放夜曲。",
+  "expected": [
+    {
+      "name": "volume_set",
+      "arguments": {
+        "level": 30
+      }
+    },
+    {
+      "name": "play_music",
+      "arguments": {
+        "song_name": "夜曲"
+      }
+    }
+  ],
+  "catalog_count": 6,
+  "scope": "diagnostic subset, not full project acceptance",
+  "status": "error",
+  "raw": "{\"fc\": [\"volume_set\", \"level\", \"30\", \"start_following\", \"enable_tracking\", \"play_music\", \"night_music\"],\"res\":\"回复\"}",
+  "ttft_s": 119.55326774499554,
+  "total_s": 132.1708022380044,
+  "native_final": {
+    "index": 0,
+    "content": "",
+    "tokens": [],
+    "id_slot": 0,
+    "stop": true,
+    "model": "gpt-3.5-turbo",
+    "tokens_predicted": 37,
+    "tokens_evaluated": 585,
+    "generation_settings": {
+      "n_predict": 128,
+      "seed": 42,
+      "temperature": 0.0,
+      "dynatemp_range": 0.0,
+      "dynatemp_exponent": 1.0,
+      "top_k": 40,
+      "top_p": 0.949999988079071,
+      "min_p": 0.05000000074505806,
+      "top_n_sigma": -1.0,
+      "xtc_probability": 0.0,
+      "xtc_threshold": 0.10000000149011612,
+      "typical_p": 1.0,
+      "repeat_last_n": 64,
+      "repeat_penalty": 1.0,
+      "presence_penalty": 0.0,
+      "frequency_penalty": 0.0,
+      "dry_multiplier": 0.0,
+      "dry_base": 1.75,
+      "dry_allowed_length": 2,
+      "dry_penalty_last_n": 2048,
+      "dry_sequence_breakers": [
+        "\n",
+        ":",
+        "\"",
+        "*"
+      ],
+      "mirostat": 0,
+      "mirostat_tau": 5.0,
+      "mirostat_eta": 0.10000000149011612,
+      "stop": [],
+      "max_tokens": 128,
+      "n_keep": 0,
+      "n_discard": 0,
+      "ignore_eos": false,
+      "stream": true,
+      "logit_bias": [],
+      "n_probs": 0,
+      "min_keep": 0,
+      "grammar": "\nroot ::= ws \"{\" ws \"\\\"fc\\\"\" ws \":\" ws calls ws \",\" ws \"\\\"res\\\"\" ws \":\" ws string ws \"}\" ws\ncalls ::= \"[\" ws (string (ws \",\" ws string)*)? ws \"]\"\nstring ::= \"\\\"\" character* \"\\\"\"\ncharacter ::= [^\"\\\\\\x00-\\x1F] | \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F]{4})\nws ::= [ \\t\\n\\r]*\n",
+      "grammar_lazy": false,
+      "grammar_triggers": [],
+      "preserved_tokens": [],
+      "chat_format": "Content-only",
+      "reasoning_format": "auto",
+      "reasoning_in_content": false,
+      "thinking_forced_open": false,
+      "samplers": [
+        "penalties",
+        "dry",
+        "top_n_sigma",
+        "top_k",
+        "typ_p",
+        "top_p",
+        "min_p",
+        "xtc",
+        "temperature"
+      ],
+      "speculative.n_max": 16,
+      "speculative.n_min": 0,
+      "speculative.p_min": 0.75,
+      "timings_per_token": false,
+      "post_sampling_probs": false,
+      "lora": []
+    },
+    "prompt": "<|im_start|>system\n你是小沫机器人。只输出 JSON 对象 {\"fc\":[], \"res\":\"回复\"}。fc 是函数调用字符串数组，只允许下列工具及关键字参数。不要执行代码；没有动作时 fc 为空。不要声称设备已经成功。\n工具：[{\"name\": \"play_music\", \"description\": \"模拟切换当前歌曲，保留等待队列。\", \"parameters\": {\"additionalProperties\": false, \"description\": \"歌曲与队列接受非空名称。\", \"properties\": {\"song_name\": {\"description\": \"歌曲名称\", \"maxLength\": 2048, \"minLength\": 1, \"pattern\": \"\\\\S\", \"title\": \"Song Name\", \"type\": \"string\"}}, \"required\": [\"song_name\"], \"title\": \"SongInput\", \"type\": \"object\"}}, {\"name\": \"volume_set\", \"description\": \"模拟源 level 的整数转换与0至100饱和。\", \"parameters\": {\"additionalProperties\": false, \"description\": \"音量执行时量化并按原契约饱和。\", \"properties\": {\"level\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"number\"}], \"default\": 50, \"description\": \"音量，执行时取整并限制在0至100\", \"title\": \"Level\"}}, \"title\": \"LevelInput\", \"type\": \"object\"}}, {\"name\": \"start_following\", \"description\": \"采集请求、融合确认、Follow 确认按序执行，不重试。\", \"parameters\": {\"additionalProperties\": false, \"description\": \"无模型参数的动作。\", \"properties\": {}, \"title\": \"NoArguments\", \"type\": \"object\"}}, {\"name\": \"enable_tracking\", \"description\": \"仅启用 Follow，保留融合尚未开启时服务端拒绝的语义。\", \"parameters\": {\"additionalProperties\": false, \"description\": \"无模型参数的动作。\", \"properties\": {}, \"title\": \"NoArguments\", \"type\": \"object\"}}, {\"name\": \"enable_lidar\", \"description\": \"开启 tracker 扫描融合，保留服务端 TF/发布端检查。\", \"parameters\": {\"additionalProperties\": false, \"description\": \"无模型参数的动作。\", \"properties\": {}, \"title\": \"NoArguments\", \"type\": \"object\"}}, {\"name\": \"disable_lidar\", \"description\": \"关闭融合，服务确认后记录其隐含的 Follow standby。\", \"parameters\": {\"additionalProperties\": false, \"description\": \"无模型参数的动作。\", \"properties\": {}, \"title\": \"NoArguments\", \"type\": \"object\"}}]<|im_end|>\n<|im_start|>user\n先把音量调到30，再播放夜曲。<|im_end|>\n<|im_start|>assistant\n",
+    "has_new_line": false,
+    "truncated": false,
+    "stop_type": "eos",
+    "stopping_word": "",
+    "tokens_cached": 621,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 585,
+      "prompt_ms": 119483.706,
+      "prompt_per_token_ms": 204.24565128205128,
+      "prompt_per_second": 4.896065075182719,
+      "predicted_n": 37,
+      "predicted_ms": 12614.024,
+      "predicted_per_token_ms": 340.9195675675675,
+      "predicted_per_second": 2.9332431902777416
+    }
+  },
+  "error": "ModelProtocolError('本地模型 res/fc 协议无效')",
+  "protocol_valid": false,
+  "intent_pass": false
+}

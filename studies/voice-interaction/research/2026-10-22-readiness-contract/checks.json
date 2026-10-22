@@ -1,0 +1,205 @@
+{
+  "schema": "edge-model-prepare/checks-v1",
+  "request_sha256": "2fe405baef18bb3f0c34c83e887a165cec3b973c77f34955144a958e7b6eafa1",
+  "evidence": [
+    {
+      "id": "assets-manifest",
+      "location": "evidence/assets-manifest.json",
+      "sha256": "74045f6a69876f61ecd6f50d67e404602910f130c019d30db02955e43355cd17",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "assets"
+    },
+    {
+      "id": "runtime-manifest",
+      "location": "evidence/runtime-manifest.json",
+      "sha256": "39d6b900e923225bd996fd57fee182011ce9e305e565817e18c8f1284d31c4b5",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "runtime"
+    },
+    {
+      "id": "sherpa-load-check",
+      "location": "evidence/sherpa-load-check.json",
+      "sha256": "b5bad397a965c7c04664fd7dcd00de9cf8b8a05ed795affe5bd3fbe23510fab3",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "load"
+    },
+    {
+      "id": "llama-load-check",
+      "location": "evidence/llama-load-check.json",
+      "sha256": "f78a5f44230f333edde13b3cdc669165576a0b5515483ca6127495c28baa8c60",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "load"
+    },
+    {
+      "id": "readiness",
+      "location": "evidence/readiness.json",
+      "sha256": "253d79f290a7055e20a409e90ae9826ebf9d3e3c418376f848d584ff42140276",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "benchmark"
+    },
+    {
+      "id": "asr-config",
+      "kind": "benchmark_config",
+      "location": "evidence/asr-screening.json",
+      "sha256": "dd389c748749091929796298ae9b10c34112894cef3efa3f0c4eaab088e52bc1",
+      "description": "历史冻结配置；绝对路径不可直接移植"
+    },
+    {
+      "id": "tts-config",
+      "kind": "benchmark_config",
+      "location": "evidence/tts-screening.json",
+      "sha256": "95c80d0de056777fd1df701b15d40faf712f1183eff530ac7b5fee4ddb4cc376",
+      "description": "历史冻结配置；绝对路径不可直接移植"
+    },
+    {
+      "id": "llm-config",
+      "kind": "benchmark_config",
+      "location": "evidence/llm-screening.json",
+      "sha256": "12da7b713478196f6ea924410bd3d55aabe7d6237cacbeea02598bf329375fe1",
+      "description": "历史冻结配置；绝对路径不可直接移植"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "asr-zh14m-int8",
+      "acquisition": {
+        "model": "download",
+        "runtime": "reuse",
+        "reason": "复用现有sherpa1.13.8及实际加载ORT1.28.2，核验依赖与哈希。"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "目标资产来源及SHA256/Git blob已核对，许可来源已记录。",
+          "evidence": [
+            "assets-manifest"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际CPU运行库和依赖身份已冻结。",
+          "evidence": [
+            "runtime-manifest"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "仅模型构造/健康接口成功；未调用生成或解码。",
+          "evidence": [
+            "sherpa-load-check"
+          ]
+        },
+        "smoke": {
+          "status": "NOT_RUN",
+          "reason": "历史准备阶段未执行最小推理，不能由模型加载或mock测试推导跑通。",
+          "evidence": []
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "旧记录中配置路径解析与112文件检查通过；18项工具测试通过。这不证明模型推理成功。",
+          "evidence": [
+            "readiness"
+          ]
+        }
+      },
+      "next_action": "在预算内执行一个固定的真实样例，保存输入hash、调用、实际输出、退出状态和运行身份；确认预期行为后再决定是否进入正式初筛。",
+      "benchmark_configs": [
+        "asr-config"
+      ]
+    },
+    {
+      "id": "tts-melo-fp32",
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "复用现有sherpa1.13.8及实际加载ORT1.28.2，核验依赖与哈希。"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "目标资产来源及SHA256/Git blob已核对，许可来源已记录。",
+          "evidence": [
+            "assets-manifest"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际CPU运行库和依赖身份已冻结。",
+          "evidence": [
+            "runtime-manifest"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "仅模型构造/健康接口成功；未调用生成或解码。",
+          "evidence": [
+            "sherpa-load-check"
+          ]
+        },
+        "smoke": {
+          "status": "NOT_RUN",
+          "reason": "历史准备阶段未执行最小推理，不能由模型加载或mock测试推导跑通。",
+          "evidence": []
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "旧记录中配置路径解析与112文件检查通过；18项工具测试通过。这不证明模型推理成功。",
+          "evidence": [
+            "readiness"
+          ]
+        }
+      },
+      "next_action": "在预算内执行一个固定的真实样例，保存输入hash、调用、实际输出、退出状态和运行身份；确认预期行为后再决定是否进入正式初筛。",
+      "benchmark_configs": [
+        "tts-config"
+      ]
+    },
+    {
+      "id": "llm-qwen25-q4",
+      "acquisition": {
+        "model": "download",
+        "runtime": "build",
+        "reason": "历史运行准备固定b6500，已有22cd二进制版本不匹配，因而从源码构建；当时未保存兼容预编译包搜索证据。新版流程优先二进制，不能把此例编译选择当通则。"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "目标资产来源及SHA256/Git blob已核对，许可来源已记录。",
+          "evidence": [
+            "assets-manifest"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际CPU运行库和依赖身份已冻结。",
+          "evidence": [
+            "runtime-manifest"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "仅模型构造/健康接口成功；未调用生成或解码。",
+          "evidence": [
+            "llama-load-check"
+          ]
+        },
+        "smoke": {
+          "status": "NOT_RUN",
+          "reason": "历史准备阶段未执行最小推理，不能由模型加载或mock测试推导跑通。",
+          "evidence": []
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "旧记录中配置路径解析与112文件检查通过；18项工具测试通过。这不证明模型推理成功。",
+          "evidence": [
+            "readiness"
+          ]
+        }
+      },
+      "next_action": "在预算内执行一个固定的真实样例，保存输入hash、调用、实际输出、退出状态和运行身份；确认预期行为后再决定是否进入正式初筛。",
+      "benchmark_configs": [
+        "llm-config"
+      ]
+    }
+  ]
+}

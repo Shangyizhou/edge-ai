@@ -192,7 +192,10 @@ def run_case(config: dict, root: Path, python: str) -> dict:
                             if config.get("budget_limited")
                             else "timeout"
                         )
-                    elif current["host"]["MemAvailable"] < 384 * 1024:
+                    elif (
+                        current["host"]["MemAvailable"]
+                        < config.get("min_memavailable_mib", 384) * 1024
+                    ):
                         reason = "host_memory_guard"
                     elif current["host"]["SwapFree"] < 512 * 1024:
                         reason = "host_swap_guard"
@@ -240,7 +243,11 @@ def run_case(config: dict, root: Path, python: str) -> dict:
 
 def inventory(suite: dict) -> dict:
     """固定环境和输入资产身份，避免事后只按路径猜测权重。"""
-    paths = {Path(__file__), Path(__file__).with_name("workers.py")}
+    paths = {
+        Path(__file__),
+        Path(__file__).with_name("workers.py"),
+        Path(__file__).with_name("voice_v2.py"),
+    }
     paths.update(Path(p) for p in suite.get("extra_assets", []))
     cases = list(suite["cases"])
     for case in cases:

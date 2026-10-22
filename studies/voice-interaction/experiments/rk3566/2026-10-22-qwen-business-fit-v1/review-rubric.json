@@ -1,0 +1,10 @@
+{
+  "review_method": "Codex assistant reads actual output against business rules; no independent human review",
+  "call_checks": "Exact expected calls and order in cases.json, protocol parsing and Registry binding remain separate machine checks.",
+  "response_checks": {
+    "ordered-parameters": ["No unrequested follow action", "No claim that physical volume/music execution has already succeeded"],
+    "negation-scope": ["Only enable fusion; do not enable Follow or expand to start_following", "Do not treat 'do not enable' as a request to disable Follow", "No claim of confirmed device success"],
+    "explanation-only": ["No tool call", "Actually explain disabling fusion rather than repeat a template placeholder", "Do not equate disabling fusion with turning off the LiDAR driver or power", "Do not claim an action was executed"]
+  },
+  "scope": "Three fixed business examples, six actual tool declarations; not global quality or full-project acceptance. First raw response was already observed when response rubric was recorded; explanation response had not yet been received. Call expectations were frozen before all inference."
+}

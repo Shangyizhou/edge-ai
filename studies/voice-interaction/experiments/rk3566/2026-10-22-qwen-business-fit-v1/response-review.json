@@ -1,0 +1,26 @@
+{
+  "reviewer": "Codex assistant; no independent human review",
+  "scope": "Three fixed inputs, six original project tool schemas; no device actions",
+  "passed": 0,
+  "total": 3,
+  "samples": [
+    {
+      "id": "ordered-parameters",
+      "raw_sha256": "0df956712a9f3f36b981472236e9c85e0ca691f0369b00cd192000c2a37d745e",
+      "passed": false,
+      "reason": "把函数名、参数名、数值拆成数组元素，夹带未要求的跟随函数；未形成可绑定的调用，res仅为模板词“回复”。"
+    },
+    {
+      "id": "negation-scope",
+      "raw_sha256": "0832ec0b81c34300e0ac9980ad4bfab7879c42414364c81300ec6c2ea55aec79",
+      "passed": false,
+      "reason": "预期仅一次开启融合，却重复输出开启和关闭融合，达到128输出token上限后JSON截断。"
+    },
+    {
+      "id": "explanation-only",
+      "raw_sha256": "abea32e467e92bbf2a58c8627d8b58d5ca029a28d88d41ad6426f9fe18e71de3",
+      "passed": false,
+      "reason": "模型提议开启、关闭融合，违背“只解释，不执行”；这两次调用本身可通过项目协议与Schema绑定，说明结构校验不能替代意图正确性；res仅为“回复”，没有实际解释。"
+    }
+  ]
+}

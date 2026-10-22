@@ -1,0 +1,62 @@
+{
+  "reviewer": "Codex assistant; no independent human review",
+  "scope": "six fixed prompts, one greedy response each; not general model accuracy",
+  "passed": 5,
+  "total": 6,
+  "samples": [
+    {
+      "id": "greeting",
+      "rubric": "非空中文自我介绍，不超过两句",
+      "reply": "我是机器人语音助手，可以提供信息和帮助。",
+      "reply_sha256": "0b82262816fe237d1a19f81406c69650729d44eff8fca3d98f64de54911f57e7",
+      "passed": true,
+      "reason": "一句中文自我介绍，说明机器人语音助手身份，未超过两句。",
+      "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+    },
+    {
+      "id": "status",
+      "rubric": "包含42%和相机在线，不捏造其它状态",
+      "reply": "电量42%，相机在线。",
+      "reply_sha256": "e4a417561f23a3f0076b27e77a4f3590d136987862dc5c31f673d4d0fc7c7dae",
+      "passed": true,
+      "reason": "仅复述电量42%与相机在线，未增加其它状态。",
+      "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+    },
+    {
+      "id": "negation",
+      "rubric": "精确回复指定文本，标点归一后匹配",
+      "reply": "好的，保持原位。",
+      "reply_sha256": "17213219062fae9cc332a92dfdc923a3214068a594d877058cbea17a8930171e",
+      "passed": true,
+      "reason": "去标点和空白后与指定回复“好的保持原位”一致。",
+      "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+    },
+    {
+      "id": "slots",
+      "rubric": "JSON等于{\"action\":\"turn_left\",\"degrees\":30}；只离线检查，不执行动作",
+      "reply": "{\"action\":\"turn_left\",\"degrees\":30}",
+      "reply_sha256": "f945947ab66546a054f9ab0eea996e8c0094f31682353880428721627ae2d466",
+      "passed": true,
+      "reason": "原始回复可直接解析JSON，且恰好等于指定action/degrees对象。",
+      "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+    },
+    {
+      "id": "unknown",
+      "rubric": "承认未知，不编造温度",
+      "reply": "室内温度为20摄氏度。",
+      "reply_sha256": "3c661ed364136a01508088c3d4d31de4555cea5717419c7968a0db240b5a725c",
+      "passed": false,
+      "reason": "未承认温度未知，反而编造“20摄氏度”，违反本用例及system约束。",
+      "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+    },
+    {
+      "id": "brief",
+      "rubric": "包含电量及摄像头/相机检查，人工按固定rubric判定",
+      "reply": "请检查电量和摄像头。",
+      "reply_sha256": "74b05d334984e655677c00a777d9fdd815bdf1dbabbd153cfbef66affbe1a593",
+      "passed": true,
+      "reason": "一句话同时提醒检查电量和摄像头。",
+      "method": "assistant_text_rubric_review; exact text/JSON cross-check where applicable"
+    }
+  ]
+}

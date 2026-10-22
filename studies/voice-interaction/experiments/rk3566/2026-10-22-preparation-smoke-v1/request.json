@@ -1,0 +1,116 @@
+{
+  "schema": "edge-model-prepare/request-v1",
+  "device": {
+    "board": "Orange Pi 3B / RK3566",
+    "cpu": "4×Cortex-A55；Linux aarch64",
+    "ram": "MemTotal 4017020 KiB ≈ 3.83 GiB；非推理可用预算",
+    "os": "Orange Pi 1.0.8 / Ubuntu 20.04；kernel 5.10.160-rockchip-rk356x",
+    "npu": "当前驱动未核实；历史文档0.9.6；不换系统驱动"
+  },
+  "requirements": [
+    {
+      "type": "hard",
+      "text": "用户确认：ASR、LLM、TTS全本地部署，机器人语音交互；排除历史实测作为推荐依据"
+    },
+    {
+      "type": "hard",
+      "text": "现有项目约束：RK3566标称4GB，同时为ROS/视觉留资源"
+    },
+    {
+      "type": "target",
+      "text": "普通话、原生流式ASR partial/final、短中文回答与按句TTS作为本轮设计假设；双工/打断尚未确认"
+    },
+    {
+      "type": "target",
+      "text": "建议首轮预算：ASR 300MiB、LLM 1000MiB、TTS 400MiB进程树峰值PSS，主机MemAvailable不低于600MiB；均非实测或已确认门槛"
+    },
+    {
+      "type": "target",
+      "text": "首音、ASR等待/CER、LLM有效输出速度、TTS RTF尚无用户硬阈值；不得宣称达标"
+    }
+  ],
+  "source_selection_sha256": "28bcf81a3980461e245774eaf88f21a9f0bc84940e2f76aa0ae353a725412086",
+  "candidates": [
+    {
+      "name": "ASR 首选：Zipformer zh-14M CPU",
+      "model": "sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23 @204ad334e2e683fd295359930cc16fc0432a23ac",
+      "runtime": "sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结",
+      "backend": "RK3566 A55 CPU",
+      "precision": "encoder/joiner INT8，decoder FP32；同包FP32对照",
+      "artifact": "encoder-epoch-99-avg-1.int8.onnx + decoder-epoch-99-avg-1.onnx + joiner-epoch-99-avg-1.int8.onnx + tokens.txt",
+      "decision": "baseline",
+      "reason": "公开原生流式中文小模型，有官方INT8与FP32命令。推荐依据是部署路径及规模，而非旧实测。",
+      "risks": [
+        "中文噪声/远场/数字质量未知",
+        "ARM INT8实际执行和CPU共跑代价待测",
+        "模型卡Apache-2.0；release包和各文件hash待下载冻结；实际ORT加载版本待核验"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "官方Zipformer模型及运行参数",
+          "url": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html"
+        }
+      ],
+      "id": "asr-zh14m-int8",
+      "test_focus": "执行准备完成后首轮运行：同一6条素材，INT8/FP32均2线程，100ms实时回放与无等待吞吐分组。仅两条独立公开转写计CER；用FP32判断量化退化，未通过质量复核不进入三轮复测。"
+    },
+    {
+      "name": "TTS 首选：MeloTTS zh_en ONNX",
+      "model": "vits-melo-tts-zh_en; csukuangfj/vits-melo-tts-zh_en@a0d5c6a264c0ef92d70d8661d8cc502d79627cd6",
+      "runtime": "sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结",
+      "backend": "RK3566 A55 CPU",
+      "precision": "FP32起点；INT8只作独立待验证优化",
+      "artifact": "model.onnx + tokens.txt + lexicon.txt + 中文词典/FST完整资产",
+      "decision": "baseline",
+      "reason": "单模型VITS路线、中文及词典覆盖内英文，有官方sherpa部署说明；先用原精度减少变量。",
+      "risks": [
+        "官方约163MB文件尺寸不是PSS或峰值内存",
+        "英文受lexicon覆盖限制；数字多音字需固定用例",
+        "按句/短语生成不是原生逐字流式；首段播放等待待测",
+        "upstream MIT，转换资产须保留许可溯源"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "sherpa VITS/Melo部署",
+          "url": "https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/vits.html"
+        },
+        {
+          "title": "Melo官方模型MIT许可",
+          "url": "https://huggingface.co/myshell-ai/MeloTTS-Chinese"
+        }
+      ],
+      "id": "tts-melo-fp32",
+      "test_focus": "执行准备完成后首轮运行：同一4条中文文本，FP32、2线程、逐句提交，记录首PCM与整句合成RTF；数字及否定句人工听检。首音等待或发音不合适再试其它TTS。"
+    },
+    {
+      "name": "LLM 首选：Qwen2.5-0.5B-Instruct Q4_K_M",
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF@9217f5db79a29953eb74d5343926648285ec7e67",
+      "runtime": "llama.cpp b6500 (a7a98e0fffed794396b3fbad4dcdbbc184963645)，CPU构建候选，非本机验收版本",
+      "backend": "RK3566 A55 CPU",
+      "precision": "Q4_K_M混合张量量化",
+      "artifact": "qwen2.5-0.5b-instruct-q4_k_m.gguf; 491400032 bytes; sha256 74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+      "decision": "baseline",
+      "reason": "官方现成小型指令GGUF、Apache-2.0；作为短中文指令与短回复的首轮起点。",
+      "risks": [
+        "0.5B复杂推理、指令稳定性未知",
+        "权重文件不等于运行内存；KV/工作区另计",
+        "建议context 2048、回复64~96 token、2线程起点，均非用户门槛"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "Qwen官方GGUF及许可",
+          "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF"
+        },
+        {
+          "title": "llama.cpp冻结构建说明",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/b6500/docs/build.md"
+        }
+      ],
+      "id": "llm-qwen25-q4",
+      "test_focus": "执行准备完成后首轮运行：同6条固定中文任务，2线程context2048输出96token，greedy、无缓存复用，记录首token及首个标点闭合短句等待。任务不可靠则转入Qwen3备选。"
+    }
+  ]
+}

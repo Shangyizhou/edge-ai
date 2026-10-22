@@ -1,0 +1,255 @@
+{
+  "title": "RK3566 4GB 机器人离线 ASR / LLM / TTS 资料筛选",
+  "as_of": "2026-10-22",
+  "report_status": "research_only",
+  "scenario": {
+    "description": "普通话优先（依据现有需求，待最终确认）；本地听懂→短回复→说话→恢复监听，保留ROS与YOLO资源。旧本地实测不参与筛选。"
+  },
+  "device": {
+    "board": "Orange Pi 3B / RK3566",
+    "cpu": "4×Cortex-A55；Linux aarch64",
+    "ram": "MemTotal 4017020 KiB ≈ 3.83 GiB；非推理可用预算",
+    "os": "Orange Pi 1.0.8 / Ubuntu 20.04；kernel 5.10.160-rockchip-rk356x",
+    "npu": "当前驱动未核实；历史文档0.9.6；不换系统驱动"
+  },
+  "requirements": [
+    {
+      "type": "hard",
+      "text": "用户确认：ASR、LLM、TTS全本地部署，机器人语音交互；排除历史实测作为推荐依据"
+    },
+    {
+      "type": "hard",
+      "text": "现有项目约束：RK3566标称4GB，同时为ROS/视觉留资源"
+    },
+    {
+      "type": "target",
+      "text": "普通话、原生流式ASR partial/final、短中文回答与按句TTS作为本轮设计假设；双工/打断尚未确认"
+    },
+    {
+      "type": "target",
+      "text": "建议首轮预算：ASR 300MiB、LLM 1000MiB、TTS 400MiB进程树峰值PSS，主机MemAvailable不低于600MiB；均非实测或已确认门槛"
+    },
+    {
+      "type": "target",
+      "text": "首音、ASR等待/CER、LLM有效输出速度、TTS RTF尚无用户硬阈值；不得宣称达标"
+    }
+  ],
+  "summary": "优先验证 Zipformer zh14M CPU INT8 + Qwen2.5-0.5B-Instruct Q4_K_M + MeloTTS zh_en CPU FP32。先以半双工、短回复、按句TTS冻结一组；ASR NPU留作兼容性调查。完整交互验收：INSUFFICIENT_EVIDENCE。历史数字全部不参与本轮决策。",
+  "recommended_stack": [
+    {
+      "stage": "ASR",
+      "choice": "Streaming Zipformer zh14M CPU INT8 + FP32质量对照"
+    },
+    {
+      "stage": "LLM",
+      "choice": "Qwen2.5-0.5B-Instruct Q4_K_M / llama.cpp CPU"
+    },
+    {
+      "stage": "TTS",
+      "choice": "MeloTTS zh_en / sherpa-onnx CPU FP32"
+    },
+    {
+      "stage": "建议交互策略",
+      "choice": "半双工起点；短回复、按句合成；双工/AEC/打断另行验证"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "ASR 首选：Zipformer zh-14M CPU",
+      "model": "sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23 @204ad334e2e683fd295359930cc16fc0432a23ac",
+      "runtime": "sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结",
+      "backend": "RK3566 A55 CPU",
+      "precision": "encoder/joiner INT8，decoder FP32；同包FP32对照",
+      "artifact": "encoder-epoch-99-avg-1.int8.onnx + decoder-epoch-99-avg-1.onnx + joiner-epoch-99-avg-1.int8.onnx + tokens.txt",
+      "decision": "baseline",
+      "reason": "公开原生流式中文小模型，有官方INT8与FP32命令。推荐依据是部署路径及规模，而非旧实测。",
+      "risks": [
+        "中文噪声/远场/数字质量未知",
+        "ARM INT8实际执行和CPU共跑代价待测",
+        "模型卡Apache-2.0；release包和各文件hash待下载冻结；实际ORT加载版本待核验"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "官方Zipformer模型及运行参数",
+          "url": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html"
+        }
+      ]
+    },
+    {
+      "name": "ASR 备查：RK3566 RKNN bilingual Zipformer",
+      "model": "sherpa-onnx-rk3566-streaming-zipformer-bilingual-zh-en-2023-02-20",
+      "runtime": "sherpa-onnx v1.13.8 RKNN构建；compiler/runtime/driver匹配待核验",
+      "backend": "RK3566 NPU + CPU预后处理",
+      "precision": "不得从文件名推定FP16或INT8，须读取metadata",
+      "artifact": "rk3566专用tar.bz2；2026-10-15 release asset，sha256 28e3f8949c93ef9cafbc7cb2ec7398f76730ff0309c7ed2d508e2afd22f28228",
+      "decision": "investigate",
+      "reason": "官方有RK3566专用模型；当前下载包不继承历史compiler/runtime兼容性。CPU资源不足时值得验证。",
+      "risks": [
+        "当前driver只读接口无权限；历史0.9.6不能当现状确认",
+        "需要核验当前包compiler及IO精度、与YOLO的NPU竞争",
+        "此bilingual模型与zh14M不同，不能称同源CPU/NPU受控对照"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "官方RKNN模型资产",
+          "url": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models"
+        }
+      ]
+    },
+    {
+      "name": "TTS 首选：MeloTTS zh_en ONNX",
+      "model": "vits-melo-tts-zh_en; csukuangfj/vits-melo-tts-zh_en@a0d5c6a264c0ef92d70d8661d8cc502d79627cd6",
+      "runtime": "sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结",
+      "backend": "RK3566 A55 CPU",
+      "precision": "FP32起点；INT8只作独立待验证优化",
+      "artifact": "model.onnx + tokens.txt + lexicon.txt + 中文词典/FST完整资产",
+      "decision": "baseline",
+      "reason": "单模型VITS路线、中文及词典覆盖内英文，有官方sherpa部署说明；先用原精度减少变量。",
+      "risks": [
+        "官方约163MB文件尺寸不是PSS或峰值内存",
+        "英文受lexicon覆盖限制；数字多音字需固定用例",
+        "按句/短语生成不是原生逐字流式；首段播放等待待测",
+        "upstream MIT，转换资产须保留许可溯源"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "sherpa VITS/Melo部署",
+          "url": "https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/vits.html"
+        },
+        {
+          "title": "Melo官方模型MIT许可",
+          "url": "https://huggingface.co/myshell-ai/MeloTTS-Chinese"
+        }
+      ]
+    },
+    {
+      "name": "TTS 研究备选：Matcha zh Baker + Vocos",
+      "model": "matcha-icefall-zh-baker + vocos-22khz-univ",
+      "runtime": "sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结",
+      "backend": "RK3566 A55 CPU",
+      "precision": "FP32，model-steps-3",
+      "artifact": "model-steps-3.onnx + vocos-22khz-univ.onnx + lexicon/tokens/dict/FST",
+      "decision": "alternative",
+      "reason": "有官方中文部署及独立声码器路径，可在个人非商业研究比较自然度/等待。",
+      "risks": [
+        "训练数据non-commercial only，不列为商业产品默认方案",
+        "声学模型+声码器资源、分段首音等待待测",
+        "不能把其它设备官方速度移植到A55"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "官方Matcha模型、限制及声码器",
+          "url": "https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/matcha.html"
+        }
+      ]
+    },
+    {
+      "name": "LLM 首选：Qwen2.5-0.5B-Instruct Q4_K_M",
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF@9217f5db79a29953eb74d5343926648285ec7e67",
+      "runtime": "llama.cpp b6500 (a7a98e0fffed794396b3fbad4dcdbbc184963645)，CPU构建候选，非本机验收版本",
+      "backend": "RK3566 A55 CPU",
+      "precision": "Q4_K_M混合张量量化",
+      "artifact": "qwen2.5-0.5b-instruct-q4_k_m.gguf; 491400032 bytes; sha256 74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+      "decision": "baseline",
+      "reason": "官方现成小型指令GGUF、Apache-2.0；作为短中文指令与短回复的首轮起点。",
+      "risks": [
+        "0.5B复杂推理、指令稳定性未知",
+        "权重文件不等于运行内存；KV/工作区另计",
+        "建议context 2048、回复64~96 token、2线程起点，均非用户门槛"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "Qwen官方GGUF及许可",
+          "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF"
+        },
+        {
+          "title": "llama.cpp冻结构建说明",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/b6500/docs/build.md"
+        }
+      ]
+    },
+    {
+      "name": "LLM 备选：Qwen3-0.6B Q8_0",
+      "model": "Qwen/Qwen3-0.6B-GGUF@23749fefcc72300e3a2ad315e1317431b06b590a",
+      "runtime": "llama.cpp b6500 (a7a98e0fffed794396b3fbad4dcdbbc184963645)，CPU构建候选，非本机验收版本",
+      "backend": "RK3566 A55 CPU",
+      "precision": "Q8_0",
+      "artifact": "Qwen3-0.6B-Q8_0.gguf; 639446688 bytes; sha256 9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "decision": "alternative",
+      "reason": "官方GGUF、Apache-2.0；与Qwen2.5比较短中文任务，必须禁用thinking减少无关生成。",
+      "risks": [
+        "官方此仓库仅Q8_0；不能写成官方Q4",
+        "使用enable_thinking=false模板语义并核对llama模板支持；/no_think软提示不等于硬保证",
+        "比Qwen2.5是否更优须同任务验证；非同精度量化对照"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "Qwen3官方GGUF",
+          "url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF"
+        },
+        {
+          "title": "Qwen3关闭thinking说明",
+          "url": "https://huggingface.co/Qwen/Qwen3-0.6B"
+        }
+      ]
+    }
+  ],
+  "benchmark_plan": [
+    {
+      "name": "未入首轮路线与证据边界",
+      "method": "RKLLM官方平台无RK3566，因此不走官方LLM NPU路线。Qwen3.5-0.8B已有ggml-org GGUF，列第二批调查，需另冻新版llama runtime，不能套用b6500。接受整句ASR时再调查SenseVoice/Whisper。原生partial、普通话、半双工是本轮假设；完整交互INSUFFICIENT_EVIDENCE，非验收通过。"
+    },
+    {
+      "name": "冻结身份与轻量协议",
+      "method": "不运行本轮模型。后续按SOP记录编译器、ORT/依赖、CPU ISA与ABI、驱动/runtime、模型hash、FST/tokenizer、1/2线程、环境空闲状态。旧模型/权重不得自动继承身份。"
+    },
+    {
+      "name": "ASR 单模块与受控对照",
+      "method": "复用6–10条约1分钟有来源小集，100ms块实时回放与非实时吞吐分开；先单轮筛选再3轮复测。记录CER来源、首partial、能量锚点/文件末尾到final、RTF、加载/待机/推理PSS和CPU。仅同源同精度时比较CPU/NPU后端。"
+    },
+    {
+      "name": "LLM / TTS 固定小集",
+      "method": "中文指令、否定、数字、简短问答固定prompt和输出上限；记录LLM首token与首个可播短句时间、有效token/s和正确性。TTS同文本测文本提交到首块可播PCM、实际首音、RTF、数字读法/听感；分句并不自动意味着真正流式。"
+    },
+    {
+      "name": "完整交互与视觉共跑",
+      "method": "单模块复测后，在固定ROS/YOLO负载下3轮短场景，测用户末音代理锚点→ASR final→LLM首可播句→TTS PCM→扬声器首音→恢复监听。共跑结果不得由单模块加和推算。播放自识别、失败恢复、打断/AEC若要求需独立用例；当前全部UNKNOWN。"
+    }
+  ],
+  "acceptance": {
+    "status": "INSUFFICIENT_EVIDENCE",
+    "scope": "research screening only",
+    "measurements_used": [],
+    "root_cause": "UNKNOWN"
+  },
+  "additional_investigations": [
+    {
+      "name": "Qwen3.5-0.8B",
+      "status": "investigate",
+      "reason": "当前官方小模型及ggml-org GGUF部署路径值得第二批调查；需要新runtime独立冻结，不能套用b6500支持结论；未做RK3566 ABI、算子和资源验收。",
+      "evidence": [
+        "https://huggingface.co/Qwen/Qwen3.5-0.8B",
+        "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF"
+      ]
+    },
+    {
+      "name": "RKLLM RK3566 NPU",
+      "status": "excluded official route",
+      "reason": "官方RKLLM支持列表没有RK3566；不推广为硬件上任何自研LLM NPU实现绝不可能。",
+      "evidence": [
+        "https://github.com/airockchip/rknn-llm"
+      ]
+    },
+    {
+      "name": "Whisper / SenseVoice 整句方案",
+      "status": "conditional",
+      "reason": "若原生partial为硬需求则不替代流式ASR；若接受说完后识别，保留为另一轮调查，不因历史实测排除。"
+    }
+  ]
+}

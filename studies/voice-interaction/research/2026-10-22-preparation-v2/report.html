@@ -1,0 +1,200 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RK3566 语音栈：新版skill第一步与可实施测试计划</title><style>
+    :root{color-scheme:light;--ink:#192d3d;--muted:#627587;--line:#e0e8ee;--surface:#fff;--soft:#f0f5f7;--accent:#12716c}
+    *{box-sizing:border-box}
+    html{min-width:0}body{margin:0;background:#f4f7f9;color:var(--ink);font:15px/1.7 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+    body,main,section,article,.panel,.grid,.grid>*,.stack-grid>*,.spec-grid>*,.fact,.stack-card,.spec-value{min-width:0}
+    h1,h2,h3,p,li,dd,td,th,small,strong,span,a,.fact,.stack-card,.spec-value,.spec-grid{overflow-wrap:anywhere;word-break:break-word}
+    h1{font-size:clamp(27px,4vw,42px);line-height:1.26;margin:10px 0}h2{font-size:clamp(20px,2.5vw,24px);line-height:1.35;margin:0 0 14px}h3{font-size:clamp(18px,2.2vw,21px);line-height:1.4;margin:8px 0}
+    p{margin:10px 0}a{color:#126982}a:hover{text-decoration:underline}
+    header.hero{background:linear-gradient(125deg,#132c40,#205c6b);color:#fff;padding:46px max(20px,calc((100% - 1100px)/2));overflow-wrap:anywhere}
+    .hero p{color:#dbe9ee;max-width:800px}.hero .topline{font-size:13px;color:#d8e9ee}
+    main{max-width:1100px;margin:auto;padding:24px 20px 64px}
+    section{margin:24px 0}.panel,article.candidate{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:23px;box-shadow:0 2px 7px #17394a09}
+    .panel.feature{border-left:5px solid var(--accent)}.eyebrow{font-size:12px;letter-spacing:.06em;color:#527f86;font-weight:750}
+    .intro{font-size:16px;line-height:1.8}.muted,.sub,.subcopy{color:var(--muted);font-size:13px}
+    .tag,.status{display:inline-flex;align-items:center;max-width:100%;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:720;background:#e1f1ed;color:#126b61;white-space:normal}
+    .warning-note{background:#fff7e8;border:1px solid #f0dfbf;border-radius:9px;padding:12px 15px;font-size:13px;line-height:1.65;margin-top:16px}
+    .grid,.stack-grid,.device-grid,.spec-grid{display:grid;gap:12px}
+    .grid,.stack-grid,.device-grid,.spec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .fact,.stack-card,.spec-grid>div{background:#f2f6f8;border-radius:9px;padding:14px;min-width:0;overflow-wrap:anywhere}
+    .fact small,.stack-card small,.spec-grid dt{display:block;color:#647989;font-size:12px;font-weight:600;margin-bottom:7px}
+    .fact .value,.stack-card .value,.spec-grid dd{font-size:14px;font-weight:570;line-height:1.65;margin:0;overflow-wrap:anywhere;word-break:break-word}
+    .spec-grid>div:first-child,.spec-grid>div:last-child{grid-column:1 / -1}
+    .section-heading{margin:0 0 18px}.section-heading p{color:var(--muted);font-size:13px}
+    .stack-card{border:1px solid #e5edf1}.stack-card .value{font-size:15px;font-weight:650}
+    .req-list{display:grid;gap:10px}.req-item{display:flex;gap:10px;align-items:flex-start;min-width:0;border-bottom:1px solid #edf1f3;padding-bottom:10px}
+    .req-item:last-child{border:0;padding-bottom:0}.req-item .tag{flex-shrink:0;background:#e8eef7;color:#3b6387}
+    .req-item .tag.hard{background:#fceee8;color:#9b4f3c}.req-item .tag.target{background:#edf2fb;color:#5068aa}
+    article.candidate{margin:15px 0;padding:23px;border-left-width:5px}
+    article.baseline{border-left-color:#239b82}article.alternative{border-left-color:#799ac0}article.investigate{border-left-color:#d6a744}article.excluded{border-left-color:#c98478}
+    .candidate-head{display:flex;gap:16px;align-items:flex-start;justify-content:space-between}
+    .candidate-head>div{min-width:0}.candidate-head .sub{display:block;margin-bottom:5px}
+    .status.investigate{background:#fbf0d7;color:#976a13}.status.excluded{background:#fbe8e4;color:#9e5144}.status.alternative{background:#e9f0fa;color:#41699a}
+    .decision-copy{line-height:1.75;padding:12px 14px;background:#f7fafb;border-radius:9px;border:1px solid #e9eff3}
+    .decision-copy strong{display:block;margin-bottom:4px;color:#355e6a;font-size:12px}.experiment-note{margin:15px 0;padding:12px 14px;background:#edf5f7;border-radius:9px;font-size:14px}
+    details{margin-top:17px;border-top:1px solid var(--line);padding-top:12px}
+    summary{cursor:pointer;color:#186a72;font-weight:700}summary:focus-visible{outline:2px solid #137d7e;outline-offset:4px}
+    .details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:12px}
+    ul{padding-left:22px}li{margin:6px 0}.metrics{font-size:13px}
+    .bench-row{display:grid;grid-template-columns:36px minmax(0,1fr);gap:13px;border-bottom:1px solid #e8eef1;padding:14px 0}
+    .bench-row:last-child{border:0}.bench-num{color:#277980;font-weight:750}.bench-row strong{font-size:15px}
+    .bench-row p{color:#576d7d;margin:5px 0}.bench-row .sub{margin-top:6px}
+    footer{padding-top:24px;margin-top:28px;border-top:1px solid var(--line);color:#718391;font-size:12px}
+    @media(max-width:720px){
+      main{padding:18px 14px 48px}header.hero{padding:32px 16px}
+      .panel,article.candidate{padding:17px}
+      .grid,.stack-grid,.device-grid,.spec-grid,.details-grid{grid-template-columns:minmax(0,1fr)}
+      .spec-grid>div:first-child,.spec-grid>div:last-child{grid-column:auto}
+      .candidate-head{flex-wrap:wrap;gap:8px}.candidate-head .status{margin-left:0}
+    }
+    @media print{body{background:#fff}header.hero{background:#fff;color:var(--ink);border-bottom:2px solid var(--ink)}.hero p,.hero .topline{color:#50677a}.panel,article.candidate{box-shadow:none;break-inside:avoid}details{display:block}}
+    </style></head><body>
+<header class="hero"><div class="eyebrow" style="color:#b4e6e6">EDGE AI / MODEL SELECTION</div><h1>RK3566 语音栈：新版skill第一步与可实施测试计划</h1><p>普通话优先（依据现有需求，待最终确认）；本地听懂→短回复→说话→恢复监听，保留ROS与YOLO资源。旧本地实测不参与筛选。</p><div class="topline">资料日期：2026-10-22 · 研究阶段：所有板端数值待测</div></header>
+<main><section class="panel feature"><div class="eyebrow">01 / 调研结论</div><h2>优先验证的部署路线</h2>
+<p class="intro">优先验证 Zipformer zh14M CPU INT8 + Qwen2.5-0.5B-Instruct Q4_K_M + MeloTTS zh_en CPU FP32。先以半双工、短回复、按句TTS冻结一组；ASR NPU留作兼容性调查。完整交互验收：INSUFFICIENT_EVIDENCE。历史数字全部不参与本轮决策。 新版第一步：测试设计已冻结，目标资产与实际runtime身份未齐全，执行准备尚未完成；详见benchmark-plan.json及asset-readiness.json。</p>
+<p class="warning-note">当前属于资料筛选，不是板端性能排名。推荐组合仍需验证真实模型加载、功能、精度、P95 延迟、内存及整机并发负载。</p>
+</section><section class="panel"><div class="section-heading"><h2>02 / 硬件与需求边界</h2><p>筛选依据：先满足必须条件，再比较性能目标；未确认的指标不能判为通过。</p></div><div class="device-grid">
+<div class="fact"><small>board</small><div class="value">Orange Pi 3B / RK3566</div></div>
+<div class="fact"><small>cpu</small><div class="value">4×Cortex-A55；Linux aarch64</div></div>
+<div class="fact"><small>ram</small><div class="value">MemTotal 4017020 KiB ≈ 3.83 GiB；非推理可用预算</div></div>
+<div class="fact"><small>os</small><div class="value">Orange Pi 1.0.8 / Ubuntu 20.04；kernel 5.10.160-rockchip-rk356x</div></div>
+<div class="fact"><small>npu</small><div class="value">当前驱动未核实；历史文档0.9.6；不换系统驱动</div></div>
+</div><h3>功能与性能约束</h3><div class="req-list">
+<div class="req-item"><span class="tag hard">必须满足</span><span>用户确认：ASR、LLM、TTS全本地部署，机器人语音交互；排除历史实测作为推荐依据</span></div>
+<div class="req-item"><span class="tag hard">必须满足</span><span>现有项目约束：RK3566标称4GB，同时为ROS/视觉留资源</span></div>
+<div class="req-item"><span class="tag target">目标待验证</span><span>普通话、原生流式ASR partial/final、短中文回答与按句TTS作为本轮设计假设；双工/打断尚未确认</span></div>
+<div class="req-item"><span class="tag target">目标待验证</span><span>建议首轮预算：ASR 300MiB、LLM 1000MiB、TTS 400MiB进程树峰值PSS，主机MemAvailable不低于600MiB；均非实测或已确认门槛</span></div>
+<div class="req-item"><span class="tag target">目标待验证</span><span>首音、ASR等待/CER、LLM有效输出速度、TTS RTF尚无用户硬阈值；不得宣称达标</span></div>
+</div></section><section class="panel"><div class="section-heading"><h2>03 / 推荐本地运行组合</h2><p>这里展示的是建议先跑通、再测量的完整调用链；不是已经完成部署或已达到实时性的承诺。</p></div><div class="stack-grid">
+<div class="stack-card"><small>ASR</small><div class="value">Streaming Zipformer zh14M CPU INT8 + FP32质量对照</div></div>
+<div class="stack-card"><small>LLM</small><div class="value">Qwen2.5-0.5B-Instruct Q4_K_M / llama.cpp CPU</div></div>
+<div class="stack-card"><small>TTS</small><div class="value">MeloTTS zh_en / sherpa-onnx CPU FP32</div></div>
+<div class="stack-card"><small>建议交互策略</small><div class="value">半双工起点；短回复、按句合成；双工/AEC/打断另行验证</div></div>
+</div></section><section><div class="section-heading"><h2>04 / 候选组合、保留与排除依据</h2><p>每一项是特定模型 × Runtime × 后端 × 精度的组合。区分已知事实、尚未验证的风险和下一步应做的实验。</p></div>
+<article class="candidate baseline"><div class="candidate-head"><div><span class="sub">候选方案 01</span><h3>ASR 首选：Zipformer zh-14M CPU</h3></div><span class="status baseline">优先验证</span></div><p class="decision-copy"><strong>优先验证的原因</strong>公开原生流式中文小模型，有官方INT8与FP32命令。推荐依据是部署路径及规模，而非旧实测。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23 @204ad334e2e683fd295359930cc16fc0432a23ac</dd></div>
+<div><dt>推理 Runtime</dt><dd>sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 A55 CPU</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>encoder/joiner INT8，decoder FP32；同包FP32对照</dd></div>
+<div><dt>模型文件与来源</dt><dd>encoder-epoch-99-avg-1.int8.onnx + decoder-epoch-99-avg-1.onnx + joiner-epoch-99-avg-1.int8.onnx + tokens.txt</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 执行准备完成后首轮运行：同一6条素材，INT8/FP32均2线程，100ms实时回放与无等待吞吐分组。仅两条独立公开转写计CER；用FP32判断量化退化，未通过质量复核不进入三轮复测。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html" target="_blank" rel="noopener noreferrer">官方Zipformer模型及运行参数 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>中文噪声/远场/数字质量未知</li>
+<li>ARM INT8实际执行和CPU共跑代价待测</li>
+<li>模型卡Apache-2.0；release包和各文件hash待下载冻结；实际ORT加载版本待核验</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate investigate"><div class="candidate-head"><div><span class="sub">候选方案 02</span><h3>ASR 备查：RK3566 RKNN bilingual Zipformer</h3></div><span class="status investigate">待调查</span></div><p class="decision-copy"><strong>暂缓投入的原因</strong>官方有RK3566专用模型；当前下载包不继承历史compiler/runtime兼容性。CPU资源不足时值得验证。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>sherpa-onnx-rk3566-streaming-zipformer-bilingual-zh-en-2023-02-20</dd></div>
+<div><dt>推理 Runtime</dt><dd>sherpa-onnx v1.13.8 RKNN构建；compiler/runtime/driver匹配待核验</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 NPU + CPU预后处理</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>不得从文件名推定FP16或INT8，须读取metadata</dd></div>
+<div><dt>模型文件与来源</dt><dd>rk3566专用tar.bz2；2026-10-15 release asset，sha256 28e3f8949c93ef9cafbc7cb2ec7398f76730ff0309c7ed2d508e2afd22f28228</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 暂缓性能测试：先解包核验compiler/target/IO精度与驱动runtime组合，保存metadata；只有兼容与同任务输出检查通过才测资源。与zh14M比较仅为部署方案对照。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models" target="_blank" rel="noopener noreferrer">官方RKNN模型资产 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>当前driver只读接口无权限；历史0.9.6不能当现状确认</li>
+<li>需要核验当前包compiler及IO精度、与YOLO的NPU竞争</li>
+<li>此bilingual模型与zh14M不同，不能称同源CPU/NPU受控对照</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate baseline"><div class="candidate-head"><div><span class="sub">候选方案 03</span><h3>TTS 首选：MeloTTS zh_en ONNX</h3></div><span class="status baseline">优先验证</span></div><p class="decision-copy"><strong>优先验证的原因</strong>单模型VITS路线、中文及词典覆盖内英文，有官方sherpa部署说明；先用原精度减少变量。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>vits-melo-tts-zh_en; csukuangfj/vits-melo-tts-zh_en@a0d5c6a264c0ef92d70d8661d8cc502d79627cd6</dd></div>
+<div><dt>推理 Runtime</dt><dd>sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 A55 CPU</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>FP32起点；INT8只作独立待验证优化</dd></div>
+<div><dt>模型文件与来源</dt><dd>model.onnx + tokens.txt + lexicon.txt + 中文词典/FST完整资产</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 执行准备完成后首轮运行：同一4条中文文本，FP32、2线程、逐句提交，记录首PCM与整句合成RTF；数字及否定句人工听检。首音等待或发音不合适再试其它TTS。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/vits.html" target="_blank" rel="noopener noreferrer">sherpa VITS/Melo部署 ↗</a></li>
+<li><a href="https://huggingface.co/myshell-ai/MeloTTS-Chinese" target="_blank" rel="noopener noreferrer">Melo官方模型MIT许可 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>官方约163MB文件尺寸不是PSS或峰值内存</li>
+<li>英文受lexicon覆盖限制；数字多音字需固定用例</li>
+<li>按句/短语生成不是原生逐字流式；首段播放等待待测</li>
+<li>upstream MIT，转换资产须保留许可溯源</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate alternative"><div class="candidate-head"><div><span class="sub">候选方案 04</span><h3>TTS 研究备选：Matcha zh Baker + Vocos</h3></div><span class="status alternative">备选</span></div><p class="decision-copy"><strong>作为备选的原因</strong>有官方中文部署及独立声码器路径，可在个人非商业研究比较自然度/等待。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>matcha-icefall-zh-baker + vocos-22khz-univ</dd></div>
+<div><dt>推理 Runtime</dt><dd>sherpa-onnx v1.13.8 @11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf / shared aarch64 ORT 1.28.2 (tag默认依赖)；实际加载版本/ABI待执行冻结</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 A55 CPU</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>FP32，model-steps-3</dd></div>
+<div><dt>模型文件与来源</dt><dd>model-steps-3.onnx + vocos-22khz-univ.onnx + lexicon/tokens/dict/FST</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 暂缓首轮：仅在非商业研究用途和对应许可清楚后，用同4条文本比较自然度/首PCM等待，包含Vocos资源；不得把72MB声学模型当全部占用。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://k2-fsa.github.io/sherpa/onnx/tts/pretrained_models/matcha.html" target="_blank" rel="noopener noreferrer">官方Matcha模型、限制及声码器 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>训练数据non-commercial only，不列为商业产品默认方案</li>
+<li>声学模型+声码器资源、分段首音等待待测</li>
+<li>不能把其它设备官方速度移植到A55</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate baseline"><div class="candidate-head"><div><span class="sub">候选方案 05</span><h3>LLM 首选：Qwen2.5-0.5B-Instruct Q4_K_M</h3></div><span class="status baseline">优先验证</span></div><p class="decision-copy"><strong>优先验证的原因</strong>官方现成小型指令GGUF、Apache-2.0；作为短中文指令与短回复的首轮起点。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>Qwen/Qwen2.5-0.5B-Instruct-GGUF@9217f5db79a29953eb74d5343926648285ec7e67</dd></div>
+<div><dt>推理 Runtime</dt><dd>llama.cpp b6500 (a7a98e0fffed794396b3fbad4dcdbbc184963645)，CPU构建候选，非本机验收版本</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 A55 CPU</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>Q4_K_M混合张量量化</dd></div>
+<div><dt>模型文件与来源</dt><dd>qwen2.5-0.5b-instruct-q4_k_m.gguf; 491400032 bytes; sha256 74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 执行准备完成后首轮运行：同6条固定中文任务，2线程context2048输出96token，greedy、无缓存复用，记录首token及首个标点闭合短句等待。任务不可靠则转入Qwen3备选。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF" target="_blank" rel="noopener noreferrer">Qwen官方GGUF及许可 ↗</a></li>
+<li><a href="https://github.com/ggml-org/llama.cpp/blob/b6500/docs/build.md" target="_blank" rel="noopener noreferrer">llama.cpp冻结构建说明 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>0.5B复杂推理、指令稳定性未知</li>
+<li>权重文件不等于运行内存；KV/工作区另计</li>
+<li>建议context 2048、回复64~96 token、2线程起点，均非用户门槛</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate alternative"><div class="candidate-head"><div><span class="sub">候选方案 06</span><h3>LLM 备选：Qwen3-0.6B Q8_0</h3></div><span class="status alternative">备选</span></div><p class="decision-copy"><strong>作为备选的原因</strong>官方GGUF、Apache-2.0；与Qwen2.5比较短中文任务，必须禁用thinking减少无关生成。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>Qwen/Qwen3-0.6B-GGUF@23749fefcc72300e3a2ad315e1317431b06b590a</dd></div>
+<div><dt>推理 Runtime</dt><dd>llama.cpp b6500 (a7a98e0fffed794396b3fbad4dcdbbc184963645)，CPU构建候选，非本机验收版本</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 A55 CPU</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>Q8_0</dd></div>
+<div><dt>模型文件与来源</dt><dd>Qwen3-0.6B-Q8_0.gguf; 639446688 bytes; sha256 9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 第二批：Qwen2.5固定任务失败或需要质量比较时再运行，核验模板enable_thinking=false，使用同任务/参数；检查思考内容泄漏与首句等待，不能把代际+精度差异归为单纯量化收益。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://huggingface.co/Qwen/Qwen3-0.6B-GGUF" target="_blank" rel="noopener noreferrer">Qwen3官方GGUF ↗</a></li>
+<li><a href="https://huggingface.co/Qwen/Qwen3-0.6B" target="_blank" rel="noopener noreferrer">Qwen3关闭thinking说明 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>官方此仓库仅Q8_0；不能写成官方Q4</li>
+<li>使用enable_thinking=false模板语义并核对llama模板支持；/no_think软提示不等于硬保证</li>
+<li>比Qwen2.5是否更优须同任务验证；非同精度量化对照</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+</section><section class="panel"><div class="section-heading"><h2>05 / Benchmark 实施计划</h2><p>下面每项都应转化为可重复的测试输入、采集程序和 JSON 指标。不同模型采用一致数据集，并单独记录特有的兼容性实验。</p></div>
+<div class="bench-row"><div class="bench-num">01</div><div><strong>exp-asr-zh14m-int8</strong><p>执行准备完成后首轮运行：同一6条素材，INT8/FP32均2线程，100ms实时回放与无等待吞吐分组。仅两条独立公开转写计CER；用FP32判断量化退化，未通过质量复核不进入三轮复测。 详见benchmark-plan.json的controls/metrics/evidence及固定fixtures。</p>
+<div class="sub">适用组合：asr-zh14m-int8；判定方式：研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">02</div><div><strong>exp-asr-rknn-bilingual</strong><p>暂缓性能测试：先解包核验compiler/target/IO精度与驱动runtime组合，保存metadata；只有兼容与同任务输出检查通过才测资源。与zh14M比较仅为部署方案对照。 详见benchmark-plan.json的controls/metrics/evidence及固定fixtures。</p>
+<div class="sub">适用组合：asr-rknn-bilingual；判定方式：研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">03</div><div><strong>exp-tts-melo-fp32</strong><p>执行准备完成后首轮运行：同一4条中文文本，FP32、2线程、逐句提交，记录首PCM与整句合成RTF；数字及否定句人工听检。首音等待或发音不合适再试其它TTS。 详见benchmark-plan.json的controls/metrics/evidence及固定fixtures。</p>
+<div class="sub">适用组合：tts-melo-fp32；判定方式：研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">04</div><div><strong>exp-tts-matcha-fp32</strong><p>暂缓首轮：仅在非商业研究用途和对应许可清楚后，用同4条文本比较自然度/首PCM等待，包含Vocos资源；不得把72MB声学模型当全部占用。 详见benchmark-plan.json的controls/metrics/evidence及固定fixtures。</p>
+<div class="sub">适用组合：tts-matcha-fp32；判定方式：研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">05</div><div><strong>exp-llm-qwen25-q4</strong><p>执行准备完成后首轮运行：同6条固定中文任务，2线程context2048输出96token，greedy、无缓存复用，记录首token及首个标点闭合短句等待。任务不可靠则转入Qwen3备选。 详见benchmark-plan.json的controls/metrics/evidence及固定fixtures。</p>
+<div class="sub">适用组合：llm-qwen25-q4；判定方式：研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">06</div><div><strong>exp-llm-qwen3-q8</strong><p>第二批：Qwen2.5固定任务失败或需要质量比较时再运行，核验模板enable_thinking=false，使用同任务/参数；检查思考内容泄漏与首句等待，不能把代际+精度差异归为单纯量化收益。 详见benchmark-plan.json的controls/metrics/evidence及固定fixtures。</p>
+<div class="sub">适用组合：llm-qwen3-q8；判定方式：研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS</div>
+</div></div>
+</section><section class="panel"><h2>06 / 调研结束后如何继续</h2><p>按实验顺序先验证加载与流式功能，然后在相同设备、相同测试集上比较精度、延迟、内存与稳定性。将原始日志转换成 benchmark-results.json，交给 validation 阶段逐项验收；如不达标，根据瓶颈重新选择模型或运行后端。</p></section><footer>Edge Model Selection · 静态 HTML 从已审阅的 JSON 生成。资料调研、模型假设和设备实测具有不同证据等级。</footer></main></body></html>

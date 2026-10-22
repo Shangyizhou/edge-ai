@@ -1,0 +1,155 @@
+{
+  "protocol_id": "rk3566-voice-screen-v2",
+  "status": "DESIGN_FROZEN_ASSET_FREEZE_PENDING",
+  "scope": "单模块准备；不含推理、ROS、播放、麦克风与共跑执行",
+  "provenance": {
+    "user_confirmed": [
+      "全本地ASR/LLM/TTS机器人交互",
+      "不采用旧本地实测作为选型依据"
+    ],
+    "project_constraints": [
+      "RK3566约4GB",
+      "为ROS/YOLO留资源"
+    ],
+    "assumptions": [
+      "普通话优先",
+      "原生增量ASR partial/final",
+      "半双工、短回答、按句TTS"
+    ],
+    "suggested_not_confirmed": {
+      "pss_mib": {
+        "asr": 300,
+        "llm": 1000,
+        "tts": 400
+      },
+      "min_memavailable_mib": 600
+    },
+    "acceptance_thresholds_confirmed": false
+  },
+  "controls": {
+    "asr_threads": 2,
+    "tts_threads": 2,
+    "llm_threads": 2,
+    "llm_context": 2048,
+    "llm_batch": 128,
+    "llm_microbatch": 64,
+    "llm_kv": "f16",
+    "llm_max_new_tokens": 96,
+    "llm_temperature": 0,
+    "llm_prompt_cache": false,
+    "asr_chunk_ms": 100,
+    "asr_tail_silence_s": 3.2,
+    "asr_endpoint": {
+      "rule1_min_trailing_silence_s": 2.4,
+      "rule2_min_trailing_silence_s": 1.2,
+      "rule3_min_utterance_s": 20
+    },
+    "process_model_load": "一次每进程；先记录首请求，独立预热用例后再测；复测每轮新进程",
+    "warmup": "ASR独立official0流一次；LLM“你好”一次；TTS“你好”一次；均不计正式样本",
+    "idle_window_s": 3,
+    "resource_sampling_ms": 200,
+    "resource_scope": "进程树PSS/RSS；CPU核秒和全机容量占比，加载/待机/推理分别统计"
+  },
+  "budgets": {
+    "screening_rounds": 1,
+    "qualification_rounds": 3,
+    "case_timeout_s": 90,
+    "per_candidate_budget_s": 600,
+    "total_screen_budget_s": 1800,
+    "policy": "串行；包含加载预热和全部case，达到任何预算保留事实并停止，不自动扩矩阵；guard仅终止本轮拥有的进程组",
+    "abort_min_memavailable_mib": 600
+  },
+  "metrics": {
+    "asr": [
+      "CER仅两条公开参考；归一NFKC、小写、去Unicode标点及空白，保留数字字面差异；逐条及加权CER",
+      "计算RTF=特征/解码计算wall time之和/原音频时长；含尾静音计算，不含主动等待；加载另计",
+      "首非空partial相对第一块提交；final相对文件末尾计划到达时间；能量锚点另列，非人工EOS",
+      "按绝对monotonic时钟调度100ms块，滞后不重置起点；记录EOF强制final与endpoint final区别"
+    ],
+    "llm": [
+      "请求提交到首非空content token",
+      "请求提交到首个以。！？闭合且可送TTS的短句；截断无闭合则null",
+      "decode token/s按首token至末token及对应token数定义，单token记null；prompt处理单列",
+      "按6条rubric逐项记录true/false/null，不由输出长度代替质量"
+    ],
+    "tts": [
+      "请求提交到首块非空可播放PCM；只有整句返回则记整句返回边界，不称增量首PCM",
+      "请求到全部PCM生成时间/输出音频时长；文件写入另列",
+      "数字/否定/日期/停顿听检；不输出MOS分数",
+      "当前不播放，扬声器首音和整机交互等待记null"
+    ]
+  },
+  "statistics": "按用例和轮次保存；显示中位数/范围，P50/P95注明n及nearest-rank；小n P95不作稳定尾延迟保证",
+  "evidence": [
+    "manifest.json（配置/模型/库/输入/测量源码hash）",
+    "events.jsonl（monotonic时间、阶段、partial/final/token/PCM事件）",
+    "resources.jsonl（进程树、PSS/RSS、CPU、host MemAvailable/swap）",
+    "stdout.log / stderr.log / request-response.json / generated.wav（音频Git外）",
+    "results.json + report.html（unknown=null；状态与质量/性能分开）"
+  ],
+  "comparison": "INT8/FP32是部署量化对照；zh14M与RKNN bilingual是不同模型部署比较；受控CPU/NPU必须另配同源同精度权重，不套本组结论",
+  "implementation_gaps": [
+    "旧ASR适配器默认输入/模型必须按本协议核对，禁止直接跑旧config",
+    "LLM旧Human/Assistant模板不复用，使用每个官方GGUF chat template",
+    "检查TTFT与首可播句事件采集、greedy及thinking硬关闭支持",
+    "Melo首PCM回调能力和整句返回边界需适配器明确",
+    "现有工具默认384MiB guard需显式改为本计划600MiB，且保留进程组清理"
+  ],
+  "run_gate": "首选资产和运行库身份全部核验、样本hash通过、适配器支持本协议才运行；未确认业务阈值不阻止研究筛选，但不能产品PASS",
+  "experiments": [
+    {
+      "id": "exp-asr-zh14m-int8",
+      "candidate": "asr-zh14m-int8",
+      "stage": "asr",
+      "run_when": "after preparation gate",
+      "workload": "asr-fixtures.json",
+      "method": "执行准备完成后首轮运行：同一6条素材，INT8/FP32均2线程，100ms实时回放与无等待吞吐分组。仅两条独立公开转写计CER；用FP32判断量化退化，未通过质量复核不进入三轮复测。",
+      "pass_criteria": "研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS"
+    },
+    {
+      "id": "exp-asr-rknn-bilingual",
+      "candidate": "asr-rknn-bilingual",
+      "stage": "asr",
+      "run_when": "postpone until baseline review / prerequisites",
+      "workload": "asr-fixtures.json",
+      "method": "暂缓性能测试：先解包核验compiler/target/IO精度与驱动runtime组合，保存metadata；只有兼容与同任务输出检查通过才测资源。与zh14M比较仅为部署方案对照。",
+      "pass_criteria": "研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS"
+    },
+    {
+      "id": "exp-tts-melo-fp32",
+      "candidate": "tts-melo-fp32",
+      "stage": "tts",
+      "run_when": "after preparation gate",
+      "workload": "text-fixtures.json#tts",
+      "method": "执行准备完成后首轮运行：同一4条中文文本，FP32、2线程、逐句提交，记录首PCM与整句合成RTF；数字及否定句人工听检。首音等待或发音不合适再试其它TTS。",
+      "pass_criteria": "研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS"
+    },
+    {
+      "id": "exp-tts-matcha-fp32",
+      "candidate": "tts-matcha-fp32",
+      "stage": "tts",
+      "run_when": "postpone until baseline review / prerequisites",
+      "workload": "text-fixtures.json#tts",
+      "method": "暂缓首轮：仅在非商业研究用途和对应许可清楚后，用同4条文本比较自然度/首PCM等待，包含Vocos资源；不得把72MB声学模型当全部占用。",
+      "pass_criteria": "研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS"
+    },
+    {
+      "id": "exp-llm-qwen25-q4",
+      "candidate": "llm-qwen25-q4",
+      "stage": "llm",
+      "run_when": "after preparation gate",
+      "workload": "text-fixtures.json#llm",
+      "method": "执行准备完成后首轮运行：同6条固定中文任务，2线程context2048输出96token，greedy、无缓存复用，记录首token及首个标点闭合短句等待。任务不可靠则转入Qwen3备选。",
+      "pass_criteria": "研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS"
+    },
+    {
+      "id": "exp-llm-qwen3-q8",
+      "candidate": "llm-qwen3-q8",
+      "stage": "llm",
+      "run_when": "postpone until baseline review / prerequisites",
+      "workload": "text-fixtures.json#llm",
+      "method": "第二批：Qwen2.5固定任务失败或需要质量比较时再运行，核验模板enable_thinking=false，使用同任务/参数；检查思考内容泄漏与首句等待，不能把代际+精度差异归为单纯量化收益。",
+      "pass_criteria": "研究执行通过=输入输出完整且无timeout/error；质量按独立参考/rubric呈现；用户未确认阈值时性能与产品验收UNKNOWN，不能据建议预算直接判PASS"
+    }
+  ]
+}

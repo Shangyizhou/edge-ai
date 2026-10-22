@@ -1,0 +1,57 @@
+{
+  "id": "llm-smoke",
+  "config": {
+    "threads": 2,
+    "protocol_id": "rk3566-voice-screen-v2",
+    "min_memavailable_mib": 600,
+    "max_as_mib": 3072,
+    "id": "llm-smoke",
+    "kind": "command",
+    "binary": "/home/orangepi/.cache/edge-voice-v2/llama-b6500/bin/llama-server",
+    "model": "/home/orangepi/models/edge-voice-v2/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "timeout": 180,
+    "context": 2048,
+    "batch": 128,
+    "microbatch": 64,
+    "kv": "f16",
+    "max_tokens": 96,
+    "temperature": 0,
+    "chat_template": "chatml",
+    "system": "你是机器人语音助手。只用简短中文回答；不知道的事实明确说不知道。",
+    "texts": [
+      "你好，请用一句简短中文介绍你自己。",
+      "已知：电量42%，相机在线。请只复述这两项状态。",
+      "不要移动。请只回复：好的，保持原位。",
+      "把“向左转三十度”转换成JSON，只包含action和degrees，action用turn_left。",
+      "你没有接入温度传感器。现在室内多少摄氏度？",
+      "用一句话提醒我检查电量和摄像头。"
+    ],
+    "module": "llm",
+    "candidate": "llm-qwen25-q4",
+    "input": {
+      "text": "请只回复：你好。"
+    },
+    "command": [
+      "/home/orangepi/venvs/sherpa-onnx/bin/python",
+      "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/smoke.py",
+      "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/llm-input-config.json",
+      "{output}"
+    ]
+  },
+  "command": [
+    "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/smoke.py",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/llm-input-config.json",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-preparation-smoke-v1/llm-smoke"
+  ],
+  "status": "ok",
+  "returncode": 0,
+  "wall_seconds": 9.655262838001363,
+  "peak_rss_mib": 562.953125,
+  "peak_pss_mib": 556.4794921875,
+  "peak_swap_mib": 0.0,
+  "cpu_seconds": 16.08,
+  "peak_threads": 8,
+  "min_host_available_mib": 2941.49609375,
+  "events": []
+}

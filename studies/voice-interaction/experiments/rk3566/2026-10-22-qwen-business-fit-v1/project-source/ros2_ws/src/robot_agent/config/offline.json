@@ -1,0 +1,53 @@
+{
+  "backend": "offline",
+  "log_level": "INFO",
+  "startup_timeout": 120,
+  "provider_timeout": 60,
+  "model_attempts": 1,
+  "action_timeout": 5,
+  "speech_timeout": 60,
+  "shutdown_timeout": 5,
+  "asr_control_timeout": 2,
+  "capture_timeout": 10,
+  "max_tokens": 512,
+  "tts_attempts": 1,
+  "silence_timeout": 120,
+  "output_dir": "~/.local/state/ros-robot/offline-results",
+  "memory_recent_turns": 6,
+  "memory_max_chars": 4096,
+  "record_device": "plughw:CARD=Device,DEV=0",
+  "play_device": "default",
+  "record_executable": "arecord",
+  "play_executable": "aplay",
+  "playback_enabled": true,
+  "save_reply_audio": false,
+  "save_turn_records": true,
+  "offline": {
+    "asr": {
+      "encoder": "~/.local/share/ros-robot/models/asr/encoder-epoch-99-avg-1.int8.onnx",
+      "decoder": "~/.local/share/ros-robot/models/asr/decoder-epoch-99-avg-1.onnx",
+      "joiner": "~/.local/share/ros-robot/models/asr/joiner-epoch-99-avg-1.int8.onnx",
+      "tokens": "~/.local/share/ros-robot/models/asr/tokens.txt",
+      "num_threads": 2,
+      "sample_rate": 16000,
+      "max_audio_queue": 10,
+      "max_audio_age_ms": 500,
+      "max_frame_samples": 1600,
+      "endpoint_silence": 2.4,
+      "endpoint_speech_silence": 1.2,
+      "endpoint_max_seconds": 20.0
+    },
+    "llm": {
+      "model_path": "~/.local/share/ros-robot/models/llm/qwen3-robot-q8_0.gguf",
+      "context_tokens": 4096,
+      "threads": 2
+    },
+    "tts": {
+      "model": "~/.local/share/ros-robot/models/tts/zh_CN-xiao_ya-medium.onnx",
+      "tokens": "~/.local/share/ros-robot/models/tts/tokens.txt",
+      "lexicon": "~/.local/share/ros-robot/models/tts/lexicon.txt",
+      "rule_fsts": "~/.local/share/ros-robot/models/tts/phone.fst,~/.local/share/ros-robot/models/tts/date.fst,~/.local/share/ros-robot/models/tts/number.fst",
+      "num_threads": 2
+    }
+  }
+}

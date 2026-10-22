@@ -1,57 +1,23 @@
-# edge-ai
+# edge-ai · 当前 skill 流程
 
-**第一次阅读：[从一句话开始，学懂语音模型与SOP](https://shangyizhou.github.io/edge-ai/learn.html)** · [量化与转换](https://shangyizhou.github.io/edge-ai/quantization.html) · [给部署者的说明](https://shangyizhou.github.io/edge-ai/deployment.html)。
+当前只展示2026-10-22按 `edge-model-selection`、`edge-model-prepare` 重新开展的机器人本地语音研究。旧语音、YOLO、量化/共跑实验及旧看板资料已[移至仓库外归档](archives/README.md)，不参与当前结论。
 
-**网页入口：[Edge AI 研究台](https://shangyizhou.github.io/edge-ai/)** · 建议、资源图表、研究进度与可检索证据。[网站维护与本地预览](tools/research_site/README.md)。
-
-端侧模型的调研、部署与性能测试记录。按研究主题查阅，每个主题集中保存调研依据、设备部署方法和实验结果。
-
-| 研究主题 | 做了什么 | 阅读入口 |
+| 阶段 | 当前状态 | 入口 |
 | --- | --- | --- |
-| 语音交互 | RK3566上的ASR、TTS、Qwen对照；流式ASR、生产ROS节点NPU接入及视觉共跑 | [语音交互：当前建议与下一步](studies/voice-interaction/README.md) |
-| 目标检测 | ros-robot YOLOv6 CPU候选/NPU对照、640×352@30fps回放及ASR共跑 | [目标检测总览](studies/object-detection/README.md) |
+| 选型 | 基于当前RK3566配置与官方资料重新筛选 | [候选与来源](studies/voice-interaction/research/2026-10-22-local-stack/README.md) |
+| 准备 | 模型、运行库、输入冻结；最小真实推理通过 | [准备证据](studies/voice-interaction/experiments/rk3566/2026-10-22-preparation-smoke-v1/README.md) |
+| 单模块验证 | ASR、LLM、TTS本轮记录保留；ASR补齐3条有声材料 | [当前结论](studies/voice-interaction/README.md) · [实验索引](studies/voice-interaction/experiments/rk3566/README.md) |
+| 业务适配 | 原生tool_calls尚未验证；计划Qwen3业务LoRA | [当前方案与Mac配置](studies/voice-interaction/research/2026-10-22-qwen-adaptation/README.md) |
+| 训练与整链路 | 尚未训练、整链路与共跑尚未验收 | [接入边界](studies/voice-interaction/integration.md) |
 
-从主题首页看当前建议、关键数据和下一步，再按需查依据。语音交互的详情收敛为[准备](studies/voice-interaction/plan.md)、[单模型对比](studies/voice-interaction/models.md)、[机器人验证](studies/voice-interaction/integration.md)三页。新增研究主题放在`studies/<topic>/`，共用测试工具保留在`tools/`。
+训练规划：MacBook Air M5 / 16GB统一内存 / 约70GB可用空间，由用户提供，尚未直接检查环境。计划先在Mac做Qwen3-0.6B LoRA/QLoRA小规模验证，板子负责推理验收；工具目录继续传递，不迁移整套ROS工作区。
 
-## 目录约定
+## 阅读和工具
 
-```text
-studies/<topic>/
-├── README.md                 # 当前建议、关键数据、下一步
-├── plan.md                   # 准备：目标、设备、候选与怎样测
-├── models.md                 # 单模型对比：筛选、复测与选择
-├── integration.md            # 机器人验证：共跑、接入与完整体验
-├── research/                 # 官方资料、候选方案和测量方法
-├── platforms/<device>/       # 设备说明、部署步骤和外部资产清单
-├── experiments/<device>/     # 实验索引和各轮完整记录
-├── comparisons/              # 跨实验只读视图，链接原始证据
-└── history/                  # 历史需求和决策（有需要时建立）
-tools/edge_benchmark/          # 多主题共用的测试工具
-```
+[主题首页](studies/voice-interaction/README.md) · [准备与推进](studies/voice-interaction/plan.md) · [模型与证据](studies/voice-interaction/models.md) · [研究方法](docs/methodology/README.md)。
 
-上面是语音交互的阅读布局；其他主题按已有内容逐步采用，不预建空页面。日常页面汇总判断，研究资料和实验目录保留详细证据。
+网站由当前Markdown和本轮证据生成，构建说明见[网站工具](tools/research_site/README.md)。本地整理不会自动更新线上Pages；发布仍需单独提交、推送。
 
-通用流程和结果格式集中在[研究方法](docs/methodology/README.md)。新增实验按统一协议保存；历史实验目录保留原布局和证据。跨主题实验只保留一份原始证据，通过链接引用。
+新测量另建实验，保留配置、日志、清单、哈希和源码快照；模型、音频、SDK、凭据和构建产物留在仓库外。实际生产实现维护在ros-robot，本站快照只作证据。归档没有删除模型或本轮仍在引用的外部素材。
 
-## 研究方法
-
-通用方法已确认为[端侧模型轻量评测SOP](docs/methodology/model-evaluation-sop.md)（v1.1）：资源和性能优先，少量固定用例，先单模块后共跑，结构化结果生成静态HTML。已完成[ASR现成方案试点](studies/voice-interaction/experiments/rk3566/2026-10-21-asr-lite-v1/results.md)，同精度CPU/NPU受控主基线待补齐。数据契约与入口见[方法索引](docs/methodology/README.md)；历史证据按原比较口径保留。
-
-## 复测与数据
-
-[benchmark使用说明](tools/edge_benchmark/README.md)包含配置、执行方式和报告生成方法。报告内的绝对路径、源码hash和来源清单表示测量当时的事实，不随目录迁移改写。
-
-```sh
-python3 -m unittest discover -s tools/edge_benchmark -p 'test_*.py'
-python3 tools/edge_benchmark/benchmark.py report studies/voice-interaction/experiments/rk3566/2026-10-21-baseline
-```
-
-生成报告只读取保存的数据，不加载模型或执行机器人动作。代码、文档和实测证据进入Git；模型权重、录音、SDK、凭据与构建产物放在仓库外。`.local/artifacts`是本机外部缓存入口。
-
-原始工作从ros-robot迁入，来源提交和逐文件hash见[迁移来源](studies/voice-interaction/experiments/rk3566/2026-10-21-baseline/migration-provenance.json)。ros-robot生产实现仍在其自身仓库维护。
-
-## 协作约定
-
-工作与规格记录在[GitHub Issues](https://github.com/Shangyizhou/edge-ai/issues)。
-代理入口见[AGENTS.md](AGENTS.md)，领域术语见[GLOSSARY.md](GLOSSARY.md)，
-工程技能配置在[docs/agents/](docs/agents/)。研究过程与实验数据继续按主题归档。
+工作与规格记录在[GitHub Issues](https://github.com/Shangyizhou/edge-ai/issues/7)。代理约定见[AGENTS.md](AGENTS.md)，术语见[GLOSSARY.md](GLOSSARY.md)。

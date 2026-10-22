@@ -1,0 +1,204 @@
+{
+  "id": "melo-fp32",
+  "config": {
+    "threads": 2,
+    "protocol_id": "rk3566-voice-screen-v2",
+    "min_memavailable_mib": 600,
+    "max_as_mib": 3072,
+    "id": "melo-fp32",
+    "kind": "voice_v2_tts",
+    "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en",
+    "timeout": 599.9994400069991,
+    "vits": {
+      "model": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/model.onnx",
+      "lexicon": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/lexicon.txt",
+      "tokens": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/tokens.txt",
+      "dict_dir": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/dict"
+    },
+    "tts_config": {
+      "rule_fsts": "/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/date.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/number.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/phone.fst,/home/orangepi/.cache/ros-robot-edge-benchmark/assets/tts/vits-melo-tts-zh_en/new_heteronym.fst"
+    },
+    "texts": [
+      "你好，我是机器人。现在可以和你交流了。",
+      "当前电量42%，温度25摄氏度。",
+      "今天是2026年10月22日，下午三点零五分。",
+      "请不要移动，先检查摄像头，再等待下一条指令。"
+    ],
+    "requested_timeout_seconds": 600,
+    "budget_limited": true
+  },
+  "command": [
+    "/home/orangepi/venvs/sherpa-onnx/bin/python",
+    "/home/orangepi/code/edge-ai/tools/edge_benchmark/workers.py",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32/config.json",
+    "/home/orangepi/.cache/edge-voice-v2/runs/2026-10-22-voice-screening-v2-r1/tts/melo-fp32"
+  ],
+  "status": "ok",
+  "returncode": 0,
+  "wall_seconds": 129.6894839470042,
+  "peak_rss_mib": 384.83984375,
+  "peak_pss_mib": 379.6611328125,
+  "peak_swap_mib": 0.0,
+  "cpu_seconds": 223.37,
+  "peak_threads": 2,
+  "min_host_available_mib": 2667.1015625,
+  "events": [
+    {
+      "event": "phase",
+      "monotonic_seconds": 92653.404498952,
+      "name": "loading",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92676.005875649,
+      "name": "loading",
+      "state": "end"
+    },
+    {
+      "event": "loaded",
+      "monotonic_seconds": 92676.006451685,
+      "engine_version": "1.13.8"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92676.006809847,
+      "name": "first_request",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92679.328682523,
+      "name": "first_request",
+      "state": "end"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92679.329284516,
+      "name": "warmup",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92682.557752827,
+      "name": "warmup",
+      "state": "end"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92682.558422779,
+      "name": "idle",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92685.561376072,
+      "name": "idle",
+      "state": "end"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92685.561966982,
+      "name": "inference",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92709.692466923,
+      "name": "inference",
+      "state": "end"
+    },
+    {
+      "event": "sample",
+      "monotonic_seconds": 92709.695812303,
+      "index": 0,
+      "input": "你好，我是机器人。现在可以和你交流了。",
+      "seconds": 24.07823383899813,
+      "first_pcm_seconds": 24.129787405996467,
+      "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+      "sample_rate": 44100,
+      "samples": 141428,
+      "rtf": 7.508061432671165,
+      "listening_review": null,
+      "speaker_first_sound_seconds": null
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92709.696408464,
+      "name": "inference",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92728.549273228,
+      "name": "inference",
+      "state": "end"
+    },
+    {
+      "event": "sample",
+      "monotonic_seconds": 92728.552479193,
+      "index": 1,
+      "input": "当前电量42%，温度25摄氏度。",
+      "seconds": 18.808649159007473,
+      "first_pcm_seconds": 18.852157189001446,
+      "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+      "sample_rate": 44100,
+      "samples": 133120,
+      "rtf": 6.230930197657974,
+      "listening_review": null,
+      "speaker_first_sound_seconds": null
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92728.553080895,
+      "name": "inference",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92754.292399092,
+      "name": "inference",
+      "state": "end"
+    },
+    {
+      "event": "sample",
+      "monotonic_seconds": 92754.296085718,
+      "index": 2,
+      "input": "今天是2026年10月22日，下午三点零五分。",
+      "seconds": 25.67803619299957,
+      "first_pcm_seconds": 25.73860653799784,
+      "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+      "sample_rate": 44100,
+      "samples": 174812,
+      "rtf": 6.477824154584817,
+      "listening_review": null,
+      "speaker_first_sound_seconds": null
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92754.29668567,
+      "name": "inference",
+      "state": "start"
+    },
+    {
+      "event": "phase",
+      "monotonic_seconds": 92780.058093294,
+      "name": "inference",
+      "state": "end"
+    },
+    {
+      "event": "sample",
+      "monotonic_seconds": 92780.062281291,
+      "index": 3,
+      "input": "请不要移动，先检查摄像头，再等待下一条指令。",
+      "seconds": 25.702186807000544,
+      "first_pcm_seconds": 25.760642299006577,
+      "pcm_boundary": "whole utterance return then PCM16 conversion; not incremental",
+      "sample_rate": 44100,
+      "samples": 173252,
+      "rtf": 6.542299299221504,
+      "listening_review": null,
+      "speaker_first_sound_seconds": null
+    }
+  ]
+}

@@ -132,13 +132,13 @@ def asr(config: dict, output: Path) -> None:
         )
 
 
-def request_json(url: str, data=None) -> dict:
+def request_json(url: str, data=None, timeout=10) -> dict:
     """向本机模型入口发一次 JSON 请求。"""
     body = None if data is None else json.dumps(data).encode()
     request = Request(
         url, data=body, headers={"Content-Type": "application/json"}
     )
-    with urlopen(request, timeout=10) as response:
+    with urlopen(request, timeout=timeout) as response:
         return json.load(response)
 
 
@@ -225,6 +225,16 @@ def llama(config: dict, output: Path) -> None:
     origin = "http://127.0.0.1:" + str(port)
     start = time.monotonic()
     with (output / "native.log").open("w") as log:
+        if config.get("protocol_id") == "rk3566-voice-screen-v2":
+            emit(
+                output,
+                {
+                    "event": "phase",
+                    "name": "loading",
+                    "state": "start",
+                    "monotonic_seconds": time.monotonic(),
+                },
+            )
         server = subprocess.Popen(command, stdout=log, stderr=log)
         try:
             # 1. 启动期连接拒绝/503只表示尚未就绪，原生退出即暴露失败。
@@ -250,20 +260,100 @@ def llama(config: dict, output: Path) -> None:
                     "command": command,
                 },
             )
+            if config.get("protocol_id") == "rk3566-voice-screen-v2":
+                emit(
+                    output,
+                    {
+                        "event": "phase",
+                        "name": "loading",
+                        "state": "end",
+                        "monotonic_seconds": time.monotonic(),
+                    },
+                )
             await_gate(config)
-            # 2. 固定旧模板、采样和无前缀命中，首个非空内容算 TTFT。
+            if config.get("protocol_id") == "rk3566-voice-screen-v2":
+                for stage in ("first_request", "warmup"):
+                    emit(
+                        output,
+                        {
+                            "event": "phase",
+                            "name": stage,
+                            "state": "start",
+                            "monotonic_seconds": time.monotonic(),
+                        },
+                    )
+                    request_json(
+                        origin + "/completion",
+                        {
+                            "prompt": "<|im_start|>user\n你好<|im_end|>\n<|im_start|>assistant\n",
+                            "n_predict": 8,
+                            "temperature": 0,
+                            "cache_prompt": False,
+                        },
+                        timeout=90,
+                    )
+                    emit(
+                        output,
+                        {
+                            "event": "phase",
+                            "name": stage,
+                            "state": "end",
+                            "monotonic_seconds": time.monotonic(),
+                        },
+                    )
+                emit(
+                    output,
+                    {
+                        "event": "phase",
+                        "name": "idle",
+                        "state": "start",
+                        "monotonic_seconds": time.monotonic(),
+                    },
+                )
+                time.sleep(3)
+                emit(
+                    output,
+                    {
+                        "event": "phase",
+                        "name": "idle",
+                        "state": "end",
+                        "monotonic_seconds": time.monotonic(),
+                    },
+                )
+            # 2. Use explicit protocol template; preserve legacy defaults.
             for index, text in enumerate(config["texts"]):
+                if config.get("protocol_id") == "rk3566-voice-screen-v2":
+                    emit(
+                        output,
+                        {
+                            "event": "phase",
+                            "name": "inference",
+                            "state": "start",
+                            "monotonic_seconds": time.monotonic(),
+                        },
+                    )
                 prompt = "Human: " + text + "<|im_end|>\nAssistant:"
                 system = config.get("system", "")
                 if system:
                     prompt = "System: " + system + "<|im_end|>\n" + prompt
+                if config.get("chat_template") == "chatml":
+                    prompt = (
+                        (
+                            ("<|im_start|>system\n" + system + "<|im_end|>\n")
+                            if system
+                            else ""
+                        )
+                        + "<|im_start|>user\n"
+                        + text
+                        + "<|im_end|>\n<|im_start|>assistant\n"
+                    )
                 payload = {
                     "prompt": prompt,
                     "stream": True,
                     "cache_prompt": False,
                     "n_predict": config.get("max_tokens", 64),
                     "seed": 42,
-                    "temperature": 0.7,
+                    "temperature": config.get("temperature", 0.7),
                     "top_p": 0.8,
                     "top_k": 20,
                     "min_p": 0.0,
@@ -279,6 +369,8 @@ def llama(config: dict, output: Path) -> None:
                 )
                 started = time.monotonic()
                 first = None
+                first_sentence = None
+                last_content_at = None
                 reply = ""
                 final = {}
                 trace_path = output / (str(index) + "-stream.jsonl")
@@ -286,6 +378,12 @@ def llama(config: dict, output: Path) -> None:
                     "w"
                 ) as trace:
                     for line in response:
+                        if (
+                            config.get("protocol_id")
+                            == "rk3566-voice-screen-v2"
+                            and time.monotonic() - started > 90
+                        ):
+                            raise TimeoutError("LLM input exceeds 90s")
                         if not line.startswith(b"data: "):
                             continue
                         chunk = json.loads(line[6:])
@@ -312,8 +410,32 @@ def llama(config: dict, output: Path) -> None:
                                     "ttft_seconds": first,
                                 },
                             )
+                        if content:
+                            last_content_at = time.monotonic() - started
                         reply += content
+                        if first_sentence is None and re.search(
+                            r"[。！？]", reply
+                        ):
+                            first_sentence = time.monotonic() - started
+                            emit(
+                                output,
+                                {
+                                    "event": "first_sentence",
+                                    "index": index,
+                                    "seconds": first_sentence,
+                                },
+                            )
                         final = chunk
+                if config.get("protocol_id") == "rk3566-voice-screen-v2":
+                    emit(
+                        output,
+                        {
+                            "event": "phase",
+                            "name": "inference",
+                            "state": "end",
+                            "monotonic_seconds": time.monotonic(),
+                        },
+                    )
                 emit(
                     output,
                     {
@@ -322,6 +444,16 @@ def llama(config: dict, output: Path) -> None:
                         "input": text,
                         "seconds": time.monotonic() - started,
                         "ttft_seconds": first,
+                        "first_sentence_seconds": first_sentence,
+                        "transport_observed_decode_tokens_per_second": (
+                            (final["tokens_predicted"] - 1)
+                            / (last_content_at - first)
+                            if isinstance(final.get("tokens_predicted"), int)
+                            and final["tokens_predicted"] > 1
+                            and first is not None
+                            and last_content_at > first
+                            else None
+                        ),
                         "started_monotonic_seconds": started,
                         "reply": reply,
                         "timings": final.get("timings", {}),
@@ -703,7 +835,11 @@ def main() -> None:
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
+    from voice_v2 import run as voice_v2
+
     adapters = {
+        "voice_v2_asr": voice_v2,
+        "voice_v2_tts": voice_v2,
         "asr": asr,
         "llama": llama,
         "sherpa_tts": sherpa_tts,

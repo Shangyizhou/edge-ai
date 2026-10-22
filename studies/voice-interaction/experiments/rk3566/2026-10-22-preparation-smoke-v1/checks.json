@@ -1,0 +1,256 @@
+{
+  "schema": "edge-model-prepare/checks-v1",
+  "request_sha256": "2fe405baef18bb3f0c34c83e887a165cec3b973c77f34955144a958e7b6eafa1",
+  "evidence": [
+    {
+      "id": "assets-manifest",
+      "location": "evidence/assets-manifest.json",
+      "sha256": "74045f6a69876f61ecd6f50d67e404602910f130c019d30db02955e43355cd17",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "assets"
+    },
+    {
+      "id": "runtime-manifest",
+      "location": "evidence/runtime-manifest.json",
+      "sha256": "39d6b900e923225bd996fd57fee182011ce9e305e565817e18c8f1284d31c4b5",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "runtime"
+    },
+    {
+      "id": "sherpa-load-check",
+      "location": "evidence/sherpa-load-check.json",
+      "sha256": "b5bad397a965c7c04664fd7dcd00de9cf8b8a05ed795affe5bd3fbe23510fab3",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "load"
+    },
+    {
+      "id": "llama-load-check",
+      "location": "evidence/llama-load-check.json",
+      "sha256": "f78a5f44230f333edde13b3cdc669165576a0b5515483ca6127495c28baa8c60",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "load"
+    },
+    {
+      "id": "readiness",
+      "location": "evidence/readiness.json",
+      "sha256": "253d79f290a7055e20a409e90ae9826ebf9d3e3c418376f848d584ff42140276",
+      "description": "2026-10-22 RK3566真实准备记录快照；历史绝对路径仅为出处，不是安装目标",
+      "kind": "benchmark"
+    },
+    {
+      "id": "asr-config",
+      "kind": "benchmark_config",
+      "location": "evidence/asr-screening.json",
+      "sha256": "dd389c748749091929796298ae9b10c34112894cef3efa3f0c4eaab088e52bc1",
+      "description": "历史冻结配置；绝对路径不可直接移植"
+    },
+    {
+      "id": "tts-config",
+      "kind": "benchmark_config",
+      "location": "evidence/tts-screening.json",
+      "sha256": "95c80d0de056777fd1df701b15d40faf712f1183eff530ac7b5fee4ddb4cc376",
+      "description": "历史冻结配置；绝对路径不可直接移植"
+    },
+    {
+      "id": "llm-config",
+      "kind": "benchmark_config",
+      "location": "evidence/llm-screening.json",
+      "sha256": "12da7b713478196f6ea924410bd3d55aabe7d6237cacbeea02598bf329375fe1",
+      "description": "历史冻结配置；绝对路径不可直接移植"
+    },
+    {
+      "id": "current-preflight",
+      "kind": "benchmark",
+      "location": "preflight.json",
+      "sha256": "793f3d547d82d58dca11b8186dd22a8cd43825aa326d25d33f4cf9972bbc2d23",
+      "description": "本轮重新核对112个文件及冻结配置，实际检查无错误；不替代推理证据"
+    },
+    {
+      "id": "smoke-asr",
+      "kind": "smoke",
+      "location": "asr-smoke/inference-record.json",
+      "sha256": "9a152d9b390e794ffcab4abcc2b2e5c4f15f3d9af8ef988dd544146de6d8e1a1",
+      "description": "本轮实际推理：输入、命令、退出码、检查结果与原始输出哈希；仅功能最小样例"
+    },
+    {
+      "id": "smoke-asr-fp32",
+      "kind": "smoke",
+      "location": "asr-fp32-smoke/inference-record.json",
+      "sha256": "299cd0c7df67be68ccc3279c57e1e628372813cbd334af157569b3815fe993cd",
+      "description": "本轮实际推理：输入、命令、退出码、检查结果与原始输出哈希；仅功能最小样例"
+    },
+    {
+      "id": "smoke-llm",
+      "kind": "smoke",
+      "location": "llm-smoke/inference-record.json",
+      "sha256": "6bf48d4787bf91d6edb2302367468fe2d32d613f823f514bf857fbb8c1774790",
+      "description": "本轮实际推理：输入、命令、退出码、检查结果与原始输出哈希；仅功能最小样例"
+    },
+    {
+      "id": "smoke-tts",
+      "kind": "smoke",
+      "location": "tts-smoke/inference-record.json",
+      "sha256": "652e95c5b09a9be7c85319da0f4873707c09b5c50e7ceb922dfca039e32efef1",
+      "description": "本轮实际推理：输入、命令、退出码、检查结果与原始输出哈希；仅功能最小样例"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "asr-zh14m-int8",
+      "acquisition": {
+        "model": "download",
+        "runtime": "reuse",
+        "reason": "复用现有sherpa1.13.8及实际加载ORT1.28.2，核验依赖与哈希。"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "目标资产来源及SHA256/Git blob已核对，许可来源已记录。",
+          "evidence": [
+            "assets-manifest",
+            "current-preflight"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际CPU运行库和依赖身份已冻结。",
+          "evidence": [
+            "runtime-manifest",
+            "current-preflight"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "仅模型构造/健康接口成功；未调用生成或解码。",
+          "evidence": [
+            "sherpa-load-check"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "INT8主候选及同包FP32对照均真实解码同一固定非静音样本，返回中文文本；未验收CER或流式端点。",
+          "evidence": [
+            "smoke-asr",
+            "smoke-asr-fp32"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "本轮112文件哈希检查无错，现有工具源与实际运行库身份未改变；ASR配置的INT8/FP32两种制品均完成最小推理，冻结配置可交接。性能门槛仍待正式初筛。",
+          "evidence": [
+            "readiness",
+            "current-preflight"
+          ]
+        }
+      },
+      "next_action": "按已冻结配置执行一轮单模块小集初筛，保留逐条质量/等待/资源，再决定三轮复测；当前不启动ROS/YOLO共跑。",
+      "benchmark_configs": [
+        "asr-config"
+      ]
+    },
+    {
+      "id": "tts-melo-fp32",
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "复用现有sherpa1.13.8及实际加载ORT1.28.2，核验依赖与哈希。"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "目标资产来源及SHA256/Git blob已核对，许可来源已记录。",
+          "evidence": [
+            "assets-manifest",
+            "current-preflight"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际CPU运行库和依赖身份已冻结。",
+          "evidence": [
+            "runtime-manifest",
+            "current-preflight"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "仅模型构造/健康接口成功；未调用生成或解码。",
+          "evidence": [
+            "sherpa-load-check"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "Melo按固定中文文本生成68842个44.1kHz有限非零样本，PCM16 WAV可读；未做听感验收。",
+          "evidence": [
+            "smoke-tts"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "本轮112文件哈希检查无错，现有工具源与实际运行库身份未改变；ASR配置的INT8/FP32两种制品均完成最小推理，冻结配置可交接。性能门槛仍待正式初筛。",
+          "evidence": [
+            "readiness",
+            "current-preflight"
+          ]
+        }
+      },
+      "next_action": "按已冻结配置执行一轮单模块小集初筛，保留逐条质量/等待/资源，再决定三轮复测；当前不启动ROS/YOLO共跑。",
+      "benchmark_configs": [
+        "tts-config"
+      ]
+    },
+    {
+      "id": "llm-qwen25-q4",
+      "acquisition": {
+        "model": "download",
+        "runtime": "build",
+        "reason": "历史运行准备固定b6500，已有22cd二进制版本不匹配，因而从源码构建；当时未保存兼容预编译包搜索证据。新版流程优先二进制，不能把此例编译选择当通则。"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "目标资产来源及SHA256/Git blob已核对，许可来源已记录。",
+          "evidence": [
+            "assets-manifest",
+            "current-preflight"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际CPU运行库和依赖身份已冻结。",
+          "evidence": [
+            "runtime-manifest",
+            "current-preflight"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "仅模型构造/健康接口成功；未调用生成或解码。",
+          "evidence": [
+            "llama-load-check"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "官方Qwen2.5 Q4_K_M真实生成“你好。”，请求上限16 token、greedy；未验收综合指令质量。",
+          "evidence": [
+            "smoke-llm"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "本轮112文件哈希检查无错，现有工具源与实际运行库身份未改变；ASR配置的INT8/FP32两种制品均完成最小推理，冻结配置可交接。性能门槛仍待正式初筛。",
+          "evidence": [
+            "readiness",
+            "current-preflight"
+          ]
+        }
+      },
+      "next_action": "按已冻结配置执行一轮单模块小集初筛，保留逐条质量/等待/资源，再决定三轮复测；当前不启动ROS/YOLO共跑。",
+      "benchmark_configs": [
+        "llm-config"
+      ]
+    }
+  ]
+}
