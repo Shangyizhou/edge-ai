@@ -29,4 +29,4 @@ ASR资源只取本轮3条有声输入的实时推理窗，CPU为被测进程树�
 
 完整语音交互、ROS/视觉共跑与硬件动作均未验收，不因最小推理或几条成功样例宣称产品通过。[准备计划](plan.md) · [接入边界](integration.md) · [实验索引](experiments/rk3566/README.md)。
 
-当前用户认可的报告在临时目录 `/tmp/edge-voice-report-draft/report-mac.html`；它支持Mac离线查看和试听。原实验HTML/JSON未修改；当前展示格式已写入本机edge-model-selection。
+当前认可格式已固化为[独立HTML主报告](reports/2026-10-22-voice-screening/report.html)，公开版不携带录音；网站只提供报告列表。可试听的Mac离线版仍在临时目录 `/tmp/edge-voice-report-draft/report-mac.html`；它支持Mac离线查看和试听。原实验HTML/JSON未修改；当前展示格式已写入本机edge-model-selection。

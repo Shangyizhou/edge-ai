@@ -1,41 +1,20 @@
-"""Build current skill-flow pages without importing archived measurements."""
+"""Publish standalone HTML reports with a small static report index."""
 import argparse
 import html
-from html.parser import HTMLParser
-import json
-import os
 from pathlib import Path
-import re
 import shutil
-import subprocess
-from urllib.parse import quote, unquote, urlsplit
-
-import markdown
-from markdown.extensions.toc import slugify_unicode
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = Path(__file__).parent
 VOICE = Path('studies/voice-interaction')
-
-
-def measured_data():
-    """Expose only current source pointers; comparisons remain in their reports."""
-    experiment = VOICE / 'experiments/rk3566'
-    paths = [p.relative_to(ROOT) for p in sorted((ROOT / experiment).glob('2026-10-22-*/results.json'))]
-    return dict(scope='current_skill_flow', sources=[str(p) for p in paths],
-                note='Different schemas and timing scopes are not pooled.')
-
-
-def source_files():
-    """Include local current work too; excluded history lives outside the repo."""
-    files = {p.relative_to(ROOT) for p in ROOT.glob('*.md')}
-    files.update(p.relative_to(ROOT) for p in (ROOT / 'tools').rglob('*.md'))
-    files.update(p.relative_to(ROOT) for p in (ROOT / 'tools/edge_benchmark/schemas').glob('*.json'))
-    for folder in ('studies', 'docs', 'archives'):
-        files.update(p.relative_to(ROOT) for p in (ROOT / folder).rglob('*')
-                     if p.is_file() and '__pycache__' not in p.parts
-                     and p.suffix not in ('.pyc', '.pyo'))
-    return sorted(files)
+REPORTS = [
+    ('voice-screening/report.html', '语音单模块评测',
+     '主报告 · 结论、模型与后端、3 条样例、实际转写、速度和 CPU / 内存对照。公开版不含录音。',
+     VOICE / 'reports/2026-10-22-voice-screening/report.html'),
+    ('selection.html', '模型选型', '候选模型、来源与本轮筛选结果；不代表板端验收通过。',
+     VOICE / 'research/2026-10-22-local-stack/report.html'),
+    ('readiness.html', '最小推理就绪', 'ASR 解码、LLM 生成和 TTS 合成的最小真实推理记录。',
+     VOICE / 'experiments/rk3566/2026-10-22-preparation-smoke-v1/readiness/report.html'),
+]
 
 
 def build(output):
@@ -44,108 +23,32 @@ def build(output):
         raise FileExistsError('Use a new output directory: ' + str(output))
     if output == ROOT or ROOT in output.parents and not output.name.startswith('_site'):
         raise ValueError('Build outside the repository or to an _site* directory')
-    files = source_files()
-    docs = [p for p in files if p.suffix == '.md']
-    assets = [p for p in files if p.suffix != '.md']
-    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip())
-    display_revision = revision[:7] + ('-local' if dirty else '')
-    aliases = {
-        'index': ('当前结论', VOICE / 'README.md'),
-        'solutions': ('我们怎么选', VOICE / 'research/README.md'),
-        'models': ('模型与测试', VOICE / 'models.md'),
-        'integration': ('接入边界', VOICE / 'integration.md'),
-        'process': ('准备与推进', VOICE / 'plan.md'),
-        'evidence': ('实验与证据', VOICE / 'experiments/rk3566/README.md'),
-        'learn': ('从这里读起', VOICE / 'learn.md'),
-        'quantization': ('量化与转换', VOICE / 'quantization.md'),
-        'deployment': ('部署与训练交接', VOICE / 'deployment-guide.md'),
-    }
-    published = {str(p): 'read/' + str(p.with_suffix('.html')) for p in docs}
-    published.update({str(p): 'evidence/' + str(p) for p in assets})
+    # Keep evidence files available to frozen reports, without rendering SOP pages.
     output.mkdir(parents=True)
-    for name in ('style.css', 'app.js'):
-        shutil.copy2(SOURCE / name, output / name)
+    for path in (ROOT / 'studies').rglob('*'):
+        if path.is_file() and '__pycache__' not in path.parts and path.suffix not in ('.pyc', '.pyo'):
+            target = output / 'evidence' / path.relative_to(ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(path, target)
+    cards = []
+    for destination, title, description, source in REPORTS:
+        target = output / 'reports' / destination
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # Frozen reports keep their original relative evidence links at their
+        # evidence URL. Only the self-contained presentation gets a short URL.
+        if destination == 'voice-screening/report.html':
+            shutil.copy2(ROOT / source, target)
+            href = 'reports/' + destination
+        else:
+            href = 'evidence/' + source.as_posix()
+        assert (output / href).is_file(), href
+        cards.append(f'<a class="card" href="{html.escape(href)}"><h2>{html.escape(title)}</h2><p>{html.escape(description)}</p><span>打开独立 HTML 报告 →</span></a>')
+    page = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Edge AI · 报告</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f6;color:#18313b;font:16px/1.75 system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:60px 24px}small,span{color:#08776b}h1{font-size:38px;margin:8px 0}header p{color:#536873}nav{display:grid;gap:18px;margin-top:32px}.card{display:block;background:white;border:1px solid #dce5e7;border-radius:16px;padding:25px;color:inherit;text-decoration:none}.card:hover,.card:focus-visible{border-color:#08776b;outline:2px solid #08776b}h2{margin:0;font-size:23px}.card p{color:#536873}footer{margin-top:28px;color:#536873;font-size:14px}
+</style><main><header><small>EDGE AI / REPORTS</small><h1>机器人端侧模型报告</h1><p>RK3566 · 独立 HTML 报告。选择一份，直接阅读。</p></header><nav aria-label="报告列表">''' + ''.join(cards) + '''</nav><footer>2026-10-22 · 单模块测试不等于完整交互验收。SOP 与研究过程保留在仓库，不作为网站导航。</footer></main></html>'''
+    (output / 'index.html').write_text(page)
     (output / '.nojekyll').touch()
-    (output / 'data.json').write_text(json.dumps(measured_data(), ensure_ascii=False))
-    template = (SOURCE / 'layout.html').read_text()
-
-    def render(destination, title, body, current=''):
-        prefix = os.path.relpath(output, (output / destination).parent).replace(os.sep, '/') + '/'
-        if prefix == './':
-            prefix = ''
-        page = template.replace('{{ROOT}}', prefix).replace('{{TITLE}}', html.escape(title)).replace('{{BODY}}', body).replace('{{REVISION}}', display_revision).replace('{{CURRENT}}', current)
-        target = output / destination
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(page)
-
-    def document(path, destination, current=''):
-        text = (ROOT / path).read_text()
-        md = markdown.Markdown(extensions=['extra', 'toc', 'sane_lists'], extension_configs={'toc': {'slugify': slugify_unicode}})
-        content = md.convert(text)
-
-        def link(match):
-            url = html.unescape(match.group(2))
-            if url.startswith(('#', 'https:', 'http:', 'mailto:', 'data:')):
-                return match.group(0)
-            parts = urlsplit(url)
-            target = (ROOT / path.parent / unquote(parts.path)).resolve()
-            try:
-                relative = str(target.relative_to(ROOT))
-            except ValueError:
-                return 'data-external-path="' + html.escape(url, quote=True) + '" title="原始记录的本机路径，未随网站发布"'
-            if relative in published:
-                value = os.path.relpath(output / published[relative], (output / destination).parent)
-            elif target.is_dir():
-                value = 'https://github.com/Shangyizhou/edge-ai/tree/' + revision + '/' + quote(relative)
-            elif 'sources' in path.parts:
-                # Frozen upstream excerpts do not include the upstream directory tree.
-                return 'data-source-relative="' + html.escape(url, quote=True) + '" title="上游来源快照的相对路径；完整上游文档见来源链接"'
-            else:
-                raise ValueError('Unpublished or missing current link: ' + str(path) + ' -> ' + url)
-            if parts.fragment:
-                value += '#' + parts.fragment
-            return match.group(1) + '="' + html.escape(value, quote=True) + '"'
-
-        content = re.sub(r'(href|src)="([^"]*)"', link, content)
-        title = re.search(r'^# (.+)', text, re.M)
-        title = title.group(1) if title else path.stem
-        render(destination, title, '<article class="document"><a class="back" href="' + os.path.relpath(output / 'index.html', (output / destination).parent) + '">← 当前结论</a>' + content + '</article>', current)
-        return title
-
-    entries = []
-    for path in docs:
-        destination = published[str(path)]
-        entries.append(dict(title=document(path, destination), path=destination))
-    # Raw Markdown accompanies frozen HTML that links to README.md directly.
-    for path in files:
-        target = output / 'evidence' / path
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / path, target)
-    for name, (title, path) in aliases.items():
-        document(path, name + '.html', name)
-    (output / 'search.json').write_text(json.dumps(entries, ensure_ascii=False))
-    failures = []
-
-    class Links(HTMLParser):
-        def handle_starttag(self, tag, attrs):
-            for key, value in attrs:
-                if key not in ('href', 'src') or not value or value.startswith(('#', 'http:', 'https:', 'data:', 'mailto:', 'file:', '/')):
-                    continue
-                path = unquote(urlsplit(value).path)
-                if path and not (self.file.parent / path).exists():
-                    failures.append((str(self.file.relative_to(output)), value))
-
-    for path in output.rglob('*.html'):
-        relative_parts = path.relative_to(output).parts
-        if relative_parts[0] == 'evidence' and 'sources' in relative_parts:
-            continue  # Captured upstream HTML is evidence, not a mirrored site.
-        parser = Links()
-        parser.file = path
-        parser.feed(path.read_text())
-    if failures:
-        raise ValueError('Broken links: ' + repr(failures[:20]))
-    print(f'Built {len(docs)} current documents and {len(assets)} assets; local HTML links verified.')
+    print(f'Built report index and {len(REPORTS)} standalone report entries; no SOP pages rendered.')
 
 
 if __name__ == '__main__':
