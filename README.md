@@ -1,23 +1,21 @@
-# edge-ai · 当前 skill 流程
+# Edge AI
 
-当前只展示2026-10-22按 `edge-model-selection`、`edge-model-prepare` 重新开展的机器人本地语音研究。旧语音、YOLO、量化/共跑实验及旧看板资料已[移至仓库外归档](archives/README.md)，不参与当前结论。
+在 **RK3566 · Orange Pi 3B · 4GB** 上验证机器人本地语音交互：**听懂 → 理解 → 回答 → 发声**。
 
-| 阶段 | 当前状态 | 入口 |
+**[查看 HTML 报告 ↗](https://shangyizhou.github.io/edge-ai/)** · [语音评测主报告](https://shangyizhou.github.io/edge-ai/reports/voice-screening/report.html) · [任务进展](https://github.com/Shangyizhou/edge-ai/issues/7)
+
+## 当前进展
+
+| 模块 | 当前方案 | 验证情况 |
 | --- | --- | --- |
-| 选型 | 基于当前RK3566配置与官方资料重新筛选 | [候选与来源](studies/voice-interaction/research/2026-10-22-local-stack/README.md) |
-| 准备 | 模型、运行库、输入冻结；最小真实推理通过 | [准备证据](studies/voice-interaction/experiments/rk3566/2026-10-22-preparation-smoke-v1/README.md) |
-| 单模块验证 | ASR、LLM、TTS本轮记录保留；ASR补齐3条有声材料 | [当前结论](studies/voice-interaction/README.md) · [实验索引](studies/voice-interaction/experiments/rk3566/README.md) |
-| 业务适配 | 原生tool_calls尚未验证；计划Qwen3业务LoRA | [当前方案与Mac配置](studies/voice-interaction/research/2026-10-22-qwen-adaptation/README.md) |
-| 训练与整链路 | 尚未训练、整链路与共跑尚未验收 | [接入边界](studies/voice-interaction/integration.md) |
+| ASR · 语音识别 | Zipformer zh14M · 混合 INT8 / FP32 | 完成 3 条语音对照，业务指令转写经用户确认 |
+| LLM · 理解与调用 | Qwen2.5-0.5B · Q4_K_M | 已做通用生成测试，原生工具调用尚未验证 |
+| TTS · 语音合成 | MeloTTS zh_en · FP32 | 已生成音频，合成等待较长，听感待评审 |
 
-训练规划：MacBook Air M5 / 16GB统一内存 / 约70GB可用空间，由用户提供，尚未直接检查环境。计划先在Mac做Qwen3-0.6B LoRA/QLoRA小规模验证，板子负责推理验收；工具目录继续传递，不迁移整套ROS工作区。
+**下一步：**准备 Qwen3 小模型的业务 LoRA 验证，先在 Mac 训练，再回板子测工具调用与资源消耗。训练尚未开始，完整语音链路与机器人共跑尚未验收。
 
-## 阅读和工具
+## 资料入口
 
-[主题首页](studies/voice-interaction/README.md) · [准备与推进](studies/voice-interaction/plan.md) · [模型与证据](studies/voice-interaction/models.md) · [研究方法](docs/methodology/README.md)。
+[模型与证据](studies/voice-interaction/models.md) · [实验记录](studies/voice-interaction/experiments/rk3566/README.md) · [业务适配方案](studies/voice-interaction/research/2026-10-22-qwen-adaptation/README.md) · [推进计划](studies/voice-interaction/plan.md)
 
-网站由当前Markdown和本轮证据生成，构建说明见[网站工具](tools/research_site/README.md)。本地整理不会自动更新线上Pages；发布仍需单独提交、推送。
-
-新测量另建实验，保留配置、日志、清单、哈希和源码快照；模型、音频、SDK、凭据和构建产物留在仓库外。实际生产实现维护在ros-robot，本站快照只作证据。归档没有删除模型或本轮仍在引用的外部素材。
-
-工作与规格记录在[GitHub Issues](https://github.com/Shangyizhou/edge-ai/issues/7)。代理约定见[AGENTS.md](AGENTS.md)，术语见[GLOSSARY.md](GLOSSARY.md)。
+<sub>当前结论仅依据本轮 skill 流程；旧资料已[归档](archives/README.md)。配置、日志与哈希保留在仓库，模型权重和录音存放于仓库外。生产代码维护在 ros-robot。</sub>
