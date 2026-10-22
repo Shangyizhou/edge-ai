@@ -1,0 +1,142 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qwen3 机器人业务微调：Mac 与 RK3566 计划</title><style>
+    :root{color-scheme:light;--ink:#192d3d;--muted:#627587;--line:#e0e8ee;--surface:#fff;--soft:#f0f5f7;--accent:#12716c}
+    *{box-sizing:border-box}
+    html{min-width:0}body{margin:0;background:#f4f7f9;color:var(--ink);font:15px/1.7 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+    body,main,section,article,.panel,.grid,.grid>*,.stack-grid>*,.spec-grid>*,.fact,.stack-card,.spec-value{min-width:0}
+    h1,h2,h3,p,li,dd,td,th,small,strong,span,a,.fact,.stack-card,.spec-value,.spec-grid{overflow-wrap:anywhere;word-break:break-word}
+    h1{font-size:clamp(27px,4vw,42px);line-height:1.26;margin:10px 0}h2{font-size:clamp(20px,2.5vw,24px);line-height:1.35;margin:0 0 14px}h3{font-size:clamp(18px,2.2vw,21px);line-height:1.4;margin:8px 0}
+    p{margin:10px 0}a{color:#126982}a:hover{text-decoration:underline}
+    header.hero{background:linear-gradient(125deg,#132c40,#205c6b);color:#fff;padding:46px max(20px,calc((100% - 1100px)/2));overflow-wrap:anywhere}
+    .hero p{color:#dbe9ee;max-width:800px}.hero .topline{font-size:13px;color:#d8e9ee}
+    main{max-width:1100px;margin:auto;padding:24px 20px 64px}
+    section{margin:24px 0}.panel,article.candidate{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:23px;box-shadow:0 2px 7px #17394a09}
+    .panel.feature{border-left:5px solid var(--accent)}.eyebrow{font-size:12px;letter-spacing:.06em;color:#527f86;font-weight:750}
+    .intro{font-size:16px;line-height:1.8}.muted,.sub,.subcopy{color:var(--muted);font-size:13px}
+    .tag,.status{display:inline-flex;align-items:center;max-width:100%;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:720;background:#e1f1ed;color:#126b61;white-space:normal}
+    .warning-note{background:#fff7e8;border:1px solid #f0dfbf;border-radius:9px;padding:12px 15px;font-size:13px;line-height:1.65;margin-top:16px}
+    .grid,.stack-grid,.device-grid,.spec-grid{display:grid;gap:12px}
+    .grid,.stack-grid,.device-grid,.spec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .fact,.stack-card,.spec-grid>div{background:#f2f6f8;border-radius:9px;padding:14px;min-width:0;overflow-wrap:anywhere}
+    .fact small,.stack-card small,.spec-grid dt{display:block;color:#647989;font-size:12px;font-weight:600;margin-bottom:7px}
+    .fact .value,.stack-card .value,.spec-grid dd{font-size:14px;font-weight:570;line-height:1.65;margin:0;overflow-wrap:anywhere;word-break:break-word}
+    .spec-grid>div:first-child,.spec-grid>div:last-child{grid-column:1 / -1}
+    .section-heading{margin:0 0 18px}.section-heading p{color:var(--muted);font-size:13px}
+    .stack-card{border:1px solid #e5edf1}.stack-card .value{font-size:15px;font-weight:650}
+    .req-list{display:grid;gap:10px}.req-item{display:flex;gap:10px;align-items:flex-start;min-width:0;border-bottom:1px solid #edf1f3;padding-bottom:10px}
+    .req-item:last-child{border:0;padding-bottom:0}.req-item .tag{flex-shrink:0;background:#e8eef7;color:#3b6387}
+    .req-item .tag.hard{background:#fceee8;color:#9b4f3c}.req-item .tag.target{background:#edf2fb;color:#5068aa}
+    article.candidate{margin:15px 0;padding:23px;border-left-width:5px}
+    article.baseline{border-left-color:#239b82}article.alternative{border-left-color:#799ac0}article.investigate{border-left-color:#d6a744}article.excluded{border-left-color:#c98478}
+    .candidate-head{display:flex;gap:16px;align-items:flex-start;justify-content:space-between}
+    .candidate-head>div{min-width:0}.candidate-head .sub{display:block;margin-bottom:5px}
+    .status.investigate{background:#fbf0d7;color:#976a13}.status.excluded{background:#fbe8e4;color:#9e5144}.status.alternative{background:#e9f0fa;color:#41699a}
+    .decision-copy{line-height:1.75;padding:12px 14px;background:#f7fafb;border-radius:9px;border:1px solid #e9eff3}
+    .decision-copy strong{display:block;margin-bottom:4px;color:#355e6a;font-size:12px}.experiment-note{margin:15px 0;padding:12px 14px;background:#edf5f7;border-radius:9px;font-size:14px}
+    details{margin-top:17px;border-top:1px solid var(--line);padding-top:12px}
+    summary{cursor:pointer;color:#186a72;font-weight:700}summary:focus-visible{outline:2px solid #137d7e;outline-offset:4px}
+    .details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:12px}
+    ul{padding-left:22px}li{margin:6px 0}.metrics{font-size:13px}
+    .bench-row{display:grid;grid-template-columns:36px minmax(0,1fr);gap:13px;border-bottom:1px solid #e8eef1;padding:14px 0}
+    .bench-row:last-child{border:0}.bench-num{color:#277980;font-weight:750}.bench-row strong{font-size:15px}
+    .bench-row p{color:#576d7d;margin:5px 0}.bench-row .sub{margin-top:6px}
+    footer{padding-top:24px;margin-top:28px;border-top:1px solid var(--line);color:#718391;font-size:12px}
+    @media(max-width:720px){
+      main{padding:18px 14px 48px}header.hero{padding:32px 16px}
+      .panel,article.candidate{padding:17px}
+      .grid,.stack-grid,.device-grid,.spec-grid,.details-grid{grid-template-columns:minmax(0,1fr)}
+      .spec-grid>div:first-child,.spec-grid>div:last-child{grid-column:auto}
+      .candidate-head{flex-wrap:wrap;gap:8px}.candidate-head .status{margin-left:0}
+    }
+    @media print{body{background:#fff}header.hero{background:#fff;color:var(--ink);border-bottom:2px solid var(--ink)}.hero p,.hero .topline{color:#50677a}.panel,article.candidate{box-shadow:none;break-inside:avoid}details{display:block}}
+    </style></head><body>
+<header class="hero"><div class="eyebrow" style="color:#b4e6e6">EDGE AI / MODEL SELECTION</div><h1>Qwen3 机器人业务微调：Mac 与 RK3566 计划</h1><p>Mac训练Qwen3-0.6B关键工具子集及精简SystemPrompt，先独立调通Agent原生tool_calls和JSON/Schema，再适配旧项目代码并验证RK3566内存。</p><div class="topline">资料日期：2026-10-22 · 研究阶段：所有板端数值待测</div></header>
+<main><section class="panel feature"><div class="eyebrow">01 / 调研结论</div><h2>优先验证的部署路线</h2>
+<p class="intro">用户确认先调通原生tool_calls，不处理旧C++；只训练关键有用工具，首轮关注格式和Schema接收，业务后续处理。建议MLX-LM BF16 LoRA，Q4_K_M部署候选；按选定工具完整token长度优先试2048/4096上下文，未执行训练或新模型测试。</p>
+<p class="warning-note">当前属于资料筛选，不是板端性能排名。推荐组合仍需验证真实模型加载、功能、精度、P95 延迟、内存及整机并发负载。</p>
+</section><section class="panel"><div class="section-heading"><h2>02 / 硬件与需求边界</h2><p>筛选依据：先满足必须条件，再比较性能目标；未确认的指标不能判为通过。</p></div><div class="device-grid">
+<div class="fact"><small>训练机</small><div class="value">MacBook Air M5 / 16GB统一内存 / 8核GPU；磁盘剩约58GiB</div></div>
+<div class="fact"><small>部署机</small><div class="value">Orange Pi 3B / RK3566 / 4×A55 1.8GHz / MemTotal 4017020KiB</div></div>
+<div class="fact"><small>板端系统</small><div class="value">Linux 5.10.160-rockchip-rk356x aarch64；CPU路线，BSP/驱动如转NPU需另查</div></div>
+<div class="fact"><small>板端磁盘</small><div class="value">只读快照约895MiB剩余；不代表部署时可用空间</div></div>
+<div class="fact"><small>协议来源</small><div class="value">ros-robot 23ef814cfb0a8c174b42b288454c30d5498e88d0，codex/offline-agent-integration-20261021</div></div>
+</div><h3>功能与性能约束</h3><div class="req-list">
+<div class="req-item"><span class="tag hard">必须满足</span><span>目标是Agent原生tool_calls，先独立调试；不使用旧fc/res训练，不以旧C++适配作为前置条件。</span></div>
+<div class="req-item"><span class="tag hard">必须满足</span><span>仅选关键有用工具；训练/推理提供选定目录，不要求全60工具覆盖。</span></div>
+<div class="req-item"><span class="tag hard">必须满足</span><span>首轮验证原生可解析、参数JSON合法及现有JSON Schema接收边界，业务流程后续适配。</span></div>
+<div class="req-item"><span class="tag target">目标待验证</span><span>固定SystemPrompt行为和重复示例通过训练学习，验证精简system；动态工具Schema与当前状态继续输入。</span></div>
+<div class="req-item"><span class="tag target">目标待验证</span><span>Q4_K_M优先；建议LLM PSS≤1.3GiB、共跑余量≥512MiB，待板端验证，非用户确认门槛。</span></div>
+</div></section><section class="panel"><div class="section-heading"><h2>03 / 推荐本地运行组合</h2><p>这里展示的是建议先跑通、再测量的完整调用链；不是已经完成部署或已达到实时性的承诺。</p></div><div class="stack-grid">
+<div class="stack-card"><small>数据</small><div class="value">关键工具子集，具体名单待定；试点300/60/120，按语义来源切分，不要求60工具全覆盖。</div></div>
+<div class="stack-card"><small>训练</small><div class="value">MLX-LM / Apple Silicon；首选BF16基座LoRA，内存不足评估QLoRA；未安装或试跑。</div></div>
+<div class="stack-card"><small>输出协议</small><div class="value">冻结Qwen3原生模板与解析；精简system训练，验证JSON/Schema接收，模型调通后再改旧代码。</div></div>
+<div class="stack-card"><small>部署</small><div class="value">合并 → llama.cpp Qwen3 GGUF → Q4_K_M / ARM CPU / q8_0 KV候选；先离线再dry-run共跑。</div></div>
+</div></section><section><div class="section-heading"><h2>04 / 候选组合、保留与排除依据</h2><p>每一项是特定模型 × Runtime × 后端 × 精度的组合。区分已知事实、尚未验证的风险和下一步应做的实验。</p></div>
+<article class="candidate baseline"><div class="candidate-head"><div><span class="sub">候选方案 01</span><h3>Qwen3-0.6B LoRA → Q4_K_M</h3></div><span class="status baseline">优先验证</span></div><p class="decision-copy"><strong>优先验证的原因</strong>首选部署候选，优先减少权重占用；最终是否可用取决于选定目录原生解析与Schema通过率与共跑资源。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>Qwen/Qwen3-0.6B，固定 revision 后训练；同一合并权重对照</dd></div>
+<div><dt>推理 Runtime</dt><dd>llama.cpp；研究快照 e3797b184d428c7a019362612b76971f60af6670，实际部署版本待核实</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 ARM CPU；Linux 5.10.160 aarch64；不假定 NPU 支持</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>Q4_K_M 权重；q8_0 KV 候选，另作 f16 KV 对照</dd></div>
+<div><dt>模型文件与来源</dt><dd>合并高精度模型 → Qwen3 GGUF → 量化；新文件大小/hash 待导出</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 检查原生解析、参数/顺序准确率；先固定 q8_0 KV 和上下文，再测进程树 PSS、延迟与系统余量。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/tools/quantize/README.md" target="_blank" rel="noopener noreferrer">llama.cpp 量化说明 ↗</a></li>
+<li><a href="https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md" target="_blank" rel="noopener noreferrer">Qwen3 官方工具协议 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>原生模板、解析器与Schema接收边界待独立验证；旧C++不作为前置条件</li>
+<li>选定工具token长度、新权重格式表现与板端资源待测</li>
+<li>板端磁盘余量小，传输前重查空间</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate alternative"><div class="candidate-head"><div><span class="sub">候选方案 02</span><h3>Qwen3-0.6B LoRA → Q5_K_M</h3></div><span class="status alternative">备选</span></div><p class="decision-copy"><strong>作为备选的原因</strong>Q4 质量不足时保留，判断额外权重开销是否换来业务收益。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>Qwen/Qwen3-0.6B，固定 revision 后训练；同一合并权重对照</dd></div>
+<div><dt>推理 Runtime</dt><dd>llama.cpp；研究快照 e3797b184d428c7a019362612b76971f60af6670，实际部署版本待核实</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 ARM CPU；Linux 5.10.160 aarch64；不假定 NPU 支持</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>Q5_K_M 权重；q8_0 KV 候选，另作 f16 KV 对照</dd></div>
+<div><dt>模型文件与来源</dt><dd>合并高精度模型 → Qwen3 GGUF → 量化；新文件大小/hash 待导出</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 使用同一合并权重、模板、工具目录、解码、KV 和线程，对照 Q4 的错误簇及资源。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/tools/quantize/README.md" target="_blank" rel="noopener noreferrer">llama.cpp 量化说明 ↗</a></li>
+<li><a href="https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md" target="_blank" rel="noopener noreferrer">Qwen3 官方工具协议 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>原生模板、解析器与Schema接收边界待独立验证；旧C++不作为前置条件</li>
+<li>选定工具token长度、新权重格式表现与板端资源待测</li>
+<li>板端磁盘余量小，传输前重查空间</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+<article class="candidate alternative"><div class="candidate-head"><div><span class="sub">候选方案 03</span><h3>Qwen3-0.6B LoRA → Q8_0</h3></div><span class="status alternative">备选</span></div><p class="decision-copy"><strong>作为备选的原因</strong>高精度量化诊断参照；保留区分训练错误与低位量化损失，不预设为产品默认。</p><dl class="spec-grid">
+<div><dt>模型与版本</dt><dd>Qwen/Qwen3-0.6B，固定 revision 后训练；同一合并权重对照</dd></div>
+<div><dt>推理 Runtime</dt><dd>llama.cpp；研究快照 e3797b184d428c7a019362612b76971f60af6670，实际部署版本待核实</dd></div>
+<div><dt>执行后端</dt><dd>RK3566 ARM CPU；Linux 5.10.160 aarch64；不假定 NPU 支持</dd></div>
+<div><dt>量化 / 计算精度</dt><dd>Q8_0 权重；q8_0 KV 候选，另作 f16 KV 对照</dd></div>
+<div><dt>模型文件与来源</dt><dd>合并高精度模型 → Qwen3 GGUF → 量化；新文件大小/hash 待导出</dd></div>
+</dl>
+<p class="experiment-note"><strong>下一步具体测试：</strong> 同一测试核查 Q4/Q5 错误是否也出现在 Q8；板端空间不足时先在 Mac 对照，不覆盖旧模型。</p>
+<details><summary>展开：证据来源、风险与板端实测状态</summary><div class="details-grid"><section><h4>来源与可追溯证据</h4><ul>
+<li><a href="https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/tools/quantize/README.md" target="_blank" rel="noopener noreferrer">llama.cpp 量化说明 ↗</a></li>
+<li><a href="https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md" target="_blank" rel="noopener noreferrer">Qwen3 官方工具协议 ↗</a></li>
+</ul></section><section><h4>缺失证据 / 主要风险</h4><ul>
+<li>原生模板、解析器与Schema接收边界待独立验证；旧C++不作为前置条件</li>
+<li>选定工具token长度、新权重格式表现与板端资源待测</li>
+<li>板端磁盘余量小，传输前重查空间</li>
+</ul><h4>已获得的板端实测值</h4><ul class="metrics">
+<li>尚无相应组合的板端实测数据</li>
+</ul></section></div></details></article>
+</section><section class="panel"><div class="section-heading"><h2>05 / Benchmark 实施计划</h2><p>下面每项都应转化为可重复的测试输入、采集程序和 JSON 指标。不同模型采用一致数据集，并单独记录特有的兼容性实验。</p></div>
+<div class="bench-row"><div class="bench-num">01</div><div><strong>关键工具与协议冻结</strong><p>选定工具子集，导出Schema和精简system；独立验证Qwen3原生序列化/解析及Agent调用结构，不调用设备，不先改旧C++。</p>
+<div class="sub">适用组合：所有候选；判定方式：原生解析、参数JSON和Schema通过分别统计。</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">02</div><div><strong>最小训练与导出</strong><p>统计完整样本token数、核对loss mask，先20–50步记录峰值内存/swap/吞吐；验证合并和Qwen3 GGUF转换。</p>
+<div class="sub">适用组合：Qwen3-0.6B LoRA；判定方式：不截断选定目录/输入/答案；转换加载成功，资源实测。</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">03</div><div><strong>精简Prompt与格式回归</strong><p>未微调/微调与完整/精简提示对照，继续传选定tools；固定独立测试记录原生解析、JSON、Schema逐条结果。</p>
+<div class="sub">适用组合：所有候选；判定方式：争取冻结测试集100%格式及Schema通过，不设全60工具或完整业务95%前置门槛。</div>
+</div></div>
+<div class="bench-row"><div class="bench-num">04</div><div><strong>量化与板端资源</strong><p>同一合并权重、样本、上下文、KV和线程对照，再单独测KV精度；Mac先回归，板端逐个加载测PSS/CPU/延迟/余量。</p>
+<div class="sub">适用组合：Q4_K_M/Q5_K_M/Q8_0；判定方式：选格式和Schema通过且资源合适的最小版本；模型调通后再做旧项目接入和业务适配。</div>
+</div></div>
+</section><section class="panel"><h2>06 / 调研结束后如何继续</h2><p>按实验顺序先验证加载与流式功能，然后在相同设备、相同测试集上比较精度、延迟、内存与稳定性。将原始日志转换成 benchmark-results.json，交给 validation 阶段逐项验收；如不达标，根据瓶颈重新选择模型或运行后端。</p></section><footer>Edge Model Selection · 静态 HTML 从已审阅的 JSON 生成。资料调研、模型假设和设备实测具有不同证据等级。</footer></main></body></html>
