@@ -14,3 +14,5 @@ python -m http.server 8080 --directory /tmp/edge-ai-report-site
 推送 main 后由 `.github/workflows/pages.yml` 自动构建并发布。
 
 对外报告入口使用 `reports.html`；根首页也保留报告列表，避免旧根页面缓存影响新入口。
+
+发布时，`report_navigation.py` 为报告与入口添加右侧固定导航：执行流程、章节锚点与返回顶部；移动端为顶部可折叠目录。只修改构建副本，不改写原始实验 HTML 或上游来源快照。

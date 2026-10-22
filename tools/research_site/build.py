@@ -4,6 +4,8 @@ import html
 from pathlib import Path
 import shutil
 
+from report_navigation import add_navigation
+
 ROOT = Path(__file__).resolve().parents[2]
 VOICE = Path('studies/voice-interaction')
 REPORTS = [
@@ -49,6 +51,12 @@ def build(output):
     (output / 'index.html').write_text(page)
     # Dedicated entry avoids cached copies of the retired root dashboard.
     (output / 'reports.html').write_text(page)
+    catalog = [('evidence/' + source.as_posix() if name != 'voice-screening/report.html'
+                else 'reports/' + name, title) for name, title, _, source in REPORTS]
+    for target in output.rglob('*.html'):
+        if 'sources' in target.relative_to(output).parts:
+            continue  # Upstream source snapshots are evidence, not our reports.
+        target.write_text(add_navigation(target.read_text(), target, output, catalog))
     (output / '.nojekyll').touch()
     print(f'Built report index and {len(REPORTS)} standalone report entries; no SOP pages rendered.')
 
