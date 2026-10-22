@@ -166,7 +166,24 @@ def execute(request, output):
             (output / "benchmark/report.html").write_text(
                 render([result]), encoding="utf-8"
             )
-            return result
+            handoff = dict(result)
+            handoff["source"] = dict(
+                result["source"],
+                raw_evidence="benchmark/cases/ and benchmark/events/",
+            )
+            handoff["evidence"] = [
+                dict(item, path="benchmark/" + item["path"])
+                for item in result["evidence"]
+            ]
+            handoff["benchmark_result"] = {
+                "path": "benchmark/results.json",
+                "sha256": file_hash(output / "benchmark/results.json"),
+            }
+            write_json(output / "results.json", handoff)
+            (output / "report.html").write_text(
+                render([handoff]), encoding="utf-8"
+            )
+            return handoff
         except Exception as error:
             write_json(
                 output / "launcher-failure.json",
