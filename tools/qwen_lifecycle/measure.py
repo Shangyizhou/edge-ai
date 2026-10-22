@@ -1,13 +1,14 @@
-"""Sample a declared process tree; keep platform memory quantities distinct."""
+"""Sample a process tree; keep platform memory quantities distinct."""
 
 import os
 import platform
 import threading
 import time
+from pathlib import Path
 
 
 class ResourceSampler:
-    """CPU is process-tree CPU seconds / wall / logical host CPU count."""
+    """CPU = process-tree CPU seconds / wall / logical host CPUs."""
 
     def __init__(self, pid=None, interval=0.2):
         import psutil
@@ -39,6 +40,7 @@ class ResourceSampler:
             except (self.psutil.NoSuchProcess, self.psutil.ZombieProcess):
                 continue
         memory = self.psutil.virtual_memory()
+        swap = self.psutil.swap_memory()
         sample = {
             "monotonic_seconds": time.perf_counter(),
             "cpu_seconds": sum(self.cpu_by_process.values()),
@@ -46,8 +48,22 @@ class ResourceSampler:
             "pss_bytes": None if pss is None else int(pss),
             "host_mem_total_bytes": memory.total,
             "host_mem_available_bytes": memory.available,
-            "host_swap_used_bytes": self.psutil.swap_memory().used,
+            "host_swap_used_bytes": swap.used,
+            "host_swap_in_bytes": swap.sin,
+            "host_swap_out_bytes": swap.sout,
         }
+        if platform.system() == "Linux":
+            temperatures = {}
+            for sensor in Path("/sys/class/thermal").glob(
+                "thermal_zone*/temp"
+            ):
+                try:
+                    temperatures[sensor.parent.name] = (
+                        float(sensor.read_text()) / 1000
+                    )
+                except (OSError, ValueError):
+                    pass
+            sample["thermal_zone_celsius"] = temperatures
         self.samples.append(sample)
 
     def start(self):
@@ -87,6 +103,11 @@ class ResourceSampler:
             ),
             "host_swap_delta_bytes": last["host_swap_used_bytes"]
             - first["host_swap_used_bytes"],
+            "host_swap_in_delta_bytes": last["host_swap_in_bytes"]
+            - first["host_swap_in_bytes"],
+            "host_swap_out_delta_bytes": last["host_swap_out_bytes"]
+            - first["host_swap_out_bytes"],
+            "swap_scope": "system-wide counters; not model-only",
             "limitation": "sampled peak, not kernel high-water mark; "
             "last observed CPU of retired children is retained, so short "
             "child lifetimes can remain under-sampled; "

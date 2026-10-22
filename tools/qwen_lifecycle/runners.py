@@ -1,4 +1,4 @@
-"""Minimal MLX/llama.cpp transports; neither adapter executes business tools."""
+"""MLX/llama.cpp transports; neither executes business tools."""
 
 import importlib.metadata
 import json
@@ -93,7 +93,7 @@ class MlxRunner:
 
 
 class LlamaHttpRunner:
-    """Use llama-server native OpenAI tool parser and preserve stream events."""
+    """Use llama-server native parser and preserve stream events."""
 
     def __init__(self, request):
         self.settings = request["runner"]
@@ -118,7 +118,8 @@ class LlamaHttpRunner:
             "stream": True,
             "temperature": config.get("temperature", 0),
             "max_tokens": config.get("max_tokens", 256),
-            "cache_prompt": False,
+            "cache_prompt": config.get("cache_prompt", False),
+            "stream_options": {"include_usage": True},
             "chat_template_kwargs": {"enable_thinking": False},
         }
         if tools:
@@ -139,6 +140,7 @@ class LlamaHttpRunner:
         calls = {}
         finish = None
         timings = {}
+        usage = {}
         with self.opener.open(
             request, timeout=config.get("timeout_seconds", 600)
         ) as response:
@@ -152,6 +154,7 @@ class LlamaHttpRunner:
                 elapsed = time.perf_counter() - started
                 on_event({"elapsed_seconds": elapsed, "wire": event})
                 timings.update(event.get("timings", {}))
+                usage.update(event.get("usage") or {})
                 for choice in event.get("choices", []):
                     delta = choice.get("delta", {})
                     if (
@@ -182,15 +185,22 @@ class LlamaHttpRunner:
             "wire_calls": [calls[k] for k in sorted(calls)] if calls else None,
             "wall_seconds": time.perf_counter() - started,
             "ttft_seconds": first,
-            "prompt_tokens": timings.get("prompt_n"),
+            "prompt_tokens": usage.get(
+                "prompt_tokens",
+                None if payload["cache_prompt"] else timings.get("prompt_n"),
+            ),
+            "evaluated_prefill_tokens": timings.get("prompt_n"),
+            "native_usage": usage,
+            "native_timings": timings,
+            "cache_prompt": payload["cache_prompt"],
             "output_tokens": timings.get("predicted_n"),
             "prefill_seconds": _seconds(timings.get("prompt_ms")),
             "decode_seconds": _seconds(timings.get("predicted_ms")),
             "prefill_tokens_per_second": timings.get("prompt_per_second"),
             "decode_tokens_per_second": timings.get("predicted_per_second"),
             "mlx_peak_allocated_bytes": None,
-            "timing_source": "llama-server final timings; unknown if "
-            "runtime does not emit timings",
+            "timing_source": "llama-server timings use evaluated prefill; "
+            "full prompt uses native usage; raw counters retained",
         }
 
 

@@ -106,7 +106,7 @@ def run(request, output, runner=None, source_kind="device_measurement"):
                           "resources": loading_resources},
               "measurement": {"resources": "per-case sampled process tree",
                               "cache": "new MLX prompt cache per case / "
-                              "llama cache_prompt=false",
+                              "llama cache_prompt=" + str(generation.get("cache_prompt", False)).lower(),
                               "timing": "request to complete response; "
                               "valid-call latency only if native+schema pass",
                               "sampling_interval_seconds": interval,

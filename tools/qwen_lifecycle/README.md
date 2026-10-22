@@ -77,3 +77,20 @@ is invented for another platform.
 `report` is read-only and imports no MLX runtime. A combined HTML embeds result
 JSON; each run's generated HTML also carries a zip of raw JSON evidence. It
 follows the existing approved layout without modifying historical reports.
+
+For isolated Linux CPU preparation and benchmarking, run
+`python -m tools.qwen_lifecycle.board_run REQUEST NEW_OUTPUT` on the board.
+The request adds `server.binary`, `server.port` and explicit `server.argv`
+(threads, batch/microbatch, context, KV and CPU backend flags). The launcher
+binds loopback, records binary/ldd/source/loading evidence, checks every complete
+rendered prompt plus output budget, monitors its own model server, and stops
+only that owned process. Existing servers and production environments are not
+modified. Python 3.8 works with isolated compatible psutil/jsonschema/Pydantic.
+
+HTTP prompt caching is opt-in via `generation.cache_prompt` (default false).
+`prompt_tokens` uses full native usage when emitted; `evaluated_prefill_tokens`
+retains `timings.prompt_n`, with raw usage/timings saved separately. Cached
+prefill rate uses evaluated tokens, never the full prompt length. Keep cache
+conditions in separate run groups. Linux raw samples include thermal-zone
+readings when available and system-wide swap-in/out counters; their deltas
+cannot be attributed solely to the model process.
