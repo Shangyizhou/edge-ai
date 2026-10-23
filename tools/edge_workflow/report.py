@@ -481,6 +481,7 @@ def build(output, root=ROOT):
             ),
         ],
     )
+    release = load(study / "releases/selected9-768-v3.json")
     final = load(
         study
         / "experiments/final/2026-10-22-qwen-final132-v1/final-summary.json"
@@ -540,6 +541,17 @@ def build(output, root=ROOT):
                 )
                 + links(
                     [
+                        (
+                            release["model_card"],
+                            "下载正式768微步adapter和Q4（HF私有仓库，需授权）",
+                        ),
+                        (
+                            "https://huggingface.co/datasets/"
+                            + release["dataset"]["repo_id"]
+                            + "/tree/"
+                            + release["dataset"]["revision"],
+                            "下载数据与实验归档（HF私有仓库，需授权）",
+                        ),
                         ("../workflow/report.html", "查看工作流技术实例"),
                         ("../../reports.html", "返回报告列表"),
                     ]

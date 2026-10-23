@@ -60,3 +60,5 @@ M5/16GB已实际完成0.6B LoRA，无需LLaMA-Factory；选定768微步/96次优
 - [保存的实验索引](experiments/index.json)：派生目录，历史未登记关联保留为未知。
 - [公开报告生成及 Pages 白名单](../../tools/research_site/README.md)：正式报告与原始证据分开管理。
 - [工作流报告总览](reports/2026-10-23-curated/workflow/report.html)：只读回放；32微步试跑不能替代原正式模型验收。
+
+- [HF模型下载](https://huggingface.co/Shangyizhou/xiaomo-qwen3-0.6b/tree/0bd09b627bb133b8a9f5a71cfeb8225a421d33ba) · [模型固定版本清单](releases/selected9-768-v3.json) · [HF数据归档](https://huggingface.co/datasets/Shangyizhou/xiaomo-robotics-data/tree/3f78791304c9c0b1457d6674273ba3e46927f4b5)（均需授权访问）。

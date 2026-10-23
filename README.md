@@ -14,7 +14,15 @@
 
 **[Qwen生命周期离线报告](studies/voice-interaction/experiments/final/2026-10-22-qwen-final132-v1/report.html)**：已完成基线、Mac LoRA、合并转换、量化、RK3566与528次正式请求。原生格式试点通过；人设仍有误调用，角色配置尚不能可靠省略。板端工具完整调用P50/P95约11.6/27.3秒，KV冷首例约174秒。
 
-**下一步：**用新来源训练数据和新封存集改进角色/路由泛化；生产接入、完整语音链路和机器人共跑另行验证。新Qwen报告默认不进入Pages导出。
+**下一步：**用新来源训练数据和新封存集改进角色/路由泛化；生产接入、完整语音链路和机器人共跑另行验证。本PR的Pages白名单提供精简Qwen总结，原始实验不递归发布。
+
+## 模型与数据下载
+
+- [模型权重与中文说明](https://huggingface.co/Shangyizhou/xiaomo-qwen3-0.6b/tree/0bd09b627bb133b8a9f5a71cfeb8225a421d33ba)：正式选定的768微步MLX adapter（1.25 MiB）与完整Q4（378.33 MiB），官方基座不重复上传。
+- [数据与实验归档](https://huggingface.co/datasets/Shangyizhou/xiaomo-robotics-data/tree/3f78791304c9c0b1457d6674273ba3e46927f4b5)：冻结数据、工作流原始记录及元数据。
+- [固定模型版本与文件校验清单](studies/voice-interaction/releases/selected9-768-v3.json) · [实验恢复说明](studies/voice-interaction/datasets/README.md)。两个HF仓库均为Private，需要有权限的账号登录。
+
+GitHub保留代码、清单、摘要与正式报告；大文件和917份工作流原始记录按需从HF下载。模型上传不代表质量门槛全部通过。
 
 ## 资料入口
 
