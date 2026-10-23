@@ -290,6 +290,16 @@ def build_index(output, catalog=STUDY / "datasets/catalog.json"):
             }
         )
     output = Path(output)
+    # Keep remote-only historical records when rebuilding from a sparse checkout.
+    if output.is_file():
+        previous = json.loads(output.read_text())
+        present = {row["result"] for row in rows}
+        rows.extend(
+            row
+            for row in previous.get("runs", [])
+            if row.get("storage", {}).get("state") == "remote_archived"
+            and row["result"] not in present
+        )
     output.write_text(
         json.dumps(
             {

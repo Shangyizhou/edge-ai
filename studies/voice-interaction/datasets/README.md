@@ -32,3 +32,18 @@ python3 -m tools.edge_workflow.backup restore /外部存储/datasets-v2.tar.gz /
 长期保留来源及许可说明、划分依据、冻结配置、原始结果、代码快照、数据清单和重要决策。模型大文件及音频用外部存储和校验身份管理。当前先使用目录、JSON 清单和验证命令，不引入 DVC/MLflow 服务。
 
 原实验里被哈希清单引用的旧 HTML 也属于历史证据，保留原样。重复的总结、原型不作为 Pages 入口；它们可以在可验证归档之后退出当前视图。不要依据日期批量删除实验。隐私录音与硬件明细不进入 Pages。Git 历史中已有的内容不会因发布白名单而变成私密资料。
+
+## 已迁移到 Hugging Face 的工作流实验
+
+2026-10-23的两轮工作流原始记录共917个文件，已从代码仓库移出，并校验删除对应的本地展开副本。正式HTML、工具代码、数据版本和结果索引保留。完整记录位于私有仓库 `Shangyizhou/xiaomo-robotics-data`；固定版本、包哈希见 [远端归档清单](remote-archive.json)。需要有权限的HF账号，先运行 `hf auth login`。
+
+```sh
+# 使用安装有huggingface_hub的Python，恢复到Git外的本地目录
+python -m tools.edge_workflow.archive
+# 恢复完成后可以重新生成报告
+python -m tools.edge_workflow.report /新的报告目录
+```
+
+默认恢复到 `~/.local/share/edge-ai/archive-cache/20261023-v1`，不写回Git目录，不覆盖已有恢复目录。日常浏览已提交HTML不需要下载归档。数据清单中的新工作流输入也指向此恢复根目录；未恢复时校验会报告缺失，这是按需下载的预期状态。
+
+移除记录是后续提交：原PR分支的前序Git提交仍含这些文件，本次不会强推或重写历史。私有HF下载需要认证，公开Pages报告不依赖私有下载才能浏览。

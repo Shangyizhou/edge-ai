@@ -8,6 +8,7 @@ import re
 import shutil
 from pathlib import Path
 
+from .archive import CACHE
 from .presentation import paragraph, review, table
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,11 +26,22 @@ def build(output, root=ROOT):
     sources = {}
     created = []
 
+    def evidence(path):
+        if path.is_file():
+            return path
+        restored = CACHE / path.relative_to(root)
+        if not restored.is_file():
+            raise FileNotFoundError(
+                "Restore archived inputs first: python -m tools.edge_workflow.archive"
+            )
+        return restored
+
     def load(path):
+        actual = evidence(path)
         sources[str(path.relative_to(root))] = hashlib.sha256(
-            path.read_bytes()
+            actual.read_bytes()
         ).hexdigest()
-        return json.loads(path.read_text())
+        return json.loads(actual.read_text())
 
     def emit(name, title, sections):
         folder = output / name
@@ -291,9 +303,9 @@ def build(output, root=ROOT):
     curve = mac / "training-report/curves/pilot32.svg"
     target = output / "workflow-training/curve.svg"
     target.parent.mkdir(parents=True)
-    shutil.copyfile(curve, target)
+    shutil.copyfile(evidence(curve), target)
     sources[str(curve.relative_to(root))] = hashlib.sha256(
-        curve.read_bytes()
+        evidence(curve).read_bytes()
     ).hexdigest()
     created.append(target)
     # The curve folder already exists, so emit the page without creating it twice.
