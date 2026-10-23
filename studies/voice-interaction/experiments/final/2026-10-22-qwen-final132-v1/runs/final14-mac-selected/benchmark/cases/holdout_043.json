@@ -1,0 +1,126 @@
+{
+  "id": "holdout_043",
+  "user": "对机器人提出请求：将音量设为100。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 100
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "对机器人提出请求：将音量设为100。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "arguments": "{\"level\": 100}"
+        }
+      }
+    ],
+    "wall_seconds": 0.4438505420112051,
+    "ttft_seconds": 0.3399763330235146,
+    "prompt_tokens": 921,
+    "evaluated_prefill_tokens": 921,
+    "native_usage": {
+      "completion_tokens": 22,
+      "prompt_tokens": 921,
+      "total_tokens": 943,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 921,
+      "prompt_ms": 271.938,
+      "prompt_per_token_ms": 0.29526384364820846,
+      "prompt_per_second": 3386.8014032610376,
+      "predicted_n": 22,
+      "predicted_ms": 165.524,
+      "predicted_per_token_ms": 7.882095238095238,
+      "predicted_per_second": 126.86981948237114
+    },
+    "cache_prompt": false,
+    "output_tokens": 22,
+    "prefill_seconds": 0.271938,
+    "decode_seconds": 0.165524,
+    "prefill_tokens_per_second": 3386.8014032610376,
+    "decode_tokens_per_second": 126.86981948237114,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 100
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 100
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.699102959013544,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 3629,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.7126294159679674,
+    "cpu_seconds": 0.3417265599999979,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.795291245953261,
+    "peak_rss_bytes": 1439744000,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2404532224,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 3031040,
+    "host_swap_out_delta_bytes": 212992,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

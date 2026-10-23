@@ -1,0 +1,34 @@
+{
+  "revision": "e3797b184d428c7a019362612b76971f60af6670",
+  "origin": "https://github.com/ggml-org/llama.cpp",
+  "snapshots": [
+    {
+      "path": "tools/server/server-task.cpp",
+      "source_sha256": "d7901c9609a6fe8c859a3777d45a37148e335bb73984313ba08a339d558382ef",
+      "first_line": 350,
+      "last_line": 365,
+      "excerpt": "    };\n    if (!stream && !probs_output.empty()) {\n        res[\"completion_probabilities\"] = completion_token_output::probs_vector_to_json(probs_output, post_sampling_probs);\n    }\n    return response_fields.empty() ? res : json_get_nested_values(response_fields, res);\n}\n\njson server_task_result_cmpl_final::usage_json_oaicompat() {\n    return json {\n        {\"completion_tokens\", n_decoded},\n        {\"prompt_tokens\",     n_prompt_tokens},\n        {\"total_tokens\",      n_decoded + n_prompt_tokens},\n        {\"prompt_tokens_details\", json { {\"cached_tokens\", n_prompt_tokens_cache} }},\n    };\n}\n"
+    },
+    {
+      "path": "tools/server/server-common.cpp",
+      "source_sha256": "6f0b8d370cf7c4bfde1c76216b42f50a11206310738958afe239ade619a29045",
+      "first_line": 138,
+      "last_line": 155,
+      "excerpt": "\njson server_slot_stats::to_json() const {\n    json base = {\n        {\"cache_n\",                n_prompt_cached},\n\n        {\"prompt_n\",               n_prompt_processed},\n        {\"prompt_ms\",              t_prompt_ms()},\n        {\"prompt_per_token_ms\",    t_prompt_per_token_ms()},\n        {\"prompt_per_second\",      n_prompt_tps()},\n\n        {\"predicted_n\",            n_gen},\n        {\"predicted_ms\",           t_gen_ms()},\n        {\"predicted_per_token_ms\", t_gen_per_token_ms()},\n        {\"predicted_per_second\",   n_gen_tps()},\n    };\n\n    if (n_draft_tokens > 0) {\n        base[\"draft_n\"]          = n_draft_tokens;"
+    },
+    {
+      "path": "tools/server/server-context.cpp",
+      "source_sha256": "e808b66076eefbe0bd9a31c6f8716db1bc784ee5dce1385c14fe40fd5377befe",
+      "first_line": 2310,
+      "last_line": 2327,
+      "excerpt": "            res->progress.time_ms   = slot.stats.t_elapsed_us() / 1000;\n        }\n        if (is_begin) {\n            res->is_begin = true;\n        } else {\n            res->content = slot.generated.substr(slot.n_sent_text - tkn.text_to_send.size(), tkn.text_to_send.size());\n            res->tokens.assign(1, tkn.tok);\n        }\n\n        res->n_decoded             = slot.stats.n_gen;\n        res->n_prompt_tokens       = slot.task->n_tokens();\n        res->n_prompt_tokens_cache = slot.stats.n_prompt_cached;\n        res->post_sampling_probs   = slot.task->params.post_sampling_probs;\n\n        res->verbose           = slot.task->params.verbose;\n        res->res_type          = slot.task->params.res_type;\n        res->oaicompat_model   = slot.task->params.oaicompat_model;\n        res->oaicompat_cmpl_id = slot.task->params.oaicompat_cmpl_id;"
+    },
+    {
+      "path": "tools/server/server-common.h",
+      "source_sha256": "f2d93b30299d1e84c8c15c502ef72295085079f314aa39ecda369ca069775da3",
+      "first_line": 440,
+      "last_line": 480,
+      "excerpt": "    double t_prompt_ms() const {\n        if (t_prompt_last == 0) {\n            return 0.0; // the prompt is not processed yet\n        }\n        return (t_prompt_last - t_start) / 1000.0;\n    }\n    int64_t t_gen_us() const {\n        if (t_gen_last == 0) {\n            return 0; // the generation is not started yet\n        }\n        // clamp to 1 us, the first token can land in the same us as t_prompt_last\n        return std::max<int64_t>(1, t_gen_last - t_prompt_last);\n    }\n    double t_gen_ms() const {\n        return t_gen_us() / 1000.0;\n    }\n\n    // number of decode steps spent on generation\n    // the first token is free, it comes from the logits of the last prompt batch\n    uint64_t n_gen_steps() const {\n        return n_gen > 0 ? n_gen - 1 : 0;\n    }\n\n    // other derived metrics\n    // note: all of them return 0.0 if the divisor is not known yet\n    double t_prompt_per_token_ms() const {\n        return n_prompt_processed > 0 ? t_prompt_ms() / n_prompt_processed : 0.0;\n    }\n    double t_gen_per_token_ms() const {\n        return n_gen_steps() > 0 ? t_gen_ms() / n_gen_steps() : 0.0;\n    }\n    double n_prompt_tps() const {\n        const double t_ms = t_prompt_ms();\n        return t_ms > 0.0 ? 1e3 / t_ms * n_prompt_processed : 0.0;\n    }\n    double n_gen_tps() const {\n        const double t_ms = t_gen_ms();\n        return t_ms > 0.0 ? 1e3 / t_ms * n_gen_steps() : 0.0;\n    }\n\n    // false if the slot never started, i.e. the task result carries no stats"
+    }
+  ]
+}

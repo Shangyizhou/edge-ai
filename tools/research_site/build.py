@@ -1,6 +1,7 @@
 """Publish standalone HTML reports with a small static report index."""
 import argparse
 import html
+import os
 from pathlib import Path
 import shutil
 
@@ -19,6 +20,31 @@ REPORTS = [
 ]
 
 
+# Repository-relative directory prefixes. These Qwen deliveries are offline-only;
+# a separate publication decision must explicitly remove their exclusions.
+UNPUBLISHED_DIRECTORIES = (
+    VOICE / 'experiments/mac',
+    VOICE / 'experiments/rk3566/2026-10-22-qwen-pilot32-board-v1',
+    VOICE / 'research/2026-10-22-mac-qwen-plan',
+    VOICE / 'experiments/final/2026-10-22-qwen-final132-v1',
+)
+
+
+def public_evidence_files():
+    # Prune before descending: no nested HTML, JSON or source snapshots from
+    # an offline directory may reach the export, even without a catalog card.
+    for directory, subdirectories, filenames in os.walk(ROOT / 'studies'):
+        directory = Path(directory)
+        subdirectories[:] = [name for name in subdirectories
+                             if name != '__pycache__'
+                             and (directory / name).relative_to(ROOT)
+                             not in UNPUBLISHED_DIRECTORIES]
+        for name in filenames:
+            path = directory / name
+            if path.suffix not in ('.pyc', '.pyo'):
+                yield path
+
+
 def build(output):
     output = output.resolve()
     if output.exists():
@@ -27,11 +53,10 @@ def build(output):
         raise ValueError('Build outside the repository or to an _site* directory')
     # Keep evidence files available to frozen reports, without rendering SOP pages.
     output.mkdir(parents=True)
-    for path in (ROOT / 'studies').rglob('*'):
-        if path.is_file() and '__pycache__' not in path.parts and path.suffix not in ('.pyc', '.pyo'):
-            target = output / 'evidence' / path.relative_to(ROOT)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(path, target)
+    for path in public_evidence_files():
+        target = output / 'evidence' / path.relative_to(ROOT)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target)
     cards = []
     for step, (destination, title, description, source) in enumerate(REPORTS, start=1):
         target = output / 'reports' / destination

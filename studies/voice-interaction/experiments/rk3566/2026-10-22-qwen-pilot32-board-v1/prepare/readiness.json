@@ -1,0 +1,362 @@
+{
+  "schema": "edge-model-prepare/readiness-v1",
+  "status": "READY_FOR_BENCHMARK",
+  "request_sha256": "7ed3d4776b425a723aa1d7eb84c7d261289968daeb454f9b3a8675a51df4429b",
+  "device": {
+    "model": "Rockchip RK3566 OPi3B",
+    "cpu": "4xCortex-A55",
+    "os": "Ubuntu20.04 / Linux5.10.160",
+    "glibc": "2.31",
+    "host_mem_total_bytes": 4113428480
+  },
+  "requirements": {
+    "scope": "试点部署、3工具/3人设/1聊天开发用例，纯Registry边界；不执行ROS/硬件动作",
+    "hard_capability": "原生工具调用可经原始Schema/Registry接收",
+    "product_acceptance": "NOT_EVALUATED",
+    "confirmed_performance_thresholds": []
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "model": "Qwen/Qwen3-0.6B",
+        "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "parameter_count": 596049920,
+        "parameter_count_stored": 751632384,
+        "precision": "Q4_K_M",
+        "artifact_format": "GGUF",
+        "backend": "ARM CPU",
+        "context_tokens": 2048,
+        "kv_type": "f16",
+        "lineage": "seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M",
+        "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+        "constraint_mode": "llama-server native tool grammar; differs from unconstrained MLX",
+        "device": "Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB",
+        "id": "f16-e379-v2",
+        "name": "Qwen3试点 Q4_K_M / ARM CPU / f16 KV"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "build",
+        "reason": "复用同一Mac试点GGUF；旧运行库原Schema失败，隔离构建同Mac固定e379源码，见build-recipe.json"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "396704704字节试点GGUF，板端SHA与Mac导出相同，原模型和许可证身份可追溯",
+          "evidence": [
+            "f16-e379-v2-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "真实aarch64 CPU运行库版本和ldd/共享库哈希已记录；旧库保持原样",
+          "evidence": [
+            "f16-e379-v2-runtime"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "服务健康就绪；页缓存可能已由哈希预热，加载与推理分窗",
+          "evidence": [
+            "f16-e379-v2-load"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "只证明此条原生调用及纯intake路径；人设和完整目录另计",
+          "evidence": [
+            "f16-e379-v2-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "同一7条开发用例和真实采集完成；生成结束状态与质量逐例保留",
+          "evidence": [
+            "f16-e379-v2-config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "f16-e379-v2-config"
+      ],
+      "next_action": "交给独立完整测试冻结配置；本轮开发冒烟不作为生产或完整交互验收。"
+    },
+    {
+      "candidate": {
+        "model": "Qwen/Qwen3-0.6B",
+        "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "parameter_count": 596049920,
+        "parameter_count_stored": 751632384,
+        "precision": "Q4_K_M",
+        "artifact_format": "GGUF",
+        "backend": "ARM CPU",
+        "context_tokens": 2048,
+        "kv_type": "q8_0",
+        "lineage": "seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M",
+        "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+        "constraint_mode": "llama-server native tool grammar; differs from unconstrained MLX",
+        "device": "Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB",
+        "id": "q8-e379-v2",
+        "name": "Qwen3试点 Q4_K_M / ARM CPU / q8_0 KV"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "build",
+        "reason": "复用同一Mac试点GGUF；旧运行库原Schema失败，隔离构建同Mac固定e379源码，见build-recipe.json"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "396704704字节试点GGUF，板端SHA与Mac导出相同，原模型和许可证身份可追溯",
+          "evidence": [
+            "q8-e379-v2-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "真实aarch64 CPU运行库版本和ldd/共享库哈希已记录；旧库保持原样",
+          "evidence": [
+            "q8-e379-v2-runtime"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "服务健康就绪；页缓存可能已由哈希预热，加载与推理分窗",
+          "evidence": [
+            "q8-e379-v2-load"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "只证明此条原生调用及纯intake路径；人设和完整目录另计",
+          "evidence": [
+            "q8-e379-v2-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "同一7条开发用例和真实采集完成；生成结束状态与质量逐例保留",
+          "evidence": [
+            "q8-e379-v2-config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "q8-e379-v2-config"
+      ],
+      "next_action": "交给独立完整测试冻结配置；本轮开发冒烟不作为生产或完整交互验收。"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "f16-e379-v2-assets",
+      "kind": "assets",
+      "location": "runs/f16-e379-v2/assets-manifest.json",
+      "sha256": "dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53",
+      "description": "实际板端权重字节数与SHA256"
+    },
+    {
+      "id": "f16-e379-v2-runtime",
+      "kind": "runtime",
+      "location": "runs/f16-e379-v2/runtime.json",
+      "sha256": "af9b24569e3c47b7f184a35f3b1b8068b360ee8a4855ca8cb001867a0e4dff2a",
+      "description": "实际ARM CPU二进制、共享库、版本与ABI身份"
+    },
+    {
+      "id": "f16-e379-v2-load",
+      "kind": "load",
+      "location": "runs/f16-e379-v2/server-load.json",
+      "sha256": "0257c988ad085c9fd773921f321eebb56b526cbf99596b724a0510aaa18ba341",
+      "description": "独立服务启动至health ready；不包含事先资产哈希成本"
+    },
+    {
+      "id": "f16-e379-v2-smoke",
+      "kind": "smoke",
+      "location": "runs/f16-e379-v2/benchmark/cases/start_camera.json",
+      "sha256": "8ffe4af1e1e1ef677b7ce190fc0c68fd966ba35682bc3bb7d753f41146680a2f",
+      "description": "真实原生工具输出经JSON/原始Schema/纯Registry接收，未执行处理器"
+    },
+    {
+      "id": "f16-e379-v2-config",
+      "kind": "benchmark_config",
+      "location": "runs/f16-e379-v2/launcher-request.json",
+      "sha256": "25f1865e13f7d624917ed22bd9321645bd14d5b85acaf30ad5775962da06bb14",
+      "description": "冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run"
+    },
+    {
+      "id": "q8-e379-v2-assets",
+      "kind": "assets",
+      "location": "runs/q8-e379-v2/assets-manifest.json",
+      "sha256": "dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53",
+      "description": "实际板端权重字节数与SHA256"
+    },
+    {
+      "id": "q8-e379-v2-runtime",
+      "kind": "runtime",
+      "location": "runs/q8-e379-v2/runtime.json",
+      "sha256": "f9b67d87470d62224728f3a4c55543ef706f52057e78c9872d7c9da000adb1cd",
+      "description": "实际ARM CPU二进制、共享库、版本与ABI身份"
+    },
+    {
+      "id": "q8-e379-v2-load",
+      "kind": "load",
+      "location": "runs/q8-e379-v2/server-load.json",
+      "sha256": "ee019ddabe4352facfad9aa77bafc5e857b9fa7afaad66b98ea3bb9ddf8068d7",
+      "description": "独立服务启动至health ready；不包含事先资产哈希成本"
+    },
+    {
+      "id": "q8-e379-v2-smoke",
+      "kind": "smoke",
+      "location": "runs/q8-e379-v2/benchmark/cases/start_camera.json",
+      "sha256": "9e0f1d9668b80e4b55aa257e57bdbbc075fbfb3876f1e5e8fe297b26ee010b76",
+      "description": "真实原生工具输出经JSON/原始Schema/纯Registry接收，未执行处理器"
+    },
+    {
+      "id": "q8-e379-v2-config",
+      "kind": "benchmark_config",
+      "location": "runs/q8-e379-v2/launcher-request.json",
+      "sha256": "fec31ed6318c8e57a661d347d3d573cafcd4a6eebd0a543ce6473dc5021aa4cc",
+      "description": "冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run"
+    }
+  ],
+  "evidence_verification": "references_only",
+  "product_acceptance": "NOT_EVALUATED",
+  "benchmark_handoff": {
+    "candidates": [
+      {
+        "candidate": {
+          "model": "Qwen/Qwen3-0.6B",
+          "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf",
+          "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+          "parameter_count": 596049920,
+          "parameter_count_stored": 751632384,
+          "precision": "Q4_K_M",
+          "artifact_format": "GGUF",
+          "backend": "ARM CPU",
+          "context_tokens": 2048,
+          "kv_type": "f16",
+          "lineage": "seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M",
+          "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+          "constraint_mode": "llama-server native tool grammar; differs from unconstrained MLX",
+          "device": "Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB",
+          "id": "f16-e379-v2",
+          "name": "Qwen3试点 Q4_K_M / ARM CPU / f16 KV"
+        },
+        "configurations": [
+          {
+            "id": "f16-e379-v2-config",
+            "kind": "benchmark_config",
+            "location": "runs/f16-e379-v2/launcher-request.json",
+            "sha256": "25f1865e13f7d624917ed22bd9321645bd14d5b85acaf30ad5775962da06bb14",
+            "description": "冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "model": "Qwen/Qwen3-0.6B",
+          "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf",
+          "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+          "parameter_count": 596049920,
+          "parameter_count_stored": 751632384,
+          "precision": "Q4_K_M",
+          "artifact_format": "GGUF",
+          "backend": "ARM CPU",
+          "context_tokens": 2048,
+          "kv_type": "q8_0",
+          "lineage": "seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M",
+          "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+          "constraint_mode": "llama-server native tool grammar; differs from unconstrained MLX",
+          "device": "Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB",
+          "id": "q8-e379-v2",
+          "name": "Qwen3试点 Q4_K_M / ARM CPU / q8_0 KV"
+        },
+        "configurations": [
+          {
+            "id": "q8-e379-v2-config",
+            "kind": "benchmark_config",
+            "location": "runs/q8-e379-v2/launcher-request.json",
+            "sha256": "fec31ed6318c8e57a661d347d3d573cafcd4a6eebd0a543ce6473dc5021aa4cc",
+            "description": "冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run"
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "f16-e379-v2-assets",
+        "kind": "assets",
+        "location": "runs/f16-e379-v2/assets-manifest.json",
+        "sha256": "dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53",
+        "description": "实际板端权重字节数与SHA256"
+      },
+      {
+        "id": "f16-e379-v2-runtime",
+        "kind": "runtime",
+        "location": "runs/f16-e379-v2/runtime.json",
+        "sha256": "af9b24569e3c47b7f184a35f3b1b8068b360ee8a4855ca8cb001867a0e4dff2a",
+        "description": "实际ARM CPU二进制、共享库、版本与ABI身份"
+      },
+      {
+        "id": "f16-e379-v2-load",
+        "kind": "load",
+        "location": "runs/f16-e379-v2/server-load.json",
+        "sha256": "0257c988ad085c9fd773921f321eebb56b526cbf99596b724a0510aaa18ba341",
+        "description": "独立服务启动至health ready；不包含事先资产哈希成本"
+      },
+      {
+        "id": "f16-e379-v2-smoke",
+        "kind": "smoke",
+        "location": "runs/f16-e379-v2/benchmark/cases/start_camera.json",
+        "sha256": "8ffe4af1e1e1ef677b7ce190fc0c68fd966ba35682bc3bb7d753f41146680a2f",
+        "description": "真实原生工具输出经JSON/原始Schema/纯Registry接收，未执行处理器"
+      },
+      {
+        "id": "f16-e379-v2-config",
+        "kind": "benchmark_config",
+        "location": "runs/f16-e379-v2/launcher-request.json",
+        "sha256": "25f1865e13f7d624917ed22bd9321645bd14d5b85acaf30ad5775962da06bb14",
+        "description": "冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run"
+      },
+      {
+        "id": "q8-e379-v2-assets",
+        "kind": "assets",
+        "location": "runs/q8-e379-v2/assets-manifest.json",
+        "sha256": "dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53",
+        "description": "实际板端权重字节数与SHA256"
+      },
+      {
+        "id": "q8-e379-v2-runtime",
+        "kind": "runtime",
+        "location": "runs/q8-e379-v2/runtime.json",
+        "sha256": "f9b67d87470d62224728f3a4c55543ef706f52057e78c9872d7c9da000adb1cd",
+        "description": "实际ARM CPU二进制、共享库、版本与ABI身份"
+      },
+      {
+        "id": "q8-e379-v2-load",
+        "kind": "load",
+        "location": "runs/q8-e379-v2/server-load.json",
+        "sha256": "ee019ddabe4352facfad9aa77bafc5e857b9fa7afaad66b98ea3bb9ddf8068d7",
+        "description": "独立服务启动至health ready；不包含事先资产哈希成本"
+      },
+      {
+        "id": "q8-e379-v2-smoke",
+        "kind": "smoke",
+        "location": "runs/q8-e379-v2/benchmark/cases/start_camera.json",
+        "sha256": "9e0f1d9668b80e4b55aa257e57bdbbc075fbfb3876f1e5e8fe297b26ee010b76",
+        "description": "真实原生工具输出经JSON/原始Schema/纯Registry接收，未执行处理器"
+      },
+      {
+        "id": "q8-e379-v2-config",
+        "kind": "benchmark_config",
+        "location": "runs/q8-e379-v2/launcher-request.json",
+        "sha256": "fec31ed6318c8e57a661d347d3d573cafcd4a6eebd0a543ce6473dc5021aa4cc",
+        "description": "冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run"
+      }
+    ]
+  }
+}

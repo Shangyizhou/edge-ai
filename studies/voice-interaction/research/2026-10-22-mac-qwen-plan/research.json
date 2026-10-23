@@ -1,0 +1,204 @@
+{
+  "title": "Qwen3 机器人业务微调：Mac 与 RK3566 计划",
+  "report_status": "research_only",
+  "as_of": "2026-10-22",
+  "scenario": {
+    "description": "Mac训练Qwen3-0.6B关键工具子集及精简SystemPrompt，先独立调通Agent原生tool_calls和JSON/Schema，再适配旧项目代码并验证RK3566内存。"
+  },
+  "device": {
+    "训练机": "MacBook Air M5 / 16GB统一内存 / 8核GPU；磁盘剩约58GiB",
+    "部署机": "Orange Pi 3B / RK3566 / 4×A55 1.8GHz / MemTotal 4017020KiB",
+    "板端系统": "Linux 5.10.160-rockchip-rk356x aarch64；CPU路线，BSP/驱动如转NPU需另查",
+    "板端磁盘": "只读快照约895MiB剩余；不代表部署时可用空间",
+    "协议来源": "ros-robot 23ef814cfb0a8c174b42b288454c30d5498e88d0，codex/offline-agent-integration-20261021"
+  },
+  "requirements": [
+    {
+      "type": "hard",
+      "text": "目标是Agent原生tool_calls，先独立调试；不使用旧fc/res训练，不以旧C++适配作为前置条件。"
+    },
+    {
+      "type": "hard",
+      "text": "仅选关键有用工具；训练/推理提供选定目录，不要求全60工具覆盖。"
+    },
+    {
+      "type": "hard",
+      "text": "首轮验证原生可解析、参数JSON合法及现有JSON Schema接收边界，业务流程后续适配。"
+    },
+    {
+      "type": "target",
+      "text": "固定SystemPrompt行为和重复示例通过训练学习，验证精简system；动态工具Schema与当前状态继续输入。"
+    },
+    {
+      "type": "target",
+      "text": "Q4_K_M优先；建议LLM PSS≤1.3GiB、共跑余量≥512MiB，待板端验证，非用户确认门槛。"
+    }
+  ],
+  "summary": "用户确认先调通原生tool_calls，不处理旧C++；只训练关键有用工具，首轮关注格式和Schema接收，业务后续处理。建议MLX-LM BF16 LoRA，Q4_K_M部署候选；按选定工具完整token长度优先试2048/4096上下文，未执行训练或新模型测试。",
+  "recommended_stack": [
+    {
+      "stage": "数据",
+      "choice": "关键工具子集，具体名单待定；试点300/60/120，按语义来源切分，不要求60工具全覆盖。"
+    },
+    {
+      "stage": "训练",
+      "choice": "MLX-LM / Apple Silicon；首选BF16基座LoRA，内存不足评估QLoRA；未安装或试跑。"
+    },
+    {
+      "stage": "输出协议",
+      "choice": "冻结Qwen3原生模板与解析；精简system训练，验证JSON/Schema接收，模型调通后再改旧代码。"
+    },
+    {
+      "stage": "部署",
+      "choice": "合并 → llama.cpp Qwen3 GGUF → Q4_K_M / ARM CPU / q8_0 KV候选；先离线再dry-run共跑。"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Qwen3-0.6B LoRA → Q4_K_M",
+      "model": "Qwen/Qwen3-0.6B，固定 revision 后训练；同一合并权重对照",
+      "runtime": "llama.cpp；研究快照 e3797b184d428c7a019362612b76971f60af6670，实际部署版本待核实",
+      "backend": "RK3566 ARM CPU；Linux 5.10.160 aarch64；不假定 NPU 支持",
+      "precision": "Q4_K_M 权重；q8_0 KV 候选，另作 f16 KV 对照",
+      "artifact": "合并高精度模型 → Qwen3 GGUF → 量化；新文件大小/hash 待导出",
+      "decision": "baseline",
+      "reason": "首选部署候选，优先减少权重占用；最终是否可用取决于选定目录原生解析与Schema通过率与共跑资源。",
+      "test_focus": "检查原生解析、参数/顺序准确率；先固定 q8_0 KV 和上下文，再测进程树 PSS、延迟与系统余量。",
+      "risks": [
+        "原生模板、解析器与Schema接收边界待独立验证；旧C++不作为前置条件",
+        "选定工具token长度、新权重格式表现与板端资源待测",
+        "板端磁盘余量小，传输前重查空间"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "llama.cpp 量化说明",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/tools/quantize/README.md"
+        },
+        {
+          "title": "Qwen3 官方工具协议",
+          "url": "https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3-0.6B LoRA → Q5_K_M",
+      "model": "Qwen/Qwen3-0.6B，固定 revision 后训练；同一合并权重对照",
+      "runtime": "llama.cpp；研究快照 e3797b184d428c7a019362612b76971f60af6670，实际部署版本待核实",
+      "backend": "RK3566 ARM CPU；Linux 5.10.160 aarch64；不假定 NPU 支持",
+      "precision": "Q5_K_M 权重；q8_0 KV 候选，另作 f16 KV 对照",
+      "artifact": "合并高精度模型 → Qwen3 GGUF → 量化；新文件大小/hash 待导出",
+      "decision": "alternative",
+      "reason": "Q4 质量不足时保留，判断额外权重开销是否换来业务收益。",
+      "test_focus": "使用同一合并权重、模板、工具目录、解码、KV 和线程，对照 Q4 的错误簇及资源。",
+      "risks": [
+        "原生模板、解析器与Schema接收边界待独立验证；旧C++不作为前置条件",
+        "选定工具token长度、新权重格式表现与板端资源待测",
+        "板端磁盘余量小，传输前重查空间"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "llama.cpp 量化说明",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/tools/quantize/README.md"
+        },
+        {
+          "title": "Qwen3 官方工具协议",
+          "url": "https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3-0.6B LoRA → Q8_0",
+      "model": "Qwen/Qwen3-0.6B，固定 revision 后训练；同一合并权重对照",
+      "runtime": "llama.cpp；研究快照 e3797b184d428c7a019362612b76971f60af6670，实际部署版本待核实",
+      "backend": "RK3566 ARM CPU；Linux 5.10.160 aarch64；不假定 NPU 支持",
+      "precision": "Q8_0 权重；q8_0 KV 候选，另作 f16 KV 对照",
+      "artifact": "合并高精度模型 → Qwen3 GGUF → 量化；新文件大小/hash 待导出",
+      "decision": "alternative",
+      "reason": "高精度量化诊断参照；保留区分训练错误与低位量化损失，不预设为产品默认。",
+      "test_focus": "同一测试核查 Q4/Q5 错误是否也出现在 Q8；板端空间不足时先在 Mac 对照，不覆盖旧模型。",
+      "risks": [
+        "原生模板、解析器与Schema接收边界待独立验证；旧C++不作为前置条件",
+        "选定工具token长度、新权重格式表现与板端资源待测",
+        "板端磁盘余量小，传输前重查空间"
+      ],
+      "metrics": {},
+      "evidence": [
+        {
+          "title": "llama.cpp 量化说明",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/tools/quantize/README.md"
+        },
+        {
+          "title": "Qwen3 官方工具协议",
+          "url": "https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md"
+        }
+      ]
+    }
+  ],
+  "benchmark_plan": [
+    {
+      "name": "关键工具与协议冻结",
+      "candidate": "所有候选",
+      "method": "选定工具子集，导出Schema和精简system；独立验证Qwen3原生序列化/解析及Agent调用结构，不调用设备，不先改旧C++。",
+      "pass_criteria": "原生解析、参数JSON和Schema通过分别统计。"
+    },
+    {
+      "name": "最小训练与导出",
+      "candidate": "Qwen3-0.6B LoRA",
+      "method": "统计完整样本token数、核对loss mask，先20–50步记录峰值内存/swap/吞吐；验证合并和Qwen3 GGUF转换。",
+      "pass_criteria": "不截断选定目录/输入/答案；转换加载成功，资源实测。"
+    },
+    {
+      "name": "精简Prompt与格式回归",
+      "candidate": "所有候选",
+      "method": "未微调/微调与完整/精简提示对照，继续传选定tools；固定独立测试记录原生解析、JSON、Schema逐条结果。",
+      "pass_criteria": "争取冻结测试集100%格式及Schema通过，不设全60工具或完整业务95%前置门槛。"
+    },
+    {
+      "name": "量化与板端资源",
+      "candidate": "Q4_K_M/Q5_K_M/Q8_0",
+      "method": "同一合并权重、样本、上下文、KV和线程对照，再单独测KV精度；Mac先回归，板端逐个加载测PSS/CPU/延迟/余量。",
+      "pass_criteria": "选格式和Schema通过且资源合适的最小版本；模型调通后再做旧项目接入和业务适配。"
+    }
+  ],
+  "read_only_observations": {
+    "mac": {
+      "chip": "Apple M5",
+      "unified_memory_gb": 16,
+      "gpu_cores": 8,
+      "available_disk_gib_approx": 58
+    },
+    "board": {
+      "mem_total_kib": 4017020,
+      "mem_available_kib_snapshot": 2947848,
+      "available_disk_mib_approx": 895,
+      "kernel": "5.10.160-rockchip-rk356x",
+      "repo_commit": "23ef814cfb0a8c174b42b288454c30d5498e88d0",
+      "working_tree": "clean",
+      "current_model_bytes": {
+        "legacy_q8_0": 639443232,
+        "legacy_bf16": 1198178592
+      }
+    },
+    "source_sha256": {
+      "ros2_ws/src/robot_inference/src/llm_node.cpp": "c476c609ddeb2a2b43dce81f08b401830ee15070d834186ceb73588c645630af",
+      "ros2_ws/src/robot_agent/robot_agent/conversation/local_model.py": "290fb4a133bb40856075636344bf62e2ea6e2e5e301947aa6aeb556259ca1547",
+      "ros2_ws/src/robot_agent/robot_agent/actions/registry.py": "719569aafa51b16d1782d84198c73a3aa67e5b6134ec91af5a863218fc60f7b7",
+      "ros2_ws/src/robot_agent/robot_agent/conversation/online_system_prompt.txt": "4264e03ee03f8a2a882c8600aace64fa94b85a71b61eb7ba37b347f1cca19d1f"
+    }
+  },
+  "evidence_limits": [
+    "未安装训练依赖、未下载模型、未启动训练/原生推理/ROS或硬件动作",
+    "量化和训练资源是候选/估算；板端瞬时可用内存不代表共跑预算",
+    "旧compat 0/3不能代表原生失败；全60工具覆盖不在首轮范围",
+    "JSON合法与Schema通过分开统计；业务正确性与生产执行后续处理"
+  ],
+  "research_revisions": {
+    "mlx_lm": "72be8c955d9a0d3099bd01865af288e0e947c3fa",
+    "llama_cpp": "e3797b184d428c7a019362612b76971f60af6670",
+    "llama_factory": "c683e59edd8f893abc5e1403184a1d0644817d2a",
+    "qwen_config": "c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "scope_revision": "用户澄清：关键工具子集、精简SystemPrompt、独立原生tool_calls与JSON/Schema验证优先；旧C++与完整业务适配后置。"
+}

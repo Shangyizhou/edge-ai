@@ -1,0 +1,119 @@
+{
+  "id": "start_camera",
+  "user": "开启摄像头。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "start_camera",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "开启摄像头。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "start_camera",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 70.51730948399927,
+    "ttft_seconds": 68.07178809600009,
+    "prompt_tokens": 439,
+    "evaluated_prefill_tokens": 439,
+    "native_usage": {
+      "completion_tokens": 16,
+      "prompt_tokens": 439,
+      "total_tokens": 455,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 439,
+      "prompt_ms": 65625.15,
+      "prompt_per_token_ms": 149.4878132118451,
+      "prompt_per_second": 6.689508519218624,
+      "predicted_n": 16,
+      "predicted_ms": 4871.365,
+      "predicted_per_token_ms": 324.75766666666664,
+      "predicted_per_second": 3.0792190689878507
+    },
+    "cache_prompt": false,
+    "output_tokens": 16,
+    "prefill_seconds": 65.62514999999999,
+    "decode_seconds": 4.871365,
+    "prefill_tokens_per_second": 6.689508519218624,
+    "decode_tokens_per_second": 3.0792190689878507,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "start_camera",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "start_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 72.34013406699523,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 150729,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 269,
+    "wall_seconds": 72.40725713899883,
+    "cpu_seconds": 140.06,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 48.358412379552476,
+    "peak_rss_bytes": 623554560,
+    "peak_pss_bytes": 623382528,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2818424832,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 8192,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

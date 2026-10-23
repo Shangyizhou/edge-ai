@@ -1,0 +1,42 @@
+{
+  "schema": "edge-model-prepare/request-v1",
+  "device": {
+    "name": "Orange Pi 3B RK3566",
+    "memory_bytes": 4113428480
+  },
+  "requirements": {
+    "scope": "selected and matchedbase Q4 dev smoke; minimal inference only, not final quality"
+  },
+  "candidates": [
+    {
+      "id": "base",
+      "name": "final14-board-base",
+      "decision": "prepare",
+      "model": "Qwen/Qwen3-0.6B",
+      "artifact": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-base-q4_k_m.gguf",
+      "runtime": {
+        "name": "llama.cpp",
+        "version": "e3797b184d428c7a019362612b76971f60af6670",
+        "backend": "ARM CPU",
+        "network": "direct"
+      },
+      "backend": "ARM CPU",
+      "precision": "Q4_K_M"
+    },
+    {
+      "id": "selected",
+      "name": "final14-board-selected",
+      "decision": "prepare",
+      "model": "Qwen/Qwen3-0.6B",
+      "artifact": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-selected9-768-v3-q4_k_m.gguf",
+      "runtime": {
+        "name": "llama.cpp",
+        "version": "e3797b184d428c7a019362612b76971f60af6670",
+        "backend": "ARM CPU",
+        "network": "direct"
+      },
+      "backend": "ARM CPU",
+      "precision": "Q4_K_M"
+    }
+  ]
+}

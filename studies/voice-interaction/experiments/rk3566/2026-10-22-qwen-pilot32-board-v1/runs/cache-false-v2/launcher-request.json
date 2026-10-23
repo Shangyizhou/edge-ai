@@ -1,0 +1,71 @@
+{
+  "schema": "edge-model-benchmark/request-v1",
+  "run_id": "rk3566-pilot32-nine-tool-prefix-false-v2",
+  "stage": "RK3566 / 同输入九工具目录 / cache_prompt=false",
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "Q4_K_M",
+    "artifact_format": "GGUF",
+    "backend": "ARM CPU",
+    "context_tokens": 2048,
+    "kv_type": "f16",
+    "lineage": "seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; differs from unconstrained MLX",
+    "device": "Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB"
+  },
+  "runner": {
+    "kind": "llama-http",
+    "network": "direct"
+  },
+  "suite_ref": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/inputs/board-cache-suite.json",
+  "generation": {
+    "context_tokens": 2048,
+    "max_tokens": 128,
+    "temperature": 0,
+    "prefill_step_size": 512,
+    "timeout_seconds": 600,
+    "cache_prompt": false
+  },
+  "registry_validator": [
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/venv/bin/python",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/inputs/registry_validate.py"
+  ],
+  "sampling_interval_seconds": 0.2,
+  "server": {
+    "binary": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/build-e379/bin/llama-server",
+    "port": 18082,
+    "argv": [
+      "-t",
+      "2",
+      "-tb",
+      "2",
+      "-c",
+      "2048",
+      "-np",
+      "1",
+      "-b",
+      "512",
+      "-ub",
+      "128",
+      "-ngl",
+      "0",
+      "--jinja",
+      "-ctk",
+      "f16",
+      "-ctv",
+      "f16",
+      "--no-repack",
+      "--load-mode",
+      "mmap",
+      "--fit",
+      "off",
+      "-fa",
+      "on"
+    ]
+  }
+}

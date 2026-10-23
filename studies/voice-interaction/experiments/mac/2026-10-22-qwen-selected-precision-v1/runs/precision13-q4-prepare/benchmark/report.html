@@ -1,0 +1,307 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qwen 原生调用 · 模型生命周期实测</title>
+<style>
+:root{--ink:#18313b;--muted:#536873;--line:#dce5e7;--teal:#08776b;--paper:#fff;--bg:#f2f5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}main{max-width:1150px;margin:0 auto;padding:42px 30px 80px}body{padding-right:230px}.rail{position:fixed;right:0;top:0;height:100vh;width:230px;border-left:1px solid var(--line);padding:42px 22px;background:#fbfcfc;overflow-y:auto}.rail strong{display:block;margin-bottom:18px}.rail a{display:block;color:var(--muted);text-decoration:none;padding:11px 12px;border-radius:8px;margin:4px 0;font-size:14px}.rail a.active{background:#e2f1ed;color:#066457;font-weight:700}.rail small{display:block;margin-top:24px;color:var(--muted)}header{padding:0 0 18px}h1{font-size:clamp(29px,3.6vw,42px);line-height:1.3;margin:14px 0;letter-spacing:-.7px}h2{font-size:27px;line-height:1.4;margin:8px 0 16px}h3{font-size:20px;margin:24px 0 12px}h4{font-size:17px;margin:8px 0}p{margin:10px 0}.eyebrow,.badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--teal)}.badge{display:inline-block;padding:3px 10px;border:1px solid #bedbd3;border-radius:15px;letter-spacing:0}.muted,small{color:var(--muted)}section{background:var(--paper);padding:30px;border:1px solid var(--line);border-radius:16px;margin:20px 0;scroll-margin-top:24px}.deployment-table td:first-child{min-width:285px;white-space:pre-line;font-size:13px;line-height:1.85}.lead{font-size:22px;font-weight:650;line-height:1.6}.scroll{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf4f3;white-space:nowrap}td{min-width:92px}tr:last-child td{border:0}.sample{padding:20px;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:#fcfdfd}.sample-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.number{font-weight:700;color:var(--teal)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.output{padding:14px;background:#edf4f3;border-radius:8px;white-space:pre-wrap;font-size:17px;margin:8px 0}.fail{background:#fff1e6;border-left:3px solid #b6671f}.reference{padding:10px 0;font-size:14px;color:var(--muted)}audio{width:100%;max-width:540px;display:block;margin:12px 0}.finding{border-left:4px solid var(--teal);background:#e9f4ef;border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}.finding strong{font-size:18px}.finding p{margin:7px 0}.method{font-size:14px;color:var(--muted);background:#f5f7f8;padding:14px 18px;border-radius:10px}.stats{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin:12px 0}.stats span{padding:4px 9px;background:#f1f4f6;border-radius:6px}a{color:var(--teal);text-underline-offset:3px}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal)}pre{font-size:12px;background:#f4f6f7;padding:15px;white-space:pre-wrap;max-height:400px;overflow:auto}p,td,pre,.output{overflow-wrap:anywhere}.foot{font-size:13px;color:var(--muted)}.warning{color:#97541d;font-weight:600}.meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meter{padding:14px;border:1px solid var(--line);border-radius:10px}.track{height:9px;background:#e5ebed;border-radius:10px;overflow:hidden;margin:10px 0}.track b{display:block;height:100%;background:var(--teal);border-radius:10px}.meter small{font-size:12px}@media(max-width:1100px){body{padding-right:190px}.rail{width:190px;padding:30px 14px}main{padding:30px 20px}section{padding:24px}}@media(max-width:760px){body{padding-right:0}.rail{position:sticky;top:0;width:100%;height:auto;padding:8px 12px;border:0;border-bottom:1px solid var(--line);z-index:10;display:flex;gap:4px;overflow-x:auto}.rail a{display:inline-block;white-space:nowrap;padding:8px 12px;margin:0}.rail strong,.rail small{display:none}main{padding:20px 12px}section{padding:20px 15px;scroll-margin-top:76px}.pair,.meters{grid-template-columns:1fr}h2{font-size:24px}.sample{padding:16px}.lead{font-size:20px}}@media print{body{padding:0}.rail{display:none}section{break-inside:avoid}audio{display:none}}
+</style></head><body>
+<nav class="rail" aria-label="章节导航"><strong>本页导航</strong>
+<a href="#summary">结论与选择</a>
+<a href="#run-0">precision13-q4-prepare</a>
+<a href="#resources">精度与资源对比</a>
+<a href="#evidence">口径与原始证据</a>
+<a href="#top">回到顶部</a></nav><main id="top">
+<header><span class="badge">原生工具 / 角色事实 / 独立模型实验</span>
+<h1>Qwen：从未微调基线到部署制品</h1>
+<p class="muted">同一结构化结果生成 · 实际输入输出保留 · 无硬件动作或完整交互验收</p></header>
+<section id="summary"><div class="eyebrow">先给结论</div>
+<h2>原生调用、角色设定和硬件资源分别判断</h2>
+<div class="scroll"><table class="deployment-table"><thead><tr>
+<th>候选部署方案</th><th>本轮能力观察</th>
+<th>CPU / 整机容量</th><th>采样峰值内存 / 实际内存</th>
+</tr></thead><tbody>
+<tr><td>Qwen/Qwen3-0.6B · 596049920
+精度：Q4_K_M
+框架：llama.cpp e3797b184d428c7a019362612b76971f60af6670
+后端：Metal / Darwin
+阶段：actual minimum inference before full validation</td><td>工具 Schema 1/1；原生调用 1/1；角色固定规则 0/0</td><td>5.46%</td><td>RSS 1431.19 MiB / 8.74%<br>MLX峰值分配 未测 MiB（不相加）</td></tr>
+</tbody></table></div><p class="foot">CPU为已声明进程树占整机逻辑核容量，内存为逐例窗口的采样峰值。CPU不包含Metal GPU利用率。Mac RSS 与 Linux PSS 不等价；资源窗口包含模板、推理、解析与纯校验。未将不同设备混成纯加速比较。</p></section>
+<section id="run-0"><div class="eyebrow">actual minimum inference before full validation</div><h2>precision13-q4-prepare</h2>
+<div class="method"><strong>怎样测：</strong>固定工具、system和输入；每例新建模型prompt cache；非思考模式。真实响应完整解析后，只通过JSON Schema及可配置Registry纯校验，不执行设备。<br>
+<strong>怎样读：</strong>prefill与decode tokens/s采用运行时计时，TTFT为生成入口至首非空输出，完整有效调用等待包含模板/推理/解析/校验；缺失字段为未测，失败/截断不是快速成功。角色采用预先固定文本规则，不是独立人工整体人设评审。</div>
+<h3>工具调用 · 实际输入与输出</h3>
+<article class="sample"><div class="sample-head"><h4>valid_000</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>收到指令后，请完成以下操作——相机重新采集图像。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: &quot;{}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: {}}]}</pre><div class="stats"><span>prompt 920 tokens</span><span>首内容 0.23s</span><span>完整有效调用 0.47s</span><span>prefill 5039.00 tokens/s</span><span>decode 169.75 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;arguments&quot;: {}
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;parameters&quot;: {},
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<h3>角色 / 背景 / 自我介绍</h3>
+<h3>普通聊天 · 无调用</h3>
+<aside class="finding"><strong>本阶段发现</strong><p>工具调用Schema通过 1/1，与期望函数和参数一致 1/1；角色规则通过 0/0。这些是当前固定样例的观察，不能外推完整业务或所有人设已学入。失败输出保留，作为下一阶段数据与协议诊断依据。</p></aside></section>
+<section id="resources"><h2>精度与资源对比</h2><p>只有模型、输入、设备、运行时、context/KV和解码可比时才解释精度差异。模型文件大小不等于运行内存。没有测量的精度不推算成绩。</p><div class="scroll"><table><thead><tr><th>候选 / 阶段</th><th>文件MiB</th><th>prefill tokens/s 中位数</th><th>decode tokens/s 中位数</th><th>TTFT中位数 s</th><th>CPU容量</th><th>采样峰值</th></tr></thead><tbody>
+<tr><td>precision13-q4-prepare</td><td>378.33</td><td>5039.00</td><td>169.75</td><td>0.23</td><td>5.46%</td><td>RSS 1431.19MiB / MLX 未测MiB</td></tr>
+</tbody></table></div></section><section id="evidence"><h2>口径与原始证据</h2><p>统计覆盖本页全部样例，而非挑选成功项；单轮小样本不能宣称稳定尾延迟。MLX峰值分配与RSS可能重叠，不相加。未执行生产集成、ROS共跑或完整交互验收。</p>
+<p><a download="benchmark-results.json" href="data:application/json;base64,WwogIHsKICAgICJzY2hlbWEiOiAiZWRnZS1tb2RlbC1iZW5jaG1hcmsvcmVzdWx0LXYxIiwKICAgICJydW5faWQiOiAicHJlY2lzaW9uMTMtcTQtcHJlcGFyZSIsCiAgICAic291cmNlIjogewogICAgICAia2luZCI6ICJkZXZpY2VfbWVhc3VyZW1lbnQiLAogICAgICAicmF3X2V2aWRlbmNlIjogImNhc2VzLyBhbmQgZXZlbnRzLyB3aXRoaW4gdGhpcyBydW4iCiAgICB9LAogICAgImNhbmRpZGF0ZSI6IHsKICAgICAgIm1vZGVsIjogIlF3ZW4vUXdlbjMtMC42QiIsCiAgICAgICJtb2RlbF9wYXRoIjogIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvYXJ0aWZhY3RzL3NlbGVjdGVkOS03NjgtdjMvcXdlbjMtc2VsZWN0ZWQ5LTc2OC12My1xNF9rX20uZ2d1ZiIsCiAgICAgICJyZXZpc2lvbiI6ICJjMTg5OWRlMjg5YTA0ZDEyMTAwZGIzNzBkODE0ODVjZGY3NWU0N2NhIiwKICAgICAgInBhcmFtZXRlcl9jb3VudCI6IDU5NjA0OTkyMCwKICAgICAgInBhcmFtZXRlcl9jb3VudF9zdG9yZWQiOiA3NTE2MzIzODQsCiAgICAgICJwcmVjaXNpb24iOiAiUTRfS19NIiwKICAgICAgImFydGlmYWN0X2Zvcm1hdCI6ICJHR1VGIiwKICAgICAgImJhY2tlbmQiOiAiTWV0YWwiLAogICAgICAiY29udGV4dF90b2tlbnMiOiA4MTkyLAogICAgICAia3ZfdHlwZSI6ICJmMTYgSyBhbmQgViIsCiAgICAgICJsaW5lYWdlIjogInNhbWUgc2VsZWN0ZWQgRjE2IC0+IFE0X0tfTSIsCiAgICAgICJydW50aW1lX3ZlcnNpb24iOiAiZTM3OTdiMTg0ZDQyOGM3YTAxOTM2MjYxMmI3Njk3MWY2MGFmNjY3MCIsCiAgICAgICJjb25zdHJhaW50X21vZGUiOiAibGxhbWEtc2VydmVyIG5hdGl2ZSB0b29sIGdyYW1tYXI7IHVuY29uc3RyYWluZWQgTUxYIGRpZmZlcnMiLAogICAgICAiYWN0dWFsX3J1bnRpbWUiOiB7CiAgICAgICAgIm5hbWUiOiAibGxhbWEuY3BwIiwKICAgICAgICAidmVyc2lvbiI6ICJlMzc5N2IxODRkNDI4YzdhMDE5MzYyNjEyYjc2OTcxZjYwYWY2NjcwIiwKICAgICAgICAiYmFja2VuZCI6ICJNZXRhbCIsCiAgICAgICAgIm5ldHdvcmsiOiAiZGlyZWN0IgogICAgICB9CiAgICB9LAogICAgInN0YWdlIjogImFjdHVhbCBtaW5pbXVtIGluZmVyZW5jZSBiZWZvcmUgZnVsbCB2YWxpZGF0aW9uIiwKICAgICJyZXF1ZXN0X3NoYTI1NiI6ICIxZjEzYTVjN2IxYmU1Nzk3ZGM5MjdiMTc2ZjMzNjk1MTBmNGFhMzcyZjI3YTFmNGNmODdhYTBmNGRmMTgzYzYyIiwKICAgICJzdWl0ZV9zaGEyNTYiOiAiNTVmZDNiZTY2NWRhNTYyYjM0MWJkNDgyNjFiOGNlNTYzM2RjOGUyMGJkZjFkNDYyMWU2YzViZDY1YjBjZDdjNCIsCiAgICAiYXJ0aWZhY3RzIjogewogICAgICAicm9vdCI6ICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL2FydGlmYWN0cy9zZWxlY3RlZDktNzY4LXYzL3F3ZW4zLXNlbGVjdGVkOS03NjgtdjMtcTRfa19tLmdndWYiLAogICAgICAidG90YWxfYnl0ZXMiOiAzOTY3MDQ3MDQsCiAgICAgICJmaWxlcyI6IFsKICAgICAgICB7CiAgICAgICAgICAibmFtZSI6ICJxd2VuMy1zZWxlY3RlZDktNzY4LXYzLXE0X2tfbS5nZ3VmIiwKICAgICAgICAgICJieXRlcyI6IDM5NjcwNDcwNCwKICAgICAgICAgICJzaGEyNTYiOiAiNmYxNzNmOGEwYzUxYjU2YzU1OGVkNDc1NTlhNTdhNzhiNWMwMzYzOTFiNjNmOWI4ZWQwNzMxZDU0Y2M0YjJmNSIKICAgICAgICB9CiAgICAgIF0KICAgIH0sCiAgICAiZW52aXJvbm1lbnQiOiB7CiAgICAgICJzeXN0ZW0iOiAiRGFyd2luIiwKICAgICAgIm1hY2hpbmUiOiAiYXJtNjQiLAogICAgICAicGxhdGZvcm0iOiAibWFjT1MtMjYuNi4yLWFybTY0LWFybS02NGJpdCIsCiAgICAgICJweXRob24iOiAiMy4xMi4xNCIsCiAgICAgICJsb2dpY2FsX2NwdXMiOiAxMAogICAgfSwKICAgICJsb2FkaW5nIjogewogICAgICAid2FsbF9zZWNvbmRzIjogMC4wMTU2Mjk4NzUwMDgwMTY4MjUsCiAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgInNjb3BlIjogImRlY2xhcmVkIHByb2Nlc3MgYW5kIHJlY3Vyc2l2ZSBjaGlsZHJlbiIsCiAgICAgICAgInBpZCI6IDc5ODc3LAogICAgICAgICJzYW1wbGluZ19pbnRlcnZhbF9zZWNvbmRzIjogMC4yLAogICAgICAgICJzYW1wbGVfY291bnQiOiAyLAogICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjAxMDI1NDg3NTAwMDEwMDU4MywKICAgICAgICAiY3B1X3NlY29uZHMiOiAyLjc4Mzk5OTk5OTk3NzkxNTNlLTA2LAogICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICJjcHVfY2FwYWNpdHlfcGVyY2VudCI6IDAuMDAyNzE0ODA2MzcyNTMwNzMxNywKICAgICAgICAicGVha19yc3NfYnl0ZXMiOiAxNDgyMzc1MTY4LAogICAgICAgICJwZWFrX3Bzc19ieXRlcyI6IG51bGwsCiAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMzk2NDE0MTU2OCwKICAgICAgICAiaG9zdF9zd2FwX2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAiaG9zdF9zd2FwX2luX2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAiaG9zdF9zd2FwX291dF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgInN3YXBfc2NvcGUiOiAic3lzdGVtLXdpZGUgY291bnRlcnM7IG5vdCBtb2RlbC1vbmx5IiwKICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICB9CiAgICB9LAogICAgIm1lYXN1cmVtZW50IjogewogICAgICAicmVzb3VyY2VzIjogInBlci1jYXNlIHNhbXBsZWQgcHJvY2VzcyB0cmVlIiwKICAgICAgImNhY2hlIjogIm5ldyBNTFggcHJvbXB0IGNhY2hlIHBlciBjYXNlIC8gbGxhbWEgY2FjaGVfcHJvbXB0PWZhbHNlIiwKICAgICAgInRpbWluZyI6ICJyZXF1ZXN0IHRvIGNvbXBsZXRlIHJlc3BvbnNlOyB2YWxpZC1jYWxsIGxhdGVuY3kgb25seSBpZiBuYXRpdmUrc2NoZW1hIHBhc3MiLAogICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgInF1YWxpdHlfc2NvcGUiOiAiZnJvemVuIGRldGVybWluaXN0aWMgZml4dHVyZSBydWxlczsgbm8gaGFyZHdhcmUgZXhlY3V0aW9uIG9yIHByb2R1Y3QgYWNjZXB0YW5jZSIKICAgIH0sCiAgICAiY2FzZXMiOiBbCiAgICAgIHsKICAgICAgICAiaWQiOiAidmFsaWRfMDAwIiwKICAgICAgICAidXNlciI6ICLmlLbliLDmjIfku6TlkI7vvIzor7flrozmiJDku6XkuIvmk43kvZzigJTigJTnm7jmnLrph43mlrDph4fpm4blm77lg4/jgIIiLAogICAgICAgICJleHBlY3RlZCI6IHsKICAgICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICAgImNhbGxzIjogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgIm5hbWUiOiAic3RhcnRfY2FtZXJhIiwKICAgICAgICAgICAgICAiYXJndW1lbnRzIjoge30KICAgICAgICAgICAgfQogICAgICAgICAgXQogICAgICAgIH0sCiAgICAgICAgIm1lc3NhZ2VzIjogWwogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJzeXN0ZW0iLAogICAgICAgICAgICAiY29udGVudCI6ICLkvaDmmK/mnLrlmajkurrliqnmiYvjgILlj6rmnInorr7lpIfmk43kvZzmiJbmn6Xor6Lorr7lpIflvZPliY3nirbmgIHml7bmiY3osIPnlKjlt6XlhbfjgILlp5PlkI3jgIHouqvku73jgIHop5LoibLjgIHliJvpgKDogIXjgIHog4zmma/lkozoh6rmiJHku4vnu43pl67popjnlKjmma7pgJrmloflrZflm57nrZTvvIzkuI3mn6Xor6Lorr7lpIfnirbmgIHjgILlhbbku5bogYrlpKnmraPluLjlm57lpI3jgIIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5pS25Yiw5oyH5Luk5ZCO77yM6K+35a6M5oiQ5Lul5LiL5pON5L2c4oCU4oCU55u45py66YeN5paw6YeH6ZuG5Zu+5YOP44CCIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAidG9vbCIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICIiLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAidG9vbF9jYWxscyIsCiAgICAgICAgICAid2lyZV9jYWxscyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJ0eXBlIjogImZ1bmN0aW9uIiwKICAgICAgICAgICAgICAiZnVuY3Rpb24iOiB7CiAgICAgICAgICAgICAgICAibmFtZSI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICAgICAgICAgImFyZ3VtZW50cyI6ICJ7fSIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0sCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogMC4yNzQxNTU0NTkwMTc0OTI4MywKICAgICAgICAgICJ0dGZ0X3NlY29uZHMiOiAwLjIzMjc0MTY2NzAxNTk0MzY4LAogICAgICAgICAgInByb21wdF90b2tlbnMiOiA5MjAsCiAgICAgICAgICAiZXZhbHVhdGVkX3ByZWZpbGxfdG9rZW5zIjogOTIwLAogICAgICAgICAgIm5hdGl2ZV91c2FnZSI6IHsKICAgICAgICAgICAgImNvbXBsZXRpb25fdG9rZW5zIjogMTYsCiAgICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogOTIwLAogICAgICAgICAgICAidG90YWxfdG9rZW5zIjogOTM2LAogICAgICAgICAgICAicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjogewogICAgICAgICAgICAgICJjYWNoZWRfdG9rZW5zIjogMAogICAgICAgICAgICB9CiAgICAgICAgICB9LAogICAgICAgICAgIm5hdGl2ZV90aW1pbmdzIjogewogICAgICAgICAgICAiY2FjaGVfbiI6IDAsCiAgICAgICAgICAgICJwcm9tcHRfbiI6IDkyMCwKICAgICAgICAgICAgInByb21wdF9tcyI6IDE4Mi41NzYsCiAgICAgICAgICAgICJwcm9tcHRfcGVyX3Rva2VuX21zIjogMC4xOTg0NTIxNzM5MTMwNDM0OCwKICAgICAgICAgICAgInByb21wdF9wZXJfc2Vjb25kIjogNTAzOC45OTc0NTg1OTI1ODYsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfbiI6IDE2LAogICAgICAgICAgICAicHJlZGljdGVkX21zIjogODguMzY1LAogICAgICAgICAgICAicHJlZGljdGVkX3Blcl90b2tlbl9tcyI6IDUuODkxLAogICAgICAgICAgICAicHJlZGljdGVkX3Blcl9zZWNvbmQiOiAxNjkuNzUwNDY2ODEzNzgzNzYKICAgICAgICAgIH0sCiAgICAgICAgICAiY2FjaGVfcHJvbXB0IjogZmFsc2UsCiAgICAgICAgICAib3V0cHV0X3Rva2VucyI6IDE2LAogICAgICAgICAgInByZWZpbGxfc2Vjb25kcyI6IDAuMTgyNTc2LAogICAgICAgICAgImRlY29kZV9zZWNvbmRzIjogMC4wODgzNjUsCiAgICAgICAgICAicHJlZmlsbF90b2tlbnNfcGVyX3NlY29uZCI6IDUwMzguOTk3NDU4NTkyNTg2LAogICAgICAgICAgImRlY29kZV90b2tlbnNfcGVyX3NlY29uZCI6IDE2OS43NTA0NjY4MTM3ODM3NiwKICAgICAgICAgICJtbHhfcGVha19hbGxvY2F0ZWRfYnl0ZXMiOiBudWxsLAogICAgICAgICAgInRpbWluZ19zb3VyY2UiOiAibGxhbWEtc2VydmVyIHRpbWluZ3MgdXNlIGV2YWx1YXRlZCBwcmVmaWxsOyBmdWxsIHByb21wdCB1c2VzIG5hdGl2ZSB1c2FnZTsgcmF3IGNvdW50ZXJzIHJldGFpbmVkIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjYWxsX2lkIjogImxvY2FsX2NhbGxfMCIsCiAgICAgICAgICAgICAgICAibmFtZSI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHt9CiAgICAgICAgICAgICAgfQogICAgICAgICAgICBdCiAgICAgICAgICB9LAogICAgICAgICAgInNjaGVtYV9lcnJvcnMiOiBbXSwKICAgICAgICAgICJyZWdpc3RyeV9yZXN1bHQiOiB7CiAgICAgICAgICAgICJwYXNzZWQiOiB0cnVlLAogICAgICAgICAgICAiY29tbWFuZHMiOiBbCiAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgIm5hbWUiOiAic3RhcnRfY2FtZXJhIiwKICAgICAgICAgICAgICAgICJwYXJhbWV0ZXJzIjoge30sCiAgICAgICAgICAgICAgICAidG9vbF9jYWxsX2lkIjogImxvY2FsX2NhbGxfMCIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiAwLjQ2ODcxMTQxNjAwNDIyNTYsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDc5ODc3LAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogNCwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjQ3NjU5MTc5MTk1NzYxNjgsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAwLjI2MDI5NDkwNCwKICAgICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNS40NjE1OTAxNTcyODgwNjIsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiAxNTAwNzA4ODY0LAogICAgICAgICAgInBlYWtfcHNzX2J5dGVzIjogbnVsbCwKICAgICAgICAgICJob3N0X21lbV90b3RhbF9ieXRlcyI6IDE3MTc5ODY5MTg0LAogICAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMjkwNTA2MzQyNCwKICAgICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImhvc3Rfc3dhcF9pbl9kZWx0YV9ieXRlcyI6IDY5MzA0MzIsCiAgICAgICAgICAiaG9zdF9zd2FwX291dF9kZWx0YV9ieXRlcyI6IDE1NTY0ODAsCiAgICAgICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9CiAgICAgIH0KICAgIF0sCiAgICAic3VtbWFyeSI6IHsKICAgICAgInNhbXBsZXMiOiAxLAogICAgICAidG9vbF9zYW1wbGVzIjogMSwKICAgICAgIm5hdGl2ZV9jYWxscyI6IDEsCiAgICAgICJqc29uX3ZhbGlkIjogMSwKICAgICAgInNjaGVtYV92YWxpZCI6IDEsCiAgICAgICJyZWdpc3RyeV92YWxpZCI6IDEsCiAgICAgICJ0b29sX2V4cGVjdGVkX2JlaGF2aW9yIjogMSwKICAgICAgInBlcnNvbmFfc2FtcGxlcyI6IDAsCiAgICAgICJwZXJzb25hX3ZhbGlkIjogMCwKICAgICAgImNoYXRfc2FtcGxlcyI6IDAsCiAgICAgICJjaGF0X3ZhbGlkIjogMAogICAgfSwKICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICJldmlkZW5jZSI6IFsKICAgICAgewogICAgICAgICJwYXRoIjogImFzc2V0cy1tYW5pZmVzdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjVkY2IzYzc4MDYwYzY2ZmY2NjZiOGRhZDllZjYyZTg2ZTY3MDI4MmJlZjlkMjRjMTBlN2IzYTYwNzYyZjYwZjAiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJjYXNlcy92YWxpZF8wMDAuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICI0ZDQxZjEyMGJmMzgzMDU0ODUxY2M5NmMzZTA0NWFlM2M4ZjBjMzRmZDEzOWZiODExYjZmYjk1OWE0MGIyZjc4IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiZXZlbnRzL3ZhbGlkXzAwMC5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjFjZTg0NmY1MDI3M2VmMzllYjE2ZjY0ODNkZmY2MGU0N2Q2YmE3MTJlYjVlY2UxMGFlOWYyMzFmNWNmZDg1ZDIiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJyZXF1ZXN0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiMWYxM2E1YzdiMWJlNTc5N2RjOTI3YjE3NmYzMzY5NTEwZjRhYTM3MmYyN2ExZjRjZjg3YWEwZjRkZjE4M2M2MiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogInN1aXRlLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiNTVmZDNiZTY2NWRhNTYyYjM0MWJkNDgyNjFiOGNlNTYzM2RjOGUyMGJkZjFkNDYyMWU2YzViZDY1YjBjZDdjNCIKICAgICAgfQogICAgXQogIH0KXQ==">下载本页原始结果 JSON</a></p>
+<details><summary>完整配置、资产哈希与逐例结果</summary><pre>[
+  {
+    &quot;schema&quot;: &quot;edge-model-benchmark/result-v1&quot;,
+    &quot;run_id&quot;: &quot;precision13-q4-prepare&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;device_measurement&quot;,
+      &quot;raw_evidence&quot;: &quot;cases/ and events/ within this run&quot;
+    },
+    &quot;candidate&quot;: {
+      &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+      &quot;model_path&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf&quot;,
+      &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;parameter_count&quot;: 596049920,
+      &quot;parameter_count_stored&quot;: 751632384,
+      &quot;precision&quot;: &quot;Q4_K_M&quot;,
+      &quot;artifact_format&quot;: &quot;GGUF&quot;,
+      &quot;backend&quot;: &quot;Metal&quot;,
+      &quot;context_tokens&quot;: 8192,
+      &quot;kv_type&quot;: &quot;f16 K and V&quot;,
+      &quot;lineage&quot;: &quot;same selected F16 -&gt; Q4_K_M&quot;,
+      &quot;runtime_version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+      &quot;constraint_mode&quot;: &quot;llama-server native tool grammar; unconstrained MLX differs&quot;,
+      &quot;actual_runtime&quot;: {
+        &quot;name&quot;: &quot;llama.cpp&quot;,
+        &quot;version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+        &quot;backend&quot;: &quot;Metal&quot;,
+        &quot;network&quot;: &quot;direct&quot;
+      }
+    },
+    &quot;stage&quot;: &quot;actual minimum inference before full validation&quot;,
+    &quot;request_sha256&quot;: &quot;1f13a5c7b1be5797dc927b176f3369510f4aa372f27a1f4cf87aa0f4df183c62&quot;,
+    &quot;suite_sha256&quot;: &quot;55fd3be665da562b341bd48261b8ce5633dc8e20bdf1d4621e6c5bd65b0cd7c4&quot;,
+    &quot;artifacts&quot;: {
+      &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q4_k_m.gguf&quot;,
+      &quot;total_bytes&quot;: 396704704,
+      &quot;files&quot;: [
+        {
+          &quot;name&quot;: &quot;qwen3-selected9-768-v3-q4_k_m.gguf&quot;,
+          &quot;bytes&quot;: 396704704,
+          &quot;sha256&quot;: &quot;6f173f8a0c51b56c558ed47559a57a78b5c036391b63f9b8ed0731d54cc4b2f5&quot;
+        }
+      ]
+    },
+    &quot;environment&quot;: {
+      &quot;system&quot;: &quot;Darwin&quot;,
+      &quot;machine&quot;: &quot;arm64&quot;,
+      &quot;platform&quot;: &quot;macOS-26.6.2-arm64-arm-64bit&quot;,
+      &quot;python&quot;: &quot;3.12.14&quot;,
+      &quot;logical_cpus&quot;: 10
+    },
+    &quot;loading&quot;: {
+      &quot;wall_seconds&quot;: 0.015629875008016825,
+      &quot;resources&quot;: {
+        &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+        &quot;pid&quot;: 79877,
+        &quot;sampling_interval_seconds&quot;: 0.2,
+        &quot;sample_count&quot;: 2,
+        &quot;wall_seconds&quot;: 0.010254875000100583,
+        &quot;cpu_seconds&quot;: 2.7839999999779153e-06,
+        &quot;host_logical_cpus&quot;: 10,
+        &quot;cpu_capacity_percent&quot;: 0.0027148063725307317,
+        &quot;peak_rss_bytes&quot;: 1482375168,
+        &quot;peak_pss_bytes&quot;: null,
+        &quot;host_mem_total_bytes&quot;: 17179869184,
+        &quot;minimum_host_mem_available_bytes&quot;: 3964141568,
+        &quot;host_swap_delta_bytes&quot;: 0,
+        &quot;host_swap_in_delta_bytes&quot;: 0,
+        &quot;host_swap_out_delta_bytes&quot;: 0,
+        &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+        &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+      }
+    },
+    &quot;measurement&quot;: {
+      &quot;resources&quot;: &quot;per-case sampled process tree&quot;,
+      &quot;cache&quot;: &quot;new MLX prompt cache per case / llama cache_prompt=false&quot;,
+      &quot;timing&quot;: &quot;request to complete response; valid-call latency only if native+schema pass&quot;,
+      &quot;sampling_interval_seconds&quot;: 0.2,
+      &quot;quality_scope&quot;: &quot;frozen deterministic fixture rules; no hardware execution or product acceptance&quot;
+    },
+    &quot;cases&quot;: [
+      {
+        &quot;id&quot;: &quot;valid_000&quot;,
+        &quot;user&quot;: &quot;收到指令后，请完成以下操作——相机重新采集图像。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;start_camera&quot;,
+              &quot;arguments&quot;: {}
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;收到指令后，请完成以下操作——相机重新采集图像。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: &quot;{}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 0.27415545901749283,
+          &quot;ttft_seconds&quot;: 0.23274166701594368,
+          &quot;prompt_tokens&quot;: 920,
+          &quot;evaluated_prefill_tokens&quot;: 920,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 16,
+            &quot;prompt_tokens&quot;: 920,
+            &quot;total_tokens&quot;: 936,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 920,
+            &quot;prompt_ms&quot;: 182.576,
+            &quot;prompt_per_token_ms&quot;: 0.19845217391304348,
+            &quot;prompt_per_second&quot;: 5038.997458592586,
+            &quot;predicted_n&quot;: 16,
+            &quot;predicted_ms&quot;: 88.365,
+            &quot;predicted_per_token_ms&quot;: 5.891,
+            &quot;predicted_per_second&quot;: 169.75046681378376
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 16,
+          &quot;prefill_seconds&quot;: 0.182576,
+          &quot;decode_seconds&quot;: 0.088365,
+          &quot;prefill_tokens_per_second&quot;: 5038.997458592586,
+          &quot;decode_tokens_per_second&quot;: 169.75046681378376,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: {}
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;parameters&quot;: {},
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 0.4687114160042256,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 79877,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 4,
+          &quot;wall_seconds&quot;: 0.4765917919576168,
+          &quot;cpu_seconds&quot;: 0.260294904,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 5.461590157288062,
+          &quot;peak_rss_bytes&quot;: 1500708864,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 2905063424,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 6930432,
+          &quot;host_swap_out_delta_bytes&quot;: 1556480,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      }
+    ],
+    &quot;summary&quot;: {
+      &quot;samples&quot;: 1,
+      &quot;tool_samples&quot;: 1,
+      &quot;native_calls&quot;: 1,
+      &quot;json_valid&quot;: 1,
+      &quot;schema_valid&quot;: 1,
+      &quot;registry_valid&quot;: 1,
+      &quot;tool_expected_behavior&quot;: 1,
+      &quot;persona_samples&quot;: 0,
+      &quot;persona_valid&quot;: 0,
+      &quot;chat_samples&quot;: 0,
+      &quot;chat_valid&quot;: 0
+    },
+    &quot;status&quot;: &quot;completed&quot;,
+    &quot;evidence&quot;: [
+      {
+        &quot;path&quot;: &quot;assets-manifest.json&quot;,
+        &quot;sha256&quot;: &quot;5dcb3c78060c66ff666b8dad9ef62e86e670282bef9d24c10e7b3a60762f60f0&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/valid_000.json&quot;,
+        &quot;sha256&quot;: &quot;4d41f120bf383054851cc96c3e045ae3c8f0c34fd139fb811b6fb959a40b2f78&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/valid_000.json&quot;,
+        &quot;sha256&quot;: &quot;1ce846f50273ef39eb16f6483dff60e47d6ba712eb5ece10ae9f231f5cfd85d2&quot;
+      },
+      {
+        &quot;path&quot;: &quot;request.json&quot;,
+        &quot;sha256&quot;: &quot;1f13a5c7b1be5797dc927b176f3369510f4aa372f27a1f4cf87aa0f4df183c62&quot;
+      },
+      {
+        &quot;path&quot;: &quot;suite.json&quot;,
+        &quot;sha256&quot;: &quot;55fd3be665da562b341bd48261b8ce5633dc8e20bdf1d4621e6c5bd65b0cd7c4&quot;
+      }
+    ]
+  }
+]</pre></details></section><footer class="foot">Qwen lifecycle · 自包含离线报告 · 渲染只读数据，不执行模型</footer></main><script>const links=[...document.querySelectorAll(".rail a")];function nav(){let id="summary";for(const a of links){const s=document.querySelector(a.getAttribute("href"));if(s&&s.getBoundingClientRect().top<=150)id=s.id;}for(const a of links)a.classList.toggle("active",a.getAttribute("href")==="#"+id);}addEventListener("scroll",nav,{passive:true});nav();</script></body></html>

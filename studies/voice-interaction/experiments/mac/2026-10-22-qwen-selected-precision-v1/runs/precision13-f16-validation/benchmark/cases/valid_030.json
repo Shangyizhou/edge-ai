@@ -1,0 +1,152 @@
+{
+  "id": "valid_030",
+  "user": "请同时安排音量3和歌曲\"星晴\"，按顺序提交。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 3
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "星晴"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "请同时安排音量3和歌曲\"星晴\"，按顺序提交。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "arguments": "{\"level\": 3}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"星晴\"}"
+        }
+      }
+    ],
+    "wall_seconds": 0.9973741669673473,
+    "ttft_seconds": 0.4160402919515036,
+    "prompt_tokens": 924,
+    "evaluated_prefill_tokens": 924,
+    "native_usage": {
+      "completion_tokens": 42,
+      "prompt_tokens": 924,
+      "total_tokens": 966,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 924,
+      "prompt_ms": 275.61,
+      "prompt_per_token_ms": 0.2982792207792208,
+      "prompt_per_second": 3352.563404811146,
+      "predicted_n": 42,
+      "predicted_ms": 713.994,
+      "predicted_per_token_ms": 17.41448780487805,
+      "predicted_per_second": 57.42345173768967
+    },
+    "cache_prompt": false,
+    "output_tokens": 42,
+    "prefill_seconds": 0.27561,
+    "decode_seconds": 0.713994,
+    "prefill_tokens_per_second": 3352.563404811146,
+    "decode_tokens_per_second": 57.42345173768967,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 3
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "星晴"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 3
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "星晴"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 1.2923127080430277,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 79249,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 7,
+    "wall_seconds": 1.3047798339975998,
+    "cpu_seconds": 1.3804469760000018,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 10.579922681442525,
+    "peak_rss_bytes": 2241265664,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2244558848,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 2064384,
+    "host_swap_out_delta_bytes": 16384,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

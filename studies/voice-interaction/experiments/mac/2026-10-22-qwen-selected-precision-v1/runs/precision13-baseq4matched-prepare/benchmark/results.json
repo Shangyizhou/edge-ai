@@ -1,0 +1,236 @@
+{
+  "schema": "edge-model-benchmark/result-v1",
+  "run_id": "precision13-baseq4matched-prepare",
+  "source": {
+    "kind": "device_measurement",
+    "raw_evidence": "cases/ and events/ within this run"
+  },
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "Q4_K_M",
+    "artifact_format": "GGUF",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "f16 K and V",
+    "lineage": "official same revision -> F16 -> Q4_K_M",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+    "actual_runtime": {
+      "name": "llama.cpp",
+      "version": "e3797b184d428c7a019362612b76971f60af6670",
+      "backend": "Metal",
+      "network": "direct"
+    }
+  },
+  "stage": "actual minimum inference before full validation",
+  "request_sha256": "ccdf878c1916783918061524058cc8d97a6731cd70ced4c189731a468cf52551",
+  "suite_sha256": "55fd3be665da562b341bd48261b8ce5633dc8e20bdf1d4621e6c5bd65b0cd7c4",
+  "artifacts": {
+    "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+    "total_bytes": 396705024,
+    "files": [
+      {
+        "name": "qwen3-base-q4_k_m.gguf",
+        "bytes": 396705024,
+        "sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab"
+      }
+    ]
+  },
+  "environment": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10
+  },
+  "loading": {
+    "wall_seconds": 0.017947582993656397,
+    "resources": {
+      "scope": "declared process and recursive children",
+      "pid": 83408,
+      "sampling_interval_seconds": 0.2,
+      "sample_count": 2,
+      "wall_seconds": 0.01118066703202203,
+      "cpu_seconds": 1.813600000005744e-05,
+      "host_logical_cpus": 10,
+      "cpu_capacity_percent": 0.016220856902468307,
+      "peak_rss_bytes": 1482833920,
+      "peak_pss_bytes": null,
+      "host_mem_total_bytes": 17179869184,
+      "minimum_host_mem_available_bytes": 3407036416,
+      "host_swap_delta_bytes": 0,
+      "host_swap_in_delta_bytes": 0,
+      "host_swap_out_delta_bytes": 0,
+      "swap_scope": "system-wide counters; not model-only",
+      "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+    }
+  },
+  "measurement": {
+    "resources": "per-case sampled process tree",
+    "cache": "new MLX prompt cache per case / llama cache_prompt=false",
+    "timing": "request to complete response; valid-call latency only if native+schema pass",
+    "sampling_interval_seconds": 0.2,
+    "quality_scope": "frozen deterministic fixture rules; no hardware execution or product acceptance"
+  },
+  "cases": [
+    {
+      "id": "valid_000",
+      "user": "收到指令后，请完成以下操作——相机重新采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——相机重新采集图像。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "start_camera",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.29554625001037493,
+        "ttft_seconds": 0.25316370802465826,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 920,
+          "total_tokens": 936,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 200.011,
+          "prompt_per_token_ms": 0.2174032608695652,
+          "prompt_per_second": 4599.747013914235,
+          "predicted_n": 16,
+          "predicted_ms": 91.814,
+          "predicted_per_token_ms": 6.1209333333333324,
+          "predicted_per_second": 163.37377741956567
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.200011,
+        "decode_seconds": 0.09181399999999999,
+        "prefill_tokens_per_second": 4599.747013914235,
+        "decode_tokens_per_second": 163.37377741956567,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.49244166701100767,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83408,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.49995970801683143,
+        "cpu_seconds": 0.21237282400000007,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.247798784474257,
+        "peak_rss_bytes": 1501560832,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3407036416,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  ],
+  "summary": {
+    "samples": 1,
+    "tool_samples": 1,
+    "native_calls": 1,
+    "json_valid": 1,
+    "schema_valid": 1,
+    "registry_valid": 1,
+    "tool_expected_behavior": 1,
+    "persona_samples": 0,
+    "persona_valid": 0,
+    "chat_samples": 0,
+    "chat_valid": 0
+  },
+  "status": "completed",
+  "evidence": [
+    {
+      "path": "assets-manifest.json",
+      "sha256": "c641d22c1cf8c7add1cc988458dc1744aef83673113f510a4d4c56f418f1ee8d"
+    },
+    {
+      "path": "cases/valid_000.json",
+      "sha256": "4cbd192a7d53321779e662313363e42226e3c515478bf4b3ce0f40ed55cba20f"
+    },
+    {
+      "path": "events/valid_000.json",
+      "sha256": "92748f6eca57ed3aa5e6647094369c87688aa2d94e6434be6e66e62084d13b16"
+    },
+    {
+      "path": "request.json",
+      "sha256": "ccdf878c1916783918061524058cc8d97a6731cd70ced4c189731a468cf52551"
+    },
+    {
+      "path": "suite.json",
+      "sha256": "55fd3be665da562b341bd48261b8ce5633dc8e20bdf1d4621e6c5bd65b0cd7c4"
+    }
+  ]
+}

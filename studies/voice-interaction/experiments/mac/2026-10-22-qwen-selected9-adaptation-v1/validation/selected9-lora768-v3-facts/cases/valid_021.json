@@ -1,0 +1,87 @@
+{
+  "id": "valid_021",
+  "user": "能否把任务切换到把扫描融合关掉？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "disable_lidar",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是小沫，是用户创造的科研AI与机器人助手角色；底层模型是Qwen，用户创造角色不代表研发模型。角色生日、年龄、出生地、履历及创建者实名均未提供。按已知事实回答身份问题，未知就说未提供。操作用当前工具，聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到把扫描融合关掉？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"disable_lidar\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.21643337496789172,
+    "wall_seconds": 0.446043792006094,
+    "prompt_tokens": 940,
+    "output_tokens": 17,
+    "prefill_tokens_per_second": 4362.9848772468185,
+    "decode_tokens_per_second": 77.69898246722438,
+    "prefill_seconds": 0.21544883295428008,
+    "decode_seconds": 0.21879308403003964,
+    "mlx_peak_allocated_bytes": 1714224160,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "disable_lidar",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "disable_lidar",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.7109678749693558,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 70090,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.7245252919965424,
+    "cpu_seconds": 0.5212626159999996,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.194539952685146,
+    "peak_rss_bytes": 684146688,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3204136960,
+    "host_swap_delta_bytes": -25165824,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,247 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qwen 微调、合并与转换 · 阶段实测</title>
+<style>
+:root{--ink:#18313b;--muted:#536873;--line:#dce5e7;--teal:#08776b;--paper:#fff;--bg:#f2f5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}main{max-width:1150px;margin:0 auto;padding:42px 30px 80px}body{padding-right:230px}.rail{position:fixed;right:0;top:0;height:100vh;width:230px;border-left:1px solid var(--line);padding:42px 22px;background:#fbfcfc;overflow-y:auto}.rail strong{display:block;margin-bottom:18px}.rail a{display:block;color:var(--muted);text-decoration:none;padding:11px 12px;border-radius:8px;margin:4px 0;font-size:14px}.rail a.active{background:#e2f1ed;color:#066457;font-weight:700}.rail small{display:block;margin-top:24px;color:var(--muted)}header{padding:0 0 18px}h1{font-size:clamp(29px,3.6vw,42px);line-height:1.3;margin:14px 0;letter-spacing:-.7px}h2{font-size:27px;line-height:1.4;margin:8px 0 16px}h3{font-size:20px;margin:24px 0 12px}h4{font-size:17px;margin:8px 0}p{margin:10px 0}.eyebrow,.badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--teal)}.badge{display:inline-block;padding:3px 10px;border:1px solid #bedbd3;border-radius:15px;letter-spacing:0}.muted,small{color:var(--muted)}section{background:var(--paper);padding:30px;border:1px solid var(--line);border-radius:16px;margin:20px 0;scroll-margin-top:24px}.deployment-table td:first-child{min-width:285px;white-space:pre-line;font-size:13px;line-height:1.85}.lead{font-size:22px;font-weight:650;line-height:1.6}.scroll{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf4f3;white-space:nowrap}td{min-width:92px}tr:last-child td{border:0}.sample{padding:20px;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:#fcfdfd}.sample-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.number{font-weight:700;color:var(--teal)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.output{padding:14px;background:#edf4f3;border-radius:8px;white-space:pre-wrap;font-size:17px;margin:8px 0}.fail{background:#fff1e6;border-left:3px solid #b6671f}.reference{padding:10px 0;font-size:14px;color:var(--muted)}audio{width:100%;max-width:540px;display:block;margin:12px 0}.finding{border-left:4px solid var(--teal);background:#e9f4ef;border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}.finding strong{font-size:18px}.finding p{margin:7px 0}.method{font-size:14px;color:var(--muted);background:#f5f7f8;padding:14px 18px;border-radius:10px}.stats{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin:12px 0}.stats span{padding:4px 9px;background:#f1f4f6;border-radius:6px}a{color:var(--teal);text-underline-offset:3px}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal)}pre{font-size:12px;background:#f4f6f7;padding:15px;white-space:pre-wrap;max-height:400px;overflow:auto}p,td,pre,.output{overflow-wrap:anywhere}.foot{font-size:13px;color:var(--muted)}.warning{color:#97541d;font-weight:600}.meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meter{padding:14px;border:1px solid var(--line);border-radius:10px}.track{height:9px;background:#e5ebed;border-radius:10px;overflow:hidden;margin:10px 0}.track b{display:block;height:100%;background:var(--teal);border-radius:10px}.meter small{font-size:12px}@media(max-width:1100px){body{padding-right:190px}.rail{width:190px;padding:30px 14px}main{padding:30px 20px}section{padding:24px}}@media(max-width:760px){body{padding-right:0}.rail{position:sticky;top:0;width:100%;height:auto;padding:8px 12px;border:0;border-bottom:1px solid var(--line);z-index:10;display:flex;gap:4px;overflow-x:auto}.rail a{display:inline-block;white-space:nowrap;padding:8px 12px;margin:0}.rail strong,.rail small{display:none}main{padding:20px 12px}section{padding:20px 15px;scroll-margin-top:76px}.pair,.meters{grid-template-columns:1fr}h2{font-size:24px}.sample{padding:16px}.lead{font-size:20px}}@media print{body{padding:0}.rail{display:none}section{break-inside:avoid}audio{display:none}}
+</style><nav class="rail"><strong>阶段导航</strong>
+<a href="#summary">结论与边界</a>
+<a href="#stage-0">qwen3-pilot32-export-v1</a>
+<a href="#evidence">原始证据</a></nav><main><header><span class="badge">实际训练 / 制品变换成本</span><h1>从 LoRA 到可加载的部署制品</h1></header><section id="summary"><h2>完成链路不等于能力验收</h2><p>下面分别记录训练、合并、格式转换、量化的实际成本；原生调用与角色效果应阅读配套推理报告。少量训练步不证明完整业务或人设已学入。</p></section>
+<section id="stage-0"><div class="eyebrow">edge-model-export/result-v1</div><h2>qwen3-pilot32-export-v1</h2><div class="method">训练tokens/s是上游监督token速率，不是生成tokens/s；CPU按整机逻辑核容量，内存是采样峰值，MLX分配与RSS可能重叠。每步输入与输出身份及原始日志保留，失败不会因渲染变为成功。</div>
+<div class="scroll"><table><tr><th>步骤</th><th>状态</th><th>墙钟s</th><th>CPU容量%</th><th>峰值RSS MiB</th><th>输出bytes</th></tr>
+<tr><td>merge</td><td>completed</td><td>4.54</td><td>5.23</td><td>1395.27</td><td>1203585805</td></tr>
+<tr><td>convert</td><td>failed</td><td>18.57</td><td>2.41</td><td>485.31</td><td>未生成</td></tr>
+</table></div>
+<aside class="finding"><strong>本阶段发现</strong><p>记录状态：failed。转换正常退出只证明制品生成，加载、原生推理和独立能力验收继续分开。</p></aside></section>
+<section id="evidence"><h2>原始配置、指标与制品谱系</h2><a download="stage-results.json" href="data:application/json;base64,WwogIHsKICAgICJzY2hlbWEiOiAiZWRnZS1tb2RlbC1leHBvcnQvcmVzdWx0LXYxIiwKICAgICJydW5faWQiOiAicXdlbjMtcGlsb3QzMi1leHBvcnQtdjEiLAogICAgInN0YXR1cyI6ICJmYWlsZWQiLAogICAgInNvdXJjZSI6IHsKICAgICAgImtpbmQiOiAiZGV2aWNlX21lYXN1cmVtZW50IgogICAgfSwKICAgICJyZXF1ZXN0X3NoYTI1NiI6ICI4YWIxMjEwMjk2YTRhYzRmMmE4NTQzZjNhNjhkMzI4MjAwYmY4ZTcxZTVjNzgzM2Y5ODRhNmUwNThkNjc5OWE0IiwKICAgICJhcnRpZmFjdHMiOiB7CiAgICAgICJiYXNlIjogewogICAgICAgICJyb290IjogIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvaGYtY2FjaGUvbW9kZWxzLS1Rd2VuLS1Rd2VuMy0wLjZCL3NuYXBzaG90cy9jMTg5OWRlMjg5YTA0ZDEyMTAwZGIzNzBkODE0ODVjZGY3NWU0N2NhIiwKICAgICAgICAidG90YWxfYnl0ZXMiOiAxNTE5MjA3NjczLAogICAgICAgICJmaWxlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAiTElDRU5TRSIsCiAgICAgICAgICAgICJieXRlcyI6IDExMzQzLAogICAgICAgICAgICAic2hhMjU2IjogIjgzMmRkOWUwMGE2OGRkODNiM2MzZmI5ZjU1ODhkYWQ3ZGNmMzM3YTBkYjUwZjdkOTQ4M2YzMTBjZDI5MmU5MmUiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICJSRUFETUUubWQiLAogICAgICAgICAgICAiYnl0ZXMiOiAxMzk2NSwKICAgICAgICAgICAgInNoYTI1NiI6ICIxYWI2NGEyNmZjYjNiNDYxNDIzYjg5YTQzM2E4Yzg1OGYxYmY4ZDQwODZmOTc5Y2JiM2ZmODc4ZDQ3Y2YyMGU5IgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAiY29uZmlnLmpzb24iLAogICAgICAgICAgICAiYnl0ZXMiOiA3MjYsCiAgICAgICAgICAgICJzaGEyNTYiOiAiNjYwZGIzYjczZDc4ODExOWMwNDUzNWU0OGNmOWJlNWY1NWJjMzEwMDg0MWE3MTg2MzdhZTY5NWI0NDJmMjdkZCIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogImdlbmVyYXRpb25fY29uZmlnLmpzb24iLAogICAgICAgICAgICAiYnl0ZXMiOiAyMzksCiAgICAgICAgICAgICJzaGEyNTYiOiAiMjMyNWRhMGYxNWJiODQ4ZTAxOGM1YWUwNzFiNzk0MzMzMmU5Zjg3MWQ2YjYwZTJlZDIyY2E5N2Q0Y2I5OTNkMiIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogIm1lcmdlcy50eHQiLAogICAgICAgICAgICAiYnl0ZXMiOiAxNjcxODUzLAogICAgICAgICAgICAic2hhMjU2IjogIjg4MzFlNGYxYTA0NDQ3MTM0MGY3YzBhODNkN2JkNzEzMDZhNWI4NjdlOTVmZDg3MGY3NGQwYzUzMDhhOTA0ZDUiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICJtb2RlbC5zYWZldGVuc29ycyIsCiAgICAgICAgICAgICJieXRlcyI6IDE1MDMzMDAzMjgsCiAgICAgICAgICAgICJzaGEyNTYiOiAiZjQ3ZjcxMTc3ZjMyYmNkMTAxYjc1NzNlYzkxNzFlNmE1N2Y0ZjRkMzExNDhkMzhlMzgyMzA2ZjQyOTk2ODc0YiIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogInRva2VuaXplci5qc29uIiwKICAgICAgICAgICAgImJ5dGVzIjogMTE0MjI2NTQsCiAgICAgICAgICAgICJzaGEyNTYiOiAiYWViMTMzMDdhNzFhY2Q4ZmU4MTg2MWQ5NGFkNTRhYjY4OWRmNzczMzE4ODA5ZWVkM2NiZTc5NGI0NDkyZGFlNCIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogInRva2VuaXplcl9jb25maWcuanNvbiIsCiAgICAgICAgICAgICJieXRlcyI6IDk3MzIsCiAgICAgICAgICAgICJzaGEyNTYiOiAiZDVkMDlmMDdiNDhjMzA4NmM1MDhiMzBkMWM5MTE0YmQxMTg5MTQ1Yjc0ZTk4MmEyNjUzNTBjOTIzYWNkODEwMSIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogInZvY2FiLmpzb24iLAogICAgICAgICAgICAiYnl0ZXMiOiAyNzc2ODMzLAogICAgICAgICAgICAic2hhMjU2IjogImNhMTBkN2U5ZmIzZWQxODU3NWRkMWUyNzdhMjU3OWMxNmQxMDhlMzJmMjc0Mzk2ODRhZmEwZTEwYjE0NDA5MTAiCiAgICAgICAgICB9CiAgICAgICAgXQogICAgICB9LAogICAgICAiYWRhcHRlciI6IHsKICAgICAgICAicm9vdCI6ICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL3J1bnMvcGlsb3QtdHJhaW4zMi12MS9hZGFwdGVyIiwKICAgICAgICAidG90YWxfYnl0ZXMiOiAyNjI5NTI1LAogICAgICAgICJmaWxlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAiMDAwMDAzMl9hZGFwdGVycy5zYWZldGVuc29ycyIsCiAgICAgICAgICAgICJieXRlcyI6IDEzMTQxNDMsCiAgICAgICAgICAgICJzaGEyNTYiOiAiZDVmNjZjNWNlNDZiZDQzMmMwMjY1MzhhYzI0NGZiNzg5M2VjNTk2YTkwYmE4MzY5YzJjOTQzMGZjNGI3ZjE0MCIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogImFkYXB0ZXJfY29uZmlnLmpzb24iLAogICAgICAgICAgICAiYnl0ZXMiOiAxMjM5LAogICAgICAgICAgICAic2hhMjU2IjogIjQ2Y2Q5NmMyYWZlMGU5YmIyMGE1YTgwNzMwMGFkNzc4YTY4YzEwMWE5OWZiMDE1ZTU0YTRmMzFiODgwNmVlYjgiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICJhZGFwdGVycy5zYWZldGVuc29ycyIsCiAgICAgICAgICAgICJieXRlcyI6IDEzMTQxNDMsCiAgICAgICAgICAgICJzaGEyNTYiOiAiZDVmNjZjNWNlNDZiZDQzMmMwMjY1MzhhYzI0NGZiNzg5M2VjNTk2YTkwYmE4MzY5YzJjOTQzMGZjNGI3ZjE0MCIKICAgICAgICAgIH0KICAgICAgICBdCiAgICAgIH0sCiAgICAgICJtZXJnZWQiOiB7CiAgICAgICAgInJvb3QiOiAiL1VzZXJzL3N5ei8ubG9jYWwvc2hhcmUvZWRnZS1haS9xd2VuLWxpZmVjeWNsZS9hcnRpZmFjdHMvcGlsb3QzMi12MS9tZXJnZWQiLAogICAgICAgICJ0b3RhbF9ieXRlcyI6IDEyMDM1ODU4MDUsCiAgICAgICAgImZpbGVzIjogWwogICAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICJSRUFETUUubWQiLAogICAgICAgICAgICAiYnl0ZXMiOiA4MSwKICAgICAgICAgICAgInNoYTI1NiI6ICI3NDhjOTY0ZjliN2U1ZjJjMzc3MGNlMDEzYmJjMDE1M2JlN2M1NDMxMWQ5NjkyYzM0M2I2MTg4ZWVmZTc3YWM2IgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAiY2hhdF90ZW1wbGF0ZS5qaW5qYSIsCiAgICAgICAgICAgICJieXRlcyI6IDQxNjgsCiAgICAgICAgICAgICJzaGEyNTYiOiAiYTU1ZWUxYjE2NjAxMjhiNzA5ODcyM2UwYWJjZDkyY2FhMDc4ODA2MTA1MWM2MmQ1MWNiZTg3ZDljZjE5NzRkOCIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogImNvbmZpZy5qc29uIiwKICAgICAgICAgICAgImJ5dGVzIjogODE2LAogICAgICAgICAgICAic2hhMjU2IjogIjRiNzhmNjE0MzU5NzhhYzEyZGJmNzg2NDM3Y2M5ZGJmNjI3NDAxY2YwYzg5NjI3N2IzM2Q5YmU5ZTQ4NDZmYjMiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICJnZW5lcmF0aW9uX2NvbmZpZy5qc29uIiwKICAgICAgICAgICAgImJ5dGVzIjogMjM5LAogICAgICAgICAgICAic2hhMjU2IjogIjIzMjVkYTBmMTViYjg0OGUwMThjNWFlMDcxYjc5NDMzMzJlOWY4NzFkNmI2MGUyZWQyMmNhOTdkNGNiOTkzZDIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAibmFtZSI6ICJtb2RlbC5zYWZldGVuc29ycyIsCiAgICAgICAgICAgICJieXRlcyI6IDExOTIxMzQ5MzUsCiAgICAgICAgICAgICJzaGEyNTYiOiAiZjI1MjJiMmE1N2Q2MmM3OTM1MGZhMmNjYzI0NDU0NmU3NzllYzZlYTUyNWUwMDgzNzhhYTYzMTllNDI3ODY3MSIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJuYW1lIjogIm1vZGVsLnNhZmV0ZW5zb3JzLmluZGV4Lmpzb24iLAogICAgICAgICAgICAiYnl0ZXMiOiAyMjE4NywKICAgICAgICAgICAgInNoYTI1NiI6ICI5MDY4MWUzMTQxOTc3M2FmMWI4OWQ4NTk3YzFmNGY1MTUzZjA5MmZlYzZlNTVkMDlhYzI2OGU2MjQ2MmEwMDhlIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAidG9rZW5pemVyLmpzb24iLAogICAgICAgICAgICAiYnl0ZXMiOiAxMTQyMjY1MCwKICAgICAgICAgICAgInNoYTI1NiI6ICJiZTc1NjA2MDkzZGIyMDk0ZDdjZDIwZjNjMmYzODVjMjEyNzUwNjQ4YmQ2ZWE0ZmIyYmY1MDdhNmE0YzU1NTA2IgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgIm5hbWUiOiAidG9rZW5pemVyX2NvbmZpZy5qc29uIiwKICAgICAgICAgICAgImJ5dGVzIjogNzI5LAogICAgICAgICAgICAic2hhMjU2IjogImVlOGY2ZDQ0YmYyMzUzZTZkMzY4NmMzYWRhZjcwZTFjY2ZlOWU2ZWQ2ODIyZDBhYjJmMjhjYWZkZDc3NTQ3OTIiCiAgICAgICAgICB9CiAgICAgICAgXQogICAgICB9CiAgICB9LAogICAgInN0YWdlcyI6IFsKICAgICAgewogICAgICAgICJvcGVyYXRpb24iOiAibWVyZ2UiLAogICAgICAgICJjb21tYW5kIjogWwogICAgICAgICAgIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvdmVudi9iaW4vcHl0aG9uIiwKICAgICAgICAgICItbSIsCiAgICAgICAgICAibWx4X2xtIiwKICAgICAgICAgICJmdXNlIiwKICAgICAgICAgICItLW1vZGVsIiwKICAgICAgICAgICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL2hmLWNhY2hlL21vZGVscy0tUXdlbi0tUXdlbjMtMC42Qi9zbmFwc2hvdHMvYzE4OTlkZTI4OWEwNGQxMjEwMGRiMzcwZDgxNDg1Y2RmNzVlNDdjYSIsCiAgICAgICAgICAiLS1hZGFwdGVyLXBhdGgiLAogICAgICAgICAgIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvcnVucy9waWxvdC10cmFpbjMyLXYxL2FkYXB0ZXIiLAogICAgICAgICAgIi0tc2F2ZS1wYXRoIiwKICAgICAgICAgICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL2FydGlmYWN0cy9waWxvdDMyLXYxL21lcmdlZCIKICAgICAgICBdLAogICAgICAgICJpbnB1dHMiOiBbCiAgICAgICAgICAiYmFzZSIsCiAgICAgICAgICAiYWRhcHRlciIKICAgICAgICBdLAogICAgICAgICJvdXRwdXRfaWQiOiAibWVyZ2VkIiwKICAgICAgICAic3RhdHVzIjogImNvbXBsZXRlZCIsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDMyOTg4LAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjEsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogNDEsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNC41MjA1MzMyNTAwMDQ1MTksCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAyLjM2NDA0MDIwOTk5OTk5OTgsCiAgICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiAxMCwKICAgICAgICAgICJjcHVfY2FwYWNpdHlfcGVyY2VudCI6IDUuMjI5NTYwNDk0ODc2NjU0LAogICAgICAgICAgInBlYWtfcnNzX2J5dGVzIjogMTQ2MzA0MjA0OCwKICAgICAgICAgICJwZWFrX3Bzc19ieXRlcyI6IG51bGwsCiAgICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiAxNzE3OTg2OTE4NCwKICAgICAgICAgICJtaW5pbXVtX2hvc3RfbWVtX2F2YWlsYWJsZV9ieXRlcyI6IDIzODY4ODY2NTYsCiAgICAgICAgICAiaG9zdF9zd2FwX2RlbHRhX2J5dGVzIjogMjg5NjY5MTIwLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9LAogICAgICAgICJ3YWxsX3NlY29uZHMiOiA0LjU0MDI1NzUwMDAxODkyNDUsCiAgICAgICAgImV4aXRfY29kZSI6IDAKICAgICAgfSwKICAgICAgewogICAgICAgICJvcGVyYXRpb24iOiAiY29udmVydCIsCiAgICAgICAgImNvbW1hbmQiOiBbCiAgICAgICAgICAiL1VzZXJzL3N5ei8ubG9jYWwvc2hhcmUvZWRnZS1haS9xd2VuLWxpZmVjeWNsZS9jb252ZXJ0ZXItdmVudi9iaW4vcHl0aG9uIiwKICAgICAgICAgICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL2xsYW1hLmNwcC9jb252ZXJ0X2hmX3RvX2dndWYucHkiLAogICAgICAgICAgIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvYXJ0aWZhY3RzL3BpbG90MzItdjEvbWVyZ2VkIiwKICAgICAgICAgICItLW91dGZpbGUiLAogICAgICAgICAgIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvYXJ0aWZhY3RzL3BpbG90MzItdjEvcXdlbjMtcGlsb3QzMi1mMTYuZ2d1ZiIsCiAgICAgICAgICAiLS1vdXR0eXBlIiwKICAgICAgICAgICJmMTYiCiAgICAgICAgXSwKICAgICAgICAiaW5wdXRzIjogWwogICAgICAgICAgIm1lcmdlZCIKICAgICAgICBdLAogICAgICAgICJvdXRwdXRfaWQiOiAiZjE2IiwKICAgICAgICAic3RhdHVzIjogImZhaWxlZCIsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDMzMDIyLAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjEsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogMTY1LAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDE4LjU1NTA1NzYyNDk5NTI0MywKICAgICAgICAgICJjcHVfc2Vjb25kcyI6IDQuNDc0Nzg2Mzk2LAogICAgICAgICAgImhvc3RfbG9naWNhbF9jcHVzIjogMTAsCiAgICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAyLjQxMTYyNjI0NTc1ODUwNDcsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA1MDg4ODcwNDAsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAzMjY2OTA0MDY0LAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IC01MTE3MDUwODgsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0sCiAgICAgICAgIndhbGxfc2Vjb25kcyI6IDE4LjU2NTI0MTQ1ODAxMDg2LAogICAgICAgICJleGl0X2NvZGUiOiAxLAogICAgICAgICJlcnJvciI6ICJwcm9jZXNzIGZhaWxlZCBvciByZXF1ZXN0ZWQgb3V0cHV0IGFydGlmYWN0IGlzIGFic2VudCIKICAgICAgfQogICAgXSwKICAgICJxdWFsaXR5X3N0YXR1cyI6ICJOT1RfRVZBTFVBVEVEIiwKICAgICJuZXh0X3N0ZXAiOiAicHJlcGFyZSBvdXRwdXQgYXJ0aWZhY3Qgd2l0aCBhY3R1YWwgbG9hZGluZy9zbW9rZSwgdGhlbiBiZW5jaG1hcmsgdXNpbmcgdGhlIGZyb3plbiB0YXNrIHN1aXRlIiwKICAgICJldmlkZW5jZSI6IFsKICAgICAgewogICAgICAgICJwYXRoIjogIjAwLW1lcmdlLmxvZyIsCiAgICAgICAgInNoYTI1NiI6ICIyZThmYTVkYjQ2ZDUyNThlYmFiMDY4MTg3MTU4MTJmNjY3NjJlZjEyOWMyNTFiODViMTA2NjRhMjM5MTkxYWIyIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiMDAtcmVzb3VyY2VzLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiMGViNDIyYzNmYWVkYWZmMmE1NTVkNGRmNTQ5MGRhNjlhOGNjZTJhYTAwNTQzYWVjZmVmNmQyMzAwNTViYTk2ZiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogIjAxLWNvbnZlcnQubG9nIiwKICAgICAgICAic2hhMjU2IjogImRlYWQ0YmUwM2ZkYmZkNWFhMDhjZmJhYzE2MzgyOTMwNTQ5NTM5NjcxNDlkYmE3MjhjZjJjZDg3ZGYxMGM1ZDgiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICIwMS1yZXNvdXJjZXMuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICIzZGU5ZGNhMzM4MTQyMjc2NmJhMzU2NWM2NDZkNDZmZDllYTIzZDBiNjBmZWYzZWZhNTc2NTk1OTVmMDdjNzIzIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAicmVxdWVzdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjhhYjEyMTAyOTZhNGFjNGYyYTg1NDNmM2E2OGQzMjgyMDBiZjhlNzFlNWM3ODMzZjk4NGE2ZTA1OGQ2Nzk5YTQiCiAgICAgIH0KICAgIF0KICB9Cl0=">下载结果JSON</a><details><summary>展开完整阶段结果</summary><pre>[
+  {
+    &quot;schema&quot;: &quot;edge-model-export/result-v1&quot;,
+    &quot;run_id&quot;: &quot;qwen3-pilot32-export-v1&quot;,
+    &quot;status&quot;: &quot;failed&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;device_measurement&quot;
+    },
+    &quot;request_sha256&quot;: &quot;8ab1210296a4ac4f2a8543f3a68d328200bf8e71e5c7833f984a6e058d6799a4&quot;,
+    &quot;artifacts&quot;: {
+      &quot;base&quot;: {
+        &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+        &quot;total_bytes&quot;: 1519207673,
+        &quot;files&quot;: [
+          {
+            &quot;name&quot;: &quot;LICENSE&quot;,
+            &quot;bytes&quot;: 11343,
+            &quot;sha256&quot;: &quot;832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e&quot;
+          },
+          {
+            &quot;name&quot;: &quot;README.md&quot;,
+            &quot;bytes&quot;: 13965,
+            &quot;sha256&quot;: &quot;1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9&quot;
+          },
+          {
+            &quot;name&quot;: &quot;config.json&quot;,
+            &quot;bytes&quot;: 726,
+            &quot;sha256&quot;: &quot;660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd&quot;
+          },
+          {
+            &quot;name&quot;: &quot;generation_config.json&quot;,
+            &quot;bytes&quot;: 239,
+            &quot;sha256&quot;: &quot;2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2&quot;
+          },
+          {
+            &quot;name&quot;: &quot;merges.txt&quot;,
+            &quot;bytes&quot;: 1671853,
+            &quot;sha256&quot;: &quot;8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5&quot;
+          },
+          {
+            &quot;name&quot;: &quot;model.safetensors&quot;,
+            &quot;bytes&quot;: 1503300328,
+            &quot;sha256&quot;: &quot;f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b&quot;
+          },
+          {
+            &quot;name&quot;: &quot;tokenizer.json&quot;,
+            &quot;bytes&quot;: 11422654,
+            &quot;sha256&quot;: &quot;aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4&quot;
+          },
+          {
+            &quot;name&quot;: &quot;tokenizer_config.json&quot;,
+            &quot;bytes&quot;: 9732,
+            &quot;sha256&quot;: &quot;d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101&quot;
+          },
+          {
+            &quot;name&quot;: &quot;vocab.json&quot;,
+            &quot;bytes&quot;: 2776833,
+            &quot;sha256&quot;: &quot;ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910&quot;
+          }
+        ]
+      },
+      &quot;adapter&quot;: {
+        &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/pilot-train32-v1/adapter&quot;,
+        &quot;total_bytes&quot;: 2629525,
+        &quot;files&quot;: [
+          {
+            &quot;name&quot;: &quot;0000032_adapters.safetensors&quot;,
+            &quot;bytes&quot;: 1314143,
+            &quot;sha256&quot;: &quot;d5f66c5ce46bd432c026538ac244fb7893ec596a90ba8369c2c9430fc4b7f140&quot;
+          },
+          {
+            &quot;name&quot;: &quot;adapter_config.json&quot;,
+            &quot;bytes&quot;: 1239,
+            &quot;sha256&quot;: &quot;46cd96c2afe0e9bb20a5a807300ad778a68c101a99fb015e54a4f31b8806eeb8&quot;
+          },
+          {
+            &quot;name&quot;: &quot;adapters.safetensors&quot;,
+            &quot;bytes&quot;: 1314143,
+            &quot;sha256&quot;: &quot;d5f66c5ce46bd432c026538ac244fb7893ec596a90ba8369c2c9430fc4b7f140&quot;
+          }
+        ]
+      },
+      &quot;merged&quot;: {
+        &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/merged&quot;,
+        &quot;total_bytes&quot;: 1203585805,
+        &quot;files&quot;: [
+          {
+            &quot;name&quot;: &quot;README.md&quot;,
+            &quot;bytes&quot;: 81,
+            &quot;sha256&quot;: &quot;748c964f9b7e5f2c3770ce013bbc0153be7c54311d9692c343b6188eefe77ac6&quot;
+          },
+          {
+            &quot;name&quot;: &quot;chat_template.jinja&quot;,
+            &quot;bytes&quot;: 4168,
+            &quot;sha256&quot;: &quot;a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8&quot;
+          },
+          {
+            &quot;name&quot;: &quot;config.json&quot;,
+            &quot;bytes&quot;: 816,
+            &quot;sha256&quot;: &quot;4b78f61435978ac12dbf786437cc9dbf627401cf0c896277b33d9be9e4846fb3&quot;
+          },
+          {
+            &quot;name&quot;: &quot;generation_config.json&quot;,
+            &quot;bytes&quot;: 239,
+            &quot;sha256&quot;: &quot;2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2&quot;
+          },
+          {
+            &quot;name&quot;: &quot;model.safetensors&quot;,
+            &quot;bytes&quot;: 1192134935,
+            &quot;sha256&quot;: &quot;f2522b2a57d62c79350fa2ccc244546e779ec6ea525e008378aa6319e4278671&quot;
+          },
+          {
+            &quot;name&quot;: &quot;model.safetensors.index.json&quot;,
+            &quot;bytes&quot;: 22187,
+            &quot;sha256&quot;: &quot;90681e31419773af1b89d8597c1f4f5153f092fec6e55d09ac268e62462a008e&quot;
+          },
+          {
+            &quot;name&quot;: &quot;tokenizer.json&quot;,
+            &quot;bytes&quot;: 11422650,
+            &quot;sha256&quot;: &quot;be75606093db2094d7cd20f3c2f385c212750648bd6ea4fb2bf507a6a4c55506&quot;
+          },
+          {
+            &quot;name&quot;: &quot;tokenizer_config.json&quot;,
+            &quot;bytes&quot;: 729,
+            &quot;sha256&quot;: &quot;ee8f6d44bf2353e6d3686c3adaf70e1ccfe9e6ed6822d0ab2f28cafdd7754792&quot;
+          }
+        ]
+      }
+    },
+    &quot;stages&quot;: [
+      {
+        &quot;operation&quot;: &quot;merge&quot;,
+        &quot;command&quot;: [
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python&quot;,
+          &quot;-m&quot;,
+          &quot;mlx_lm&quot;,
+          &quot;fuse&quot;,
+          &quot;--model&quot;,
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+          &quot;--adapter-path&quot;,
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/pilot-train32-v1/adapter&quot;,
+          &quot;--save-path&quot;,
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/merged&quot;
+        ],
+        &quot;inputs&quot;: [
+          &quot;base&quot;,
+          &quot;adapter&quot;
+        ],
+        &quot;output_id&quot;: &quot;merged&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 32988,
+          &quot;sampling_interval_seconds&quot;: 0.1,
+          &quot;sample_count&quot;: 41,
+          &quot;wall_seconds&quot;: 4.520533250004519,
+          &quot;cpu_seconds&quot;: 2.3640402099999998,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 5.229560494876654,
+          &quot;peak_rss_bytes&quot;: 1463042048,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 2386886656,
+          &quot;host_swap_delta_bytes&quot;: 289669120,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        },
+        &quot;wall_seconds&quot;: 4.5402575000189245,
+        &quot;exit_code&quot;: 0
+      },
+      {
+        &quot;operation&quot;: &quot;convert&quot;,
+        &quot;command&quot;: [
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/converter-venv/bin/python&quot;,
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/convert_hf_to_gguf.py&quot;,
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/merged&quot;,
+          &quot;--outfile&quot;,
+          &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-v1/qwen3-pilot32-f16.gguf&quot;,
+          &quot;--outtype&quot;,
+          &quot;f16&quot;
+        ],
+        &quot;inputs&quot;: [
+          &quot;merged&quot;
+        ],
+        &quot;output_id&quot;: &quot;f16&quot;,
+        &quot;status&quot;: &quot;failed&quot;,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 33022,
+          &quot;sampling_interval_seconds&quot;: 0.1,
+          &quot;sample_count&quot;: 165,
+          &quot;wall_seconds&quot;: 18.555057624995243,
+          &quot;cpu_seconds&quot;: 4.474786396,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 2.4116262457585047,
+          &quot;peak_rss_bytes&quot;: 508887040,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 3266904064,
+          &quot;host_swap_delta_bytes&quot;: -511705088,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        },
+        &quot;wall_seconds&quot;: 18.56524145801086,
+        &quot;exit_code&quot;: 1,
+        &quot;error&quot;: &quot;process failed or requested output artifact is absent&quot;
+      }
+    ],
+    &quot;quality_status&quot;: &quot;NOT_EVALUATED&quot;,
+    &quot;next_step&quot;: &quot;prepare output artifact with actual loading/smoke, then benchmark using the frozen task suite&quot;,
+    &quot;evidence&quot;: [
+      {
+        &quot;path&quot;: &quot;00-merge.log&quot;,
+        &quot;sha256&quot;: &quot;2e8fa5db46d5258ebab06818715812f66762ef129c251b85b10664a239191ab2&quot;
+      },
+      {
+        &quot;path&quot;: &quot;00-resources.json&quot;,
+        &quot;sha256&quot;: &quot;0eb422c3faedaff2a555d4df5490da69a8cce2aa00543aecfef6d230055ba96f&quot;
+      },
+      {
+        &quot;path&quot;: &quot;01-convert.log&quot;,
+        &quot;sha256&quot;: &quot;dead4be03fdbfd5aa08cfbac1638293054953967149dba728cf2cd87df10c5d8&quot;
+      },
+      {
+        &quot;path&quot;: &quot;01-resources.json&quot;,
+        &quot;sha256&quot;: &quot;3de9dca3381422766ba3565c646d46fd9ea23d0b60fef3efa57659595f07c723&quot;
+      },
+      {
+        &quot;path&quot;: &quot;request.json&quot;,
+        &quot;sha256&quot;: &quot;8ab1210296a4ac4f2a8543f3a68d328200bf8e71e5c7833f984a6e058d6799a4&quot;
+      }
+    ]
+  }
+]</pre></details></section></main></html>

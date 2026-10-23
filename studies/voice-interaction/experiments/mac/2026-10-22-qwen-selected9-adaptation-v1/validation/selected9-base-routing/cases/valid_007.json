@@ -1,0 +1,72 @@
+{
+  "id": "valid_007",
+  "user": "收到指令后，请完成以下操作——将音量设为0。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 0
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "收到指令后，请完成以下操作——将音量设为0。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请将音量设为0。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.2676702910102904,
+    "wall_seconds": 0.41308999998727813,
+    "prompt_tokens": 922,
+    "output_tokens": 9,
+    "prefill_tokens_per_second": 3451.608540085817,
+    "decode_tokens_per_second": 68.25468369616128,
+    "prefill_seconds": 0.2671218329924159,
+    "decode_seconds": 0.131859082961455,
+    "mlx_peak_allocated_bytes": 1702777048,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请将音量设为0。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 71140,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 3,
+    "wall_seconds": 0.42666612501489,
+    "cpu_seconds": 0.16960703999999982,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 3.975170046463867,
+    "peak_rss_bytes": 634519552,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3086188544,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

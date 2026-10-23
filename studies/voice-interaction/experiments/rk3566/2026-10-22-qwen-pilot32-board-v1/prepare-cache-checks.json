@@ -1,0 +1,92 @@
+{
+  "schema": "edge-model-prepare/checks-v1",
+  "request_sha256": "9fe14798e3b191f76b4589b209f0f5524000a43c11d9826e08437e2e20875301",
+  "evidence": [
+    {
+      "id": "q8cache-assets",
+      "kind": "assets",
+      "location": "runs/cache-q8-true-v1/assets-manifest.json",
+      "sha256": "dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53",
+      "description": "实际q8_0 KV + cache_prompt=true 九目录开发对照 assets"
+    },
+    {
+      "id": "q8cache-runtime",
+      "kind": "runtime",
+      "location": "runs/cache-q8-true-v1/runtime.json",
+      "sha256": "0891e3298d928c006e9f38f73c8a13b09de09156d2ca8368800a6fd9debf2547",
+      "description": "实际q8_0 KV + cache_prompt=true 九目录开发对照 runtime"
+    },
+    {
+      "id": "q8cache-load",
+      "kind": "load",
+      "location": "runs/cache-q8-true-v1/server-load.json",
+      "sha256": "0b1ecc602516a1b45d1cc0812c578a99c71749a875649384fe9e0d949c9b4f64",
+      "description": "实际q8_0 KV + cache_prompt=true 九目录开发对照 load"
+    },
+    {
+      "id": "q8cache-smoke",
+      "kind": "smoke",
+      "location": "runs/cache-q8-true-v1/benchmark/cases/repeat_1.json",
+      "sha256": "adeb6c8099dd4cb98876078e7b02f360baf60735792fa51a0a225d733257e424",
+      "description": "实际q8_0 KV + cache_prompt=true 九目录开发对照 smoke"
+    },
+    {
+      "id": "q8cache-benchmark",
+      "kind": "benchmark_config",
+      "location": "runs/cache-q8-true-v1/launcher-request.json",
+      "sha256": "060cfdd3e5c2ccf1538d83b16115e686021d433e342c7ac94af8bbc487c48496",
+      "description": "实际q8_0 KV + cache_prompt=true 九目录开发对照 benchmark"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "cache-q8-true-v1",
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "同已准备试点GGUF与e379原生CPU运行库，独立进程运行新冻结缓存组"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "实际加载/推理与原生计数已保存；仅开发准备范围",
+          "evidence": [
+            "q8cache-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "实际加载/推理与原生计数已保存；仅开发准备范围",
+          "evidence": [
+            "q8cache-runtime"
+          ]
+        },
+        "load": {
+          "status": "PASS",
+          "reason": "实际加载/推理与原生计数已保存；仅开发准备范围",
+          "evidence": [
+            "q8cache-load"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "实际加载/推理与原生计数已保存；仅开发准备范围",
+          "evidence": [
+            "q8cache-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "实际加载/推理与原生计数已保存；仅开发准备范围",
+          "evidence": [
+            "q8cache-benchmark"
+          ]
+        }
+      },
+      "benchmark_configs": [
+        "q8cache-benchmark"
+      ],
+      "next_action": "新selected制品独立冒烟后冻结q8缓存配置，完整执行132条final；不以重复例代替完整测试。"
+    }
+  ]
+}

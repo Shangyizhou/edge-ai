@@ -1,0 +1,42 @@
+{
+  "source_revision": "e3797b184d428c7a019362612b76971f60af6670",
+  "existing_runtime": "22cd28d2d63ba1165f3fbceba205e02ed94f204d",
+  "decision": "Reuse tested first; exact tool schema failed HTTP400. Build same pinned source as Mac in isolated directory. No compatible publisher binary was verified for board glibc2.31; pinned upstream arm64 release workflow uses Ubuntu24.04. This does not claim every official binary is incompatible.",
+  "upstream_workflow": "https://github.com/ggml-org/llama.cpp/blob/e3797b184d428c7a019362612b76971f60af6670/.github/workflows/release.yml",
+  "configure_1": [
+    "cmake",
+    "-S",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/llama-e379",
+    "-B",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/build-e379",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DGGML_NATIVE=ON",
+    "-DGGML_CPU_REPACK=OFF",
+    "-DGGML_VULKAN=OFF",
+    "-DGGML_CUDA=OFF",
+    "-DGGML_OPENMP=ON",
+    "-DLLAMA_CURL=OFF",
+    "-DLLAMA_BUILD_TESTS=OFF",
+    "-DLLAMA_BUILD_EXAMPLES=OFF"
+  ],
+  "configure_2": [
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/venv/bin/cmake",
+    "-S",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/llama-e379",
+    "-B",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/build-e379",
+    "-DLLAMA_BUILD_UI=OFF",
+    "-DLLAMA_USE_PREBUILT_UI=OFF",
+    "-DLLAMA_BUILD_APP=OFF",
+    "-DLLAMA_BUILD_COMMIT=e3797b184d428c7a019362612b76971f60af6670"
+  ],
+  "build": [
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/venv/bin/cmake",
+    "--build",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/build-e379",
+    "--target",
+    "llama-server",
+    "-j3"
+  ],
+  "repair": "System CMake3.16.3 passed top-level configure, nested UI asset script required3.18. Installed CMake4.4.4 in isolated Python venv; preserved first build log. Earlier j2 objects were reused or recompiled according to CMake."
+}

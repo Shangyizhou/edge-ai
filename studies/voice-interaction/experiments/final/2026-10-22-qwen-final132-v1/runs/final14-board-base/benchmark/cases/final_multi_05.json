@@ -1,0 +1,103 @@
+{
+  "id": "final_multi_05",
+  "user": "先关闭雷达融合，随后重新开启融合，最后查询当前跟随状态。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "disable_lidar",
+        "arguments": {}
+      },
+      {
+        "name": "enable_lidar",
+        "arguments": {}
+      },
+      {
+        "name": "following_status",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "先关闭雷达融合，随后重新开启融合，最后查询当前跟随状态。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "1. 使用 `disable_lidar` 关闭融合。\n2. 使用 `enable_lidar` 重新开启融合。\n3. 使用 `following_status` 查询当前跟随状态。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 19.97575261699967,
+    "ttft_seconds": 6.0731548509938875,
+    "prompt_tokens": 923,
+    "evaluated_prefill_tokens": 24,
+    "native_usage": {
+      "completion_tokens": 38,
+      "prompt_tokens": 923,
+      "total_tokens": 961,
+      "prompt_tokens_details": {
+        "cached_tokens": 899
+      }
+    },
+    "native_timings": {
+      "cache_n": 899,
+      "prompt_n": 24,
+      "prompt_ms": 6043.464,
+      "prompt_per_token_ms": 251.811,
+      "prompt_per_second": 3.97123239254838,
+      "predicted_n": 38,
+      "predicted_ms": 13902.108,
+      "predicted_per_token_ms": 375.73264864864865,
+      "predicted_per_second": 2.6614668796991077
+    },
+    "cache_prompt": true,
+    "output_tokens": 38,
+    "prefill_seconds": 6.043464,
+    "decode_seconds": 13.902108,
+    "prefill_tokens_per_second": 3.97123239254838,
+    "decode_tokens_per_second": 2.6614668796991077,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "1. 使用 `disable_lidar` 关闭融合。\n2. 使用 `enable_lidar` 重新开启融合。\n3. 使用 `following_status` 查询当前跟随状态。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 76,
+    "wall_seconds": 20.03884755099716,
+    "cpu_seconds": 39.840000000000146,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 49.70345712073853,
+    "peak_rss_bytes": 595087360,
+    "peak_pss_bytes": 593682432,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2873114624,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

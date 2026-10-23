@@ -1,0 +1,87 @@
+{
+  "id": "enable_lidar",
+  "user": "开启雷达融合。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "enable_lidar",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "开启雷达融合。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"enable_lidar\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.2425837080227211,
+    "wall_seconds": 0.6226092909928411,
+    "prompt_tokens": 879,
+    "output_tokens": 17,
+    "prefill_tokens_per_second": 3652.5569339806552,
+    "decode_tokens_per_second": 46.015487288911125,
+    "prefill_seconds": 0.2406533329631202,
+    "decode_seconds": 0.3694408339797519,
+    "mlx_peak_allocated_bytes": 1527402656,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "enable_lidar",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "enable_lidar",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 1.2493587089702487,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 22640,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 7,
+    "wall_seconds": 1.2680055829696357,
+    "cpu_seconds": 0.4791320319999999,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 3.7786271482960294,
+    "peak_rss_bytes": 451837952,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2465579008,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; RSS and accelerator allocations may overlap"
+  }
+}

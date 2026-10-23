@@ -1,0 +1,101 @@
+{
+  "id": "valid_028",
+  "user": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 23.5
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "a\"b"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 23.5}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"a\", \"title\": \"b\"}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.16366695798933506,
+    "wall_seconds": 0.9332736249780282,
+    "prompt_tokens": 896,
+    "output_tokens": 50,
+    "prefill_tokens_per_second": 5515.381974251351,
+    "decode_tokens_per_second": 65.3449880479345,
+    "prefill_seconds": 0.16245475003961474,
+    "decode_seconds": 0.7651696249959059,
+    "mlx_peak_allocated_bytes": 1603563256,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": false,
+    "registry_valid": false,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 23.5
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "a",
+            "title": "b"
+          }
+        }
+      ]
+    },
+    "schema_errors": [
+      "Additional properties are not allowed ('title' was unexpected)"
+    ],
+    "registry_result": {
+      "passed": false,
+      "reason": "第2项 play_music title：Extra inputs are not permitted；本批全部未执行"
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 55025,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 8,
+    "wall_seconds": 1.377941750048194,
+    "cpu_seconds": 1.234091320000001,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 8.9560485409259,
+    "peak_rss_bytes": 293355520,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2896478208,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

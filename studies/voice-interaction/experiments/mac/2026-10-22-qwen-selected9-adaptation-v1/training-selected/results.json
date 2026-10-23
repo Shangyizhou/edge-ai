@@ -1,0 +1,569 @@
+{
+  "schema": "edge-model-finetune/result-v1",
+  "run_id": "qwen3-selected9-train768-v3",
+  "status": "completed",
+  "source": {
+    "kind": "device_measurement"
+  },
+  "base_artifact": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "BF16",
+    "artifact_format": "HF safetensors",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "runtime default unquantized",
+    "lineage": "official untrained base"
+  },
+  "request_sha256": "e5f21e8604d0221d76fa48dff816360c7876100047fe968ea10343171f6ccb67",
+  "dataset": {
+    "train_samples": 300,
+    "valid_samples": 60,
+    "test_loaded": false,
+    "train_sha256": "81d30c593d81da68d829951e5b406c8546265c87bf3efecb36bd23e7a89b4356",
+    "valid_sha256": "7d5039a3c3f2b36ba1c17cb30a875cdb6c261481d840fffe625863d6370b5189"
+  },
+  "runtime": {
+    "mlx": "0.32.4",
+    "mlx-lm": "0.32.2",
+    "transformers": "5.20.2"
+  },
+  "config": {
+    "model": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "train": true,
+    "fine_tune_type": "lora",
+    "optimizer": "adam",
+    "optimizer_config": {
+      "adam": {},
+      "adamw": {},
+      "muon": {},
+      "sgd": {},
+      "adafactor": {}
+    },
+    "data": "mlx-community/WikiSQL",
+    "seed": 42,
+    "num_layers": 8,
+    "batch_size": 1,
+    "iters": 768,
+    "val_batches": 60,
+    "learning_rate": 0.0001,
+    "steps_per_report": 32,
+    "steps_per_eval": 256,
+    "resume_adapter_file": null,
+    "adapter_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v3/adapter",
+    "save_every": 256,
+    "test": false,
+    "test_batches": 500,
+    "max_seq_length": 2048,
+    "config": null,
+    "grad_checkpoint": true,
+    "grad_accumulation_steps": 8,
+    "clear_cache_threshold": 0,
+    "lr_schedule": null,
+    "lora_parameters": {
+      "rank": 8,
+      "scale": 16.0,
+      "dropout": 0.0,
+      "keys": [
+        "self_attn.q_proj",
+        "self_attn.v_proj"
+      ]
+    },
+    "mask_prompt": true,
+    "report_to": null,
+    "project_name": null,
+    "trust_remote_code": false
+  },
+  "metrics": [
+    {
+      "kind": "validation",
+      "elapsed_seconds": 24.206305957981385,
+      "upstream": {
+        "iteration": 0,
+        "val_loss": 2.628662347793579,
+        "val_time": 22.02464079199126
+      },
+      "microstep": 0
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 47.186787499987986,
+      "upstream": {
+        "iteration": 32,
+        "train_loss": 1.78523588180542,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.3931468654221186,
+        "tokens_per_second": 42.79573027218571,
+        "trained_tokens": 983,
+        "peak_memory": 2.79568206
+      },
+      "microstep": 32
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 70.188234250003,
+      "upstream": {
+        "iteration": 64,
+        "train_loss": 0.5832019448280334,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.391912666496348,
+        "tokens_per_second": 38.45158741196161,
+        "trained_tokens": 1867,
+        "peak_memory": 2.79568206
+      },
+      "microstep": 64
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 92.34448591596447,
+      "upstream": {
+        "iteration": 96,
+        "train_loss": 0.3700619041919708,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4448739771360373,
+        "tokens_per_second": 37.43126647018047,
+        "trained_tokens": 2696,
+        "peak_memory": 2.79568206
+      },
+      "microstep": 96
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 114.48611424997216,
+      "upstream": {
+        "iteration": 128,
+        "train_loss": 0.21652743220329285,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4459545429775076,
+        "tokens_per_second": 45.140893388579066,
+        "trained_tokens": 3695,
+        "peak_memory": 2.79568212
+      },
+      "microstep": 128
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 136.48347241600277,
+      "upstream": {
+        "iteration": 160,
+        "train_loss": 0.15490996837615967,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4559942239187496,
+        "tokens_per_second": 40.26734025525292,
+        "trained_tokens": 4580,
+        "peak_memory": 2.79568212
+      },
+      "microstep": 160
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 158.32983320800122,
+      "upstream": {
+        "iteration": 192,
+        "train_loss": 0.2454107403755188,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.465544283792989,
+        "tokens_per_second": 45.29447802097707,
+        "trained_tokens": 5569,
+        "peak_memory": 2.79568212
+      },
+      "microstep": 192
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 180.20393358299043,
+      "upstream": {
+        "iteration": 224,
+        "train_loss": 0.13210782408714294,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.463550810256816,
+        "tokens_per_second": 42.94606908847344,
+        "trained_tokens": 6508,
+        "peak_memory": 2.79568212
+      },
+      "microstep": 224
+    },
+    {
+      "kind": "validation",
+      "elapsed_seconds": 223.87908033299027,
+      "upstream": {
+        "iteration": 255,
+        "val_loss": 0.7655975818634033,
+        "val_time": 21.97964358399622
+      },
+      "microstep": 256
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 224.56679812498624,
+      "upstream": {
+        "iteration": 256,
+        "train_loss": 0.033207230269908905,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4305763801019284,
+        "tokens_per_second": 45.77844416326171,
+        "trained_tokens": 7532,
+        "peak_memory": 2.79568212
+      },
+      "microstep": 256
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 246.80177179095335,
+      "upstream": {
+        "iteration": 288,
+        "train_loss": 0.07990762591362,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4407142134870827,
+        "tokens_per_second": 41.87075682946834,
+        "trained_tokens": 8462,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 288
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 267.9017496659653,
+      "upstream": {
+        "iteration": 320,
+        "train_loss": 0.03417501226067543,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.5172639149901166,
+        "tokens_per_second": 39.44886178974303,
+        "trained_tokens": 9294,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 320
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 289.0011422910029,
+      "upstream": {
+        "iteration": 352,
+        "train_loss": 0.018774550408124924,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.51710731674515,
+        "tokens_per_second": 39.776657460911906,
+        "trained_tokens": 10133,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 352
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 310.53568362497026,
+      "upstream": {
+        "iteration": 384,
+        "train_loss": 0.0034962408244609833,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4868085205841652,
+        "tokens_per_second": 45.3941226440853,
+        "trained_tokens": 11110,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 384
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 331.3954341249773,
+      "upstream": {
+        "iteration": 416,
+        "train_loss": 0.005878848489373922,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.5348308824139478,
+        "tokens_per_second": 41.29654342995028,
+        "trained_tokens": 11971,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 416
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 352.9501424159971,
+      "upstream": {
+        "iteration": 448,
+        "train_loss": 0.002877863822504878,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4854153767626344,
+        "tokens_per_second": 41.96298439354442,
+        "trained_tokens": 12875,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 448
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 374.70732479100116,
+      "upstream": {
+        "iteration": 480,
+        "train_loss": 0.003473334014415741,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.471705239482146,
+        "tokens_per_second": 48.33631895924173,
+        "trained_tokens": 13926,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 480
+    },
+    {
+      "kind": "validation",
+      "elapsed_seconds": 418.717485125002,
+      "upstream": {
+        "iteration": 511,
+        "val_loss": 0.8596441149711609,
+        "val_time": 22.612521249975543
+      },
+      "microstep": 512
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 419.4131102079991,
+      "upstream": {
+        "iteration": 512,
+        "train_loss": 0.0034468916710466146,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4494204413512954,
+        "tokens_per_second": 40.402594802667366,
+        "trained_tokens": 14818,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 512
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 442.088479582977,
+      "upstream": {
+        "iteration": 544,
+        "train_loss": 0.0015554724959656596,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4122711945011117,
+        "tokens_per_second": 38.35198962567082,
+        "trained_tokens": 15687,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 544
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 464.80481237499043,
+      "upstream": {
+        "iteration": 576,
+        "train_loss": 0.04211869463324547,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4094367128376117,
+        "tokens_per_second": 50.475452278496974,
+        "trained_tokens": 16833,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 576
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 487.37081558298087,
+      "upstream": {
+        "iteration": 608,
+        "train_loss": 0.004527643322944641,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.418903493350624,
+        "tokens_per_second": 41.94633452217782,
+        "trained_tokens": 17779,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 608
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 510.0435416249675,
+      "upstream": {
+        "iteration": 640,
+        "train_loss": 0.0010946177644655108,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.412469632481786,
+        "tokens_per_second": 39.769848089565286,
+        "trained_tokens": 18680,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 640
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 532.4399121659808,
+      "upstream": {
+        "iteration": 672,
+        "train_loss": 0.0024219227489084005,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4294153230175366,
+        "tokens_per_second": 37.25413685614455,
+        "trained_tokens": 19514,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 672
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 554.838802040962,
+      "upstream": {
+        "iteration": 704,
+        "train_loss": 0.04026684910058975,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.429256666081636,
+        "tokens_per_second": 37.9199659219784,
+        "trained_tokens": 20363,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 704
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 577.5308458329528,
+      "upstream": {
+        "iteration": 736,
+        "train_loss": 0.004089991562068462,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4108731586639118,
+        "tokens_per_second": 47.043801884199816,
+        "trained_tokens": 21430,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 736
+    },
+    {
+      "kind": "validation",
+      "elapsed_seconds": 620.9056697079795,
+      "upstream": {
+        "iteration": 767,
+        "val_loss": 0.8024994134902954,
+        "val_time": 21.96036358299898
+      },
+      "microstep": 768
+    },
+    {
+      "kind": "train",
+      "elapsed_seconds": 621.5517858329695,
+      "upstream": {
+        "iteration": 768,
+        "train_loss": 0.0009535279823467135,
+        "learning_rate": 9.999999747378752e-05,
+        "iterations_per_second": 1.4516793365323422,
+        "tokens_per_second": 42.280160676504465,
+        "trained_tokens": 22362,
+        "peak_memory": 2.796992886
+      },
+      "microstep": 768
+    }
+  ],
+  "measurement_sources": [
+    {
+      "path": "collector-source/training.py",
+      "sha256": "645378bc7f93c42f3ef3ed36e0cc84d0ef6f754148cacacb2f72d398d98683f2"
+    },
+    {
+      "path": "collector-source/measure.py",
+      "sha256": "ccc6cba53be4a4857e6ad321c30fd34cf613c2e8544b909e6cd7cb17a2b69b10"
+    },
+    {
+      "path": "collector-source/benchmark.py",
+      "sha256": "d008dd7238bc1659a7096e9a5643e7c2b197825e228c85a171cb638a1c47aadb"
+    },
+    {
+      "path": "collector-source/lineage.py",
+      "sha256": "9b7f3ef3eb53753abdcb3aaa7bf7cb67d8092615786e81fe0d0a2e199c05c450"
+    }
+  ],
+  "measurement": "whole run resources include model load, preflight, training and validation; native training tokens/s counts supervised tokens and excludes validation; MLX GB are decimal, not RSS",
+  "load_seconds": 1.2501608330057934,
+  "preflight": {
+    "maximum_tokens": 950,
+    "mask_prefix_matches": true
+  },
+  "trainable_parameters": 327680,
+  "training_wall_seconds": 619.5002484159777,
+  "mlx_peak_allocated_bytes": 2796992886,
+  "microsteps": 768,
+  "optimizer_updates": 96,
+  "adapter": {
+    "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v3/adapter",
+    "total_bytes": 5257821,
+    "files": [
+      {
+        "name": "0000256_adapters.safetensors",
+        "bytes": 1314143,
+        "sha256": "2ae9d73bb6ff9618dbc10bf86b973fe4b6961cdcf8240e5130451a1b46e8189c"
+      },
+      {
+        "name": "0000512_adapters.safetensors",
+        "bytes": 1314143,
+        "sha256": "5de57dc6b6737290b976a5b52490075a4ac5a596de126a533c471fc8f51be8b9"
+      },
+      {
+        "name": "0000768_adapters.safetensors",
+        "bytes": 1314143,
+        "sha256": "3f9a8e9d7d823781497bcc24a468e2618fb39aed65735a27974b493cbf9bfbfc"
+      },
+      {
+        "name": "adapter_config.json",
+        "bytes": 1249,
+        "sha256": "b2c2e1fbec9998821bce6897e211f79bb3c7a7a9d757eaedea6addca0f79ed03"
+      },
+      {
+        "name": "adapters.safetensors",
+        "bytes": 1314143,
+        "sha256": "3f9a8e9d7d823781497bcc24a468e2618fb39aed65735a27974b493cbf9bfbfc"
+      }
+    ]
+  },
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 63818,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 2869,
+    "wall_seconds": 621.5893354589934,
+    "cpu_seconds": 135.12273251200003,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 2.1738264285410045,
+    "peak_rss_bytes": 579584000,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 1566801920,
+    "host_swap_delta_bytes": 551878656,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  },
+  "wall_seconds": 621.6042312500067,
+  "evidence": [
+    {
+      "path": "metrics.jsonl",
+      "sha256": "a2a373833eb1df24e9191f0535deb10c8ac767478904e6e73def55092171604b"
+    },
+    {
+      "path": "preflight.json",
+      "sha256": "bb985c2cf84b9a21059017591b26d04a79f3b97541c6e6b23acd90d38d0352c0"
+    },
+    {
+      "path": "request.json",
+      "sha256": "e5f21e8604d0221d76fa48dff816360c7876100047fe968ea10343171f6ccb67"
+    },
+    {
+      "path": "resource-samples.json",
+      "sha256": "08c438f5d751593664162dba55d1cc9b4fac0aa37bd1b96ac5afab6bdeddd0a6"
+    },
+    {
+      "path": "train-config.json",
+      "sha256": "6b45708f93723e17dfbb076e9adfbd98ae1dd172a0136877ae9e97dd5bb72e25"
+    },
+    {
+      "path": "train.jsonl",
+      "sha256": "81d30c593d81da68d829951e5b406c8546265c87bf3efecb36bd23e7a89b4356"
+    },
+    {
+      "path": "training.log",
+      "sha256": "3ea40d79b0205d32e6b829d967191a2a7eb15703a2f18b8c3de6595a4d04691b"
+    },
+    {
+      "path": "valid.jsonl",
+      "sha256": "7d5039a3c3f2b36ba1c17cb30a875cdb6c261481d840fffe625863d6370b5189"
+    }
+  ]
+}

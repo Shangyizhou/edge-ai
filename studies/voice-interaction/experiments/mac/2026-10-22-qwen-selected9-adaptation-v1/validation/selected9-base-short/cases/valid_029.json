@@ -1,0 +1,113 @@
+{
+  "id": "valid_029",
+  "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 99
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "海\\浪"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海\\\\浪\"}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.171266499964986,
+    "wall_seconds": 0.7989102500141598,
+    "prompt_tokens": 895,
+    "output_tokens": 44,
+    "prefill_tokens_per_second": 5285.0923489829465,
+    "decode_tokens_per_second": 70.903357115679,
+    "prefill_seconds": 0.16934424999635667,
+    "decode_seconds": 0.6205629999749362,
+    "mlx_peak_allocated_bytes": 1592742048,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 99
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "海\\浪"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 99
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "海\\浪"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 1.221311124972999,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 53827,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 7,
+    "wall_seconds": 1.2374446670291945,
+    "cpu_seconds": 1.1443523519999985,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 9.247705230709927,
+    "peak_rss_bytes": 834306048,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3123003392,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

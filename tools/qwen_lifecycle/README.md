@@ -1,0 +1,144 @@
+# Qwen lifecycle experiment adapter
+
+The reusable Skills define handoffs; this project owns Qwen3/MLX-LM and
+llama.cpp execution, native intake, resource sampling and the measured view.
+The public seam ends at pure application Registry validation, never execution.
+
+Use the isolated model runtime Python with `psutil`, `jsonschema`, and MLX-LM
+for the Metal adapter. The HTTP adapter uses a prepared llama-server and must
+set `runner.monitor_pid` to the actual local model server PID so CPU/RAM are
+not incorrectly measured on the client alone.
+
+```sh
+python -m tools.qwen_lifecycle benchmark REQUEST.json NEW_OUTPUT_DIRECTORY
+python -m tools.qwen_lifecycle report RESULTS.json --output report.html
+python -m unittest tools.qwen_lifecycle.test_lifecycle -v
+```
+
+Low-rank training and artifact transformations use separate explicit commands:
+
+```sh
+python -m tools.qwen_lifecycle finetune TRAIN_REQUEST NEW_RUN
+python -m tools.qwen_lifecycle export EXPORT_REQUEST NEW_RUN
+python -m tools.qwen_lifecycle stage-report TRAIN_RESULTS EXPORT_RESULTS --output stages.html --loss-plot loss.svg
+```
+
+Finetune request/result schemas are `edge-model-finetune/request-v1` and
+`edge-model-finetune/result-v1`. A request identifies `base_artifact`,
+`dataset.train_ref` / `dataset.valid_ref`, and `train_config`. JSONL examples
+carry `id`, `source_group`, tools and messages ending in their assistant target.
+The preflight validates targets, rejects train/valid source or exact-prompt
+leakage and over-length sequences, and proves the nonthinking inference-prefix
+loss mask before loading the optimizer. Both NumPy shuffle and MLX are seeded;
+microsteps and optimizer-update counts are recorded separately. The final
+independent test set is not an input to training.
+
+Export request/result schemas are `edge-model-export/request-v1` and
+`edge-model-export/result-v1`. Explicit operations reference prior artifact IDs,
+argv and new output IDs/locations. Costs are measured around the transformation
+process, separately from manifest hashing. The chain stops on its first failed
+operation and the CLI returns failure while retaining logs/results. Weights
+remain external to the evidence run. Each output still needs preparation
+loading/smoke and separate capability evaluation.
+
+For Qwen3, use ordinary MLX fuse, then the full pinned llama.cpp converter and
+quantizer. The direct MLX GGUF exporter rejects Qwen3. Keep converter and MLX
+dependencies isolated. `convert_hf` stages immutable merged tensors with
+canonical base tokenizer assets after proving vocabulary and native
+nonthinking prompt equality; this handles the observed TF5 tokenizer-save /
+TF4 converter incompatibility without rewriting either source artifact.
+
+Training and transformation commands freeze collector source before execution.
+`stage-report` only reads saved data; its optional SVG loss plot is generated
+by `training_curve` using matplotlib in a separate plotting environment. The
+training table retains raw callback payloads; the normalized validation
+microstep accounts for the upstream zero-based validation counter.
+
+The request schema is `edge-model-benchmark/request-v1`; inspect the frozen
+Mac baseline request and suite for a complete working example. It identifies
+candidate/model/runtime/backend/precision, generation controls, source-grouped
+suite, and the optional exact `registry_validator` argv. The validator reads
+`{"calls":[{"call_id":"...","name":"...","arguments":{}}]}` from stdin and
+returns `{"passed":true|false,...}` without invoking handlers.
+
+Output is `edge-model-benchmark/result-v1`, a frozen expanded request/suite,
+asset hashes, per-case results/events/resource samples, and offline HTML.
+A new directory is required. Failures/truncation stay in the denominator;
+fixtures are explicitly synthetic and cannot satisfy real-model handoff.
+
+Generation throughput retains native runtime counter boundaries. MLX's prompt
+time includes the first sampled token and generation count can include EOS.
+Valid-call latency spans template, generation, parsing and pure validation.
+Loading is separate. Sampled CPU covers the declared process tree divided by
+logical host capacity. Mac RSS and MLX allocated memory are distinct,
+potentially overlapping quantities; Linux PSS is separate. No available field
+is invented for another platform.
+
+`report` is read-only and imports no MLX runtime. A combined HTML embeds result
+JSON; the benchmark CLI's HTML also carries a zip of raw JSON evidence.
+It follows the approved layout without modifying historical reports.
+
+For isolated Linux CPU preparation and benchmarking, run
+`python -m tools.qwen_lifecycle.board_run REQUEST NEW_OUTPUT` on the board.
+The request adds `server.binary`, `server.port` and explicit `server.argv`
+(threads, batch/microbatch, context, KV and CPU backend flags). The launcher
+binds loopback, records binary/ldd/source/loading evidence, checks every complete
+rendered prompt plus output budget, monitors its own model server, and stops
+only that owned process. Existing servers and production environments are not
+modified. Python 3.8 works with isolated compatible psutil/jsonschema/Pydantic.
+
+HTTP prompt caching is opt-in via `generation.cache_prompt` (default false).
+`prompt_tokens` uses full native usage when emitted; `evaluated_prefill_tokens`
+retains `timings.prompt_n`, with raw usage/timings saved separately. Cached
+prefill rate uses evaluated tokens, never the full prompt length. Keep cache
+conditions in separate run groups. Linux raw samples include thermal-zone
+readings when available and system-wide swap-in/out counters; their deltas
+cannot be attributed solely to the model process.
+
+### Versioned server flags
+
+Server flags are versioned inputs: inspect the actual binary's `--help`
+before freezing `server.argv`. Observed Linux compatibility: `22cd28d`
+accepts `--mmap`; `e3797b1` removes that flag and requires
+`--load-mode mmap`. The launcher passes the frozen argv through unchanged,
+records startup failures, and never silently rewrites historical requests.
+Current verified RK3566 pilot argv is `-t 2 -tb 2 -c 2048 -np 1 -b 512
+-ub 128 -ngl 0 --jinja -ctk f16 -ctv f16 --no-repack --load-mode mmap
+--fit off -fa on`; the separate KV comparison changes both cache types to
+`q8_0`. These flags still require actual loading/inference on a new binary.
+
+### Intake metric layers
+
+`json_valid` describes strict JSON in identifiable native tool payloads,
+independent of native envelope fields, tool schemas, and finish metadata.
+Valid JSON arrays/non-object arguments or missing native fields may therefore
+be JSON-valid but `native_parse=false`; Schema/Registry remain null because
+no complete native call can be assessed. `response_complete` records whether
+the finish reason is `stop`/`tool_calls`. A length-finished response with an
+already complete JSON payload remains JSON-valid, but is never accepted as a
+complete native reply. An observed incomplete JSON fragment is JSON-invalid;
+missing/malformed markers alone are native failures, not JSON failures.
+
+No identifiable tool payload (including ordinary content JSON, an empty wire
+call list, or only a stray closing marker) has `json_valid=null`. All observed
+payloads must pass strict decoding: duplicate keys and non-finite numbers are
+rejected. Wire arguments supplied as JSON strings are decoded strictly;
+already transport-decoded wire envelopes are checked for JSON serialization
+and finite values (duplicate keys discarded upstream cannot be reconstructed).
+`native_parse` requires a complete response and valid native envelope;
+`schema_valid` concerns the parsed tool's declared parameter schema. These
+layers do not imply correct intent, handler execution, or product acceptance.
+
+Mac uses `python -m tools.qwen_lifecycle.mac_run REQUEST NEW_OUTPUT` with
+explicit `otool -L` identity probing; board uses `ldd`. Both thin entrypoints
+share `server_lifecycle.py` for guards, readiness, complete-context preflight,
+owned PID sampling, evidence rebasing and cleanup. The public module paths,
+requests and output layout remain the same. Historical source copies remain
+immutable evidence.
+
+Raw native intake decodes each strict JSON boundary before consuming its
+closing tool marker. Literal opening/closing markers inside JSON strings,
+Unicode and escapes are preserved, including repeated ordered calls.
+[Review validation](../../docs/validation/qwen-review-2026-10-22/README.md)
+records the read-only historical comparison. Desktop/mobile visual acceptance
+remains pending; static checks do not establish rendered acceptance.

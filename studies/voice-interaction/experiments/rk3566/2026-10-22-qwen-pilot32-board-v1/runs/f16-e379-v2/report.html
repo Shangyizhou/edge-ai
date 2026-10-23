@@ -1,0 +1,1096 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qwen 原生调用 · 模型生命周期实测</title>
+<style>
+:root{--ink:#18313b;--muted:#536873;--line:#dce5e7;--teal:#08776b;--paper:#fff;--bg:#f2f5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}main{max-width:1150px;margin:0 auto;padding:42px 30px 80px}body{padding-right:230px}.rail{position:fixed;right:0;top:0;height:100vh;width:230px;border-left:1px solid var(--line);padding:42px 22px;background:#fbfcfc;overflow-y:auto}.rail strong{display:block;margin-bottom:18px}.rail a{display:block;color:var(--muted);text-decoration:none;padding:11px 12px;border-radius:8px;margin:4px 0;font-size:14px}.rail a.active{background:#e2f1ed;color:#066457;font-weight:700}.rail small{display:block;margin-top:24px;color:var(--muted)}header{padding:0 0 18px}h1{font-size:clamp(29px,3.6vw,42px);line-height:1.3;margin:14px 0;letter-spacing:-.7px}h2{font-size:27px;line-height:1.4;margin:8px 0 16px}h3{font-size:20px;margin:24px 0 12px}h4{font-size:17px;margin:8px 0}p{margin:10px 0}.eyebrow,.badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--teal)}.badge{display:inline-block;padding:3px 10px;border:1px solid #bedbd3;border-radius:15px;letter-spacing:0}.muted,small{color:var(--muted)}section{background:var(--paper);padding:30px;border:1px solid var(--line);border-radius:16px;margin:20px 0;scroll-margin-top:24px}.deployment-table td:first-child{min-width:285px;white-space:pre-line;font-size:13px;line-height:1.85}.lead{font-size:22px;font-weight:650;line-height:1.6}.scroll{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf4f3;white-space:nowrap}td{min-width:92px}tr:last-child td{border:0}.sample{padding:20px;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:#fcfdfd}.sample-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.number{font-weight:700;color:var(--teal)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.output{padding:14px;background:#edf4f3;border-radius:8px;white-space:pre-wrap;font-size:17px;margin:8px 0}.fail{background:#fff1e6;border-left:3px solid #b6671f}.reference{padding:10px 0;font-size:14px;color:var(--muted)}audio{width:100%;max-width:540px;display:block;margin:12px 0}.finding{border-left:4px solid var(--teal);background:#e9f4ef;border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}.finding strong{font-size:18px}.finding p{margin:7px 0}.method{font-size:14px;color:var(--muted);background:#f5f7f8;padding:14px 18px;border-radius:10px}.stats{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin:12px 0}.stats span{padding:4px 9px;background:#f1f4f6;border-radius:6px}a{color:var(--teal);text-underline-offset:3px}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal)}pre{font-size:12px;background:#f4f6f7;padding:15px;white-space:pre-wrap;max-height:400px;overflow:auto}p,td,pre,.output{overflow-wrap:anywhere}.foot{font-size:13px;color:var(--muted)}.warning{color:#97541d;font-weight:600}.meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meter{padding:14px;border:1px solid var(--line);border-radius:10px}.track{height:9px;background:#e5ebed;border-radius:10px;overflow:hidden;margin:10px 0}.track b{display:block;height:100%;background:var(--teal);border-radius:10px}.meter small{font-size:12px}@media(max-width:1100px){body{padding-right:190px}.rail{width:190px;padding:30px 14px}main{padding:30px 20px}section{padding:24px}}@media(max-width:760px){body{padding-right:0}.rail{position:sticky;top:0;width:100%;height:auto;padding:8px 12px;border:0;border-bottom:1px solid var(--line);z-index:10;display:flex;gap:4px;overflow-x:auto}.rail a{display:inline-block;white-space:nowrap;padding:8px 12px;margin:0}.rail strong,.rail small{display:none}main{padding:20px 12px}section{padding:20px 15px;scroll-margin-top:76px}.pair,.meters{grid-template-columns:1fr}h2{font-size:24px}.sample{padding:16px}.lead{font-size:20px}}@media print{body{padding:0}.rail{display:none}section{break-inside:avoid}audio{display:none}}
+</style></head><body>
+<nav class="rail" aria-label="章节导航"><strong>本页导航</strong>
+<a href="#summary">结论与选择</a>
+<a href="#run-0">rk3566-pilot32-q4-f16-e379-v2</a>
+<a href="#resources">精度与资源对比</a>
+<a href="#evidence">口径与原始证据</a>
+<a href="#top">回到顶部</a></nav><main id="top">
+<header><span class="badge">原生工具 / 角色事实 / 独立模型实验</span>
+<h1>Qwen：从未微调基线到部署制品</h1>
+<p class="muted">同一结构化结果生成 · 实际输入输出保留 · 无硬件动作或完整交互验收</p></header>
+<section id="summary"><div class="eyebrow">先给结论</div>
+<h2>原生调用、角色设定和硬件资源分别判断</h2>
+<div class="scroll"><table class="deployment-table"><thead><tr>
+<th>候选部署方案</th><th>本轮能力观察</th>
+<th>CPU / 整机容量</th><th>采样峰值内存 / 实际内存</th>
+</tr></thead><tbody>
+<tr><td>Qwen/Qwen3-0.6B · 596049920
+精度：Q4_K_M
+框架：llama.cpp e3797b184d428c7a019362612b76971f60af6670
+后端：ARM CPU / Linux
+阶段：RK3566 / 试点32步 / f16 KV / 禁用缓存</td><td>工具 Schema 3/3；原生调用 3/3；角色固定规则 0/3</td><td>49.12%</td><td>PSS 699.22 MiB / 17.82%<br>MLX峰值分配 未测 MiB（不相加）</td></tr>
+</tbody></table></div><p class="foot">CPU为已声明进程树占整机逻辑核容量，内存为逐例窗口的采样峰值。CPU不包含Metal GPU利用率。Mac RSS 与 Linux PSS 不等价；资源窗口包含模板、推理、解析与纯校验。未将不同设备混成纯加速比较。</p></section>
+<section id="run-0"><div class="eyebrow">RK3566 / 试点32步 / f16 KV / 禁用缓存</div><h2>rk3566-pilot32-q4-f16-e379-v2</h2>
+<div class="method"><strong>怎样测：</strong>固定工具、system和输入；每例新建模型prompt cache；非思考模式。真实响应完整解析后，只通过JSON Schema及可配置Registry纯校验，不执行设备。<br>
+<strong>怎样读：</strong>prefill与decode tokens/s采用运行时计时，TTFT为生成入口至首非空输出，完整有效调用等待包含模板/推理/解析/校验；缺失字段为未测，失败/截断不是快速成功。角色采用预先固定文本规则，不是独立人工整体人设评审。</div>
+<h3>工具调用 · 实际输入与输出</h3>
+<article class="sample"><div class="sample-head"><h4>start_camera</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>开启摄像头。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: &quot;{}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: {}}]}</pre><div class="stats"><span>prompt 439 tokens</span><span>首内容 68.02s</span><span>完整有效调用 73.21s</span><span>prefill 6.77 tokens/s</span><span>decode 2.39 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;arguments&quot;: {}
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;parameters&quot;: {},
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>volume_set</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>把音量设置为30。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;volume_set&quot;, &quot;arguments&quot;: &quot;{\&quot;level\&quot;: 30}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;volume_set&quot;, &quot;arguments&quot;: {&quot;level&quot;: 30}}]}</pre><div class="stats"><span>prompt 444 tokens</span><span>首内容 69.50s</span><span>完整有效调用 75.74s</span><span>prefill 6.72 tokens/s</span><span>decode 2.43 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;volume_set&quot;,
+        &quot;arguments&quot;: {
+          &quot;level&quot;: 30
+        }
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;volume_set&quot;,
+        &quot;parameters&quot;: {
+          &quot;level&quot;: 30
+        },
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>play_music</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>播放夜曲。</p><small>实际输出</small><div class="output ">
+[{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;play_music&quot;, &quot;arguments&quot;: &quot;{\&quot;song_name\&quot;: \&quot;夜曲\&quot;}&quot;}}]</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;play_music&quot;, &quot;arguments&quot;: {&quot;song_name&quot;: &quot;夜曲&quot;}}]}</pre><div class="stats"><span>prompt 440 tokens</span><span>首内容 68.07s</span><span>完整有效调用 74.73s</span><span>prefill 6.78 tokens/s</span><span>decode 2.50 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;play_music&quot;,
+        &quot;arguments&quot;: {
+          &quot;song_name&quot;: &quot;夜曲&quot;
+        }
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;play_music&quot;,
+        &quot;parameters&quot;: {
+          &quot;song_name&quot;: &quot;夜曲&quot;
+        },
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<h3>角色 / 背景 / 自我介绍</h3>
+<article class="sample"><div class="sample-head"><h4>persona_name</h4><span class="badge">检查未通过 / 未完成</span></div><small>输入</small><p>你叫什么名字？用一句话介绍自己。</p><small>实际输出</small><div class="output fail">我叫小安，是AI机器人。</div><small>预期</small><pre>{&quot;kind&quot;: &quot;persona&quot;, &quot;contains_all&quot;: [&quot;小沫&quot;]}</pre><div class="stats"><span>prompt 446 tokens</span><span>首内容 66.50s</span><span>完整有效调用 未测s</span><span>prefill 6.71 tokens/s</span><span>decode 2.51 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: false,
+  &quot;persona_valid&quot;: false,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;我叫小安，是AI机器人。&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>persona_role</h4><span class="badge">检查未通过 / 未完成</span></div><small>输入</small><p>你是什么身份，主要做什么？</p><small>实际输出</small><div class="output fail">我是AI机器人，主要用来提供帮助和信息。</div><small>预期</small><pre>{&quot;kind&quot;: &quot;persona&quot;, &quot;contains_any&quot;: [&quot;科研&quot;, &quot;机器人助手&quot;]}</pre><div class="stats"><span>prompt 443 tokens</span><span>首内容 65.84s</span><span>完整有效调用 未测s</span><span>prefill 6.73 tokens/s</span><span>decode 2.51 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: false,
+  &quot;persona_valid&quot;: false,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;我是AI机器人，主要用来提供帮助和信息。&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<article class="sample"><div class="sample-head"><h4>persona_creator</h4><span class="badge">检查未通过 / 未完成</span></div><small>输入</small><p>这个机器人助手角色是谁创造的？</p><small>实际输出</small><div class="output fail">这个机器人助手角色是AI创造的。</div><small>预期</small><pre>{&quot;kind&quot;: &quot;persona&quot;, &quot;contains_any&quot;: [&quot;用户&quot;, &quot;你创造&quot;, &quot;您创造&quot;]}</pre><div class="stats"><span>prompt 444 tokens</span><span>首内容 66.16s</span><span>完整有效调用 未测s</span><span>prefill 6.71 tokens/s</span><span>decode 2.51 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: false,
+  &quot;persona_valid&quot;: false,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;这个机器人助手角色是AI创造的。&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<h3>普通聊天 · 无调用</h3>
+<article class="sample"><div class="sample-head"><h4>chat</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>你好。</p><small>实际输出</small><div class="output ">你好！</div><small>预期</small><pre>{&quot;kind&quot;: &quot;chat&quot;}</pre><div class="stats"><span>prompt 438 tokens</span><span>首内容 65.05s</span><span>完整有效调用 未测s</span><span>prefill 6.74 tokens/s</span><span>decode 2.50 tokens/s</span></div><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: null,
+  &quot;schema_valid&quot;: null,
+  &quot;registry_valid&quot;: null,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;你好！&quot;,
+    &quot;tool_calls&quot;: []
+  }
+}</pre></details></article>
+<aside class="finding"><strong>本阶段发现</strong><p>工具调用Schema通过 3/3，与期望函数和参数一致 3/3；角色规则通过 0/3。这些是当前固定样例的观察，不能外推完整业务或所有人设已学入。失败输出保留，作为下一阶段数据与协议诊断依据。</p></aside></section>
+<section id="resources"><h2>精度与资源对比</h2><p>只有模型、输入、设备、运行时、context/KV和解码可比时才解释精度差异。模型文件大小不等于运行内存。没有测量的精度不推算成绩。</p><div class="scroll"><table><thead><tr><th>候选 / 阶段</th><th>文件MiB</th><th>prefill tokens/s 中位数</th><th>decode tokens/s 中位数</th><th>TTFT中位数 s</th><th>CPU容量</th><th>采样峰值</th></tr></thead><tbody>
+<tr><td>rk3566-pilot32-q4-f16-e379-v2</td><td>378.33</td><td>6.73</td><td>2.50</td><td>66.50</td><td>49.12%</td><td>PSS 699.22MiB / MLX 未测MiB</td></tr>
+</tbody></table></div></section><section id="evidence"><h2>口径与原始证据</h2><p>统计覆盖本页全部样例，而非挑选成功项；单轮小样本不能宣称稳定尾延迟。MLX峰值分配与RSS可能重叠，不相加。未执行生产集成、ROS共跑或完整交互验收。</p>
+<p><a download="benchmark-results.json" href="data:application/json;base64,WwogIHsKICAgICJzY2hlbWEiOiAiZWRnZS1tb2RlbC1iZW5jaG1hcmsvcmVzdWx0LXYxIiwKICAgICJydW5faWQiOiAicmszNTY2LXBpbG90MzItcTQtZjE2LWUzNzktdjIiLAogICAgInNvdXJjZSI6IHsKICAgICAgImtpbmQiOiAiZGV2aWNlX21lYXN1cmVtZW50IiwKICAgICAgInJhd19ldmlkZW5jZSI6ICJiZW5jaG1hcmsvY2FzZXMvIGFuZCBiZW5jaG1hcmsvZXZlbnRzLyIKICAgIH0sCiAgICAiY2FuZGlkYXRlIjogewogICAgICAibW9kZWwiOiAiUXdlbi9Rd2VuMy0wLjZCIiwKICAgICAgIm1vZGVsX3BhdGgiOiAiL2hvbWUvb3JhbmdlcGkvLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi10aWNrZXQxMi9hcnRpZmFjdHMvcXdlbjMtcGlsb3QzMi1xNF9rX20uZ2d1ZiIsCiAgICAgICJyZXZpc2lvbiI6ICJjMTg5OWRlMjg5YTA0ZDEyMTAwZGIzNzBkODE0ODVjZGY3NWU0N2NhIiwKICAgICAgInBhcmFtZXRlcl9jb3VudCI6IDU5NjA0OTkyMCwKICAgICAgInBhcmFtZXRlcl9jb3VudF9zdG9yZWQiOiA3NTE2MzIzODQsCiAgICAgICJwcmVjaXNpb24iOiAiUTRfS19NIiwKICAgICAgImFydGlmYWN0X2Zvcm1hdCI6ICJHR1VGIiwKICAgICAgImJhY2tlbmQiOiAiQVJNIENQVSIsCiAgICAgICJjb250ZXh0X3Rva2VucyI6IDIwNDgsCiAgICAgICJrdl90eXBlIjogImYxNiIsCiAgICAgICJsaW5lYWdlIjogInNlZWRlZCBwaWxvdDMyIG1lcmdlZOKGkmNhbm9uaWNhbCB0b2tlbml6ZXLihpJGMTbihpJRNF9LX00iLAogICAgICAicnVudGltZV92ZXJzaW9uIjogImUzNzk3YjE4NGQ0MjhjN2EwMTkzNjI2MTJiNzY5NzFmNjBhZjY2NzAiLAogICAgICAiY29uc3RyYWludF9tb2RlIjogImxsYW1hLXNlcnZlciBuYXRpdmUgdG9vbCBncmFtbWFyOyBkaWZmZXJzIGZyb20gdW5jb25zdHJhaW5lZCBNTFgiLAogICAgICAiZGV2aWNlIjogIk9yYW5nZSBQaTNCIFJLMzU2NiAvIDR4Q29ydGV4LUE1NSAvIE1lbVRvdGFsNDAxNzAyMEtpQiIsCiAgICAgICJhY3R1YWxfcnVudGltZSI6IHsKICAgICAgICAibmFtZSI6ICJsbGFtYS5jcHAiLAogICAgICAgICJ2ZXJzaW9uIjogImUzNzk3YjE4NGQ0MjhjN2EwMTkzNjI2MTJiNzY5NzFmNjBhZjY2NzAiLAogICAgICAgICJiYWNrZW5kIjogIkFSTSBDUFUiLAogICAgICAgICJuZXR3b3JrIjogImRpcmVjdCIKICAgICAgfQogICAgfSwKICAgICJzdGFnZSI6ICJSSzM1NjYgLyDor5XngrkzMuatpSAvIGYxNiBLViAvIOemgeeUqOe8k+WtmCIsCiAgICAicmVxdWVzdF9zaGEyNTYiOiAiNzRkYWViMjVjNmY4ZjMzMjI1MjhiNWM3YjcwMDg1MGI4MjFiYjRkNDFhOGM2YjI4NjNjNjU2ODBmNmZmYjE2MiIsCiAgICAic3VpdGVfc2hhMjU2IjogIjA3NmJiNjYwNDU5NWE1MGVkNjQyNmNiNjA5MDRiYTc4N2M1MzJkM2QyZjY1NDkyNWU0ZDZkNmRmMzYxYzQyYWIiLAogICAgImFydGlmYWN0cyI6IHsKICAgICAgInJvb3QiOiAiL2hvbWUvb3JhbmdlcGkvLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi10aWNrZXQxMi9hcnRpZmFjdHMvcXdlbjMtcGlsb3QzMi1xNF9rX20uZ2d1ZiIsCiAgICAgICJ0b3RhbF9ieXRlcyI6IDM5NjcwNDcwNCwKICAgICAgImZpbGVzIjogWwogICAgICAgIHsKICAgICAgICAgICJuYW1lIjogInF3ZW4zLXBpbG90MzItcTRfa19tLmdndWYiLAogICAgICAgICAgImJ5dGVzIjogMzk2NzA0NzA0LAogICAgICAgICAgInNoYTI1NiI6ICI4YTFlNTU4NGE5ZjhlZTA0YjFlNTRhZmFkMjE3ZjJkYmI2ZjRlMzFhYjBhMWQ4ODMyZDhmYWFkZGE5MmU3YTliIgogICAgICAgIH0KICAgICAgXQogICAgfSwKICAgICJlbnZpcm9ubWVudCI6IHsKICAgICAgInN5c3RlbSI6ICJMaW51eCIsCiAgICAgICJtYWNoaW5lIjogImFhcmNoNjQiLAogICAgICAicGxhdGZvcm0iOiAiTGludXgtNS4xMC4xNjAtcm9ja2NoaXAtcmszNTZ4LWFhcmNoNjQtd2l0aC1nbGliYzIuMjkiLAogICAgICAicHl0aG9uIjogIjMuOC4xMCIsCiAgICAgICJsb2dpY2FsX2NwdXMiOiA0CiAgICB9LAogICAgImxvYWRpbmciOiB7CiAgICAgICJ3YWxsX3NlY29uZHMiOiAwLjE0MDkyODE0ODAwMDk2Njc2LAogICAgICAicmVzb3VyY2VzIjogewogICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgInNhbXBsZV9jb3VudCI6IDIsCiAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuMDcxNTA3MDYyMDA2Mjc2MSwKICAgICAgICAiY3B1X3NlY29uZHMiOiAwLAogICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDQsCiAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogMC4wLAogICAgICAgICJwZWFrX3Jzc19ieXRlcyI6IDY5MjI0MDM4NCwKICAgICAgICAicGVha19wc3NfYnl0ZXMiOiA2OTMwMjE2OTYsCiAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogNDExMzQyODQ4MCwKICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAyNzY4MjU3MDI0LAogICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICJob3N0X3N3YXBfaW5fZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICJob3N0X3N3YXBfb3V0X2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAgICJsaW1pdGF0aW9uIjogInNhbXBsZWQgcGVhaywgbm90IGtlcm5lbCBoaWdoLXdhdGVyIG1hcms7IGxhc3Qgb2JzZXJ2ZWQgQ1BVIG9mIHJldGlyZWQgY2hpbGRyZW4gaXMgcmV0YWluZWQsIHNvIHNob3J0IGNoaWxkIGxpZmV0aW1lcyBjYW4gcmVtYWluIHVuZGVyLXNhbXBsZWQ7IFJTUyBhbmQgYWNjZWxlcmF0b3IgYWxsb2NhdGlvbnMgbWF5IG92ZXJsYXAiCiAgICAgIH0KICAgIH0sCiAgICAibWVhc3VyZW1lbnQiOiB7CiAgICAgICJyZXNvdXJjZXMiOiAicGVyLWNhc2Ugc2FtcGxlZCBwcm9jZXNzIHRyZWUiLAogICAgICAiY2FjaGUiOiAibmV3IE1MWCBwcm9tcHQgY2FjaGUgcGVyIGNhc2UgLyBsbGFtYSBjYWNoZV9wcm9tcHQ9ZmFsc2UiLAogICAgICAidGltaW5nIjogInJlcXVlc3QgdG8gY29tcGxldGUgcmVzcG9uc2U7IHZhbGlkLWNhbGwgbGF0ZW5jeSBvbmx5IGlmIG5hdGl2ZStzY2hlbWEgcGFzcyIsCiAgICAgICJzYW1wbGluZ19pbnRlcnZhbF9zZWNvbmRzIjogMC4yLAogICAgICAicXVhbGl0eV9zY29wZSI6ICJmcm96ZW4gZGV0ZXJtaW5pc3RpYyBmaXh0dXJlIHJ1bGVzOyBubyBoYXJkd2FyZSBleGVjdXRpb24gb3IgcHJvZHVjdCBhY2NlcHRhbmNlIgogICAgfSwKICAgICJjYXNlcyI6IFsKICAgICAgewogICAgICAgICJpZCI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICJ1c2VyIjogIuW8gOWQr+aRhOWDj+WktOOAgiIsCiAgICAgICAgImV4cGVjdGVkIjogewogICAgICAgICAgImtpbmQiOiAidG9vbCIsCiAgICAgICAgICAiY2FsbHMiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAibmFtZSI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICAgICAgICJhcmd1bWVudHMiOiB7fQogICAgICAgICAgICB9CiAgICAgICAgICBdCiAgICAgICAgfSwKICAgICAgICAibWVzc2FnZXMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJyb2xlIjogInN5c3RlbSIsCiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOaYr+acuuWZqOS6uuWKqeaJi+OAgumcgOimgeaTjeS9nOaXtuS9v+eUqOaPkOS+m+eahOW3peWFt++8jOWQpuWImeato+W4uOWbnuWkjeOAgiIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJyb2xlIjogInVzZXIiLAogICAgICAgICAgICAiY29udGVudCI6ICLlvIDlkK/mkYTlg4/lpLTjgIIiCiAgICAgICAgICB9CiAgICAgICAgXSwKICAgICAgICAia2luZCI6ICJ0b29sIiwKICAgICAgICAic3RhdHVzIjogImNvbXBsZXRlZCIsCiAgICAgICAgImdlbmVyYXRpb24iOiB7CiAgICAgICAgICAicmF3IjogIiIsCiAgICAgICAgICAiZmluaXNoX3JlYXNvbiI6ICJ0b29sX2NhbGxzIiwKICAgICAgICAgICJ3aXJlX2NhbGxzIjogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgInR5cGUiOiAiZnVuY3Rpb24iLAogICAgICAgICAgICAgICJmdW5jdGlvbiI6IHsKICAgICAgICAgICAgICAgICJuYW1lIjogInN0YXJ0X2NhbWVyYSIsCiAgICAgICAgICAgICAgICAiYXJndW1lbnRzIjogInt9IgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgXSwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiA3MS4xMDEwMzU0MjE5OTA2NywKICAgICAgICAgICJ0dGZ0X3NlY29uZHMiOiA2OC4wMTYzMDAwNTA5OTI4NywKICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogNDM5LAogICAgICAgICAgImV2YWx1YXRlZF9wcmVmaWxsX3Rva2VucyI6IDQzOSwKICAgICAgICAgICJuYXRpdmVfdXNhZ2UiOiB7CiAgICAgICAgICAgICJjb21wbGV0aW9uX3Rva2VucyI6IDE2LAogICAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQzOSwKICAgICAgICAgICAgInRvdGFsX3Rva2VucyI6IDQ1NSwKICAgICAgICAgICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgICAgICAgICAiY2FjaGVkX3Rva2VucyI6IDAKICAgICAgICAgICAgfQogICAgICAgICAgfSwKICAgICAgICAgICJuYXRpdmVfdGltaW5ncyI6IHsKICAgICAgICAgICAgImNhY2hlX24iOiAwLAogICAgICAgICAgICAicHJvbXB0X24iOiA0MzksCiAgICAgICAgICAgICJwcm9tcHRfbXMiOiA2NDgwNS44ODMsCiAgICAgICAgICAgICJwcm9tcHRfcGVyX3Rva2VuX21zIjogMTQ3LjYyMTYwMTM2Njc0MjYsCiAgICAgICAgICAgICJwcm9tcHRfcGVyX3NlY29uZCI6IDYuNzc0MDc2MzU5NzAzMzMxLAogICAgICAgICAgICAicHJlZGljdGVkX24iOiAxNiwKICAgICAgICAgICAgInByZWRpY3RlZF9tcyI6IDYyNzQuNjQ5LAogICAgICAgICAgICAicHJlZGljdGVkX3Blcl90b2tlbl9tcyI6IDQxOC4zMDk5MzMzMzMzMzMzMywKICAgICAgICAgICAgInByZWRpY3RlZF9wZXJfc2Vjb25kIjogMi4zOTA1NzE5NjY2NTUwMjcKICAgICAgICAgIH0sCiAgICAgICAgICAiY2FjaGVfcHJvbXB0IjogZmFsc2UsCiAgICAgICAgICAib3V0cHV0X3Rva2VucyI6IDE2LAogICAgICAgICAgInByZWZpbGxfc2Vjb25kcyI6IDY0LjgwNTg4MzAwMDAwMDAxLAogICAgICAgICAgImRlY29kZV9zZWNvbmRzIjogNi4yNzQ2NDksCiAgICAgICAgICAicHJlZmlsbF90b2tlbnNfcGVyX3NlY29uZCI6IDYuNzc0MDc2MzU5NzAzMzMxLAogICAgICAgICAgImRlY29kZV90b2tlbnNfcGVyX3NlY29uZCI6IDIuMzkwNTcxOTY2NjU1MDI3LAogICAgICAgICAgIm1seF9wZWFrX2FsbG9jYXRlZF9ieXRlcyI6IG51bGwsCiAgICAgICAgICAidGltaW5nX3NvdXJjZSI6ICJsbGFtYS1zZXJ2ZXIgdGltaW5ncyB1c2UgZXZhbHVhdGVkIHByZWZpbGw7IGZ1bGwgcHJvbXB0IHVzZXMgbmF0aXZlIHVzYWdlOyByYXcgY291bnRlcnMgcmV0YWluZWQiCiAgICAgICAgfSwKICAgICAgICAiYXNzZXNzbWVudCI6IHsKICAgICAgICAgICJuYXRpdmVfcGFyc2UiOiB0cnVlLAogICAgICAgICAgImpzb25fdmFsaWQiOiB0cnVlLAogICAgICAgICAgInNjaGVtYV92YWxpZCI6IHRydWUsCiAgICAgICAgICAicmVnaXN0cnlfdmFsaWQiOiB0cnVlLAogICAgICAgICAgImV4cGVjdGVkX2JlaGF2aW9yIjogdHJ1ZSwKICAgICAgICAgICJwZXJzb25hX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJyZXZpZXdlciI6ICJkZXRlcm1pbmlzdGljIGZyb3plbiBmaXh0dXJlIHJ1bGVzIiwKICAgICAgICAgICJyZXBseSI6IHsKICAgICAgICAgICAgImNvbnRlbnQiOiAiIiwKICAgICAgICAgICAgInRvb2xfY2FsbHMiOiBbCiAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgImNhbGxfaWQiOiAibG9jYWxfY2FsbF8wIiwKICAgICAgICAgICAgICAgICJuYW1lIjogInN0YXJ0X2NhbWVyYSIsCiAgICAgICAgICAgICAgICAiYXJndW1lbnRzIjoge30KICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0KICAgICAgICAgIH0sCiAgICAgICAgICAic2NoZW1hX2Vycm9ycyI6IFtdLAogICAgICAgICAgInJlZ2lzdHJ5X3Jlc3VsdCI6IHsKICAgICAgICAgICAgInBhc3NlZCI6IHRydWUsCiAgICAgICAgICAgICJjb21tYW5kcyI6IFsKICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAibmFtZSI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICAgICAgICAgInBhcmFtZXRlcnMiOiB7fSwKICAgICAgICAgICAgICAgICJ0b29sX2NhbGxfaWQiOiAibG9jYWxfY2FsbF8wIgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInZhbGlkX2NhbGxfc2Vjb25kcyI6IDczLjIwNjY2NjU0MDAwNTI0LAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyNjcsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzMuMjc5NjAwNzEwMDExNDQsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAxNDAuODcsCiAgICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiA0LAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNDguMDU5MDc3MzY3NzQ2MzUsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA3MzMyMzMxNTIsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiA3MzMwODg3NjgsCiAgICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiA0MTEzNDI4NDgwLAogICAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMjcwNzMwODU0NCwKICAgICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImhvc3Rfc3dhcF9pbl9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAiaG9zdF9zd2FwX291dF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAidm9sdW1lX3NldCIsCiAgICAgICAgInVzZXIiOiAi5oqK6Z+z6YeP6K6+572u5Li6MzDjgIIiLAogICAgICAgICJleHBlY3RlZCI6IHsKICAgICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICAgImNhbGxzIjogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgIm5hbWUiOiAidm9sdW1lX3NldCIsCiAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHsKICAgICAgICAgICAgICAgICJsZXZlbCI6IDMwCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICBdCiAgICAgICAgfSwKICAgICAgICAibWVzc2FnZXMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJyb2xlIjogInN5c3RlbSIsCiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOaYr+acuuWZqOS6uuWKqeaJi+OAgumcgOimgeaTjeS9nOaXtuS9v+eUqOaPkOS+m+eahOW3peWFt++8jOWQpuWImeato+W4uOWbnuWkjeOAgiIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJyb2xlIjogInVzZXIiLAogICAgICAgICAgICAiY29udGVudCI6ICLmiorpn7Pph4/orr7nva7kuLozMOOAgiIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAiIiwKICAgICAgICAgICJmaW5pc2hfcmVhc29uIjogInRvb2xfY2FsbHMiLAogICAgICAgICAgIndpcmVfY2FsbHMiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAidHlwZSI6ICJmdW5jdGlvbiIsCiAgICAgICAgICAgICAgImZ1bmN0aW9uIjogewogICAgICAgICAgICAgICAgIm5hbWUiOiAidm9sdW1lX3NldCIsCiAgICAgICAgICAgICAgICAiYXJndW1lbnRzIjogIntcImxldmVsXCI6IDMwfSIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0sCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzQuMjc3NjMxNTY5MDEzNDcsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogNjkuNDk5MjQzNDA1MDA3MjksCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQ0NCwKICAgICAgICAgICJldmFsdWF0ZWRfcHJlZmlsbF90b2tlbnMiOiA0NDQsCiAgICAgICAgICAibmF0aXZlX3VzYWdlIjogewogICAgICAgICAgICAiY29tcGxldGlvbl90b2tlbnMiOiAyMSwKICAgICAgICAgICAgInByb21wdF90b2tlbnMiOiA0NDQsCiAgICAgICAgICAgICJ0b3RhbF90b2tlbnMiOiA0NjUsCiAgICAgICAgICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICAgICAgICAgImNhY2hlZF90b2tlbnMiOiAwCiAgICAgICAgICAgIH0KICAgICAgICAgIH0sCiAgICAgICAgICAibmF0aXZlX3RpbWluZ3MiOiB7CiAgICAgICAgICAgICJjYWNoZV9uIjogMCwKICAgICAgICAgICAgInByb21wdF9uIjogNDQ0LAogICAgICAgICAgICAicHJvbXB0X21zIjogNjYwMjcuOTIxLAogICAgICAgICAgICAicHJvbXB0X3Blcl90b2tlbl9tcyI6IDE0OC43MTE1MzM3ODM3ODM3OCwKICAgICAgICAgICAgInByb21wdF9wZXJfc2Vjb25kIjogNi43MjQ0Mjc5ODg1Nzc3NDEsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfbiI6IDIxLAogICAgICAgICAgICAicHJlZGljdGVkX21zIjogODIyOS41NjIsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfcGVyX3Rva2VuX21zIjogNDExLjQ3ODEsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfcGVyX3NlY29uZCI6IDIuNDMwMjYyOTk1NzcwNjEzNAogICAgICAgICAgfSwKICAgICAgICAgICJjYWNoZV9wcm9tcHQiOiBmYWxzZSwKICAgICAgICAgICJvdXRwdXRfdG9rZW5zIjogMjEsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogNjYuMDI3OTIxLAogICAgICAgICAgImRlY29kZV9zZWNvbmRzIjogOC4yMjk1NjIsCiAgICAgICAgICAicHJlZmlsbF90b2tlbnNfcGVyX3NlY29uZCI6IDYuNzI0NDI3OTg4NTc3NzQxLAogICAgICAgICAgImRlY29kZV90b2tlbnNfcGVyX3NlY29uZCI6IDIuNDMwMjYyOTk1NzcwNjEzNCwKICAgICAgICAgICJtbHhfcGVha19hbGxvY2F0ZWRfYnl0ZXMiOiBudWxsLAogICAgICAgICAgInRpbWluZ19zb3VyY2UiOiAibGxhbWEtc2VydmVyIHRpbWluZ3MgdXNlIGV2YWx1YXRlZCBwcmVmaWxsOyBmdWxsIHByb21wdCB1c2VzIG5hdGl2ZSB1c2FnZTsgcmF3IGNvdW50ZXJzIHJldGFpbmVkIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjYWxsX2lkIjogImxvY2FsX2NhbGxfMCIsCiAgICAgICAgICAgICAgICAibmFtZSI6ICJ2b2x1bWVfc2V0IiwKICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiB7CiAgICAgICAgICAgICAgICAgICJsZXZlbCI6IDMwCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgfQogICAgICAgICAgICBdCiAgICAgICAgICB9LAogICAgICAgICAgInNjaGVtYV9lcnJvcnMiOiBbXSwKICAgICAgICAgICJyZWdpc3RyeV9yZXN1bHQiOiB7CiAgICAgICAgICAgICJwYXNzZWQiOiB0cnVlLAogICAgICAgICAgICAiY29tbWFuZHMiOiBbCiAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgIm5hbWUiOiAidm9sdW1lX3NldCIsCiAgICAgICAgICAgICAgICAicGFyYW1ldGVycyI6IHsKICAgICAgICAgICAgICAgICAgImxldmVsIjogMzAKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICAidG9vbF9jYWxsX2lkIjogImxvY2FsX2NhbGxfMCIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiA3NS43NDAwMjcyNTMwMDY3LAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyNzYsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzUuODEzOTIzMzI3OTk0NDIsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAxNDcuMzE5OTk5OTk5OTk5OTYsCiAgICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiA0LAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNDguNTc5NDY3MTc4Njg5NjYsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA3MzMyMzMxNTIsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiA3MzMwOTE4NDAsCiAgICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiA0MTEzNDI4NDgwLAogICAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMjY5ODI0NDA5NiwKICAgICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImhvc3Rfc3dhcF9pbl9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAiaG9zdF9zd2FwX291dF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAicGxheV9tdXNpYyIsCiAgICAgICAgInVzZXIiOiAi5pKt5pS+5aSc5puy44CCIiwKICAgICAgICAiZXhwZWN0ZWQiOiB7CiAgICAgICAgICAia2luZCI6ICJ0b29sIiwKICAgICAgICAgICJjYWxscyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJuYW1lIjogInBsYXlfbXVzaWMiLAogICAgICAgICAgICAgICJhcmd1bWVudHMiOiB7CiAgICAgICAgICAgICAgICAic29uZ19uYW1lIjogIuWknOabsiIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6ZyA6KaB5pON5L2c5pe25L2/55So5o+Q5L6b55qE5bel5YW377yM5ZCm5YiZ5q2j5bi45Zue5aSN44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIuaSreaUvuWknOabsuOAgiIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAiIiwKICAgICAgICAgICJmaW5pc2hfcmVhc29uIjogInRvb2xfY2FsbHMiLAogICAgICAgICAgIndpcmVfY2FsbHMiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAidHlwZSI6ICJmdW5jdGlvbiIsCiAgICAgICAgICAgICAgImZ1bmN0aW9uIjogewogICAgICAgICAgICAgICAgIm5hbWUiOiAicGxheV9tdXNpYyIsCiAgICAgICAgICAgICAgICAiYXJndW1lbnRzIjogIntcInNvbmdfbmFtZVwiOiBcIuWknOabslwifSIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0sCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzMuMjcyNDQwNjcwOTg5NDUsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogNjguMDcxMDI2MjcxOTk0OTIsCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQ0MCwKICAgICAgICAgICJldmFsdWF0ZWRfcHJlZmlsbF90b2tlbnMiOiA0NDAsCiAgICAgICAgICAibmF0aXZlX3VzYWdlIjogewogICAgICAgICAgICAiY29tcGxldGlvbl90b2tlbnMiOiAyMiwKICAgICAgICAgICAgInByb21wdF90b2tlbnMiOiA0NDAsCiAgICAgICAgICAgICJ0b3RhbF90b2tlbnMiOiA0NjIsCiAgICAgICAgICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICAgICAgICAgImNhY2hlZF90b2tlbnMiOiAwCiAgICAgICAgICAgIH0KICAgICAgICAgIH0sCiAgICAgICAgICAibmF0aXZlX3RpbWluZ3MiOiB7CiAgICAgICAgICAgICJjYWNoZV9uIjogMCwKICAgICAgICAgICAgInByb21wdF9uIjogNDQwLAogICAgICAgICAgICAicHJvbXB0X21zIjogNjQ4NjMuODE3LAogICAgICAgICAgICAicHJvbXB0X3Blcl90b2tlbl9tcyI6IDE0Ny40MTc3NjU5MDkwOTA5MiwKICAgICAgICAgICAgInByb21wdF9wZXJfc2Vjb25kIjogNi43ODM0NDI5MTcwMjcyMjMsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfbiI6IDIyLAogICAgICAgICAgICAicHJlZGljdGVkX21zIjogODM4OC4wMTUsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfcGVyX3Rva2VuX21zIjogMzk5LjQyOTI4NTcxNDI4NTcsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfcGVyX3NlY29uZCI6IDIuNTAzNTcyMDYwODUxMTA3NAogICAgICAgICAgfSwKICAgICAgICAgICJjYWNoZV9wcm9tcHQiOiBmYWxzZSwKICAgICAgICAgICJvdXRwdXRfdG9rZW5zIjogMjIsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogNjQuODYzODE3LAogICAgICAgICAgImRlY29kZV9zZWNvbmRzIjogOC4zODgwMTUsCiAgICAgICAgICAicHJlZmlsbF90b2tlbnNfcGVyX3NlY29uZCI6IDYuNzgzNDQyOTE3MDI3MjIzLAogICAgICAgICAgImRlY29kZV90b2tlbnNfcGVyX3NlY29uZCI6IDIuNTAzNTcyMDYwODUxMTA3NCwKICAgICAgICAgICJtbHhfcGVha19hbGxvY2F0ZWRfYnl0ZXMiOiBudWxsLAogICAgICAgICAgInRpbWluZ19zb3VyY2UiOiAibGxhbWEtc2VydmVyIHRpbWluZ3MgdXNlIGV2YWx1YXRlZCBwcmVmaWxsOyBmdWxsIHByb21wdCB1c2VzIG5hdGl2ZSB1c2FnZTsgcmF3IGNvdW50ZXJzIHJldGFpbmVkIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjYWxsX2lkIjogImxvY2FsX2NhbGxfMCIsCiAgICAgICAgICAgICAgICAibmFtZSI6ICJwbGF5X211c2ljIiwKICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiB7CiAgICAgICAgICAgICAgICAgICJzb25nX25hbWUiOiAi5aSc5puyIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgICAgfSwKICAgICAgICAgICJzY2hlbWFfZXJyb3JzIjogW10sCiAgICAgICAgICAicmVnaXN0cnlfcmVzdWx0IjogewogICAgICAgICAgICAicGFzc2VkIjogdHJ1ZSwKICAgICAgICAgICAgImNvbW1hbmRzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJuYW1lIjogInBsYXlfbXVzaWMiLAogICAgICAgICAgICAgICAgInBhcmFtZXRlcnMiOiB7CiAgICAgICAgICAgICAgICAgICJzb25nX25hbWUiOiAi5aSc5puyIgogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICAgICJ0b29sX2NhbGxfaWQiOiAibG9jYWxfY2FsbF8wIgogICAgICAgICAgICAgIH0KICAgICAgICAgICAgXQogICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInZhbGlkX2NhbGxfc2Vjb25kcyI6IDc0LjcyNzY3MzEwNTk5NzM4LAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyNzMsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzQuODAxMjQ2MDE4MDAzNDQsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAxNDUuNzgwMDAwMDAwMDAwMDMsCiAgICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiA0LAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNDguNzIyNDUwNDEzNzY0ODgsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA3MzM0OTUyOTYsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiA3MzMxMTY0MTYsCiAgICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiA0MTEzNDI4NDgwLAogICAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMjcwMjA1MzM3NiwKICAgICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImhvc3Rfc3dhcF9pbl9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAiaG9zdF9zd2FwX291dF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAicGVyc29uYV9uYW1lIiwKICAgICAgICAidXNlciI6ICLkvaDlj6vku4DkuYjlkI3lrZfvvJ/nlKjkuIDlj6Xor53ku4vnu43oh6rlt7HjgIIiLAogICAgICAgICJleHBlY3RlZCI6IHsKICAgICAgICAgICJraW5kIjogInBlcnNvbmEiLAogICAgICAgICAgImNvbnRhaW5zX2FsbCI6IFsKICAgICAgICAgICAgIuWwj+ayqyIKICAgICAgICAgIF0KICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6ZyA6KaB5pON5L2c5pe25L2/55So5o+Q5L6b55qE5bel5YW377yM5ZCm5YiZ5q2j5bi45Zue5aSN44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOWPq+S7gOS5iOWQjeWtl++8n+eUqOS4gOWPpeivneS7i+e7jeiHquW3seOAgiIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogInBlcnNvbmEiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAi5oiR5Y+r5bCP5a6J77yM5pivQUnmnLrlmajkurrjgIIiLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIsCiAgICAgICAgICAid2lyZV9jYWxscyI6IG51bGwsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzAuMDkyNTQ1NTIwMDA0OTMsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogNjYuNDk5MzYxODkzOTkxNTksCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQ0NiwKICAgICAgICAgICJldmFsdWF0ZWRfcHJlZmlsbF90b2tlbnMiOiA0NDYsCiAgICAgICAgICAibmF0aXZlX3VzYWdlIjogewogICAgICAgICAgICAiY29tcGxldGlvbl90b2tlbnMiOiAxMCwKICAgICAgICAgICAgInByb21wdF90b2tlbnMiOiA0NDYsCiAgICAgICAgICAgICJ0b3RhbF90b2tlbnMiOiA0NTYsCiAgICAgICAgICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICAgICAgICAgImNhY2hlZF90b2tlbnMiOiAwCiAgICAgICAgICAgIH0KICAgICAgICAgIH0sCiAgICAgICAgICAibmF0aXZlX3RpbWluZ3MiOiB7CiAgICAgICAgICAgICJjYWNoZV9uIjogMCwKICAgICAgICAgICAgInByb21wdF9uIjogNDQ2LAogICAgICAgICAgICAicHJvbXB0X21zIjogNjY0NzkuOTY3LAogICAgICAgICAgICAicHJvbXB0X3Blcl90b2tlbl9tcyI6IDE0OS4wNTgyMjE5NzMwOTQyLAogICAgICAgICAgICAicHJvbXB0X3Blcl9zZWNvbmQiOiA2LjcwODc4NzkyNzA0NTc1MSwKICAgICAgICAgICAgInByZWRpY3RlZF9uIjogMTAsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfbXMiOiAzNTkyLjc0MywKICAgICAgICAgICAgInByZWRpY3RlZF9wZXJfdG9rZW5fbXMiOiAzOTkuMTkzNjY2NjY2NjY2NywKICAgICAgICAgICAgInByZWRpY3RlZF9wZXJfc2Vjb25kIjogMi41MDUwNDk3NjI4MTM1MzgKICAgICAgICAgIH0sCiAgICAgICAgICAiY2FjaGVfcHJvbXB0IjogZmFsc2UsCiAgICAgICAgICAib3V0cHV0X3Rva2VucyI6IDEwLAogICAgICAgICAgInByZWZpbGxfc2Vjb25kcyI6IDY2LjQ3OTk2NywKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDMuNTkyNzQzLAogICAgICAgICAgInByZWZpbGxfdG9rZW5zX3Blcl9zZWNvbmQiOiA2LjcwODc4NzkyNzA0NTc1MSwKICAgICAgICAgICJkZWNvZGVfdG9rZW5zX3Blcl9zZWNvbmQiOiAyLjUwNTA0OTc2MjgxMzUzOCwKICAgICAgICAgICJtbHhfcGVha19hbGxvY2F0ZWRfYnl0ZXMiOiBudWxsLAogICAgICAgICAgInRpbWluZ19zb3VyY2UiOiAibGxhbWEtc2VydmVyIHRpbWluZ3MgdXNlIGV2YWx1YXRlZCBwcmVmaWxsOyBmdWxsIHByb21wdCB1c2VzIG5hdGl2ZSB1c2FnZTsgcmF3IGNvdW50ZXJzIHJldGFpbmVkIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiBudWxsLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IGZhbHNlLAogICAgICAgICAgInBlcnNvbmFfdmFsaWQiOiBmYWxzZSwKICAgICAgICAgICJyZXZpZXdlciI6ICJkZXRlcm1pbmlzdGljIGZyb3plbiBmaXh0dXJlIHJ1bGVzIiwKICAgICAgICAgICJyZXBseSI6IHsKICAgICAgICAgICAgImNvbnRlbnQiOiAi5oiR5Y+r5bCP5a6J77yM5pivQUnmnLrlmajkurrjgIIiLAogICAgICAgICAgICAidG9vbF9jYWxscyI6IFtdCiAgICAgICAgICB9CiAgICAgICAgfSwKICAgICAgICAidmFsaWRfY2FsbF9zZWNvbmRzIjogbnVsbCwKICAgICAgICAicmVzb3VyY2VzIjogewogICAgICAgICAgInNjb3BlIjogImRlY2xhcmVkIHByb2Nlc3MgYW5kIHJlY3Vyc2l2ZSBjaGlsZHJlbiIsCiAgICAgICAgICAicGlkIjogMTQ5MDgxLAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogMjU2LAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDcwLjE2NzI2NDk2MDk5NzI3LAogICAgICAgICAgImNwdV9zZWNvbmRzIjogMTM5LjU2LAogICAgICAgICAgImhvc3RfbG9naWNhbF9jcHVzIjogNCwKICAgICAgICAgICJjcHVfY2FwYWNpdHlfcGVyY2VudCI6IDQ5LjcyNDA0MTU3MzIyMzI2LAogICAgICAgICAgInBlYWtfcnNzX2J5dGVzIjogNzMzNzUzMzQ0LAogICAgICAgICAgInBlYWtfcHNzX2J5dGVzIjogNzMzMTM2ODk2LAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogNDExMzQyODQ4MCwKICAgICAgICAgICJtaW5pbXVtX2hvc3RfbWVtX2F2YWlsYWJsZV9ieXRlcyI6IDI3MTg5MDAyMjQsCiAgICAgICAgICAiaG9zdF9zd2FwX2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAgICJob3N0X3N3YXBfaW5fZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImhvc3Rfc3dhcF9vdXRfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgInN3YXBfc2NvcGUiOiAic3lzdGVtLXdpZGUgY291bnRlcnM7IG5vdCBtb2RlbC1vbmx5IiwKICAgICAgICAgICJsaW1pdGF0aW9uIjogInNhbXBsZWQgcGVhaywgbm90IGtlcm5lbCBoaWdoLXdhdGVyIG1hcms7IGxhc3Qgb2JzZXJ2ZWQgQ1BVIG9mIHJldGlyZWQgY2hpbGRyZW4gaXMgcmV0YWluZWQsIHNvIHNob3J0IGNoaWxkIGxpZmV0aW1lcyBjYW4gcmVtYWluIHVuZGVyLXNhbXBsZWQ7IFJTUyBhbmQgYWNjZWxlcmF0b3IgYWxsb2NhdGlvbnMgbWF5IG92ZXJsYXAiCiAgICAgICAgfQogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogInBlcnNvbmFfcm9sZSIsCiAgICAgICAgInVzZXIiOiAi5L2g5piv5LuA5LmI6Lqr5Lu977yM5Li76KaB5YGa5LuA5LmI77yfIiwKICAgICAgICAiZXhwZWN0ZWQiOiB7CiAgICAgICAgICAia2luZCI6ICJwZXJzb25hIiwKICAgICAgICAgICJjb250YWluc19hbnkiOiBbCiAgICAgICAgICAgICLnp5HnoJQiLAogICAgICAgICAgICAi5py65Zmo5Lq65Yqp5omLIgogICAgICAgICAgXQogICAgICAgIH0sCiAgICAgICAgIm1lc3NhZ2VzIjogWwogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJzeXN0ZW0iLAogICAgICAgICAgICAiY29udGVudCI6ICLkvaDmmK/mnLrlmajkurrliqnmiYvjgILpnIDopoHmk43kvZzml7bkvb/nlKjmj5DkvpvnmoTlt6XlhbfvvIzlkKbliJnmraPluLjlm57lpI3jgIIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5LuA5LmI6Lqr5Lu977yM5Li76KaB5YGa5LuA5LmI77yfIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAicGVyc29uYSIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICLmiJHmmK9BSeacuuWZqOS6uu+8jOS4u+imgeeUqOadpeaPkOS+m+W4ruWKqeWSjOS/oeaBr+OAgiIsCiAgICAgICAgICAiZmluaXNoX3JlYXNvbiI6ICJzdG9wIiwKICAgICAgICAgICJ3aXJlX2NhbGxzIjogbnVsbCwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiA3MC4yMjczNzcwMzM5OTYxNiwKICAgICAgICAgICJ0dGZ0X3NlY29uZHMiOiA2NS44MzYwODk3ODI5OTg5LAogICAgICAgICAgInByb21wdF90b2tlbnMiOiA0NDMsCiAgICAgICAgICAiZXZhbHVhdGVkX3ByZWZpbGxfdG9rZW5zIjogNDQzLAogICAgICAgICAgIm5hdGl2ZV91c2FnZSI6IHsKICAgICAgICAgICAgImNvbXBsZXRpb25fdG9rZW5zIjogMTIsCiAgICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogNDQzLAogICAgICAgICAgICAidG90YWxfdG9rZW5zIjogNDU1LAogICAgICAgICAgICAicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjogewogICAgICAgICAgICAgICJjYWNoZWRfdG9rZW5zIjogMAogICAgICAgICAgICB9CiAgICAgICAgICB9LAogICAgICAgICAgIm5hdGl2ZV90aW1pbmdzIjogewogICAgICAgICAgICAiY2FjaGVfbiI6IDAsCiAgICAgICAgICAgICJwcm9tcHRfbiI6IDQ0MywKICAgICAgICAgICAgInByb21wdF9tcyI6IDY1ODE2LjYyNSwKICAgICAgICAgICAgInByb21wdF9wZXJfdG9rZW5fbXMiOiAxNDguNTcwMjU5NTkzNjc5NDUsCiAgICAgICAgICAgICJwcm9tcHRfcGVyX3NlY29uZCI6IDYuNzMwODIyMTg5NjgyMzE5LAogICAgICAgICAgICAicHJlZGljdGVkX24iOiAxMiwKICAgICAgICAgICAgInByZWRpY3RlZF9tcyI6IDQzOTAuODc1LAogICAgICAgICAgICAicHJlZGljdGVkX3Blcl90b2tlbl9tcyI6IDM5OS4xNzA0NTQ1NDU0NTQ1NiwKICAgICAgICAgICAgInByZWRpY3RlZF9wZXJfc2Vjb25kIjogMi41MDUxOTU0MzM3MTE5NTkzCiAgICAgICAgICB9LAogICAgICAgICAgImNhY2hlX3Byb21wdCI6IGZhbHNlLAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAxMiwKICAgICAgICAgICJwcmVmaWxsX3NlY29uZHMiOiA2NS44MTY2MjUsCiAgICAgICAgICAiZGVjb2RlX3NlY29uZHMiOiA0LjM5MDg3NSwKICAgICAgICAgICJwcmVmaWxsX3Rva2Vuc19wZXJfc2Vjb25kIjogNi43MzA4MjIxODk2ODIzMTksCiAgICAgICAgICAiZGVjb2RlX3Rva2Vuc19wZXJfc2Vjb25kIjogMi41MDUxOTU0MzM3MTE5NTkzLAogICAgICAgICAgIm1seF9wZWFrX2FsbG9jYXRlZF9ieXRlcyI6IG51bGwsCiAgICAgICAgICAidGltaW5nX3NvdXJjZSI6ICJsbGFtYS1zZXJ2ZXIgdGltaW5ncyB1c2UgZXZhbHVhdGVkIHByZWZpbGw7IGZ1bGwgcHJvbXB0IHVzZXMgbmF0aXZlIHVzYWdlOyByYXcgY291bnRlcnMgcmV0YWluZWQiCiAgICAgICAgfSwKICAgICAgICAiYXNzZXNzbWVudCI6IHsKICAgICAgICAgICJuYXRpdmVfcGFyc2UiOiB0cnVlLAogICAgICAgICAgImpzb25fdmFsaWQiOiBudWxsLAogICAgICAgICAgInNjaGVtYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmVnaXN0cnlfdmFsaWQiOiBudWxsLAogICAgICAgICAgImV4cGVjdGVkX2JlaGF2aW9yIjogZmFsc2UsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IGZhbHNlLAogICAgICAgICAgInJldmlld2VyIjogImRldGVybWluaXN0aWMgZnJvemVuIGZpeHR1cmUgcnVsZXMiLAogICAgICAgICAgInJlcGx5IjogewogICAgICAgICAgICAiY29udGVudCI6ICLmiJHmmK9BSeacuuWZqOS6uu+8jOS4u+imgeeUqOadpeaPkOS+m+W4ruWKqeWSjOS/oeaBr+OAgiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogW10KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiBudWxsLAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyNTYsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNzAuMzAwNjQ4NjU3OTk3OTUsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAxMzkuNzk5OTk5OTk5OTk5OTUsCiAgICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiA0LAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNDkuNzE1MDQ2MjU4MDAzMiwKICAgICAgICAgICJwZWFrX3Jzc19ieXRlcyI6IDczNDA2ODczNiwKICAgICAgICAgICJwZWFrX3Bzc19ieXRlcyI6IDczMzE1MzI4MCwKICAgICAgICAgICJob3N0X21lbV90b3RhbF9ieXRlcyI6IDQxMTM0Mjg0ODAsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAyNzE5NjQ5NzkyLAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAiaG9zdF9zd2FwX2luX2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAgICJob3N0X3N3YXBfb3V0X2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAgICJzd2FwX3Njb3BlIjogInN5c3RlbS13aWRlIGNvdW50ZXJzOyBub3QgbW9kZWwtb25seSIsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJwZXJzb25hX2NyZWF0b3IiLAogICAgICAgICJ1c2VyIjogIui/meS4quacuuWZqOS6uuWKqeaJi+inkuiJsuaYr+iwgeWIm+mAoOeahO+8nyIsCiAgICAgICAgImV4cGVjdGVkIjogewogICAgICAgICAgImtpbmQiOiAicGVyc29uYSIsCiAgICAgICAgICAiY29udGFpbnNfYW55IjogWwogICAgICAgICAgICAi55So5oi3IiwKICAgICAgICAgICAgIuS9oOWIm+mAoCIsCiAgICAgICAgICAgICLmgqjliJvpgKAiCiAgICAgICAgICBdCiAgICAgICAgfSwKICAgICAgICAibWVzc2FnZXMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJyb2xlIjogInN5c3RlbSIsCiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOaYr+acuuWZqOS6uuWKqeaJi+OAgumcgOimgeaTjeS9nOaXtuS9v+eUqOaPkOS+m+eahOW3peWFt++8jOWQpuWImeato+W4uOWbnuWkjeOAgiIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJyb2xlIjogInVzZXIiLAogICAgICAgICAgICAiY29udGVudCI6ICLov5nkuKrmnLrlmajkurrliqnmiYvop5LoibLmmK/osIHliJvpgKDnmoTvvJ8iCiAgICAgICAgICB9CiAgICAgICAgXSwKICAgICAgICAia2luZCI6ICJwZXJzb25hIiwKICAgICAgICAic3RhdHVzIjogImNvbXBsZXRlZCIsCiAgICAgICAgImdlbmVyYXRpb24iOiB7CiAgICAgICAgICAicmF3IjogIui/meS4quacuuWZqOS6uuWKqeaJi+inkuiJsuaYr0FJ5Yib6YCg55qE44CCIiwKICAgICAgICAgICJmaW5pc2hfcmVhc29uIjogInN0b3AiLAogICAgICAgICAgIndpcmVfY2FsbHMiOiBudWxsLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDY5Ljc0ODQ2MzQ2ODAwMDQxLAogICAgICAgICAgInR0ZnRfc2Vjb25kcyI6IDY2LjE1NTgzNDg3NzAwNDk2LAogICAgICAgICAgInByb21wdF90b2tlbnMiOiA0NDQsCiAgICAgICAgICAiZXZhbHVhdGVkX3ByZWZpbGxfdG9rZW5zIjogNDQ0LAogICAgICAgICAgIm5hdGl2ZV91c2FnZSI6IHsKICAgICAgICAgICAgImNvbXBsZXRpb25fdG9rZW5zIjogMTAsCiAgICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogNDQ0LAogICAgICAgICAgICAidG90YWxfdG9rZW5zIjogNDU0LAogICAgICAgICAgICAicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjogewogICAgICAgICAgICAgICJjYWNoZWRfdG9rZW5zIjogMAogICAgICAgICAgICB9CiAgICAgICAgICB9LAogICAgICAgICAgIm5hdGl2ZV90aW1pbmdzIjogewogICAgICAgICAgICAiY2FjaGVfbiI6IDAsCiAgICAgICAgICAgICJwcm9tcHRfbiI6IDQ0NCwKICAgICAgICAgICAgInByb21wdF9tcyI6IDY2MTM2LjU2NCwKICAgICAgICAgICAgInByb21wdF9wZXJfdG9rZW5fbXMiOiAxNDguOTU2MjI1MjI1MjI1MiwKICAgICAgICAgICAgInByb21wdF9wZXJfc2Vjb25kIjogNi43MTMzODE3MjMzMDgxNTQsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfbiI6IDEwLAogICAgICAgICAgICAicHJlZGljdGVkX21zIjogMzU5Mi4yMzMsCiAgICAgICAgICAgICJwcmVkaWN0ZWRfcGVyX3Rva2VuX21zIjogMzk5LjEzNywKICAgICAgICAgICAgInByZWRpY3RlZF9wZXJfc2Vjb25kIjogMi41MDU0MDU0MTIxNzY3NzE1CiAgICAgICAgICB9LAogICAgICAgICAgImNhY2hlX3Byb21wdCI6IGZhbHNlLAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAxMCwKICAgICAgICAgICJwcmVmaWxsX3NlY29uZHMiOiA2Ni4xMzY1NjM5OTk5OTk5OSwKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDMuNTkyMjMzMDAwMDAwMDAwMiwKICAgICAgICAgICJwcmVmaWxsX3Rva2Vuc19wZXJfc2Vjb25kIjogNi43MTMzODE3MjMzMDgxNTQsCiAgICAgICAgICAiZGVjb2RlX3Rva2Vuc19wZXJfc2Vjb25kIjogMi41MDU0MDU0MTIxNzY3NzE1LAogICAgICAgICAgIm1seF9wZWFrX2FsbG9jYXRlZF9ieXRlcyI6IG51bGwsCiAgICAgICAgICAidGltaW5nX3NvdXJjZSI6ICJsbGFtYS1zZXJ2ZXIgdGltaW5ncyB1c2UgZXZhbHVhdGVkIHByZWZpbGw7IGZ1bGwgcHJvbXB0IHVzZXMgbmF0aXZlIHVzYWdlOyByYXcgY291bnRlcnMgcmV0YWluZWQiCiAgICAgICAgfSwKICAgICAgICAiYXNzZXNzbWVudCI6IHsKICAgICAgICAgICJuYXRpdmVfcGFyc2UiOiB0cnVlLAogICAgICAgICAgImpzb25fdmFsaWQiOiBudWxsLAogICAgICAgICAgInNjaGVtYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmVnaXN0cnlfdmFsaWQiOiBudWxsLAogICAgICAgICAgImV4cGVjdGVkX2JlaGF2aW9yIjogZmFsc2UsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IGZhbHNlLAogICAgICAgICAgInJldmlld2VyIjogImRldGVybWluaXN0aWMgZnJvemVuIGZpeHR1cmUgcnVsZXMiLAogICAgICAgICAgInJlcGx5IjogewogICAgICAgICAgICAiY29udGVudCI6ICLov5nkuKrmnLrlmajkurrliqnmiYvop5LoibLmmK9BSeWIm+mAoOeahOOAgiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogW10KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiBudWxsLAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyNTUsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNjkuODIxMzYwODg4MDAzMjYsCiAgICAgICAgICAiY3B1X3NlY29uZHMiOiAxMzguNzc5OTk5OTk5OTk5OTcsCiAgICAgICAgICAiaG9zdF9sb2dpY2FsX2NwdXMiOiA0LAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNDkuNjkxMDk2NzYyODU1MTQsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA3MzQwNjg3MzYsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiA3MzMxNjk2NjQsCiAgICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiA0MTEzNDI4NDgwLAogICAgICAgICAgIm1pbmltdW1faG9zdF9tZW1fYXZhaWxhYmxlX2J5dGVzIjogMjcyMTk2ODEyOCwKICAgICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgImhvc3Rfc3dhcF9pbl9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAiaG9zdF9zd2FwX291dF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgICB9CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAiY2hhdCIsCiAgICAgICAgInVzZXIiOiAi5L2g5aW944CCIiwKICAgICAgICAiZXhwZWN0ZWQiOiB7CiAgICAgICAgICAia2luZCI6ICJjaGF0IgogICAgICAgIH0sCiAgICAgICAgIm1lc3NhZ2VzIjogWwogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJzeXN0ZW0iLAogICAgICAgICAgICAiY29udGVudCI6ICLkvaDmmK/mnLrlmajkurrliqnmiYvjgILpnIDopoHmk43kvZzml7bkvb/nlKjmj5DkvpvnmoTlt6XlhbfvvIzlkKbliJnmraPluLjlm57lpI3jgIIiCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5aW944CCIgogICAgICAgICAgfQogICAgICAgIF0sCiAgICAgICAgImtpbmQiOiAiY2hhdCIsCiAgICAgICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgICAgICJnZW5lcmF0aW9uIjogewogICAgICAgICAgInJhdyI6ICLkvaDlpb3vvIEiLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIsCiAgICAgICAgICAid2lyZV9jYWxscyI6IG51bGwsCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNjUuODUyMzg3OTIxOTg2NTIsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogNjUuMDUwNTMwODgyOTg4ODIsCiAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQzOCwKICAgICAgICAgICJldmFsdWF0ZWRfcHJlZmlsbF90b2tlbnMiOiA0MzgsCiAgICAgICAgICAibmF0aXZlX3VzYWdlIjogewogICAgICAgICAgICAiY29tcGxldGlvbl90b2tlbnMiOiAzLAogICAgICAgICAgICAicHJvbXB0X3Rva2VucyI6IDQzOCwKICAgICAgICAgICAgInRvdGFsX3Rva2VucyI6IDQ0MSwKICAgICAgICAgICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgICAgICAgICAiY2FjaGVkX3Rva2VucyI6IDAKICAgICAgICAgICAgfQogICAgICAgICAgfSwKICAgICAgICAgICJuYXRpdmVfdGltaW5ncyI6IHsKICAgICAgICAgICAgImNhY2hlX24iOiAwLAogICAgICAgICAgICAicHJvbXB0X24iOiA0MzgsCiAgICAgICAgICAgICJwcm9tcHRfbXMiOiA2NTAzMS4yNzEsCiAgICAgICAgICAgICJwcm9tcHRfcGVyX3Rva2VuX21zIjogMTQ4LjQ3MzIyMTQ2MTE4NzIyLAogICAgICAgICAgICAicHJvbXB0X3Blcl9zZWNvbmQiOiA2LjczNTIyMTI3NTMxNTM3OSwKICAgICAgICAgICAgInByZWRpY3RlZF9uIjogMywKICAgICAgICAgICAgInByZWRpY3RlZF9tcyI6IDgwMS42LAogICAgICAgICAgICAicHJlZGljdGVkX3Blcl90b2tlbl9tcyI6IDQwMC44LAogICAgICAgICAgICAicHJlZGljdGVkX3Blcl9zZWNvbmQiOiAyLjQ5NTAwOTk4MDAzOTkyCiAgICAgICAgICB9LAogICAgICAgICAgImNhY2hlX3Byb21wdCI6IGZhbHNlLAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAzLAogICAgICAgICAgInByZWZpbGxfc2Vjb25kcyI6IDY1LjAzMTI3MSwKICAgICAgICAgICJkZWNvZGVfc2Vjb25kcyI6IDAuODAxNiwKICAgICAgICAgICJwcmVmaWxsX3Rva2Vuc19wZXJfc2Vjb25kIjogNi43MzUyMjEyNzUzMTUzNzksCiAgICAgICAgICAiZGVjb2RlX3Rva2Vuc19wZXJfc2Vjb25kIjogMi40OTUwMDk5ODAwMzk5MiwKICAgICAgICAgICJtbHhfcGVha19hbGxvY2F0ZWRfYnl0ZXMiOiBudWxsLAogICAgICAgICAgInRpbWluZ19zb3VyY2UiOiAibGxhbWEtc2VydmVyIHRpbWluZ3MgdXNlIGV2YWx1YXRlZCBwcmVmaWxsOyBmdWxsIHByb21wdCB1c2VzIG5hdGl2ZSB1c2FnZTsgcmF3IGNvdW50ZXJzIHJldGFpbmVkIgogICAgICAgIH0sCiAgICAgICAgImFzc2Vzc21lbnQiOiB7CiAgICAgICAgICAibmF0aXZlX3BhcnNlIjogdHJ1ZSwKICAgICAgICAgICJqc29uX3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiBudWxsLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogbnVsbCwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIuS9oOWlve+8gSIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogW10KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiBudWxsLAogICAgICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAgICJwaWQiOiAxNDkwODEsCiAgICAgICAgICAic2FtcGxpbmdfaW50ZXJ2YWxfc2Vjb25kcyI6IDAuMiwKICAgICAgICAgICJzYW1wbGVfY291bnQiOiAyMzksCiAgICAgICAgICAid2FsbF9zZWNvbmRzIjogNjUuOTI1Mjc2ODgzMDA0NywKICAgICAgICAgICJjcHVfc2Vjb25kcyI6IDEzMC41NTAwMDAwMDAwMDAwNywKICAgICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDQsCiAgICAgICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiA0OS41MDY4MDc2MjA4Nzc1OCwKICAgICAgICAgICJwZWFrX3Jzc19ieXRlcyI6IDczNDA2ODczNiwKICAgICAgICAgICJwZWFrX3Bzc19ieXRlcyI6IDczMzE4MTk1MiwKICAgICAgICAgICJob3N0X21lbV90b3RhbF9ieXRlcyI6IDQxMTM0Mjg0ODAsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAyNzAxNTMzMTg0LAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDAsCiAgICAgICAgICAiaG9zdF9zd2FwX2luX2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAgICJob3N0X3N3YXBfb3V0X2RlbHRhX2J5dGVzIjogMCwKICAgICAgICAgICJzd2FwX3Njb3BlIjogInN5c3RlbS13aWRlIGNvdW50ZXJzOyBub3QgbW9kZWwtb25seSIsCiAgICAgICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgICAgIH0KICAgICAgfQogICAgXSwKICAgICJzdW1tYXJ5IjogewogICAgICAic2FtcGxlcyI6IDcsCiAgICAgICJ0b29sX3NhbXBsZXMiOiAzLAogICAgICAibmF0aXZlX2NhbGxzIjogMywKICAgICAgImpzb25fdmFsaWQiOiAzLAogICAgICAic2NoZW1hX3ZhbGlkIjogMywKICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogMywKICAgICAgInRvb2xfZXhwZWN0ZWRfYmVoYXZpb3IiOiAzLAogICAgICAicGVyc29uYV9zYW1wbGVzIjogMywKICAgICAgInBlcnNvbmFfdmFsaWQiOiAwLAogICAgICAiY2hhdF9zYW1wbGVzIjogMSwKICAgICAgImNoYXRfdmFsaWQiOiAxCiAgICB9LAogICAgInN0YXR1cyI6ICJjb21wbGV0ZWQiLAogICAgImV2aWRlbmNlIjogWwogICAgICB7CiAgICAgICAgInBhdGgiOiAiYmVuY2htYXJrL2Fzc2V0cy1tYW5pZmVzdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogImRkNzk4Zjc2ZmI5NGJjNTUzNjMxY2ZiYTYxMTBmMWQzNzEwNWQ1ZWYxNjAwMjg1MTk0NGRiZjAxNDU1MTVlNTMiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvY2FzZXMvY2hhdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogImM3YTdmM2M0MzU5OWQyZThjYWM3NzEwN2E2MzlhMmQzNDg3M2U4MGIwMTk3YWYwMGU5YTgxY2QyMzhiODYyMjciCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvY2FzZXMvcGVyc29uYV9jcmVhdG9yLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiNTc5NGQxNTYzMTdiM2ZjZTQ2YTFmMWRkNjkxZGRiMGQ1ZGQ4YTI0YTVlMzdhZGUzNDA5MjAzNjNkYjNjMDQ5ZCIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImJlbmNobWFyay9jYXNlcy9wZXJzb25hX25hbWUuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICI5ODA1NmZhYzA3Yzg0YjUzM2IyNDEyYTBhMzFkNWRlZTRhOGEzM2NlMTgwMDM4NGVmNDc5NjY5NjU5ZDZlZWRmIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiYmVuY2htYXJrL2Nhc2VzL3BlcnNvbmFfcm9sZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogImU4YTI2YjA5NTFlMGE5NGEwZTIzYzBkMDY4YTMxNjM4OTc2Yjg2YWY2ZGY1NDI0ZGUwY2MyM2YwOTMzMDA2NTkiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvY2FzZXMvcGxheV9tdXNpYy5qc29uIiwKICAgICAgICAic2hhMjU2IjogImEwOWNmYjlhZTAzN2UyMTY0MGIwNzYzNDA5OGMyZGZmM2EyZjRhNGIyYjQ5MmI5MDM4N2VhZjk0ZTIwMTNlNjEiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvY2FzZXMvc3RhcnRfY2FtZXJhLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiOGZmZTRhZjFlMWUxZWY2NzdiN2NlMTkwZmMwYzY4ZmQ5NjZiYTM1NjgyYmMzYmI3ZDc1M2Y0MTE0NjY4MGEyZiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImJlbmNobWFyay9jYXNlcy92b2x1bWVfc2V0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiNzM5NjM5ZGYwZjNiM2QxZDI5MTZlMDM4N2JhMmIxY2I4MjZkMzU3ZmEwODRjNjY4ZGFmYzdlMDNiZDQyMWM1NiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImJlbmNobWFyay9ldmVudHMvY2hhdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogImUyNWVmZDZmMmFmZjBlNTFmODA1YjhjNWZkYTIyZjhmMTY4NGE1ZTM1MDNlZDZlMTBmMjMwMDE4YWU2Y2VjMzIiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvZXZlbnRzL3BlcnNvbmFfY3JlYXRvci5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjUwYTg3MDVmY2VmYTJhOTEzNjQwMjAxOGVmMzY5ZGRmNmM0MDkwYmEwMTExYzVlM2U4MmRkMTg3ZTJiNGM0NDUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvZXZlbnRzL3BlcnNvbmFfbmFtZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjQ3ODkyZjMzY2E2ZTNhOWU3NzIyMTUyYTEwNmIwYzhjZDYxMGM1YzU1MDI5Yjk4YjM2NDJhOWIxOGUzZThkMzAiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvZXZlbnRzL3BlcnNvbmFfcm9sZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogImJhNjAzMzU4ZjQ1ZjFkYjAyZTBlZTE5NjBhNGJiMThjZGQ4MWYzODc0MWQyNmI4OTBlODlhYjBlMGU2OTg0MWUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJiZW5jaG1hcmsvZXZlbnRzL3BsYXlfbXVzaWMuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICJiN2NkZmM3NjVmY2IyMjhlN2Q1Mzk1MTI0M2Q0YWNlN2JkZGY1ZTQ4ODM3ZDU5ZWZhYzNjYTk4YTYxMjdmNTM5IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiYmVuY2htYXJrL2V2ZW50cy9zdGFydF9jYW1lcmEuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICJiM2EzN2ZjMjk1NTJhNDg2MTM4OGY0MmY3ODZlMThhZWUyZDQ1YTMxNzQ1ZThkYTEwZTA5Nzg3NWY1OWRiNThjIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiYmVuY2htYXJrL2V2ZW50cy92b2x1bWVfc2V0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiNGEyODM3YmQ1MTgwYmFmNTZmNDhlZDU2MzZmMzI3YzI5MzJlNGY5ZGZmNmJmZGZjMDg3YjE5MjVkOTlkMjlmYyIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImJlbmNobWFyay9yZXF1ZXN0Lmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiNzRkYWViMjVjNmY4ZjMzMjI1MjhiNWM3YjcwMDg1MGI4MjFiYjRkNDFhOGM2YjI4NjNjNjU2ODBmNmZmYjE2MiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImJlbmNobWFyay9zdWl0ZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjA3NmJiNjYwNDU5NWE1MGVkNjQyNmNiNjA5MDRiYTc4N2M1MzJkM2QyZjY1NDkyNWU0ZDZkNmRmMzYxYzQyYWIiCiAgICAgIH0KICAgIF0sCiAgICAiYmVuY2htYXJrX3Jlc3VsdCI6IHsKICAgICAgInBhdGgiOiAiYmVuY2htYXJrL3Jlc3VsdHMuanNvbiIsCiAgICAgICJzaGEyNTYiOiAiMWMxYzc4N2NkMmIwNGNjZmJkOGU5YjlhYWUwYmQyYzRlNjQ2NzMxM2UxNWEyYWY4NTg1Zjc2NjUwNmU2MDY0ZSIKICAgIH0KICB9Cl0=">下载本页原始结果 JSON</a></p>
+<details><summary>完整配置、资产哈希与逐例结果</summary><pre>[
+  {
+    &quot;schema&quot;: &quot;edge-model-benchmark/result-v1&quot;,
+    &quot;run_id&quot;: &quot;rk3566-pilot32-q4-f16-e379-v2&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;device_measurement&quot;,
+      &quot;raw_evidence&quot;: &quot;benchmark/cases/ and benchmark/events/&quot;
+    },
+    &quot;candidate&quot;: {
+      &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+      &quot;model_path&quot;: &quot;/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf&quot;,
+      &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;parameter_count&quot;: 596049920,
+      &quot;parameter_count_stored&quot;: 751632384,
+      &quot;precision&quot;: &quot;Q4_K_M&quot;,
+      &quot;artifact_format&quot;: &quot;GGUF&quot;,
+      &quot;backend&quot;: &quot;ARM CPU&quot;,
+      &quot;context_tokens&quot;: 2048,
+      &quot;kv_type&quot;: &quot;f16&quot;,
+      &quot;lineage&quot;: &quot;seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M&quot;,
+      &quot;runtime_version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+      &quot;constraint_mode&quot;: &quot;llama-server native tool grammar; differs from unconstrained MLX&quot;,
+      &quot;device&quot;: &quot;Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB&quot;,
+      &quot;actual_runtime&quot;: {
+        &quot;name&quot;: &quot;llama.cpp&quot;,
+        &quot;version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+        &quot;backend&quot;: &quot;ARM CPU&quot;,
+        &quot;network&quot;: &quot;direct&quot;
+      }
+    },
+    &quot;stage&quot;: &quot;RK3566 / 试点32步 / f16 KV / 禁用缓存&quot;,
+    &quot;request_sha256&quot;: &quot;74daeb25c6f8f3322528b5c7b700850b821bb4d41a8c6b2863c65680f6ffb162&quot;,
+    &quot;suite_sha256&quot;: &quot;076bb6604595a50ed6426cb60904ba787c532d3d2f654925e4d6d6df361c42ab&quot;,
+    &quot;artifacts&quot;: {
+      &quot;root&quot;: &quot;/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf&quot;,
+      &quot;total_bytes&quot;: 396704704,
+      &quot;files&quot;: [
+        {
+          &quot;name&quot;: &quot;qwen3-pilot32-q4_k_m.gguf&quot;,
+          &quot;bytes&quot;: 396704704,
+          &quot;sha256&quot;: &quot;8a1e5584a9f8ee04b1e54afad217f2dbb6f4e31ab0a1d8832d8faadda92e7a9b&quot;
+        }
+      ]
+    },
+    &quot;environment&quot;: {
+      &quot;system&quot;: &quot;Linux&quot;,
+      &quot;machine&quot;: &quot;aarch64&quot;,
+      &quot;platform&quot;: &quot;Linux-5.10.160-rockchip-rk356x-aarch64-with-glibc2.29&quot;,
+      &quot;python&quot;: &quot;3.8.10&quot;,
+      &quot;logical_cpus&quot;: 4
+    },
+    &quot;loading&quot;: {
+      &quot;wall_seconds&quot;: 0.14092814800096676,
+      &quot;resources&quot;: {
+        &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+        &quot;pid&quot;: 149081,
+        &quot;sampling_interval_seconds&quot;: 0.2,
+        &quot;sample_count&quot;: 2,
+        &quot;wall_seconds&quot;: 0.0715070620062761,
+        &quot;cpu_seconds&quot;: 0,
+        &quot;host_logical_cpus&quot;: 4,
+        &quot;cpu_capacity_percent&quot;: 0.0,
+        &quot;peak_rss_bytes&quot;: 692240384,
+        &quot;peak_pss_bytes&quot;: 693021696,
+        &quot;host_mem_total_bytes&quot;: 4113428480,
+        &quot;minimum_host_mem_available_bytes&quot;: 2768257024,
+        &quot;host_swap_delta_bytes&quot;: 0,
+        &quot;host_swap_in_delta_bytes&quot;: 0,
+        &quot;host_swap_out_delta_bytes&quot;: 0,
+        &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+        &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+      }
+    },
+    &quot;measurement&quot;: {
+      &quot;resources&quot;: &quot;per-case sampled process tree&quot;,
+      &quot;cache&quot;: &quot;new MLX prompt cache per case / llama cache_prompt=false&quot;,
+      &quot;timing&quot;: &quot;request to complete response; valid-call latency only if native+schema pass&quot;,
+      &quot;sampling_interval_seconds&quot;: 0.2,
+      &quot;quality_scope&quot;: &quot;frozen deterministic fixture rules; no hardware execution or product acceptance&quot;
+    },
+    &quot;cases&quot;: [
+      {
+        &quot;id&quot;: &quot;start_camera&quot;,
+        &quot;user&quot;: &quot;开启摄像头。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;start_camera&quot;,
+              &quot;arguments&quot;: {}
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;开启摄像头。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: &quot;{}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 71.10103542199067,
+          &quot;ttft_seconds&quot;: 68.01630005099287,
+          &quot;prompt_tokens&quot;: 439,
+          &quot;evaluated_prefill_tokens&quot;: 439,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 16,
+            &quot;prompt_tokens&quot;: 439,
+            &quot;total_tokens&quot;: 455,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 439,
+            &quot;prompt_ms&quot;: 64805.883,
+            &quot;prompt_per_token_ms&quot;: 147.6216013667426,
+            &quot;prompt_per_second&quot;: 6.774076359703331,
+            &quot;predicted_n&quot;: 16,
+            &quot;predicted_ms&quot;: 6274.649,
+            &quot;predicted_per_token_ms&quot;: 418.30993333333333,
+            &quot;predicted_per_second&quot;: 2.390571966655027
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 16,
+          &quot;prefill_seconds&quot;: 64.80588300000001,
+          &quot;decode_seconds&quot;: 6.274649,
+          &quot;prefill_tokens_per_second&quot;: 6.774076359703331,
+          &quot;decode_tokens_per_second&quot;: 2.390571966655027,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: {}
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;parameters&quot;: {},
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 73.20666654000524,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 267,
+          &quot;wall_seconds&quot;: 73.27960071001144,
+          &quot;cpu_seconds&quot;: 140.87,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 48.05907736774635,
+          &quot;peak_rss_bytes&quot;: 733233152,
+          &quot;peak_pss_bytes&quot;: 733088768,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2707308544,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;volume_set&quot;,
+        &quot;user&quot;: &quot;把音量设置为30。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;volume_set&quot;,
+              &quot;arguments&quot;: {
+                &quot;level&quot;: 30
+              }
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;把音量设置为30。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;volume_set&quot;,
+                &quot;arguments&quot;: &quot;{\&quot;level\&quot;: 30}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 74.27763156901347,
+          &quot;ttft_seconds&quot;: 69.49924340500729,
+          &quot;prompt_tokens&quot;: 444,
+          &quot;evaluated_prefill_tokens&quot;: 444,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 21,
+            &quot;prompt_tokens&quot;: 444,
+            &quot;total_tokens&quot;: 465,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 444,
+            &quot;prompt_ms&quot;: 66027.921,
+            &quot;prompt_per_token_ms&quot;: 148.71153378378378,
+            &quot;prompt_per_second&quot;: 6.724427988577741,
+            &quot;predicted_n&quot;: 21,
+            &quot;predicted_ms&quot;: 8229.562,
+            &quot;predicted_per_token_ms&quot;: 411.4781,
+            &quot;predicted_per_second&quot;: 2.4302629957706134
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 21,
+          &quot;prefill_seconds&quot;: 66.027921,
+          &quot;decode_seconds&quot;: 8.229562,
+          &quot;prefill_tokens_per_second&quot;: 6.724427988577741,
+          &quot;decode_tokens_per_second&quot;: 2.4302629957706134,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;volume_set&quot;,
+                &quot;arguments&quot;: {
+                  &quot;level&quot;: 30
+                }
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;volume_set&quot;,
+                &quot;parameters&quot;: {
+                  &quot;level&quot;: 30
+                },
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 75.7400272530067,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 276,
+          &quot;wall_seconds&quot;: 75.81392332799442,
+          &quot;cpu_seconds&quot;: 147.31999999999996,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 48.57946717868966,
+          &quot;peak_rss_bytes&quot;: 733233152,
+          &quot;peak_pss_bytes&quot;: 733091840,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2698244096,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;play_music&quot;,
+        &quot;user&quot;: &quot;播放夜曲。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;play_music&quot;,
+              &quot;arguments&quot;: {
+                &quot;song_name&quot;: &quot;夜曲&quot;
+              }
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;播放夜曲。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&quot;,
+          &quot;finish_reason&quot;: &quot;tool_calls&quot;,
+          &quot;wire_calls&quot;: [
+            {
+              &quot;type&quot;: &quot;function&quot;,
+              &quot;function&quot;: {
+                &quot;name&quot;: &quot;play_music&quot;,
+                &quot;arguments&quot;: &quot;{\&quot;song_name\&quot;: \&quot;夜曲\&quot;}&quot;
+              }
+            }
+          ],
+          &quot;wall_seconds&quot;: 73.27244067098945,
+          &quot;ttft_seconds&quot;: 68.07102627199492,
+          &quot;prompt_tokens&quot;: 440,
+          &quot;evaluated_prefill_tokens&quot;: 440,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 22,
+            &quot;prompt_tokens&quot;: 440,
+            &quot;total_tokens&quot;: 462,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 440,
+            &quot;prompt_ms&quot;: 64863.817,
+            &quot;prompt_per_token_ms&quot;: 147.41776590909092,
+            &quot;prompt_per_second&quot;: 6.783442917027223,
+            &quot;predicted_n&quot;: 22,
+            &quot;predicted_ms&quot;: 8388.015,
+            &quot;predicted_per_token_ms&quot;: 399.4292857142857,
+            &quot;predicted_per_second&quot;: 2.5035720608511074
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 22,
+          &quot;prefill_seconds&quot;: 64.863817,
+          &quot;decode_seconds&quot;: 8.388015,
+          &quot;prefill_tokens_per_second&quot;: 6.783442917027223,
+          &quot;decode_tokens_per_second&quot;: 2.5035720608511074,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;play_music&quot;,
+                &quot;arguments&quot;: {
+                  &quot;song_name&quot;: &quot;夜曲&quot;
+                }
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;play_music&quot;,
+                &quot;parameters&quot;: {
+                  &quot;song_name&quot;: &quot;夜曲&quot;
+                },
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 74.72767310599738,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 273,
+          &quot;wall_seconds&quot;: 74.80124601800344,
+          &quot;cpu_seconds&quot;: 145.78000000000003,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 48.72245041376488,
+          &quot;peak_rss_bytes&quot;: 733495296,
+          &quot;peak_pss_bytes&quot;: 733116416,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2702053376,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;persona_name&quot;,
+        &quot;user&quot;: &quot;你叫什么名字？用一句话介绍自己。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;persona&quot;,
+          &quot;contains_all&quot;: [
+            &quot;小沫&quot;
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;你叫什么名字？用一句话介绍自己。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;persona&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;我叫小安，是AI机器人。&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 70.09254552000493,
+          &quot;ttft_seconds&quot;: 66.49936189399159,
+          &quot;prompt_tokens&quot;: 446,
+          &quot;evaluated_prefill_tokens&quot;: 446,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 10,
+            &quot;prompt_tokens&quot;: 446,
+            &quot;total_tokens&quot;: 456,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 446,
+            &quot;prompt_ms&quot;: 66479.967,
+            &quot;prompt_per_token_ms&quot;: 149.0582219730942,
+            &quot;prompt_per_second&quot;: 6.708787927045751,
+            &quot;predicted_n&quot;: 10,
+            &quot;predicted_ms&quot;: 3592.743,
+            &quot;predicted_per_token_ms&quot;: 399.1936666666667,
+            &quot;predicted_per_second&quot;: 2.505049762813538
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 10,
+          &quot;prefill_seconds&quot;: 66.479967,
+          &quot;decode_seconds&quot;: 3.592743,
+          &quot;prefill_tokens_per_second&quot;: 6.708787927045751,
+          &quot;decode_tokens_per_second&quot;: 2.505049762813538,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: false,
+          &quot;persona_valid&quot;: false,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;我叫小安，是AI机器人。&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 256,
+          &quot;wall_seconds&quot;: 70.16726496099727,
+          &quot;cpu_seconds&quot;: 139.56,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 49.72404157322326,
+          &quot;peak_rss_bytes&quot;: 733753344,
+          &quot;peak_pss_bytes&quot;: 733136896,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2718900224,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;persona_role&quot;,
+        &quot;user&quot;: &quot;你是什么身份，主要做什么？&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;persona&quot;,
+          &quot;contains_any&quot;: [
+            &quot;科研&quot;,
+            &quot;机器人助手&quot;
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;你是什么身份，主要做什么？&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;persona&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;我是AI机器人，主要用来提供帮助和信息。&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 70.22737703399616,
+          &quot;ttft_seconds&quot;: 65.8360897829989,
+          &quot;prompt_tokens&quot;: 443,
+          &quot;evaluated_prefill_tokens&quot;: 443,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 12,
+            &quot;prompt_tokens&quot;: 443,
+            &quot;total_tokens&quot;: 455,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 443,
+            &quot;prompt_ms&quot;: 65816.625,
+            &quot;prompt_per_token_ms&quot;: 148.57025959367945,
+            &quot;prompt_per_second&quot;: 6.730822189682319,
+            &quot;predicted_n&quot;: 12,
+            &quot;predicted_ms&quot;: 4390.875,
+            &quot;predicted_per_token_ms&quot;: 399.17045454545456,
+            &quot;predicted_per_second&quot;: 2.5051954337119593
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 12,
+          &quot;prefill_seconds&quot;: 65.816625,
+          &quot;decode_seconds&quot;: 4.390875,
+          &quot;prefill_tokens_per_second&quot;: 6.730822189682319,
+          &quot;decode_tokens_per_second&quot;: 2.5051954337119593,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: false,
+          &quot;persona_valid&quot;: false,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;我是AI机器人，主要用来提供帮助和信息。&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 256,
+          &quot;wall_seconds&quot;: 70.30064865799795,
+          &quot;cpu_seconds&quot;: 139.79999999999995,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 49.7150462580032,
+          &quot;peak_rss_bytes&quot;: 734068736,
+          &quot;peak_pss_bytes&quot;: 733153280,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2719649792,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;persona_creator&quot;,
+        &quot;user&quot;: &quot;这个机器人助手角色是谁创造的？&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;persona&quot;,
+          &quot;contains_any&quot;: [
+            &quot;用户&quot;,
+            &quot;你创造&quot;,
+            &quot;您创造&quot;
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;这个机器人助手角色是谁创造的？&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;persona&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;这个机器人助手角色是AI创造的。&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 69.74846346800041,
+          &quot;ttft_seconds&quot;: 66.15583487700496,
+          &quot;prompt_tokens&quot;: 444,
+          &quot;evaluated_prefill_tokens&quot;: 444,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 10,
+            &quot;prompt_tokens&quot;: 444,
+            &quot;total_tokens&quot;: 454,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 444,
+            &quot;prompt_ms&quot;: 66136.564,
+            &quot;prompt_per_token_ms&quot;: 148.9562252252252,
+            &quot;prompt_per_second&quot;: 6.713381723308154,
+            &quot;predicted_n&quot;: 10,
+            &quot;predicted_ms&quot;: 3592.233,
+            &quot;predicted_per_token_ms&quot;: 399.137,
+            &quot;predicted_per_second&quot;: 2.5054054121767715
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 10,
+          &quot;prefill_seconds&quot;: 66.13656399999999,
+          &quot;decode_seconds&quot;: 3.5922330000000002,
+          &quot;prefill_tokens_per_second&quot;: 6.713381723308154,
+          &quot;decode_tokens_per_second&quot;: 2.5054054121767715,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: false,
+          &quot;persona_valid&quot;: false,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;这个机器人助手角色是AI创造的。&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 255,
+          &quot;wall_seconds&quot;: 69.82136088800326,
+          &quot;cpu_seconds&quot;: 138.77999999999997,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 49.69109676285514,
+          &quot;peak_rss_bytes&quot;: 734068736,
+          &quot;peak_pss_bytes&quot;: 733169664,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2721968128,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      },
+      {
+        &quot;id&quot;: &quot;chat&quot;,
+        &quot;user&quot;: &quot;你好。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;chat&quot;
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。需要操作时使用提供的工具，否则正常回复。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;你好。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;chat&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;你好！&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;wire_calls&quot;: null,
+          &quot;wall_seconds&quot;: 65.85238792198652,
+          &quot;ttft_seconds&quot;: 65.05053088298882,
+          &quot;prompt_tokens&quot;: 438,
+          &quot;evaluated_prefill_tokens&quot;: 438,
+          &quot;native_usage&quot;: {
+            &quot;completion_tokens&quot;: 3,
+            &quot;prompt_tokens&quot;: 438,
+            &quot;total_tokens&quot;: 441,
+            &quot;prompt_tokens_details&quot;: {
+              &quot;cached_tokens&quot;: 0
+            }
+          },
+          &quot;native_timings&quot;: {
+            &quot;cache_n&quot;: 0,
+            &quot;prompt_n&quot;: 438,
+            &quot;prompt_ms&quot;: 65031.271,
+            &quot;prompt_per_token_ms&quot;: 148.47322146118722,
+            &quot;prompt_per_second&quot;: 6.735221275315379,
+            &quot;predicted_n&quot;: 3,
+            &quot;predicted_ms&quot;: 801.6,
+            &quot;predicted_per_token_ms&quot;: 400.8,
+            &quot;predicted_per_second&quot;: 2.49500998003992
+          },
+          &quot;cache_prompt&quot;: false,
+          &quot;output_tokens&quot;: 3,
+          &quot;prefill_seconds&quot;: 65.031271,
+          &quot;decode_seconds&quot;: 0.8016,
+          &quot;prefill_tokens_per_second&quot;: 6.735221275315379,
+          &quot;decode_tokens_per_second&quot;: 2.49500998003992,
+          &quot;mlx_peak_allocated_bytes&quot;: null,
+          &quot;timing_source&quot;: &quot;llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained&quot;
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: null,
+          &quot;schema_valid&quot;: null,
+          &quot;registry_valid&quot;: null,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;你好！&quot;,
+            &quot;tool_calls&quot;: []
+          }
+        },
+        &quot;valid_call_seconds&quot;: null,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 149081,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 239,
+          &quot;wall_seconds&quot;: 65.9252768830047,
+          &quot;cpu_seconds&quot;: 130.55000000000007,
+          &quot;host_logical_cpus&quot;: 4,
+          &quot;cpu_capacity_percent&quot;: 49.50680762087758,
+          &quot;peak_rss_bytes&quot;: 734068736,
+          &quot;peak_pss_bytes&quot;: 733181952,
+          &quot;host_mem_total_bytes&quot;: 4113428480,
+          &quot;minimum_host_mem_available_bytes&quot;: 2701533184,
+          &quot;host_swap_delta_bytes&quot;: 0,
+          &quot;host_swap_in_delta_bytes&quot;: 0,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      }
+    ],
+    &quot;summary&quot;: {
+      &quot;samples&quot;: 7,
+      &quot;tool_samples&quot;: 3,
+      &quot;native_calls&quot;: 3,
+      &quot;json_valid&quot;: 3,
+      &quot;schema_valid&quot;: 3,
+      &quot;registry_valid&quot;: 3,
+      &quot;tool_expected_behavior&quot;: 3,
+      &quot;persona_samples&quot;: 3,
+      &quot;persona_valid&quot;: 0,
+      &quot;chat_samples&quot;: 1,
+      &quot;chat_valid&quot;: 1
+    },
+    &quot;status&quot;: &quot;completed&quot;,
+    &quot;evidence&quot;: [
+      {
+        &quot;path&quot;: &quot;benchmark/assets-manifest.json&quot;,
+        &quot;sha256&quot;: &quot;dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/chat.json&quot;,
+        &quot;sha256&quot;: &quot;c7a7f3c43599d2e8cac77107a639a2d34873e80b0197af00e9a81cd238b86227&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/persona_creator.json&quot;,
+        &quot;sha256&quot;: &quot;5794d156317b3fce46a1f1dd691ddb0d5dd8a24a5e37ade340920363db3c049d&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/persona_name.json&quot;,
+        &quot;sha256&quot;: &quot;98056fac07c84b533b2412a0a31d5dee4a8a33ce1800384ef479669659d6eedf&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/persona_role.json&quot;,
+        &quot;sha256&quot;: &quot;e8a26b0951e0a94a0e23c0d068a31638976b86af6df5424de0cc23f093300659&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/play_music.json&quot;,
+        &quot;sha256&quot;: &quot;a09cfb9ae037e21640b07634098c2dff3a2f4a4b2b492b90387eaf94e2013e61&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/start_camera.json&quot;,
+        &quot;sha256&quot;: &quot;8ffe4af1e1e1ef677b7ce190fc0c68fd966ba35682bc3bb7d753f41146680a2f&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/cases/volume_set.json&quot;,
+        &quot;sha256&quot;: &quot;739639df0f3b3d1d2916e0387ba2b1cb826d357fa084c668dafc7e03bd421c56&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/chat.json&quot;,
+        &quot;sha256&quot;: &quot;e25efd6f2aff0e51f805b8c5fda22f8f1684a5e3503ed6e10f230018ae6cec32&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/persona_creator.json&quot;,
+        &quot;sha256&quot;: &quot;50a8705fcefa2a9136402018ef369ddf6c4090ba0111c5e3e82dd187e2b4c445&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/persona_name.json&quot;,
+        &quot;sha256&quot;: &quot;47892f33ca6e3a9e7722152a106b0c8cd610c5c55029b98b3642a9b18e3e8d30&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/persona_role.json&quot;,
+        &quot;sha256&quot;: &quot;ba603358f45f1db02e0ee1960a4bb18cdd81f38741d26b890e89ab0e0e69841e&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/play_music.json&quot;,
+        &quot;sha256&quot;: &quot;b7cdfc765fcb228e7d53951243d4ace7bddf5e48837d59efac3ca98a6127f539&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/start_camera.json&quot;,
+        &quot;sha256&quot;: &quot;b3a37fc29552a4861388f42f786e18aee2d45a31745e8da10e097875f59db58c&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/events/volume_set.json&quot;,
+        &quot;sha256&quot;: &quot;4a2837bd5180baf56f48ed5636f327c2932e4f9dff6bfdfc087b1925d99d29fc&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/request.json&quot;,
+        &quot;sha256&quot;: &quot;74daeb25c6f8f3322528b5c7b700850b821bb4d41a8c6b2863c65680f6ffb162&quot;
+      },
+      {
+        &quot;path&quot;: &quot;benchmark/suite.json&quot;,
+        &quot;sha256&quot;: &quot;076bb6604595a50ed6426cb60904ba787c532d3d2f654925e4d6d6df361c42ab&quot;
+      }
+    ],
+    &quot;benchmark_result&quot;: {
+      &quot;path&quot;: &quot;benchmark/results.json&quot;,
+      &quot;sha256&quot;: &quot;1c1c787cd2b04ccfbd8e9b9aae0bd2c4e6467313e15a2af8585f766506e6064e&quot;
+    }
+  }
+]</pre></details></section><footer class="foot">Qwen lifecycle · 自包含离线报告 · 渲染只读数据，不执行模型</footer></main><script>const links=[...document.querySelectorAll(".rail a")];function nav(){let id="summary";for(const a of links){const s=document.querySelector(a.getAttribute("href"));if(s&&s.getBoundingClientRect().top<=150)id=s.id;}for(const a of links)a.classList.toggle("active",a.getAttribute("href")==="#"+id);}addEventListener("scroll",nav,{passive:true});nav();</script></body></html>

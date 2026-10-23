@@ -1,0 +1,95 @@
+{
+  "id": "holdout_045",
+  "user": "接到任务，内容为视觉传感器开始采集。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "start_camera",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "接到任务，内容为视觉传感器开始采集。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "您接到任务，内容为视觉传感器开始采集。现在开始采集，请您确认采集是否需要暂停或开启。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 13.92476204400009,
+    "ttft_seconds": 4.8918453289952595,
+    "prompt_tokens": 917,
+    "evaluated_prefill_tokens": 19,
+    "native_usage": {
+      "completion_tokens": 25,
+      "prompt_tokens": 917,
+      "total_tokens": 942,
+      "prompt_tokens_details": {
+        "cached_tokens": 898
+      }
+    },
+    "native_timings": {
+      "cache_n": 898,
+      "prompt_n": 19,
+      "prompt_ms": 4862.032,
+      "prompt_per_token_ms": 255.89642105263158,
+      "prompt_per_second": 3.907831129042343,
+      "predicted_n": 25,
+      "predicted_ms": 9032.14,
+      "predicted_per_token_ms": 376.33916666666664,
+      "predicted_per_second": 2.6571775902499297
+    },
+    "cache_prompt": true,
+    "output_tokens": 25,
+    "prefill_seconds": 4.862032,
+    "decode_seconds": 9.03214,
+    "prefill_tokens_per_second": 3.907831129042343,
+    "decode_tokens_per_second": 2.6571775902499297,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "您接到任务，内容为视觉传感器开始采集。现在开始采集，请您确认采集是否需要暂停或开启。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 53,
+    "wall_seconds": 13.987880310000037,
+    "cpu_seconds": 27.690000000000055,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 49.48927104452751,
+    "peak_rss_bytes": 594546688,
+    "peak_pss_bytes": 593567744,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2871988224,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

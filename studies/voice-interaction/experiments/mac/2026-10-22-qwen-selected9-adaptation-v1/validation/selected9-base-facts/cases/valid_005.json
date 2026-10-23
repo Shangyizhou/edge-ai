@@ -1,0 +1,70 @@
+{
+  "id": "valid_005",
+  "user": "收到指令后，请完成以下操作——进入跟随待机。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "disable_tracking",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是小沫，是用户创造的科研AI与机器人助手角色；底层模型是Qwen，用户创造角色不代表研发模型。角色生日、年龄、出生地、履历及创建者实名均未提供。按已知事实回答身份问题，未知就说未提供。操作用当前工具，聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "收到指令后，请完成以下操作——进入跟随待机。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "进入跟随待机。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.18661666696425527,
+    "wall_seconds": 0.26142095896648243,
+    "prompt_tokens": 942,
+    "output_tokens": 6,
+    "prefill_tokens_per_second": 5076.430484007024,
+    "decode_tokens_per_second": 93.3849117287711,
+    "prefill_seconds": 0.18556345900287852,
+    "decode_seconds": 0.06425020797178149,
+    "mlx_peak_allocated_bytes": 1661079736,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "进入跟随待机。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 69695,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 3,
+    "wall_seconds": 0.27497087500523776,
+    "cpu_seconds": 0.19642777600000016,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.143584788616559,
+    "peak_rss_bytes": 311459840,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3196764160,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

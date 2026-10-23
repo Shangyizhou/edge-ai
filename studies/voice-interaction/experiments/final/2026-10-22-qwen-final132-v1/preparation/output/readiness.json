@@ -1,0 +1,302 @@
+{
+  "schema": "edge-model-prepare/readiness-v1",
+  "status": "READY_FOR_BENCHMARK",
+  "request_sha256": "5b679b9eeeab1a3ae414f1d116858c256f150b87f5b54ca919994663acc9cdf3",
+  "device": {
+    "name": "Orange Pi 3B RK3566",
+    "memory_bytes": 4113428480
+  },
+  "requirements": {
+    "scope": "selected and matchedbase Q4 dev smoke; minimal inference only, not final quality"
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "id": "base",
+        "name": "final14-board-base",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-base-q4_k_m.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "ARM CPU",
+          "network": "direct"
+        },
+        "backend": "ARM CPU",
+        "precision": "Q4_K_M"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "SHAverified transferred matchedQ4; reused pinned CPU e3797b1 build after actual binary/library check"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "Inspected actual assets evidence; no production acceptance",
+          "evidence": [
+            "base-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "Inspected actual runtime evidence; no production acceptance",
+          "evidence": [
+            "base-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "Inspected actual smoke evidence; no production acceptance",
+          "evidence": [
+            "base-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "Inspected actual benchmark evidence; no production acceptance",
+          "evidence": [
+            "base-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "base-benchmark_config"
+      ],
+      "next_action": "Run complete frozen132; never tune from final outputs."
+    },
+    {
+      "candidate": {
+        "id": "selected",
+        "name": "final14-board-selected",
+        "decision": "prepare",
+        "model": "Qwen/Qwen3-0.6B",
+        "artifact": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-selected9-768-v3-q4_k_m.gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "version": "e3797b184d428c7a019362612b76971f60af6670",
+          "backend": "ARM CPU",
+          "network": "direct"
+        },
+        "backend": "ARM CPU",
+        "precision": "Q4_K_M"
+      },
+      "acquisition": {
+        "model": "reuse",
+        "runtime": "reuse",
+        "reason": "SHAverified transferred matchedQ4; reused pinned CPU e3797b1 build after actual binary/library check"
+      },
+      "checks": {
+        "assets": {
+          "status": "PASS",
+          "reason": "Inspected actual assets evidence; no production acceptance",
+          "evidence": [
+            "selected-assets"
+          ]
+        },
+        "runtime": {
+          "status": "PASS",
+          "reason": "Inspected actual runtime evidence; no production acceptance",
+          "evidence": [
+            "selected-runtime"
+          ]
+        },
+        "smoke": {
+          "status": "PASS",
+          "reason": "Inspected actual smoke evidence; no production acceptance",
+          "evidence": [
+            "selected-smoke"
+          ]
+        },
+        "benchmark": {
+          "status": "PASS",
+          "reason": "Inspected actual benchmark evidence; no production acceptance",
+          "evidence": [
+            "selected-benchmark_config"
+          ]
+        }
+      },
+      "status": "READY_FOR_BENCHMARK",
+      "benchmark_configs": [
+        "selected-benchmark_config"
+      ],
+      "next_action": "Run complete frozen132; never tune from final outputs."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "base-assets",
+      "kind": "assets",
+      "location": "../runs/final14-board-base-dev-smoke/assets-manifest.json",
+      "sha256": "3cc8b5d8740459da60c73d07b641a1fc9556421c95e6437170355f20c9534f24",
+      "description": "Actual pre-final development assets; exact finalconfig frozen separately"
+    },
+    {
+      "id": "base-runtime",
+      "kind": "runtime",
+      "location": "../runs/final14-board-base-dev-smoke/runtime.json",
+      "sha256": "27f31e853ed8e6b0a5bb5259609f0d910bc3cf54ad6c88c1579c3b6e96fab928",
+      "description": "Actual pre-final development runtime; exact finalconfig frozen separately"
+    },
+    {
+      "id": "base-smoke",
+      "kind": "smoke",
+      "location": "../runs/final14-board-base-dev-smoke/results.json",
+      "sha256": "9acc9cdbdc70cddcbc034db94055cfea7113e34be6285954d2fea52e49a8379b",
+      "description": "Actual pre-final development smoke; exact finalconfig frozen separately"
+    },
+    {
+      "id": "base-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../final14-board-base-request.json",
+      "sha256": "e849f5588b5e230be938c018b1370de14dca43b3c115329331b2ecc4e6af0df9",
+      "description": "Actual pre-final development benchmark_config; exact finalconfig frozen separately"
+    },
+    {
+      "id": "selected-assets",
+      "kind": "assets",
+      "location": "../runs/final14-board-selected-dev-smoke/assets-manifest.json",
+      "sha256": "ea0f16e71aef4c31be2934ffec5e5ec3cb3a3601e3d466ebe5399ee7508a2955",
+      "description": "Actual pre-final development assets; exact finalconfig frozen separately"
+    },
+    {
+      "id": "selected-runtime",
+      "kind": "runtime",
+      "location": "../runs/final14-board-selected-dev-smoke/runtime.json",
+      "sha256": "bffff281dd13d7a21da7090230a3eb8ab40f09c3b8ff636509ed950e85c47b40",
+      "description": "Actual pre-final development runtime; exact finalconfig frozen separately"
+    },
+    {
+      "id": "selected-smoke",
+      "kind": "smoke",
+      "location": "../runs/final14-board-selected-dev-smoke/results.json",
+      "sha256": "177ad50a2be84bdd21e1356b13378f7435961d535d37138b4a52277a4c4a80ee",
+      "description": "Actual pre-final development smoke; exact finalconfig frozen separately"
+    },
+    {
+      "id": "selected-benchmark_config",
+      "kind": "benchmark_config",
+      "location": "../final14-board-selected-request.json",
+      "sha256": "fb47790fa4d43acf14773d8c5febee3e4280b88f7b1ec384fdebd08e19484794",
+      "description": "Actual pre-final development benchmark_config; exact finalconfig frozen separately"
+    }
+  ],
+  "evidence_verification": "references_only",
+  "product_acceptance": "NOT_EVALUATED",
+  "benchmark_handoff": {
+    "candidates": [
+      {
+        "candidate": {
+          "id": "base",
+          "name": "final14-board-base",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-base-q4_k_m.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "ARM CPU",
+            "network": "direct"
+          },
+          "backend": "ARM CPU",
+          "precision": "Q4_K_M"
+        },
+        "configurations": [
+          {
+            "id": "base-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../final14-board-base-request.json",
+            "sha256": "e849f5588b5e230be938c018b1370de14dca43b3c115329331b2ecc4e6af0df9",
+            "description": "Actual pre-final development benchmark_config; exact finalconfig frozen separately"
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "id": "selected",
+          "name": "final14-board-selected",
+          "decision": "prepare",
+          "model": "Qwen/Qwen3-0.6B",
+          "artifact": "/home/orangepi/.local/share/edge-ai/qwen-ticket14/artifacts/qwen3-selected9-768-v3-q4_k_m.gguf",
+          "runtime": {
+            "name": "llama.cpp",
+            "version": "e3797b184d428c7a019362612b76971f60af6670",
+            "backend": "ARM CPU",
+            "network": "direct"
+          },
+          "backend": "ARM CPU",
+          "precision": "Q4_K_M"
+        },
+        "configurations": [
+          {
+            "id": "selected-benchmark_config",
+            "kind": "benchmark_config",
+            "location": "../final14-board-selected-request.json",
+            "sha256": "fb47790fa4d43acf14773d8c5febee3e4280b88f7b1ec384fdebd08e19484794",
+            "description": "Actual pre-final development benchmark_config; exact finalconfig frozen separately"
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "base-assets",
+        "kind": "assets",
+        "location": "../runs/final14-board-base-dev-smoke/assets-manifest.json",
+        "sha256": "3cc8b5d8740459da60c73d07b641a1fc9556421c95e6437170355f20c9534f24",
+        "description": "Actual pre-final development assets; exact finalconfig frozen separately"
+      },
+      {
+        "id": "base-runtime",
+        "kind": "runtime",
+        "location": "../runs/final14-board-base-dev-smoke/runtime.json",
+        "sha256": "27f31e853ed8e6b0a5bb5259609f0d910bc3cf54ad6c88c1579c3b6e96fab928",
+        "description": "Actual pre-final development runtime; exact finalconfig frozen separately"
+      },
+      {
+        "id": "base-smoke",
+        "kind": "smoke",
+        "location": "../runs/final14-board-base-dev-smoke/results.json",
+        "sha256": "9acc9cdbdc70cddcbc034db94055cfea7113e34be6285954d2fea52e49a8379b",
+        "description": "Actual pre-final development smoke; exact finalconfig frozen separately"
+      },
+      {
+        "id": "base-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../final14-board-base-request.json",
+        "sha256": "e849f5588b5e230be938c018b1370de14dca43b3c115329331b2ecc4e6af0df9",
+        "description": "Actual pre-final development benchmark_config; exact finalconfig frozen separately"
+      },
+      {
+        "id": "selected-assets",
+        "kind": "assets",
+        "location": "../runs/final14-board-selected-dev-smoke/assets-manifest.json",
+        "sha256": "ea0f16e71aef4c31be2934ffec5e5ec3cb3a3601e3d466ebe5399ee7508a2955",
+        "description": "Actual pre-final development assets; exact finalconfig frozen separately"
+      },
+      {
+        "id": "selected-runtime",
+        "kind": "runtime",
+        "location": "../runs/final14-board-selected-dev-smoke/runtime.json",
+        "sha256": "bffff281dd13d7a21da7090230a3eb8ab40f09c3b8ff636509ed950e85c47b40",
+        "description": "Actual pre-final development runtime; exact finalconfig frozen separately"
+      },
+      {
+        "id": "selected-smoke",
+        "kind": "smoke",
+        "location": "../runs/final14-board-selected-dev-smoke/results.json",
+        "sha256": "177ad50a2be84bdd21e1356b13378f7435961d535d37138b4a52277a4c4a80ee",
+        "description": "Actual pre-final development smoke; exact finalconfig frozen separately"
+      },
+      {
+        "id": "selected-benchmark_config",
+        "kind": "benchmark_config",
+        "location": "../final14-board-selected-request.json",
+        "sha256": "fb47790fa4d43acf14773d8c5febee3e4280b88f7b1ec384fdebd08e19484794",
+        "description": "Actual pre-final development benchmark_config; exact finalconfig frozen separately"
+      }
+    ]
+  }
+}

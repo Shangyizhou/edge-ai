@@ -1,0 +1,97 @@
+{
+  "id": "holdout_035",
+  "user": "设备操作单写着播放歌曲\"A \\\"B\\\" C\"，照单办理。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "A \"B\" C"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "设备操作单写着播放歌曲\"A \\\"B\\\" C\"，照单办理。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请确认播放歌曲的名称是否正确，以便进行操作。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 0.4478724580258131,
+    "ttft_seconds": 0.338232500012964,
+    "prompt_tokens": 924,
+    "evaluated_prefill_tokens": 924,
+    "native_usage": {
+      "completion_tokens": 14,
+      "prompt_tokens": 924,
+      "total_tokens": 938,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 924,
+      "prompt_ms": 333.37,
+      "prompt_per_token_ms": 0.36079004329004327,
+      "prompt_per_second": 2771.695113537511,
+      "predicted_n": 14,
+      "predicted_ms": 109.493,
+      "predicted_per_token_ms": 8.422538461538462,
+      "predicted_per_second": 118.72905117222105
+    },
+    "cache_prompt": false,
+    "output_tokens": 14,
+    "prefill_seconds": 0.33337,
+    "decode_seconds": 0.109493,
+    "prefill_tokens_per_second": 2771.695113537511,
+    "decode_tokens_per_second": 118.72905117222105,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请确认播放歌曲的名称是否正确，以便进行操作。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 3020,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.46050791698507965,
+    "cpu_seconds": 0.205884352,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.470810259852072,
+    "peak_rss_bytes": 1440579584,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2275164160,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 1916928,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

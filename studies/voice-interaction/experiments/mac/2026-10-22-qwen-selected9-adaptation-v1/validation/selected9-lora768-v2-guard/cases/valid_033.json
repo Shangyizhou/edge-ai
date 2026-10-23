@@ -1,0 +1,113 @@
+{
+  "id": "valid_033",
+  "user": "播放前先设置音量3，所选歌曲是\"星晴\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 3
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "星晴"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+    },
+    {
+      "role": "user",
+      "content": "播放前先设置音量3，所选歌曲是\"星晴\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"星晴\"}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.21631087502464652,
+    "wall_seconds": 0.8212458330090158,
+    "prompt_tokens": 928,
+    "output_tokens": 42,
+    "prefill_tokens_per_second": 4308.580397372937,
+    "decode_tokens_per_second": 70.5425752757183,
+    "prefill_seconds": 0.21538416703697297,
+    "decode_seconds": 0.5953851250233129,
+    "mlx_peak_allocated_bytes": 1700459344,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 3
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "星晴"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 3
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "星晴"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 1.094524750020355,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 62650,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 7,
+    "wall_seconds": 1.1116468340042047,
+    "cpu_seconds": 0.6480319710000018,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 5.829477053119107,
+    "peak_rss_bytes": 121978880,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3198238720,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "id": "valid_031",
+  "user": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 23.5
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "a\"b"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.30422733299201354,
+    "wall_seconds": 0.6843542500282638,
+    "prompt_tokens": 927,
+    "output_tokens": 21,
+    "prefill_tokens_per_second": 3054.7976926249216,
+    "decode_tokens_per_second": 57.27184220843137,
+    "prefill_seconds": 0.303457083995454,
+    "decode_seconds": 0.3666723330388777,
+    "mlx_peak_allocated_bytes": 1705251032,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 71140,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.697138708026614,
+    "cpu_seconds": 0.34719641600000095,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.98030609981201,
+    "peak_rss_bytes": 634716160,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2937765888,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

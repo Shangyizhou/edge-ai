@@ -1,0 +1,5638 @@
+{
+  "schema": "edge-model-benchmark/result-v1",
+  "run_id": "selected9-lora768-v2-guard",
+  "source": {
+    "kind": "device_measurement",
+    "raw_evidence": "cases/ and events/ within this run"
+  },
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "BF16",
+    "artifact_format": "HF safetensors",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "runtime default unquantized",
+    "lineage": "officialBF16 base + selected9v2 train768 F32 LoRA matrices; residualcasttoinputdtype",
+    "adapter_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/runs/selected9-train768-v2/adapter",
+    "actual_runtime": {
+      "name": "mlx-lm",
+      "version": "0.32.2",
+      "mlx_version": "0.32.4",
+      "backend": "Metal"
+    }
+  },
+  "stage": "validation compactguard lora768-v2",
+  "request_sha256": "068c2c4ea01aab08194790a3936ac0cb7cbfe4d163ae841c341d3a77e862e4c2",
+  "suite_sha256": "50534615e9e0278a94be7a9b506a82ff00c97728c47b201c19f93847ecc6c02c",
+  "artifacts": {
+    "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "total_bytes": 1519207673,
+    "files": [
+      {
+        "name": "LICENSE",
+        "bytes": 11343,
+        "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+      },
+      {
+        "name": "README.md",
+        "bytes": 13965,
+        "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9"
+      },
+      {
+        "name": "config.json",
+        "bytes": 726,
+        "sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd"
+      },
+      {
+        "name": "generation_config.json",
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      {
+        "name": "merges.txt",
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      {
+        "name": "model.safetensors",
+        "bytes": 1503300328,
+        "sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+      },
+      {
+        "name": "tokenizer.json",
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      {
+        "name": "tokenizer_config.json",
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      {
+        "name": "vocab.json",
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    ]
+  },
+  "environment": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10
+  },
+  "loading": {
+    "wall_seconds": 1.9269454579916783,
+    "resources": {
+      "scope": "declared process and recursive children",
+      "pid": 62650,
+      "sampling_interval_seconds": 0.2,
+      "sample_count": 10,
+      "wall_seconds": 1.9133002079906873,
+      "cpu_seconds": 1.6473589759999998,
+      "host_logical_cpus": 10,
+      "cpu_capacity_percent": 8.61003918318718,
+      "peak_rss_bytes": 884228096,
+      "peak_pss_bytes": null,
+      "host_mem_total_bytes": 17179869184,
+      "minimum_host_mem_available_bytes": 3319447552,
+      "host_swap_delta_bytes": 0,
+      "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+    }
+  },
+  "measurement": {
+    "resources": "per-case sampled process tree",
+    "cache": "new MLX prompt cache per case / llama cache_prompt=false",
+    "timing": "request to complete response; valid-call latency only if native+schema pass",
+    "sampling_interval_seconds": 0.2,
+    "quality_scope": "frozen deterministic fixture rules; no hardware execution or product acceptance"
+  },
+  "cases": [
+    {
+      "id": "valid_000",
+      "user": "收到指令后，请完成以下操作——相机重新采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——相机重新采集图像。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"start_camera\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.36430125002516434,
+        "wall_seconds": 0.5562636670074426,
+        "prompt_tokens": 924,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 3002.7378830193297,
+        "decode_tokens_per_second": 86.90260150321457,
+        "prefill_seconds": 0.30771916697267443,
+        "decode_seconds": 0.18411416601156816,
+        "mlx_peak_allocated_bytes": 1723010880,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.820727291982621,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8314435829524882,
+        "cpu_seconds": 0.4733817210000004,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.693491785924953,
+        "peak_rss_bytes": 351289344,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3052535808,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_001",
+      "user": "收到指令后，请完成以下操作——相机停止采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——相机停止采集图像。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"stop_camera\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.16196691698860377,
+        "wall_seconds": 0.370900709007401,
+        "prompt_tokens": 924,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 5734.8604580762585,
+        "decode_tokens_per_second": 79.81290539013993,
+        "prefill_seconds": 0.16111987497424707,
+        "decode_seconds": 0.20046883297618479,
+        "mlx_peak_allocated_bytes": 1704586048,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "stop_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6232465829816647,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6386853330186568,
+        "cpu_seconds": 0.3146303289999999,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.926218166196861,
+        "peak_rss_bytes": 352436224,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3336339456,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_002",
+      "user": "收到指令后，请完成以下操作——把扫描融合打开。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——把扫描融合打开。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"enable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.22452433401485905,
+        "wall_seconds": 0.5012617919710465,
+        "prompt_tokens": 924,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 4131.246814134928,
+        "decode_tokens_per_second": 63.87505522396079,
+        "prefill_seconds": 0.22366129199508578,
+        "decode_seconds": 0.26614458399126306,
+        "mlx_peak_allocated_bytes": 1704586048,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8379437919938937,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8555594579665922,
+        "cpu_seconds": 0.5710548319999997,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.674636422782649,
+        "peak_rss_bytes": 358875136,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3330670592,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_003",
+      "user": "收到指令后，请完成以下操作——把扫描融合关掉。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——把扫描融合关掉。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2569067499716766,
+        "wall_seconds": 0.5383212500018999,
+        "prompt_tokens": 925,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 3614.7285530239924,
+        "decode_tokens_per_second": 63.21593393959667,
+        "prefill_seconds": 0.2558975000283681,
+        "decode_seconds": 0.2689195419661701,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8073510419926606,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8218539580120705,
+        "cpu_seconds": 0.4570902239999999,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.561696449155345,
+        "peak_rss_bytes": 342638592,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2874507264,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_004",
+      "user": "收到指令后，请完成以下操作——进入目标跟随。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——进入目标跟随。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"enable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.22040770895546302,
+        "wall_seconds": 0.4499822499928996,
+        "prompt_tokens": 923,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4204.499800358755,
+        "decode_tokens_per_second": 72.04616335405606,
+        "prefill_seconds": 0.21952670800965282,
+        "decode_seconds": 0.2220798340276815,
+        "mlx_peak_allocated_bytes": 1703832368,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.658838834031485,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6698810000088997,
+        "cpu_seconds": 0.26707072000000043,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.9868382592796667,
+        "peak_rss_bytes": 321011712,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2874507264,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_005",
+      "user": "收到指令后，请完成以下操作——进入跟随待机。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——进入跟随待机。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19016937498236075,
+        "wall_seconds": 0.39991895796265453,
+        "prompt_tokens": 924,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4876.307886270601,
+        "decode_tokens_per_second": 79.37400341874302,
+        "prefill_seconds": 0.18948762497166172,
+        "decode_seconds": 0.20157733402447775,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.5898349999915808,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6015687920153141,
+        "cpu_seconds": 0.255196722,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.242186851898784,
+        "peak_rss_bytes": 336265216,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3276292096,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_006",
+      "user": "收到指令后，请完成以下操作——查看目标跟随的当前状态。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——查看目标跟随的当前状态。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"following_status\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.17550841596676037,
+        "wall_seconds": 0.38065754098352045,
+        "prompt_tokens": 926,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 5304.847289145349,
+        "decode_tokens_per_second": 81.235920020877,
+        "prefill_seconds": 0.17455733398674056,
+        "decode_seconds": 0.19695720804156738,
+        "mlx_peak_allocated_bytes": 1706061840,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "following_status",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.5974675829638727,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6081762909889221,
+        "cpu_seconds": 0.290354765,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.77418750618953,
+        "peak_rss_bytes": 338345984,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3304472576,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_007",
+      "user": "收到指令后，请完成以下操作——将音量设为0。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 0
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——将音量设为0。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 0}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18639116699341685,
+        "wall_seconds": 0.45572974998503923,
+        "prompt_tokens": 926,
+        "output_tokens": 20,
+        "prefill_tokens_per_second": 4986.7612001116,
+        "decode_tokens_per_second": 75.68320667857103,
+        "prefill_seconds": 0.18569166696397588,
+        "decode_seconds": 0.2642594160279259,
+        "mlx_peak_allocated_bytes": 1706061840,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 0
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 0
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7117694580228999,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7289454590063542,
+        "cpu_seconds": 0.5411586600000007,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.423856659147984,
+        "peak_rss_bytes": 355368960,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3214393344,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_008",
+      "user": "收到指令后，请完成以下操作——播放歌曲\"稻香\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "稻香"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——播放歌曲\"稻香\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"稻香\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.20585683401441202,
+        "wall_seconds": 0.5065227500163019,
+        "prompt_tokens": 926,
+        "output_tokens": 22,
+        "prefill_tokens_per_second": 4520.581207377987,
+        "decode_tokens_per_second": 75.23802558002743,
+        "prefill_seconds": 0.20484091702383012,
+        "decode_seconds": 0.2924053340102546,
+        "mlx_peak_allocated_bytes": 1706061840,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "稻香"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "稻香"
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7765642919694073,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7937081669806503,
+        "cpu_seconds": 0.5964207139999997,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.51435778050322,
+        "peak_rss_bytes": 349454336,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3199647744,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_009",
+      "user": "当前环节改为相机重新采集图像，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为相机重新采集图像，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"start_camera\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.21164504199987277,
+        "wall_seconds": 0.434595208032988,
+        "prompt_tokens": 924,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4384.834923148858,
+        "decode_tokens_per_second": 74.99213436494097,
+        "prefill_seconds": 0.21072629099944606,
+        "decode_seconds": 0.21335570904193446,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6920317499898374,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7088820839999244,
+        "cpu_seconds": 0.5227644159999993,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.374490451927618,
+        "peak_rss_bytes": 353665024,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3199647744,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_010",
+      "user": "当前环节改为相机停止采集图像，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为相机停止采集图像，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"stop_camera\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.1989610829623416,
+        "wall_seconds": 0.41768566594691947,
+        "prompt_tokens": 924,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4664.275636690577,
+        "decode_tokens_per_second": 77.3986319890925,
+        "prefill_seconds": 0.19810149999102578,
+        "decode_seconds": 0.20672199997352436,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "stop_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6625252910307609,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6815644159796648,
+        "cpu_seconds": 0.3411821149999996,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.0058674866350295,
+        "peak_rss_bytes": 325058560,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3199647744,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_011",
+      "user": "当前环节改为把扫描融合打开，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为把扫描融合打开，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"enable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18952737498329952,
+        "wall_seconds": 0.41075812495546415,
+        "prompt_tokens": 924,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 4897.216100076838,
+        "decode_tokens_per_second": 79.89259916340826,
+        "prefill_seconds": 0.18867862498154864,
+        "decode_seconds": 0.21278566698310897,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.673246708989609,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6899440420093015,
+        "cpu_seconds": 0.342218527,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.960091053230464,
+        "peak_rss_bytes": 327548928,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3268100096,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_012",
+      "user": "当前环节改为把扫描融合关掉，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为把扫描融合关掉，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18281816598027945,
+        "wall_seconds": 0.40514045796589926,
+        "prompt_tokens": 925,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 5080.167097023057,
+        "decode_tokens_per_second": 79.40072704531005,
+        "prefill_seconds": 0.18208062497433275,
+        "decode_seconds": 0.21410383295733482,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6368572080391459,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6499017080059275,
+        "cpu_seconds": 0.3080450940000006,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.739872048423529,
+        "peak_rss_bytes": 333807616,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3268100096,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_013",
+      "user": "当前环节改为进入目标跟随，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为进入目标跟随，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"enable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19826454197755083,
+        "wall_seconds": 0.8141410420066677,
+        "prompt_tokens": 923,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4676.22937894004,
+        "decode_tokens_per_second": 26.55261579219912,
+        "prefill_seconds": 0.19738124997820705,
+        "decode_seconds": 0.6025771669810638,
+        "mlx_peak_allocated_bytes": 1703832368,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.1343814579886384,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 1.1522690420388244,
+        "cpu_seconds": 0.5865548600000006,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.090433211345768,
+        "peak_rss_bytes": 349618176,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3276652544,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_014",
+      "user": "当前环节改为进入跟随待机，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为进入跟随待机，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.1505119160283357,
+        "wall_seconds": 0.351903333037626,
+        "prompt_tokens": 924,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 6177.126080868127,
+        "decode_tokens_per_second": 83.17890736304868,
+        "prefill_seconds": 0.14958412502892315,
+        "decode_seconds": 0.1923564579919912,
+        "mlx_peak_allocated_bytes": 1701987872,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6144297090359032,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6304703750065528,
+        "cpu_seconds": 0.3923846960000006,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.22368173914472,
+        "peak_rss_bytes": 340590592,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3276652544,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_015",
+      "user": "当前环节改为查看目标跟随的当前状态，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为查看目标跟随的当前状态，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"following_status\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.17675887502264231,
+        "wall_seconds": 0.3956735000247136,
+        "prompt_tokens": 926,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 5264.9197014928895,
+        "decode_tokens_per_second": 76.62491207361677,
+        "prefill_seconds": 0.17588112497469408,
+        "decode_seconds": 0.20880937500623986,
+        "mlx_peak_allocated_bytes": 1706061840,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "following_status",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8624589590472169,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8759249169961549,
+        "cpu_seconds": 0.5246770759999997,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.989977746029833,
+        "peak_rss_bytes": 347996160,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3181527040,
+        "host_swap_delta_bytes": -125829120,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_016",
+      "user": "当前环节改为将音量设为1，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 1
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为将音量设为1，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 1}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.1756843330222182,
+        "wall_seconds": 0.45492708298843354,
+        "prompt_tokens": 926,
+        "output_tokens": 20,
+        "prefill_tokens_per_second": 5308.166980221846,
+        "decode_tokens_per_second": 73.83608941661578,
+        "prefill_seconds": 0.17444816703209653,
+        "decode_seconds": 0.27087025000946596,
+        "mlx_peak_allocated_bytes": 1576146188,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 1
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 1
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7321513330098242,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7415968339773826,
+        "cpu_seconds": 0.6301744319999987,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.497534012115509,
+        "peak_rss_bytes": 349650944,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3212722176,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_017",
+      "user": "当前环节改为播放歌曲\"晴天\"，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "晴天"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为播放歌曲\"晴天\"，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"晴天\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18738512496929616,
+        "wall_seconds": 0.5288985829683952,
+        "prompt_tokens": 927,
+        "output_tokens": 22,
+        "prefill_tokens_per_second": 4975.076556376637,
+        "decode_tokens_per_second": 66.09538383648766,
+        "prefill_seconds": 0.1863287910236977,
+        "decode_seconds": 0.33285229199100286,
+        "mlx_peak_allocated_bytes": 1706488240,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "晴天"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "晴天"
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8106585420318879,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8279710829956457,
+        "cpu_seconds": 0.5537468660000009,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.687997653209261,
+        "peak_rss_bytes": 341032960,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3212148736,
+        "host_swap_delta_bytes": -25165824,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_018",
+      "user": "能否把任务切换到相机重新采集图像？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到相机重新采集图像？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"start_camera\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19323229201836511,
+        "wall_seconds": 0.41153216699603945,
+        "prompt_tokens": 921,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4788.949537593062,
+        "decode_tokens_per_second": 76.16835109084302,
+        "prefill_seconds": 0.19231775001389906,
+        "decode_seconds": 0.21006100001977757,
+        "mlx_peak_allocated_bytes": 1700259824,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6659073749906383,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6851634579943493,
+        "cpu_seconds": 0.3368517879999988,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.916371182229291,
+        "peak_rss_bytes": 330874880,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3237904384,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_019",
+      "user": "能否把任务切换到相机停止采集图像？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到相机停止采集图像？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19130387500626966,
+        "wall_seconds": 0.4271788340411149,
+        "prompt_tokens": 921,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 4850.066794521282,
+        "decode_tokens_per_second": 77.18231591210865,
+        "prefill_seconds": 0.1898942919797264,
+        "decode_seconds": 0.220257707987912,
+        "mlx_peak_allocated_bytes": 1700259824,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6906755840172991,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.708064291975461,
+        "cpu_seconds": 0.5351621480000013,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.5581010660335375,
+        "peak_rss_bytes": 353353728,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3304194048,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_020",
+      "user": "能否把任务切换到把扫描融合打开？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到把扫描融合打开？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"enable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18229254201287404,
+        "wall_seconds": 0.41183699999237433,
+        "prompt_tokens": 921,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 5076.588664149518,
+        "decode_tokens_per_second": 76.84540568891028,
+        "prefill_seconds": 0.1814210409647785,
+        "decode_seconds": 0.22122337500331923,
+        "mlx_peak_allocated_bytes": 1700259824,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6608523750328459,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6769932910101488,
+        "cpu_seconds": 0.5562133439999997,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.21593583549503,
+        "peak_rss_bytes": 353550336,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3279159296,
+        "host_swap_delta_bytes": -25165824,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_021",
+      "user": "能否把任务切换到把扫描融合关掉？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到把扫描融合关掉？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_lidar\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19228250003652647,
+        "wall_seconds": 0.4409800420398824,
+        "prompt_tokens": 922,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 4828.664048274885,
+        "decode_tokens_per_second": 72.49733599440879,
+        "prefill_seconds": 0.19094308296917006,
+        "decode_seconds": 0.23449137498391792,
+        "mlx_peak_allocated_bytes": 1701200736,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7296836669556797,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7472916249535047,
+        "cpu_seconds": 0.5699869399999997,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.627369569884627,
+        "peak_rss_bytes": 350732288,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3257417728,
+        "host_swap_delta_bytes": -50331648,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19611379102570936,
+        "wall_seconds": 0.41306629101745784,
+        "prompt_tokens": 920,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4718.090864358941,
+        "decode_tokens_per_second": 77.44674238441306,
+        "prefill_seconds": 0.1949941250495613,
+        "decode_seconds": 0.2065935829887167,
+        "mlx_peak_allocated_bytes": 1700259408,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.680259709013626,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6932124590384774,
+        "cpu_seconds": 0.5509506640000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.947789408808347,
+        "peak_rss_bytes": 353615872,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3223126016,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_023",
+      "user": "能否把任务切换到进入跟随待机？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入跟随待机？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.21008970797993243,
+        "wall_seconds": 0.4270949579658918,
+        "prompt_tokens": 921,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4422.664595587095,
+        "decode_tokens_per_second": 78.40498157328139,
+        "prefill_seconds": 0.20824549999088052,
+        "decode_seconds": 0.20406866603298113,
+        "mlx_peak_allocated_bytes": 1700259824,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6910596669767983,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7087886249646544,
+        "cpu_seconds": 0.574960840000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.111880181890234,
+        "peak_rss_bytes": 353681408,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3223126016,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_024",
+      "user": "能否把任务切换到查看目标跟随的当前状态？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到查看目标跟随的当前状态？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"following_status\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19502241601003334,
+        "wall_seconds": 0.406846540980041,
+        "prompt_tokens": 923,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4764.718362813148,
+        "decode_tokens_per_second": 79.11433167888814,
+        "prefill_seconds": 0.19371554197277874,
+        "decode_seconds": 0.20223895797971636,
+        "mlx_peak_allocated_bytes": 1703832368,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "following_status",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6692210410255939,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6783479590085335,
+        "cpu_seconds": 0.5420628399999998,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.990926084487279,
+        "peak_rss_bytes": 319602688,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3278536704,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_025",
+      "user": "能否把任务切换到将音量设为17.5？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 17.5
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到将音量设为17.5？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 17.5}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18467920803232118,
+        "wall_seconds": 0.49267791700549424,
+        "prompt_tokens": 926,
+        "output_tokens": 23,
+        "prefill_tokens_per_second": 5039.028444417967,
+        "decode_tokens_per_second": 76.74453039583089,
+        "prefill_seconds": 0.18376558303134516,
+        "decode_seconds": 0.29969562496989965,
+        "mlx_peak_allocated_bytes": 1706061840,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 17.5
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 17.5
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.748115292051807,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7643308750120923,
+        "cpu_seconds": 0.5172165400000015,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.766919365802392,
+        "peak_rss_bytes": 315621376,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3220865024,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_026",
+      "user": "能否把任务切换到播放歌曲\"海阔天空\"？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海阔天空"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到播放歌曲\"海阔天空\"？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海阔天空\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19108608301030472,
+        "wall_seconds": 0.502491542021744,
+        "prompt_tokens": 924,
+        "output_tokens": 23,
+        "prefill_tokens_per_second": 4858.579527537214,
+        "decode_tokens_per_second": 75.91788427479533,
+        "prefill_seconds": 0.19017904199426994,
+        "decode_seconds": 0.3029589169891551,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海阔天空"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海阔天空"
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7911747500183992,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8057939169812016,
+        "cpu_seconds": 0.5035886079999994,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.24959555275158,
+        "peak_rss_bytes": 315195392,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3191848960,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_027",
+      "user": "有两项请求：音量调成3，然后点播\"星晴\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成3，然后点播\"星晴\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"星晴\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.20109912496991456,
+        "wall_seconds": 0.8144399589509703,
+        "prompt_tokens": 929,
+        "output_tokens": 42,
+        "prefill_tokens_per_second": 4640.518998890533,
+        "decode_tokens_per_second": 69.40850935944682,
+        "prefill_seconds": 0.2001931249978952,
+        "decode_seconds": 0.605113124998752,
+        "mlx_peak_allocated_bytes": 1706813680,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 3
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "星晴"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 3
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "星晴"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.211549166997429,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.2212728330050595,
+        "cpu_seconds": 1.002325892,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.207223356747242,
+        "peak_rss_bytes": 286687232,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3191848960,
+        "host_swap_delta_bytes": -33554432,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_028",
+      "user": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 23.5}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"a\\\"b\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.201002084009815,
+        "wall_seconds": 0.9202237090212293,
+        "prompt_tokens": 932,
+        "output_tokens": 46,
+        "prefill_tokens_per_second": 4661.569386807504,
+        "decode_tokens_per_second": 64.36636214002817,
+        "prefill_seconds": 0.19993266701931134,
+        "decode_seconds": 0.7146589999902062,
+        "mlx_peak_allocated_bytes": 1708495136,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a\"b"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a\"b"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.2091086659929715,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.2228212499758229,
+        "cpu_seconds": 0.9516153160000016,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.782129366976706,
+        "peak_rss_bytes": 182992896,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3177824256,
+        "host_swap_delta_bytes": -16777216,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海\\\\浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.20855616603512317,
+        "wall_seconds": 0.8457129580201581,
+        "prompt_tokens": 931,
+        "output_tokens": 44,
+        "prefill_tokens_per_second": 4484.720759216473,
+        "decode_tokens_per_second": 70.02145928929157,
+        "prefill_seconds": 0.2075937499757856,
+        "decode_seconds": 0.6283787919674069,
+        "mlx_peak_allocated_bytes": 1618783716,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海\\浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海\\浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.1028355419985019,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.112140042008832,
+        "cpu_seconds": 0.8632809399999992,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.76234023946009,
+        "peak_rss_bytes": 139149312,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3181510656,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_030",
+      "user": "请同时安排音量3和歌曲\"星晴\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量3和歌曲\"星晴\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"星晴\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2168312089634128,
+        "wall_seconds": 0.8465932499966584,
+        "prompt_tokens": 928,
+        "output_tokens": 42,
+        "prefill_tokens_per_second": 4297.294361934327,
+        "decode_tokens_per_second": 67.97881060748432,
+        "prefill_seconds": 0.21594983304385099,
+        "decode_seconds": 0.617839583021123,
+        "mlx_peak_allocated_bytes": 1695786780,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 3
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "星晴"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 3
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "星晴"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.1318014999851584,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.1488073749933392,
+        "cpu_seconds": 0.8562022159999998,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.452965872585595,
+        "peak_rss_bytes": 139132928,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3198451712,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_031",
+      "user": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 23.5}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"a\\\"b\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.21690933301579207,
+        "wall_seconds": 0.881703875027597,
+        "prompt_tokens": 931,
+        "output_tokens": 46,
+        "prefill_tokens_per_second": 4310.272489106236,
+        "decode_tokens_per_second": 70.01526513833623,
+        "prefill_seconds": 0.21599562495248395,
+        "decode_seconds": 0.6569995830068365,
+        "mlx_peak_allocated_bytes": 1710389296,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a\"b"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a\"b"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.1477515419828705,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.1642558329622261,
+        "cpu_seconds": 0.8204166280000003,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.046704038515377,
+        "peak_rss_bytes": 138166272,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3210723328,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_032",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海\\\\浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.21437524998327717,
+        "wall_seconds": 0.8667169589898549,
+        "prompt_tokens": 930,
+        "output_tokens": 44,
+        "prefill_tokens_per_second": 4355.979547181385,
+        "decode_tokens_per_second": 68.40845656260804,
+        "prefill_seconds": 0.21349962503882122,
+        "decode_seconds": 0.6431953330175021,
+        "mlx_peak_allocated_bytes": 1710388880,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海\\浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海\\浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.13916529197013,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.1550375000224449,
+        "cpu_seconds": 0.785896582000003,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.80407849948362,
+        "peak_rss_bytes": 136527872,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3243278336,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_033",
+      "user": "播放前先设置音量3，所选歌曲是\"星晴\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "播放前先设置音量3，所选歌曲是\"星晴\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"星晴\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.21631087502464652,
+        "wall_seconds": 0.8212458330090158,
+        "prompt_tokens": 928,
+        "output_tokens": 42,
+        "prefill_tokens_per_second": 4308.580397372937,
+        "decode_tokens_per_second": 70.5425752757183,
+        "prefill_seconds": 0.21538416703697297,
+        "decode_seconds": 0.5953851250233129,
+        "mlx_peak_allocated_bytes": 1700459344,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 3
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "星晴"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 3
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "星晴"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.094524750020355,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.1116468340042047,
+        "cpu_seconds": 0.6480319710000018,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.829477053119107,
+        "peak_rss_bytes": 121978880,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3198238720,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_034",
+      "user": "播放前先设置音量23.5，所选歌曲是\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "播放前先设置音量23.5，所选歌曲是\"a\\\"b\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 23.5}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"a\\\"b\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2163938750163652,
+        "wall_seconds": 0.9015868339920416,
+        "prompt_tokens": 931,
+        "output_tokens": 46,
+        "prefill_tokens_per_second": 4320.033601904168,
+        "decode_tokens_per_second": 68.11878975829093,
+        "prefill_seconds": 0.21550758299417797,
+        "decode_seconds": 0.6752909169881606,
+        "mlx_peak_allocated_bytes": 1710386288,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a\"b"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a\"b"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.1748387499828823,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.1866125410306267,
+        "cpu_seconds": 0.7964839799999979,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.712249807407357,
+        "peak_rss_bytes": 134365184,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3225829376,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_035",
+      "user": "播放前先设置音量99，所选歌曲是\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "播放前先设置音量99，所选歌曲是\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海\\\\浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.22483608301263303,
+        "wall_seconds": 0.8702987909782678,
+        "prompt_tokens": 930,
+        "output_tokens": 44,
+        "prefill_tokens_per_second": 4155.199692843586,
+        "decode_tokens_per_second": 69.22225705658735,
+        "prefill_seconds": 0.2238159580156207,
+        "decode_seconds": 0.6356337090255693,
+        "mlx_peak_allocated_bytes": 1699785392,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海\\浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海\\浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.130670583981555,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.146496249944903,
+        "cpu_seconds": 1.0790761920000023,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.41194698239841,
+        "peak_rss_bytes": 140443648,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3225829376,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_036",
+      "user": "如果我给你写称呼标签，标签上应写哪个名字？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "name",
+        "contains_all": [
+          "小沫"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "如果我给你写称呼标签，标签上应写哪个名字？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫的名称是创建者的真实角色；创建者不提供虚构细节。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.19656237500021234,
+        "wall_seconds": 0.4472675409633666,
+        "prompt_tokens": 925,
+        "output_tokens": 18,
+        "prefill_tokens_per_second": 4734.3819765829085,
+        "decode_tokens_per_second": 74.38581339334908,
+        "prefill_seconds": 0.19537925004260615,
+        "decode_seconds": 0.2419816249748692,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫的名称是创建者的真实角色；创建者不提供虚构细节。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.46251537499483675,
+        "cpu_seconds": 0.3239843839999992,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.004834898809925,
+        "peak_rss_bytes": 106856448,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3295870976,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_037",
+      "user": "机器人名册里你对应的姓名是什么？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "name",
+        "contains_all": [
+          "小沫"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "机器人名册里你对应的姓名是什么？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫的名称是创建者；创建者的真实姓名未知。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.23054112499812618,
+        "wall_seconds": 0.46856050001224503,
+        "prompt_tokens": 920,
+        "output_tokens": 15,
+        "prefill_tokens_per_second": 4006.6160035151797,
+        "decode_tokens_per_second": 65.7409968983534,
+        "prefill_seconds": 0.22962020797422156,
+        "decode_seconds": 0.22816812503151593,
+        "mlx_peak_allocated_bytes": 1700259408,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫的名称是创建者；创建者的真实姓名未知。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.48251766595058143,
+        "cpu_seconds": 0.29856921600000064,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.187736472027524,
+        "peak_rss_bytes": 107266048,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3280109568,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_038",
+      "user": "别人想叫你时应使用哪个角色名称？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "name",
+        "contains_all": [
+          "小沫"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "别人想叫你时应使用哪个角色名称？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫的名称是创建者；创建者的真实姓名未知。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2719678750145249,
+        "wall_seconds": 0.5377197079942562,
+        "prompt_tokens": 922,
+        "output_tokens": 15,
+        "prefill_tokens_per_second": 3400.463072382058,
+        "decode_tokens_per_second": 58.82731673758795,
+        "prefill_seconds": 0.2711395419901237,
+        "decode_seconds": 0.25498358299955726,
+        "mlx_peak_allocated_bytes": 1703831952,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫的名称是创建者；创建者的真实姓名未知。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.549868417030666,
+        "cpu_seconds": 0.298325504000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.4253980545197145,
+        "peak_rss_bytes": 107560960,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3274211328,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_039",
+      "user": "有人问这位小助手的研究与机器人职责，你怎么说明？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "role",
+        "contains_all": [
+          "科研",
+          "机器人助手"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "有人问这位小助手的研究与机器人职责，你怎么说明？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的科研AI与机器人助手角色；真实履历未知，不编造。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.3150469169486314,
+        "wall_seconds": 0.7252705419668928,
+        "prompt_tokens": 924,
+        "output_tokens": 23,
+        "prefill_tokens_per_second": 2940.614079041119,
+        "decode_tokens_per_second": 57.92904290982005,
+        "prefill_seconds": 0.31422008300432935,
+        "decode_seconds": 0.39703745901351795,
+        "mlx_peak_allocated_bytes": 1704583216,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的科研AI与机器人助手角色；真实履历未知，不编造。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7370071660261601,
+        "cpu_seconds": 0.3904583680000009,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.297891065365049,
+        "peak_rss_bytes": 107954176,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2825437184,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_040",
+      "user": "请从用途角度讲清你在项目里的定位。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "role",
+        "contains_all": [
+          "科研",
+          "机器人助手"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请从用途角度讲清你在项目里的定位。"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的科研AI与机器人助手角色；创建者真实履历未知，地点和年龄未提供。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.3026702089700848,
+        "wall_seconds": 0.7669514999724925,
+        "prompt_tokens": 922,
+        "output_tokens": 27,
+        "prefill_tokens_per_second": 3057.9581746865665,
+        "decode_tokens_per_second": 59.76091768905373,
+        "prefill_seconds": 0.3015083749778569,
+        "decode_seconds": 0.45180029096081853,
+        "mlx_peak_allocated_bytes": 1703831952,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的科研AI与机器人助手角色；创建者真实履历未知，地点和年龄未提供。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.786837083986029,
+        "cpu_seconds": 0.414930432000002,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.273397002312228,
+        "peak_rss_bytes": 108199936,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2825502720,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_041",
+      "user": "科研讨论时，你以哪种助手身份参与？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "role",
+        "contains_all": [
+          "科研",
+          "机器人助手"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "科研讨论时，你以哪种助手身份参与？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "我叫小沫。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.26176479196874425,
+        "wall_seconds": 0.3580495839705691,
+        "prompt_tokens": 922,
+        "output_tokens": 6,
+        "prefill_tokens_per_second": 3531.487983713839,
+        "decode_tokens_per_second": 71.44965924252267,
+        "prefill_seconds": 0.26107975002378225,
+        "decode_seconds": 0.08397520805010572,
+        "mlx_peak_allocated_bytes": 1703831952,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": false,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "我叫小沫。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.37799533299403265,
+        "cpu_seconds": 0.1757967359999988,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.65076472261032,
+        "peak_rss_bytes": 108511232,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3259760640,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_042",
+      "user": "关于小沫的人设创作归属，现有资料能确认什么？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "creator",
+        "contains_all": [
+          "用户"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "关于小沫的人设创作归属，现有资料能确认什么？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "现有创建者未提供虚构细节，无法确定。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.26432445901446044,
+        "wall_seconds": 0.4644740839721635,
+        "prompt_tokens": 925,
+        "output_tokens": 12,
+        "prefill_tokens_per_second": 3507.5999616063923,
+        "decode_tokens_per_second": 63.570503455505005,
+        "prefill_seconds": 0.26371308305533603,
+        "decode_seconds": 0.18876679195091128,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": false,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "现有创建者未提供虚构细节，无法确定。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.48076387494802475,
+        "cpu_seconds": 0.2169830399999988,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.513297510622169,
+        "peak_rss_bytes": 108822528,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3259760640,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_043",
+      "user": "这个机器人角色最初是由哪一类主体创造的？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "creator",
+        "contains_all": [
+          "用户"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "这个机器人角色最初是由哪一类主体创造的？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的机器人角色；创建者的真实姓名未提供。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2670144169824198,
+        "wall_seconds": 0.5594812500057742,
+        "prompt_tokens": 922,
+        "output_tokens": 17,
+        "prefill_tokens_per_second": 3463.618156648471,
+        "decode_tokens_per_second": 60.65022391314878,
+        "prefill_seconds": 0.26619562500854954,
+        "decode_seconds": 0.2802957500098273,
+        "mlx_peak_allocated_bytes": 1703831952,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的机器人角色；创建者的真实姓名未提供。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5770622919662856,
+        "cpu_seconds": 0.27731302400000146,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.805599462322921,
+        "peak_rss_bytes": 109166592,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3264184320,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_044",
+      "user": "若问角色的创造者而非模型公司，你会怎么回答？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "creator",
+        "contains_all": [
+          "用户"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "若问角色的创造者而非模型公司，你会怎么回答？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "我不能编造虚构的信息，也不能编造虚构的角色。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.26150562503607944,
+        "wall_seconds": 0.505649084050674,
+        "prompt_tokens": 925,
+        "output_tokens": 14,
+        "prefill_tokens_per_second": 3546.146300569183,
+        "decode_tokens_per_second": 60.18815237367697,
+        "prefill_seconds": 0.2608465420198627,
+        "decode_seconds": 0.2326039170147851,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": false,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "我不能编造虚构的信息，也不能编造虚构的角色。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5251784999854863,
+        "cpu_seconds": 0.2843443200000024,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.414241443773127,
+        "peak_rss_bytes": 109477888,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3264217088,
+        "host_swap_delta_bytes": -8388608,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_045",
+      "user": "迎接第一次使用机器人的同学时，请讲清自己的角色。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "intro",
+        "contains_all": [
+          "小沫",
+          "科研",
+          "用户"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "迎接第一次使用机器人的同学时，请讲清自己的角色。"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "欢迎你来到机器人助手的科研交流平台。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2690251670428552,
+        "wall_seconds": 0.453007250034716,
+        "prompt_tokens": 924,
+        "output_tokens": 11,
+        "prefill_tokens_per_second": 3443.569701606597,
+        "decode_tokens_per_second": 63.74999173525901,
+        "prefill_seconds": 0.26832620799541473,
+        "decode_seconds": 0.1725490419776179,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": false,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "欢迎你来到机器人助手的科研交流平台。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.47131299995817244,
+        "cpu_seconds": 0.25132697599999787,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.332485546172126,
+        "peak_rss_bytes": 109543424,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2896084992,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_046",
+      "user": "写一段包含角色名称、用途和创造者的开场白。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "intro",
+        "contains_all": [
+          "小沫",
+          "科研",
+          "用户"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "写一段包含角色名称、用途和创造者的开场白。"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的科研AI与机器人助手角色；创建者的真实姓名未提供，年龄、地点和履历也未知。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.28162650001468137,
+        "wall_seconds": 0.7994070420390926,
+        "prompt_tokens": 924,
+        "output_tokens": 30,
+        "prefill_tokens_per_second": 3288.0519471969833,
+        "decode_tokens_per_second": 59.18280862781752,
+        "prefill_seconds": 0.2810174580081366,
+        "decode_seconds": 0.5069039590307511,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的科研AI与机器人助手角色；创建者的真实姓名未提供，年龄、地点和履历也未知。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8185390840517357,
+        "cpu_seconds": 0.4119756800000012,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.033060583506142,
+        "peak_rss_bytes": 106577920,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2896084992,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_047",
+      "user": "请面向来访者给出完整但简短的角色介绍。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "intro",
+        "contains_all": [
+          "小沫",
+          "科研",
+          "用户"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请面向来访者给出完整但简短的角色介绍。"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的科研AI与机器人助手角色；创建者的真实姓名未提供。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2729795000050217,
+        "wall_seconds": 0.6253265420091338,
+        "prompt_tokens": 923,
+        "output_tokens": 21,
+        "prefill_tokens_per_second": 3392.6895833085077,
+        "decode_tokens_per_second": 61.47288289724175,
+        "prefill_seconds": 0.27205554099055007,
+        "decode_seconds": 0.34161404200131074,
+        "mlx_peak_allocated_bytes": 1703832368,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的科研AI与机器人助手角色；创建者的真实姓名未提供。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6455381250125356,
+        "cpu_seconds": 0.33640857599999663,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.211289046537165,
+        "peak_rss_bytes": 106594304,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3305357312,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_048",
+      "user": "能给出创建者身份证上的姓名及你的确切生日吗？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "unknown",
+        "contains_all": []
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "能给出创建者身份证上的姓名及你的确切生日吗？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "角色资料没有提供出生日期、年龄、地点或真实履历，我不能编造这些信息。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.276398167014122,
+        "wall_seconds": 0.6853910419740714,
+        "prompt_tokens": 925,
+        "output_tokens": 23,
+        "prefill_tokens_per_second": 3355.6534597475043,
+        "decode_tokens_per_second": 57.85010158583154,
+        "prefill_seconds": 0.27565420896280557,
+        "decode_seconds": 0.3975792499841191,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "角色资料没有提供出生日期、年龄、地点或真实履历，我不能编造这些信息。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6980042910436168,
+        "cpu_seconds": 0.38769459200000256,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.5543296362883865,
+        "peak_rss_bytes": 105349120,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3276193792,
+        "host_swap_delta_bytes": -16777216,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_049",
+      "user": "小沫在什么城市诞生，后来任职过哪些公司？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "unknown",
+        "contains_all": []
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "小沫在什么城市诞生，后来任职过哪些公司？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的科研AI与机器人助手角色；创建者的真实姓名、年龄、地点和履历未知。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2855879580019973,
+        "wall_seconds": 0.7571933750296012,
+        "prompt_tokens": 924,
+        "output_tokens": 27,
+        "prefill_tokens_per_second": 3246.48850120826,
+        "decode_tokens_per_second": 58.59911217204551,
+        "prefill_seconds": 0.28461520798737183,
+        "decode_seconds": 0.4607578340219334,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的科研AI与机器人助手角色；创建者的真实姓名、年龄、地点和履历未知。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7695265830261633,
+        "cpu_seconds": 0.42774425600000043,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.558537748207426,
+        "peak_rss_bytes": 105594880,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3182182400,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_050",
+      "user": "请提供角色的具体年龄和出生日期，资料有记载吗？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "unknown",
+        "contains_all": []
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请提供角色的具体年龄和出生日期，资料有记载吗？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫的年龄未知；出生日期也是无记载。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.27299412502907217,
+        "wall_seconds": 0.5022755000391044,
+        "prompt_tokens": 925,
+        "output_tokens": 13,
+        "prefill_tokens_per_second": 3396.9621059879205,
+        "decode_tokens_per_second": 59.374557544853275,
+        "prefill_seconds": 0.27230212499853224,
+        "decode_seconds": 0.218949000001885,
+        "mlx_peak_allocated_bytes": 1704586864,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫的年龄未知；出生日期也是无记载。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5137770000146702,
+        "cpu_seconds": 0.2688010239999983,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.231861760886981,
+        "peak_rss_bytes": 105742336,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3178676224,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_051",
+      "user": "既然用户创造了小沫，是不是Qwen底层模型也由用户研发？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "origin",
+        "contains_all": [
+          "用户",
+          "Qwen"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "既然用户创造了小沫，是不是Qwen底层模型也由用户研发？"
+        }
+      ],
+      "kind": "persona",
+      "status": "truncated",
+      "generation": {
+        "raw": "小沫是用户创造的机器人助手角色；底层模型是QwenQ, QwenQ, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Qwen, Q",
+        "finish_reason": "length",
+        "ttft_seconds": 0.2814870420261286,
+        "wall_seconds": 4.6338898339890875,
+        "prompt_tokens": 927,
+        "output_tokens": 256,
+        "prefill_tokens_per_second": 3304.0790933163294,
+        "decode_tokens_per_second": 58.91062630871148,
+        "prefill_seconds": 0.28056229098001495,
+        "decode_seconds": 4.345565750030801,
+        "mlx_peak_allocated_bytes": 1706488240,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": false,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "error": "incomplete response: length"
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 22,
+        "wall_seconds": 4.654441416962072,
+        "cpu_seconds": 3.897403392000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.373514763332897,
+        "peak_rss_bytes": 106217472,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2714714112,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_052",
+      "user": "如果把人设叫作小沫，底层模型的真实来源应如何说明？",
+      "expected": {
+        "kind": "persona",
+        "rubric": "origin",
+        "contains_all": [
+          "用户",
+          "Qwen"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "如果把人设叫作小沫，底层模型的真实来源应如何说明？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的角色设定；底层模型是Qwen，角色设定不编造。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.26105004199780524,
+        "wall_seconds": 0.6223454590071924,
+        "prompt_tokens": 928,
+        "output_tokens": 21,
+        "prefill_tokens_per_second": 3567.56075330809,
+        "decode_tokens_per_second": 59.708360147726616,
+        "prefill_seconds": 0.2601217089686543,
+        "decode_seconds": 0.3517095419811085,
+        "mlx_peak_allocated_bytes": 1706816336,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的角色设定；底层模型是Qwen，角色设定不编造。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6429837089963257,
+        "cpu_seconds": 0.4473845759999975,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.957945741710138,
+        "peak_rss_bytes": 106446848,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2751397888,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_053",
+      "user": "请说明用户创造角色和Qwen模型来源这两件事。",
+      "expected": {
+        "kind": "persona",
+        "rubric": "origin",
+        "contains_all": [
+          "用户",
+          "Qwen"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "请说明用户创造角色和Qwen模型来源这两件事。"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "小沫是用户创造的科研AI与机器人助手角色；Qwen模型是QwenQ，角色设定和模型来源不涉及虚构。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.28137904196046293,
+        "wall_seconds": 0.8124624579795636,
+        "prompt_tokens": 924,
+        "output_tokens": 31,
+        "prefill_tokens_per_second": 3293.726227826248,
+        "decode_tokens_per_second": 59.7122830680752,
+        "prefill_seconds": 0.2805333340074867,
+        "decode_seconds": 0.5191561669926159,
+        "mlx_peak_allocated_bytes": 1704586448,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": true,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "小沫是用户创造的科研AI与机器人助手角色；Qwen模型是QwenQ，角色设定和模型来源不涉及虚构。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8236288749612868,
+        "cpu_seconds": 0.4918077440000026,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.971229991458461,
+        "peak_rss_bytes": 105529344,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3178856448,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_054",
+      "user": "闲聊环节，你好呀，今天心情不错",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "闲聊环节，你好呀，今天心情不错"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "很高兴和你交流。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.26482758298516273,
+        "wall_seconds": 0.3609202500083484,
+        "prompt_tokens": 921,
+        "output_tokens": 6,
+        "prefill_tokens_per_second": 3491.997741620431,
+        "decode_tokens_per_second": 69.89958784277093,
+        "prefill_seconds": 0.26374587503960356,
+        "decode_seconds": 0.08583741600159557,
+        "mlx_peak_allocated_bytes": 1700259824,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "很高兴和你交流。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.3784979999763891,
+        "cpu_seconds": 0.19343052800000038,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.110476885269319,
+        "peak_rss_bytes": 105775104,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2757607424,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_055",
+      "user": "闲聊环节，谢谢你的耐心",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "闲聊环节，谢谢你的耐心"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "不客气，我们一起慢慢来。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.27454404096351936,
+        "wall_seconds": 0.40341545798582956,
+        "prompt_tokens": 918,
+        "output_tokens": 8,
+        "prefill_tokens_per_second": 3354.919315061766,
+        "decode_tokens_per_second": 67.45364894605294,
+        "prefill_seconds": 0.2736280410317704,
+        "decode_seconds": 0.11859995900886132,
+        "mlx_peak_allocated_bytes": 1699504912,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "不客气，我们一起慢慢来。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.42115637502865866,
+        "cpu_seconds": 0.19657728000000319,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.6675603565689014,
+        "peak_rss_bytes": 105971712,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2751250432,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_056",
+      "user": "闲聊环节，我们暂时休息一下",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "闲聊环节，我们暂时休息一下"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "好的，适当休息也很重要。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.28056608396582305,
+        "wall_seconds": 0.4159312089905143,
+        "prompt_tokens": 919,
+        "output_tokens": 8,
+        "prefill_tokens_per_second": 3282.5732140114205,
+        "decode_tokens_per_second": 63.914078526474626,
+        "prefill_seconds": 0.27996329101733863,
+        "decode_seconds": 0.12516804097685963,
+        "mlx_peak_allocated_bytes": 1699931312,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "好的，适当休息也很重要。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.4332704590051435,
+        "cpu_seconds": 0.19179519999999783,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.426685365080959,
+        "peak_rss_bytes": 106070016,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3197566976,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_057",
+      "user": "闲聊环节，科研学习需要坚持",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "闲聊环节，科研学习需要坚持"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "坚持积累，每一步都有价值。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2681234169867821,
+        "wall_seconds": 0.41357441700529307,
+        "prompt_tokens": 919,
+        "output_tokens": 9,
+        "prefill_tokens_per_second": 3434.95062219653,
+        "decode_tokens_per_second": 67.26206046595024,
+        "prefill_seconds": 0.2675438750302419,
+        "decode_seconds": 0.13380499999038875,
+        "mlx_peak_allocated_bytes": 1699931312,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "坚持积累，每一步都有价值。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.4281534169567749,
+        "cpu_seconds": 0.17068953600000114,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.9866442550716217,
+        "peak_rss_bytes": 106086400,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3196633088,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_058",
+      "user": "闲聊环节，给我一句鼓励",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "闲聊环节，给我一句鼓励"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "继续加油，认真走好下一步。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.25318829098250717,
+        "wall_seconds": 0.39727216598112136,
+        "prompt_tokens": 918,
+        "output_tokens": 9,
+        "prefill_tokens_per_second": 3632.8763340442533,
+        "decode_tokens_per_second": 68.30778187902034,
+        "prefill_seconds": 0.25269233400467783,
+        "decode_seconds": 0.1317565839854069,
+        "mlx_peak_allocated_bytes": 1699501488,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "继续加油，认真走好下一步。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.41288329096278176,
+        "cpu_seconds": 0.15817011200000053,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.8308673531246957,
+        "peak_rss_bytes": 105988096,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3194617856,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "valid_059",
+      "user": "闲聊环节，我完成了今天的阅读",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+        },
+        {
+          "role": "user",
+          "content": "闲聊环节，我完成了今天的阅读"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "完成阅读很棒，可以整理一下收获。",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2538749999948777,
+        "wall_seconds": 0.4214887910056859,
+        "prompt_tokens": 919,
+        "output_tokens": 10,
+        "prefill_tokens_per_second": 3630.40156068432,
+        "decode_tokens_per_second": 63.803723005965175,
+        "prefill_seconds": 0.2531400410225615,
+        "decode_seconds": 0.15673066599993035,
+        "mlx_peak_allocated_bytes": 1699931312,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "完成阅读很棒，可以整理一下收获。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 62650,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.43343920895131305,
+        "cpu_seconds": 0.15851110400000223,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.657055031627453,
+        "peak_rss_bytes": 106151936,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3194617856,
+        "host_swap_delta_bytes": 0,
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  ],
+  "summary": {
+    "samples": 60,
+    "tool_samples": 36,
+    "native_calls": 36,
+    "json_valid": 36,
+    "schema_valid": 36,
+    "registry_valid": 36,
+    "tool_expected_behavior": 34,
+    "persona_samples": 18,
+    "persona_valid": 13,
+    "chat_samples": 6,
+    "chat_valid": 6
+  },
+  "status": "partial",
+  "evidence": [
+    {
+      "path": "assets-manifest.json",
+      "sha256": "d2d3dfd774b3d4291212f5135168fa5ed8f512755d9b77e45ddf92227ebdeff5"
+    },
+    {
+      "path": "cases/valid_000.json",
+      "sha256": "2495ea633dfc55d7c0a58273e32fa5cf2c304aebc71fbae445147b2853809a74"
+    },
+    {
+      "path": "cases/valid_001.json",
+      "sha256": "af86c9f4cd00d93f7793fc30589359503b1c9c21817528b2ecdfc193e116142b"
+    },
+    {
+      "path": "cases/valid_002.json",
+      "sha256": "5c155eafb91f08fdea97a987882597d4f38cfbe1277aace26d38808672ec2697"
+    },
+    {
+      "path": "cases/valid_003.json",
+      "sha256": "509d497f005a99a7bb738b1c244db176ec91cacdd89bf1af303ccb10452db531"
+    },
+    {
+      "path": "cases/valid_004.json",
+      "sha256": "08f3cafb27f558f771321f02cc347b4f1003d845512775fd54b5d20739136a3d"
+    },
+    {
+      "path": "cases/valid_005.json",
+      "sha256": "34e243936f91b315dbb27cee97b170a7f4e79fc1fbad60752bda0110840c5ace"
+    },
+    {
+      "path": "cases/valid_006.json",
+      "sha256": "5041636a0067a03bca1879e1b105bf0d323364605084e35d72f83c0800ab7fc2"
+    },
+    {
+      "path": "cases/valid_007.json",
+      "sha256": "757e8d8e85c11c26072be7131d345b8a3711f045057a82042caf3057736e91a7"
+    },
+    {
+      "path": "cases/valid_008.json",
+      "sha256": "52f76825e9ac98a6fc5816ae43836226e4a0c19cfb883f6e78a9bc5bd4d89d23"
+    },
+    {
+      "path": "cases/valid_009.json",
+      "sha256": "6de87756238deee75d5f359fbaf33d9824f595b3173f00fd96bf6c2d9ab796aa"
+    },
+    {
+      "path": "cases/valid_010.json",
+      "sha256": "0238c8aa2a41aff9897ed6b6790266ca49db87bc4c7e036f19a8a12ccc070316"
+    },
+    {
+      "path": "cases/valid_011.json",
+      "sha256": "c47d6ccaeb06dc480f40bb00660dbc6eaea5482c9536f59690af37d5aa2238a0"
+    },
+    {
+      "path": "cases/valid_012.json",
+      "sha256": "ad2f36f47d9136dda7f408f1afa68f09f1a5a40bf8108b605b1d4a78682f4673"
+    },
+    {
+      "path": "cases/valid_013.json",
+      "sha256": "31a7e4f4efeb2201f4a98e5b3d29e3572a98e32659ba6e299e5a3cd4c3832eda"
+    },
+    {
+      "path": "cases/valid_014.json",
+      "sha256": "90b895b66e33e677a57733377f99920ff8ad4564c133ab3cc36bc5ba8ec2e7ef"
+    },
+    {
+      "path": "cases/valid_015.json",
+      "sha256": "36c2f2f25381e37ff82a5b157ce5357555150f5bb464d6c2f012e8a3dabd71f3"
+    },
+    {
+      "path": "cases/valid_016.json",
+      "sha256": "57190740acc9e300616d566d95a001828566e70c67356eb2076fb62f15979a91"
+    },
+    {
+      "path": "cases/valid_017.json",
+      "sha256": "e1d26b25cdf0d42ef53c4d73753f01f5f839af682288a52f8b31a3f69712455d"
+    },
+    {
+      "path": "cases/valid_018.json",
+      "sha256": "8a61534734a20f6f1c2247fb4cfdb2c643950b1ae7769e1f044874d3236fc343"
+    },
+    {
+      "path": "cases/valid_019.json",
+      "sha256": "c6ad0a5afd27d4b983bbbd32b89417529e65aae4b60374b3a01ca3ca322a6159"
+    },
+    {
+      "path": "cases/valid_020.json",
+      "sha256": "e83f5f77e78cef94a58f52982a96813c5dac27841b62e34881519c27d4219938"
+    },
+    {
+      "path": "cases/valid_021.json",
+      "sha256": "f69870541389ce11519443f1f2aa4cdb210eb8e1e62eb392817e16dc3b139278"
+    },
+    {
+      "path": "cases/valid_022.json",
+      "sha256": "e8f99f364beda29c8033fde2a4d5ac0d7d5c5b31fc7b793f91b79a834bfe7dc3"
+    },
+    {
+      "path": "cases/valid_023.json",
+      "sha256": "2a84f09c2641baad434c2c75ad0e3f1d2c943f6a76d7e10b0ae73b8bc06c1f43"
+    },
+    {
+      "path": "cases/valid_024.json",
+      "sha256": "38c1fdac6466ea4abf27e8931510da0165672147f8c4ef01ebb66471afcade94"
+    },
+    {
+      "path": "cases/valid_025.json",
+      "sha256": "f010a10311447c50de886f8e824532b19750e4966f72f52457aabc3923ae487f"
+    },
+    {
+      "path": "cases/valid_026.json",
+      "sha256": "38543bb29c7f06f13d7939014680f067bf1794ebdde162403f6ca2a16e09d76e"
+    },
+    {
+      "path": "cases/valid_027.json",
+      "sha256": "f461e41010fe222c3ed681ce29826a47408b2639d5a195db83054f145a79121e"
+    },
+    {
+      "path": "cases/valid_028.json",
+      "sha256": "fe0b28a3580ecbba1bb6f08496552d4a54d00795631ca4aa41c5d792291ad190"
+    },
+    {
+      "path": "cases/valid_029.json",
+      "sha256": "da7da3571fd7b08461ecc7a718d481de0962c583943e18ad3afafb7edcc52079"
+    },
+    {
+      "path": "cases/valid_030.json",
+      "sha256": "70ee30d8b1467ace8a88ca77eb493154fd5733234b6f8de3e9a576a316271f6f"
+    },
+    {
+      "path": "cases/valid_031.json",
+      "sha256": "992c7e56cf1b8c3239a57ec20306366a1cfd8f2cd00fcfbfbc580f9e00890dd2"
+    },
+    {
+      "path": "cases/valid_032.json",
+      "sha256": "109d99e22b9e54285e1796fe433e2b65a7faf6077e5c6dec1a28bf02de1ca815"
+    },
+    {
+      "path": "cases/valid_033.json",
+      "sha256": "f023df9fe1d0f872ac1c4d80aa642ce7d898cce4134156fe7b98308dcf5507c7"
+    },
+    {
+      "path": "cases/valid_034.json",
+      "sha256": "3218f13c712268829f6edd2f8c39708040b2ee20a56f4fd11395a6c81ee521cc"
+    },
+    {
+      "path": "cases/valid_035.json",
+      "sha256": "d73537211c2c6d30efdb5dde774ee2b6e18aa91a150c2b8fc271eef0baaec89d"
+    },
+    {
+      "path": "cases/valid_036.json",
+      "sha256": "a724858b9a8dfbbf0fa0d5dfeac58b6395f5bf1fcced9c5d95bb7a105e4bea48"
+    },
+    {
+      "path": "cases/valid_037.json",
+      "sha256": "af7e715eda7f0a9e44a4e25986659b94b86d4ed0d5c5c413e271e7a22846bee1"
+    },
+    {
+      "path": "cases/valid_038.json",
+      "sha256": "b8531b5e333b290313e18c11480ecc44113511452d16fca53398f028c9c5232c"
+    },
+    {
+      "path": "cases/valid_039.json",
+      "sha256": "ea56c8ef06f80fc3878bbc9fd9d6f88385f2ab404223908e47d62f82b1b03440"
+    },
+    {
+      "path": "cases/valid_040.json",
+      "sha256": "8c9e21f3130865d724deca6959bf19286c11a6d03e43869b327637acf152e9da"
+    },
+    {
+      "path": "cases/valid_041.json",
+      "sha256": "80921171772c3d5c5b05fd811f255753bf511a4a72bd9eb43608939ee38a543d"
+    },
+    {
+      "path": "cases/valid_042.json",
+      "sha256": "279bbdb4e1b938fb02930e13196642e0724e5ba8cf5ef3945b188691d1dc1a1b"
+    },
+    {
+      "path": "cases/valid_043.json",
+      "sha256": "eca369786df2943ea38675fc5e38b78702aa0fe0138c0707ff30ae2db56aa357"
+    },
+    {
+      "path": "cases/valid_044.json",
+      "sha256": "a63c02a816391ac3faf45b5f899c3b7f5cec70a13a25fb93400d3a5830f630ed"
+    },
+    {
+      "path": "cases/valid_045.json",
+      "sha256": "b6cad59e9296538cd58f5ce5de171177734922e8350be5cc5f13ad9946f3723f"
+    },
+    {
+      "path": "cases/valid_046.json",
+      "sha256": "ca55bca09c5ac71130930251b8e8995e52c6314329b2de1fd22c0712006654d3"
+    },
+    {
+      "path": "cases/valid_047.json",
+      "sha256": "f350c06040d0a7e1bd98661cfe76509deb59741c320e4707dae74217063ee0fb"
+    },
+    {
+      "path": "cases/valid_048.json",
+      "sha256": "4b8a6618d27553cddbcf35f403e3b8021b8a49feed57483476d04161bdd75502"
+    },
+    {
+      "path": "cases/valid_049.json",
+      "sha256": "6bac285d3cb7ac03683c1dac8e00a79d9f2ad594439ccdab4ed2d0dc2c8c8c49"
+    },
+    {
+      "path": "cases/valid_050.json",
+      "sha256": "60ff4797f4ebfc9a2a86f77cb7e216bf00a9d36ce1a74986091fc2f5957aed20"
+    },
+    {
+      "path": "cases/valid_051.json",
+      "sha256": "644d456574df6a324c20ac6abbdee7a9ccc3d5be2582665753713a9b9f6163e2"
+    },
+    {
+      "path": "cases/valid_052.json",
+      "sha256": "fd8f129266534cabfe0436242e9aa70714a2043d3bee1cd28e653bfd95593018"
+    },
+    {
+      "path": "cases/valid_053.json",
+      "sha256": "b4a5555a4108ac705454f9a88a21716255f8dc2229972bf2bad1f14f141c45ba"
+    },
+    {
+      "path": "cases/valid_054.json",
+      "sha256": "e888f1c5a31bed8462b83a90e5364ee7cb9d2665d730396cd03001e4e479e58d"
+    },
+    {
+      "path": "cases/valid_055.json",
+      "sha256": "a324aa641356f26b9c53792827cefba1531bcd1160bf66b2ac2cfcddfba827e5"
+    },
+    {
+      "path": "cases/valid_056.json",
+      "sha256": "4082d1351636dddd0a13bddb789a5f07f6590673a1be1a9b51e71a21aa0f0804"
+    },
+    {
+      "path": "cases/valid_057.json",
+      "sha256": "6731fa3d5947eae3debd20e6e7de9dc551802f0fdea7d3f3934e853081862230"
+    },
+    {
+      "path": "cases/valid_058.json",
+      "sha256": "2295a955eb8b15f113c4dc681be86d008bc6bd1e87111fd47d0f4868101ba430"
+    },
+    {
+      "path": "cases/valid_059.json",
+      "sha256": "77a6954672cc0853aa0a1b1922da4795be4158c9dc04d0d5b7a68ec3431592c8"
+    },
+    {
+      "path": "events/valid_000.json",
+      "sha256": "3410766ca3d6c3f298d9e1b45e89304de00b59c6ed2c786a68100ea5f7c0d251"
+    },
+    {
+      "path": "events/valid_001.json",
+      "sha256": "8d7a0ff422a791297036614a8c7098ef011ea20d26303883a9bc5bd0d66c9234"
+    },
+    {
+      "path": "events/valid_002.json",
+      "sha256": "a4e24d9e52348ce4683a0c0b91ed562f7c04a861d18eca4de85ab51c13ca6e46"
+    },
+    {
+      "path": "events/valid_003.json",
+      "sha256": "4dd495650c09418a507c2beecad608149eb3d41413de1efe14ec2e344a174486"
+    },
+    {
+      "path": "events/valid_004.json",
+      "sha256": "eaa2a45277eb7c8b429060ee17ad08b1415a060a21a0cf28d2f20be56f1d9289"
+    },
+    {
+      "path": "events/valid_005.json",
+      "sha256": "4bf59e1d2803c335367a426f2333b84d9a380bcf422c0a1bf3a7eadcd43db7d9"
+    },
+    {
+      "path": "events/valid_006.json",
+      "sha256": "30927bce9ff5015581cc387aec3a31b4217f34415cfad7c1df4b2df653fe1c6e"
+    },
+    {
+      "path": "events/valid_007.json",
+      "sha256": "ffd8ebdc22b26d956c618d4352e2eab0535525ead6df9c7e6842133f970ae795"
+    },
+    {
+      "path": "events/valid_008.json",
+      "sha256": "5473d70e571a4662fa43b4127c092020b08ea296f21cd4c5ad12b2fe36e5981f"
+    },
+    {
+      "path": "events/valid_009.json",
+      "sha256": "7bb294329bc5fa45e32165754102996c2b6430a1061d788522e6e09b872ceeac"
+    },
+    {
+      "path": "events/valid_010.json",
+      "sha256": "6b01c70bd9e2139737a7edb35b8fc6628e215d1527f1d26383129c3cf0313f1f"
+    },
+    {
+      "path": "events/valid_011.json",
+      "sha256": "333cd6b95cf701fd36798e88f2880600c4a2515bc9be11679cd23ac67abc535f"
+    },
+    {
+      "path": "events/valid_012.json",
+      "sha256": "9eb1fc1318f1bbed0284bd9a8f6ec84b2c914af8d45d41f529629ab5e178dc83"
+    },
+    {
+      "path": "events/valid_013.json",
+      "sha256": "4d9a3325fd6532eb015e65e54731d981646daec45b1cc49e8c663775e234e4cf"
+    },
+    {
+      "path": "events/valid_014.json",
+      "sha256": "8ba07e68cfc9cadf33f248f445e7400c4cbfaacb605706f6cb2ff91f0ddb4e7c"
+    },
+    {
+      "path": "events/valid_015.json",
+      "sha256": "d639aa52a5250226b702bd4018b625c4eef2ad668878e95619acd0ff7ab2360d"
+    },
+    {
+      "path": "events/valid_016.json",
+      "sha256": "cb6ffb5c994f05af05112df1feda5b90b53ee5d9c42a61c491e2ced13ca91491"
+    },
+    {
+      "path": "events/valid_017.json",
+      "sha256": "6ec23e3631fe69b8cc1259965fa0530b2075d46fd0757be3942f412128b868bc"
+    },
+    {
+      "path": "events/valid_018.json",
+      "sha256": "f0eb7b442ca2613152e66611f4c4c934bee46a88bf4d3a494ffe87aae84794c8"
+    },
+    {
+      "path": "events/valid_019.json",
+      "sha256": "ec74b5ae39e9a73b60065a0334774c9d7703a7319d2857032b1f89d5fe2532ab"
+    },
+    {
+      "path": "events/valid_020.json",
+      "sha256": "707b6d74f12f5e5d486213d1c4bf8a00ce43665a63b28ad100d7549befbcea94"
+    },
+    {
+      "path": "events/valid_021.json",
+      "sha256": "ca52b5d0e09ecd2a4327cbf3da3806623d48d86644735063b4e4e77a16218393"
+    },
+    {
+      "path": "events/valid_022.json",
+      "sha256": "d8f407f622c6d9172a97861287398b8dabdfd965b0055a41eeb12c9463fafb55"
+    },
+    {
+      "path": "events/valid_023.json",
+      "sha256": "507222fe337c51ccd601926be48ccb451c29940da20410da442d62b2748cc307"
+    },
+    {
+      "path": "events/valid_024.json",
+      "sha256": "136556ddb04ad0c525bee7706eb66c6853851fdc1d617263e908f63356536703"
+    },
+    {
+      "path": "events/valid_025.json",
+      "sha256": "ecb90174f66012ae6367fd1474ed000cd7200a5d9b5839fe7374d16b1014ca8e"
+    },
+    {
+      "path": "events/valid_026.json",
+      "sha256": "23c7720624153ee3c5de7ba00b292d503e38f880389be3edf31ef808cc0bc658"
+    },
+    {
+      "path": "events/valid_027.json",
+      "sha256": "6f614c0f16724069015a5e8b5483d9f3e82e81c07909dc7d147e6c0f008dfc01"
+    },
+    {
+      "path": "events/valid_028.json",
+      "sha256": "edf3813d4c7ee6ad3e92fffe6a18730832feecc7db9e37a4ac37ad009300122a"
+    },
+    {
+      "path": "events/valid_029.json",
+      "sha256": "6f6008cc6f3bbb68a7be22bbc8cf9a64c43db8dfff064408c3cc134a8ee89544"
+    },
+    {
+      "path": "events/valid_030.json",
+      "sha256": "ae38402ae26583d057eb1fb099bb88ff058bea7309c2b0fc038e23c330c15142"
+    },
+    {
+      "path": "events/valid_031.json",
+      "sha256": "7e21e23c6c4d52dce1c798bbe45bc979ebcae478dadbfb99b8e66ec351b4db10"
+    },
+    {
+      "path": "events/valid_032.json",
+      "sha256": "b1c8d034eea76c9a45ba99ed3f3554c93db20d6a6f61724574dbfe9f3130eacb"
+    },
+    {
+      "path": "events/valid_033.json",
+      "sha256": "7d36ff1002a5619d9ceb6d62089a09357a9fbceed327d521017d370f7f5b49e6"
+    },
+    {
+      "path": "events/valid_034.json",
+      "sha256": "bade56f55c3a3ccce8d203004905d154537c9179bb522025bdf2229433e791f4"
+    },
+    {
+      "path": "events/valid_035.json",
+      "sha256": "3a0966dba66cfbff2d2afc796d15f56118f7c7791be98d3e4b7874a27616bd08"
+    },
+    {
+      "path": "events/valid_036.json",
+      "sha256": "740635bfe6257a70994031afdd1690b0834a259af96c85923b63f7a3b6663fee"
+    },
+    {
+      "path": "events/valid_037.json",
+      "sha256": "6e3e347a089fe68df229ae66a0a8a3bec48eb814cd588a694b97cbd55a0cb519"
+    },
+    {
+      "path": "events/valid_038.json",
+      "sha256": "8cddab5f5f6b5fe04ded9760aab3e1554ed38b2ec7606b7aae73d07823835c29"
+    },
+    {
+      "path": "events/valid_039.json",
+      "sha256": "6a5ab6e310843d558b1fec6d297d7577f5e2085636cd90f6f4de2a9df26c9fbd"
+    },
+    {
+      "path": "events/valid_040.json",
+      "sha256": "78f7a8bda54adc74abd3e43e81bb260a603a4d5beaa1d9ab6a8f63ae7bbe8745"
+    },
+    {
+      "path": "events/valid_041.json",
+      "sha256": "8a16eac58a0a3d83af9729ae0686c024cd071e3feedd87029b96b4c2d71d9f83"
+    },
+    {
+      "path": "events/valid_042.json",
+      "sha256": "fa141a32232ad0bc5749eff086599c6ea66dfb80cead74ce16386c3014f43ce8"
+    },
+    {
+      "path": "events/valid_043.json",
+      "sha256": "7f803be0e2bf7f265a86161541624e951e9a3fbaabcb7131bf3e73196b84dfa4"
+    },
+    {
+      "path": "events/valid_044.json",
+      "sha256": "23090c8db0d6a9a69b5b8a845b4adf14ed41cf448a83ff4bf6503a452756fd3d"
+    },
+    {
+      "path": "events/valid_045.json",
+      "sha256": "8a7fc1989a24907a07149286184dbbd3c1a706fd90aff44ab7346d788ca17c23"
+    },
+    {
+      "path": "events/valid_046.json",
+      "sha256": "9b6d49d7401889f78d4021af07ac24a3718c56284a3776d9b9a870df1663b2f3"
+    },
+    {
+      "path": "events/valid_047.json",
+      "sha256": "b2b09395a656e754149e88f4a5839bf99f6eec5cf9f1fd2b52b8355ca4de1856"
+    },
+    {
+      "path": "events/valid_048.json",
+      "sha256": "b696ffd1346dd99b3eb0f9dcd1e832928eba9a70ab295507ee31efd705bf4970"
+    },
+    {
+      "path": "events/valid_049.json",
+      "sha256": "29338bbfb84684d0897c6df38511fddcf8caec783c0aeb37c2e697ca053debfb"
+    },
+    {
+      "path": "events/valid_050.json",
+      "sha256": "ccfbe42cc1b35a14543c80275de4294561a53a4e53305f6be87e5424459fdf0a"
+    },
+    {
+      "path": "events/valid_051.json",
+      "sha256": "9387919d3689c147897dd4e58266b13364854f62fbc9f0a9f6be572144abed25"
+    },
+    {
+      "path": "events/valid_052.json",
+      "sha256": "95bd84fb44256791dbee7e6190e2c93c42be5857f638d34c0e74021d40ecb34b"
+    },
+    {
+      "path": "events/valid_053.json",
+      "sha256": "6f384a386c4855522b7caf34dd11234ade530c276721ea3f9a1d08faab88127d"
+    },
+    {
+      "path": "events/valid_054.json",
+      "sha256": "4eb4cdce998a765c375b56c8dd21dde4ee901c43b2b83f55e7b568983b444801"
+    },
+    {
+      "path": "events/valid_055.json",
+      "sha256": "594da0e8afb84b4f60a5c5ced87fbf43cbcb106682787b5438884c7dbd08c1ec"
+    },
+    {
+      "path": "events/valid_056.json",
+      "sha256": "345dd317e76afe729a10d7cc16d902a888dd589c546a206dd44d2f3b2e302274"
+    },
+    {
+      "path": "events/valid_057.json",
+      "sha256": "345308d1e65de12aa32d7340fb2474cccdc98f5a40b806d3e7ccfc97649c8539"
+    },
+    {
+      "path": "events/valid_058.json",
+      "sha256": "c547b35867909269a5325c0634f8ff6a979371cce94863fbbe2aabf09ca8020d"
+    },
+    {
+      "path": "events/valid_059.json",
+      "sha256": "bf26ccfcc797f0be2f5ad849022b2d60cc6817fb4791278c989bb2a23ba8e0ce"
+    },
+    {
+      "path": "request.json",
+      "sha256": "068c2c4ea01aab08194790a3936ac0cb7cbfe4d163ae841c341d3a77e862e4c2"
+    },
+    {
+      "path": "suite.json",
+      "sha256": "50534615e9e0278a94be7a9b506a82ff00c97728c47b201c19f93847ecc6c02c"
+    }
+  ]
+}

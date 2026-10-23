@@ -1,0 +1,126 @@
+{
+  "id": "holdout_071",
+  "user": "进行播放歌曲\"小宇宙\"这个操作。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "小宇宙"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "进行播放歌曲\"小宇宙\"这个操作。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"小宇宙\"}"
+        }
+      }
+    ],
+    "wall_seconds": 12.502764983000816,
+    "ttft_seconds": 7.613702912000008,
+    "prompt_tokens": 917,
+    "evaluated_prefill_tokens": 18,
+    "native_usage": {
+      "completion_tokens": 22,
+      "prompt_tokens": 917,
+      "total_tokens": 939,
+      "prompt_tokens_details": {
+        "cached_tokens": 899
+      }
+    },
+    "native_timings": {
+      "cache_n": 899,
+      "prompt_n": 18,
+      "prompt_ms": 4580.075,
+      "prompt_per_token_ms": 254.4486111111111,
+      "prompt_per_second": 3.9300666473802286,
+      "predicted_n": 22,
+      "predicted_ms": 7891.679,
+      "predicted_per_token_ms": 375.7942380952381,
+      "predicted_per_second": 2.6610306881463375
+    },
+    "cache_prompt": true,
+    "output_tokens": 22,
+    "prefill_seconds": 4.580075,
+    "decode_seconds": 7.891679,
+    "prefill_tokens_per_second": 3.9300666473802286,
+    "decode_tokens_per_second": 2.6610306881463375,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "小宇宙"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "小宇宙"
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 14.00471994500549,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 163678,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 55,
+    "wall_seconds": 14.06758214099682,
+    "cpu_seconds": 24.920000000000073,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 44.28621732972916,
+    "peak_rss_bytes": 594153472,
+    "peak_pss_bytes": 593770496,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2863476736,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

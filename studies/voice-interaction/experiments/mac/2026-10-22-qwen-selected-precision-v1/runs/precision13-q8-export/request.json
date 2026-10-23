@@ -1,0 +1,28 @@
+{
+  "schema": "edge-model-export/request-v1",
+  "run_id": "precision13-q8-export",
+  "artifacts": {
+    "selected-f16": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf"
+  },
+  "operations": [
+    {
+      "kind": "quantize",
+      "inputs": [
+        "selected-f16"
+      ],
+      "output": {
+        "id": "selected-q8",
+        "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf"
+      },
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+        "Q8_0",
+        "4"
+      ]
+    }
+  ],
+  "sampling_interval_seconds": 0.1,
+  "reason": "Observed Q4 exact tool regression vs F16; Q5 additional contextual persona corruption; Q8 loss reference diagnosed from validation only."
+}

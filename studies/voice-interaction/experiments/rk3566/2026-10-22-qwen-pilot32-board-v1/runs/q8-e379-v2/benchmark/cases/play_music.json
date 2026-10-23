@@ -1,0 +1,125 @@
+{
+  "id": "play_music",
+  "user": "播放夜曲。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "夜曲"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "播放夜曲。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"夜曲\"}"
+        }
+      }
+    ],
+    "wall_seconds": 71.78714476099412,
+    "ttft_seconds": 67.83125230499718,
+    "prompt_tokens": 440,
+    "evaluated_prefill_tokens": 440,
+    "native_usage": {
+      "completion_tokens": 22,
+      "prompt_tokens": 440,
+      "total_tokens": 462,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 440,
+      "prompt_ms": 65383.598,
+      "prompt_per_token_ms": 148.59908636363636,
+      "prompt_per_second": 6.729516475982249,
+      "predicted_n": 22,
+      "predicted_ms": 6383.195,
+      "predicted_per_token_ms": 303.96166666666664,
+      "predicted_per_second": 3.2898885276103895
+    },
+    "cache_prompt": false,
+    "output_tokens": 22,
+    "prefill_seconds": 65.38359799999999,
+    "decode_seconds": 6.383195,
+    "prefill_tokens_per_second": 6.729516475982249,
+    "decode_tokens_per_second": 3.2898885276103895,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "夜曲"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "夜曲"
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 73.25969440600602,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 150729,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 271,
+    "wall_seconds": 73.3275212610024,
+    "cpu_seconds": 143.15999999999997,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 48.80841379133608,
+    "peak_rss_bytes": 623816704,
+    "peak_pss_bytes": 623427584,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2815864832,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

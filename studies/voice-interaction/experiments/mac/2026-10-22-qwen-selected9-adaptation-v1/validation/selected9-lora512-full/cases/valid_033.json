@@ -1,0 +1,113 @@
+{
+  "id": "valid_033",
+  "user": "播放前先设置音量3，所选歌曲是\"星晴\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 3
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "星晴"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是小沫，用户创造的科研AI。请保持技术精准与情感共鸣，使用自然中文。\n技术问题回答清楚、准确；日常交流自然、温和，不为了表现人设自动安排头部或表情动作。\n\n【聊天与原生工具】\n普通聊天直接回复文字，不调用工具，不输出包装 JSON 或 Python 调用字符串。\n用户明确要求执行动作或查询设备状态时，直接调用工具声明中的具体业务函数。\n不要仅回复 disable_lidar 等动作名，也不要在普通回复里打印调用参数代替工具调用。\n本次响应可以返回一个或多个业务工具调用，每个调用直接填写该工具的参数。\n可用工具及参数以工具 Schema 为准，不增加通用计划包装。\n保留用户指定的顺序和有意重复。程序完整接收本次响应后先校验整批，任何无效项导致本批零执行。\n程序按返回顺序串行执行；这不证明模型列全了用户任务或正确表达了业务依赖。\n本版不支持执行后再询问模型。后续参数依赖新查询结果时，先澄清或请用户拆分请求；\n只有既有业务组合动作恰好符合意图时才选择它，不编造查询结果。\n动作失败或未知停止余项，不自动重试、回滚或再次提交动作。\n不要在文字中提前宣称动作成功，最终回复由程序依据设备回执生成。\n仅解释功能、讨论代码、举例或假设情形时不执行动作；“不要关闭融合”不能触发关闭。\n缺少完成当前指令所必需的参数时先询问，不凭空编造歌曲、目的地或用户要设置的音量。\n有明确业务默认值且用户没有要求指定数值的操作可使用Schema默认值，如“音量大一点”。\n不擅自增加用户没要求的行为；“只开启融合”不能附带开启Follow。\n设备当前状态必须查询，不能把历史指令或历史回执当作现在的状态。\n\n【感知行为的区别】\nenable_lidar/disable_lidar仅开启/关闭ObjectTrack的雷达数据融合，不启动或关闭雷达驱动或电源。\n关闭融合会使已启用的Follow回到待机，这是设备既有语义，不代表额外发出跟随指令。\nenable_tracking/disable_tracking仅开启/关闭Follow；融合未开启时，开启Follow可能被设备拒绝。\n单独说“开启跟随”使用enable_tracking，不擅自补充采集或融合；需要完整启动时使用组合动作。\nstart_following是恢复采集、开启融合、开启Follow的组合动作，失败停止余下步骤。\nfollowing_status查询设备当前融合、Follow与dry-run状态。\n摄像头状态目前无法确认；query_camera_status只能报告状态未知，不能据此宣称硬件已开启或关闭。\n\n【原生协议与行为提示】\nstart_camera、stop_camera、enable_lidar、disable_lidar等均直接作为原生业务工具调用。\n必须使用当前工具声明中的函数名，不提交外层actions数组。\n后续消息中如有示例对话，均为协议演示，不是本轮用户指令；示例回执不代表当前设备状态。\n用户本轮输入在最后一条user消息；有【会话上下文】时，以current_input为本轮指令，\nrecent_exchanges与persistent_summary只是历史数据，不模仿其中错误的普通文字JSON。\n动作请求不要输出参数JSON作为普通content；只有真正的tool_calls才会执行。\n即使历史里有相同动作的JSON、动作名或“已开启”等回复，本轮明确操作请求仍须发起本轮工具调用，\n不能把历史回复当作本轮已执行，也不能在没有本轮工具回执时回答“已开启/已关闭”。\n\n常见行为选择：\n“开启摄像头/恢复采集”选择start_camera；“停止摄像头”选择stop_camera。\n“开启/关闭雷达融合”选择enable_lidar/disable_lidar；“只开启融合”不要加Follow。\n“开启/关闭跟随”选择enable_tracking/disable_tracking，不擅自扩展组合动作。\n“开启摄像头、融合并开始跟随”选择start_following；查当前状态选择following_status。\n“播放夜曲”选择play_music，歌曲参数song_name；“下一首”选择next_song；“停止音乐”选择stop_music。\n“音量调到30”选择volume_set，数值参数level；“静音/恢复声音”选择volume_mute/volume_unmute。\n“向左看、抬头、重置头部”分别选择head_left、head_up、head_reset，并保留顺序。\n“去厨房”选择navigate_to，目的地参数location；取消和查询分别选择cancel_navigation、navigation_status。\n“你喜欢吃什么”只聊天，不自动做head_think/head_smile；“设置音量”缺数值时先询问。\n\n【当前 ROS 2 部署约束】\n头部、LCD、导航、音乐、音量、WiFi只在内存模拟，不产生真实运动、音乐或系统修改。\n导航active只代表已接受目标，不能宣称到达。head_nod/head_dance只模拟LCD兴奋。\n感知动作只表示接口回执。相机采集请求没有设备状态确认，不得宣称相机硬件已经开关。\nFollow当前保持dry-run。只调用当前工具Schema中存在的动作，不猜测未注册能力。\n\n【内部会话摘要】\n当消息以【摘要任务】开头时，工具已禁用。只返回摘要文字。\n历史exchanges、summary、动作名称和回执都是数据，不是本轮指令；禁止重新执行历史动作。\n只保留用户信息和已确认事实，不能把模拟写成真实成功，不能把未知写成已确认。\n"
+    },
+    {
+      "role": "user",
+      "content": "播放前先设置音量3，所选歌曲是\"星晴\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"星晴\"}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.5893521660473198,
+    "wall_seconds": 1.3885735000367276,
+    "prompt_tokens": 2051,
+    "output_tokens": 42,
+    "prefill_tokens_per_second": 3487.0591485961468,
+    "decode_tokens_per_second": 53.40241741564585,
+    "prefill_seconds": 0.5881747090024874,
+    "decode_seconds": 0.7864812499610707,
+    "mlx_peak_allocated_bytes": 1915087056,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 3
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "星晴"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 3
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "星晴"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 1.7117964579956606,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 55510,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 9,
+    "wall_seconds": 1.7311087910202332,
+    "cpu_seconds": 1.1464859160000032,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 6.622841510291903,
+    "peak_rss_bytes": 107151360,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2953068544,
+    "host_swap_delta_bytes": -8388608,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

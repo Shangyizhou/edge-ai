@@ -1,0 +1,5182 @@
+[
+  {
+    "run_id": "precision13-adapter-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.18080216698581353,
+        "wall_seconds": 0.3911080419784412,
+        "prompt_tokens": 916,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 5094.56247653439,
+        "decode_tokens_per_second": 79.16487626045527,
+        "prefill_seconds": 0.17979954200563952,
+        "decode_seconds": 0.20210983400465918,
+        "mlx_peak_allocated_bytes": 1687592912,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6879090419970453,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 78682,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6984639170113951,
+        "cpu_seconds": 0.5549822759999987,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.945754426007729,
+        "peak_rss_bytes": 137625600,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2782445568,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 753664,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-adapter-validation",
+    "case": {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.22460362501442432,
+        "wall_seconds": 0.90525091602467,
+        "prompt_tokens": 927,
+        "output_tokens": 43,
+        "prefill_tokens_per_second": 4148.197752207866,
+        "decode_tokens_per_second": 64.08352523842542,
+        "prefill_seconds": 0.22347054199781266,
+        "decode_seconds": 0.6709992910036817,
+        "mlx_peak_allocated_bytes": 1706488240,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.1902745420229621,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 78682,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.2022336249938235,
+        "cpu_seconds": 0.857391766000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.131656844187884,
+        "peak_rss_bytes": 135757824,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2833842176,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 5816320,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-adapter-validation",
+    "case": {
+      "id": "valid_032",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.24635337496874854,
+        "wall_seconds": 0.8843904579989612,
+        "prompt_tokens": 926,
+        "output_tokens": 43,
+        "prefill_tokens_per_second": 3775.7621347571308,
+        "decode_tokens_per_second": 67.71939703338182,
+        "prefill_seconds": 0.2452485000248998,
+        "decode_seconds": 0.634973166976124,
+        "mlx_peak_allocated_bytes": 1548013860,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.2311236250097863,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 78682,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.2458990419982001,
+        "cpu_seconds": 0.9660594799999984,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.753914622573359,
+        "peak_rss_bytes": 135069696,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2491727872,
+        "host_swap_delta_bytes": -58720256,
+        "host_swap_in_delta_bytes": 27099136,
+        "host_swap_out_delta_bytes": 573440,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-merged-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"disable_tracking\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.1846830839640461,
+        "wall_seconds": 0.4058357499889098,
+        "prompt_tokens": 916,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 4993.723773003101,
+        "decode_tokens_per_second": 75.70354020384066,
+        "prefill_seconds": 0.1834302499773912,
+        "decode_seconds": 0.21135075000347572,
+        "mlx_peak_allocated_bytes": 1697272024,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6672636249568313,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 78182,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.680320416984614,
+        "cpu_seconds": 0.5128262960000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.538011254652645,
+        "peak_rss_bytes": 146423808,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2870116352,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 5210112,
+        "host_swap_out_delta_bytes": 49152,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-merged-validation",
+    "case": {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.2247479580109939,
+        "wall_seconds": 0.8940247500431724,
+        "prompt_tokens": 927,
+        "output_tokens": 43,
+        "prefill_tokens_per_second": 4142.168258639935,
+        "decode_tokens_per_second": 65.5282904128685,
+        "prefill_seconds": 0.22379583399742842,
+        "decode_seconds": 0.6562051249784417,
+        "mlx_peak_allocated_bytes": 1705251032,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.166017749987077,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 78182,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.179242999991402,
+        "cpu_seconds": 0.7666789640000005,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.501450201574996,
+        "peak_rss_bytes": 120782848,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2929541120,
+        "host_swap_delta_bytes": -8388608,
+        "host_swap_in_delta_bytes": 5226496,
+        "host_swap_out_delta_bytes": 507904,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-merged-validation",
+    "case": {
+      "id": "valid_032",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}\n</tool_call>\n<tool_call>\n{\"name\": \"play_music\", \"arguments\": {\"song_name\": \"海浪\"}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.21205937501508743,
+        "wall_seconds": 0.8806091250153258,
+        "prompt_tokens": 926,
+        "output_tokens": 43,
+        "prefill_tokens_per_second": 4385.2440081166615,
+        "decode_tokens_per_second": 65.44656173658139,
+        "prefill_seconds": 0.21116270800121129,
+        "decode_seconds": 0.6570245840121061,
+        "mlx_peak_allocated_bytes": 1704693976,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.165381915983744,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 78182,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.175842290977016,
+        "cpu_seconds": 0.7766345999999995,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.604921475946303,
+        "peak_rss_bytes": 121389056,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2880176128,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 34127872,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-f16-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.5020660830195993,
+        "ttft_seconds": 0.39280224998947233,
+        "prompt_tokens": 916,
+        "evaluated_prefill_tokens": 916,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 916,
+          "total_tokens": 932,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 916,
+          "prompt_ms": 261.959,
+          "prompt_per_token_ms": 0.2859814410480349,
+          "prompt_per_second": 3496.7304043762574,
+          "predicted_n": 16,
+          "predicted_ms": 233.498,
+          "predicted_per_token_ms": 15.566533333333332,
+          "predicted_per_second": 64.24037893258188
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.261959,
+        "decode_seconds": 0.23349799999999998,
+        "prefill_tokens_per_second": 3496.7304043762574,
+        "decode_tokens_per_second": 64.24037893258188,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7616587500087917,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79249,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7757697910419665,
+        "cpu_seconds": 0.4961501439999978,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.395584743427548,
+        "peak_rss_bytes": 2241069056,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2310356992,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1687552,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-f16-validation",
+    "case": {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 99}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"海浪\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.9755162500077859,
+        "ttft_seconds": 0.4125410000560805,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 927,
+          "total_tokens": 970,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 273.382,
+          "prompt_per_token_ms": 0.29491046386192016,
+          "prompt_per_second": 3390.859676203993,
+          "predicted_n": 43,
+          "predicted_ms": 695.249,
+          "predicted_per_token_ms": 16.55354761904762,
+          "predicted_per_second": 60.41001137721881
+        },
+        "cache_prompt": false,
+        "output_tokens": 43,
+        "prefill_seconds": 0.273382,
+        "decode_seconds": 0.695249,
+        "prefill_tokens_per_second": 3390.859676203993,
+        "decode_tokens_per_second": 60.41001137721881,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.2237419580342248,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79249,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.2374403750291094,
+        "cpu_seconds": 1.285999743999998,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 10.392417848575096,
+        "peak_rss_bytes": 2241249280,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2227945472,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1343488,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-f16-validation",
+    "case": {
+      "id": "valid_032",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 99}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"海浪\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.9662205830099992,
+        "ttft_seconds": 0.38338508299784735,
+        "prompt_tokens": 926,
+        "evaluated_prefill_tokens": 926,
+        "native_usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 926,
+          "total_tokens": 969,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 926,
+          "prompt_ms": 246.304,
+          "prompt_per_token_ms": 0.26598704103671705,
+          "prompt_per_second": 3759.581655190334,
+          "predicted_n": 43,
+          "predicted_ms": 712.947,
+          "predicted_per_token_ms": 16.97492857142857,
+          "predicted_per_second": 58.91040989021625
+        },
+        "cache_prompt": false,
+        "output_tokens": 43,
+        "prefill_seconds": 0.246304,
+        "decode_seconds": 0.712947,
+        "prefill_tokens_per_second": 3759.581655190334,
+        "decode_tokens_per_second": 58.91040989021625,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.9329085830249824,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79249,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 9,
+        "wall_seconds": 1.946273209003266,
+        "cpu_seconds": 1.3820103679999995,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.100803533681485,
+        "peak_rss_bytes": 2239102976,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2201305088,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 28753920,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q4-validation",
+    "case": {
+      "id": "valid_011",
+      "user": "当前环节改为把扫描融合打开，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为把扫描融合打开，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "enable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.40576474997214973,
+        "ttft_seconds": 0.35011433297768235,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 920,
+          "total_tokens": 936,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 280.357,
+          "prompt_per_token_ms": 0.3047358695652174,
+          "prompt_per_second": 3281.5303345377497,
+          "predicted_n": 16,
+          "predicted_ms": 120.21,
+          "predicted_per_token_ms": 8.014,
+          "predicted_per_second": 124.78163214374845
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.280357,
+        "decode_seconds": 0.12021,
+        "prefill_tokens_per_second": 3281.5303345377497,
+        "decode_tokens_per_second": 124.78163214374845,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.5965017089620233,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79900,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6059335829922929,
+        "cpu_seconds": 0.2555027679999995,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.216679437674431,
+        "peak_rss_bytes": 1452195840,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2809446400,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 6258688,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q4-validation",
+    "case": {
+      "id": "valid_013",
+      "user": "当前环节改为进入目标跟随，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为进入目标跟随，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.42622841603588313,
+        "ttft_seconds": 0.3549127909936942,
+        "prompt_tokens": 919,
+        "evaluated_prefill_tokens": 919,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 919,
+          "total_tokens": 935,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 919,
+          "prompt_ms": 280.957,
+          "prompt_per_token_ms": 0.30572034820457017,
+          "prompt_per_second": 3270.9631723003877,
+          "predicted_n": 16,
+          "predicted_ms": 140.073,
+          "predicted_per_token_ms": 9.3382,
+          "predicted_per_second": 107.08701891156753
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.280957,
+        "decode_seconds": 0.140073,
+        "prefill_tokens_per_second": 3270.9631723003877,
+        "decode_tokens_per_second": 107.08701891156753,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6478148340247571,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79900,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6576869159471244,
+        "cpu_seconds": 0.2883517919999994,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.384332195277879,
+        "peak_rss_bytes": 1452179456,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2843443200,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 5750784,
+        "host_swap_out_delta_bytes": 98304,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q4-validation",
+    "case": {
+      "id": "valid_020",
+      "user": "能否把任务切换到把扫描融合打开？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到把扫描融合打开？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "enable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.39683883398538455,
+        "ttft_seconds": 0.33944758400321007,
+        "prompt_tokens": 917,
+        "evaluated_prefill_tokens": 917,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 917,
+          "total_tokens": 933,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 917,
+          "prompt_ms": 269.27,
+          "prompt_per_token_ms": 0.2936423118865867,
+          "prompt_per_second": 3405.5037694507373,
+          "predicted_n": 16,
+          "predicted_ms": 122.104,
+          "predicted_per_token_ms": 8.140266666666667,
+          "predicted_per_second": 122.84609840791455
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.26927,
+        "decode_seconds": 0.122104,
+        "prefill_tokens_per_second": 3405.5037694507373,
+        "decode_tokens_per_second": 122.84609840791455,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6031883339746855,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79900,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6138771249679849,
+        "cpu_seconds": 0.24222126399999944,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.94576136083637,
+        "peak_rss_bytes": 1452343296,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2830958592,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q4-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.39548358297906816,
+        "ttft_seconds": 0.34172645799117163,
+        "prompt_tokens": 916,
+        "evaluated_prefill_tokens": 916,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 916,
+          "total_tokens": 932,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 916,
+          "prompt_ms": 274.442,
+          "prompt_per_token_ms": 0.29960917030567685,
+          "prompt_per_second": 3337.6815502000422,
+          "predicted_n": 16,
+          "predicted_ms": 115.116,
+          "predicted_per_token_ms": 7.6744,
+          "predicted_per_second": 130.30334618993015
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.274442,
+        "decode_seconds": 0.115116,
+        "prefill_tokens_per_second": 3337.6815502000422,
+        "decode_tokens_per_second": 130.30334618993015,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.5926474999869242,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79900,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6038953749812208,
+        "cpu_seconds": 0.25604654400000015,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.2399156312128135,
+        "peak_rss_bytes": 1452343296,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2833825792,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 5668864,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q4-validation",
+    "case": {
+      "id": "valid_028",
+      "user": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 23.5}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"a\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6593101670150645,
+        "ttft_seconds": 0.3451438750489615,
+        "prompt_tokens": 928,
+        "evaluated_prefill_tokens": 928,
+        "native_usage": {
+          "completion_tokens": 44,
+          "prompt_tokens": 928,
+          "total_tokens": 972,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 928,
+          "prompt_ms": 274.132,
+          "prompt_per_token_ms": 0.29540086206896554,
+          "prompt_per_second": 3385.2304729108605,
+          "predicted_n": 44,
+          "predicted_ms": 371.097,
+          "predicted_per_token_ms": 8.630162790697675,
+          "predicted_per_second": 115.87266940988475
+        },
+        "cache_prompt": false,
+        "output_tokens": 44,
+        "prefill_seconds": 0.274132,
+        "decode_seconds": 0.37109699999999995,
+        "prefill_tokens_per_second": 3385.2304729108605,
+        "decode_tokens_per_second": 115.87266940988475,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.9037224160274491,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79900,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.915689040964935,
+        "cpu_seconds": 0.7225715840000007,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.891014871583142,
+        "peak_rss_bytes": 1439481856,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2741764096,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q4-validation",
+    "case": {
+      "id": "valid_031",
+      "user": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 23.5}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"a\"}"
+            }
+          }
+        ],
+        "wall_seconds": 1.064592833048664,
+        "ttft_seconds": 0.3580200830474496,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 44,
+          "prompt_tokens": 927,
+          "total_tokens": 971,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 256.339,
+          "prompt_per_token_ms": 0.27652535059331174,
+          "prompt_per_second": 3616.304971151483,
+          "predicted_n": 44,
+          "predicted_ms": 801.279,
+          "predicted_per_token_ms": 18.63439534883721,
+          "predicted_per_second": 53.66420435329018
+        },
+        "cache_prompt": false,
+        "output_tokens": 44,
+        "prefill_seconds": 0.256339,
+        "decode_seconds": 0.801279,
+        "prefill_tokens_per_second": 3616.304971151483,
+        "decode_tokens_per_second": 53.66420435329018,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.3081166669726372,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 79900,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 7,
+        "wall_seconds": 1.3175313749816269,
+        "cpu_seconds": 0.7500041600000014,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.692495634196645,
+        "peak_rss_bytes": 1439645696,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2749628416,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 3751936,
+        "host_swap_out_delta_bytes": 49152,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q5-validation",
+    "case": {
+      "id": "valid_013",
+      "user": "当前环节改为进入目标跟随，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为进入目标跟随，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.41513887501787394,
+        "ttft_seconds": 0.3496173750027083,
+        "prompt_tokens": 919,
+        "evaluated_prefill_tokens": 919,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 919,
+          "total_tokens": 935,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 919,
+          "prompt_ms": 274.24,
+          "prompt_per_token_ms": 0.29841131664853104,
+          "prompt_per_second": 3351.07934655776,
+          "predicted_n": 16,
+          "predicted_ms": 135.771,
+          "predicted_per_token_ms": 9.0514,
+          "predicted_per_second": 110.48014671763485
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.27424,
+        "decode_seconds": 0.13577099999999998,
+        "prefill_tokens_per_second": 3351.07934655776,
+        "decode_tokens_per_second": 110.48014671763485,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6346070420113392,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 80300,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6487125409767032,
+        "cpu_seconds": 0.3430974399999993,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.288897906666502,
+        "peak_rss_bytes": 1491566592,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2391359488,
+        "host_swap_delta_bytes": -8388608,
+        "host_swap_in_delta_bytes": 12222464,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q5-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.42550870799459517,
+        "ttft_seconds": 0.3633637080201879,
+        "prompt_tokens": 916,
+        "evaluated_prefill_tokens": 916,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 916,
+          "total_tokens": 932,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 916,
+          "prompt_ms": 283.017,
+          "prompt_per_token_ms": 0.3089705240174672,
+          "prompt_per_second": 3236.554694594318,
+          "predicted_n": 16,
+          "predicted_ms": 134.831,
+          "predicted_per_token_ms": 8.988733333333332,
+          "predicted_per_second": 111.25038010546537
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.283017,
+        "decode_seconds": 0.13483099999999998,
+        "prefill_tokens_per_second": 3236.554694594318,
+        "decode_tokens_per_second": 111.25038010546537,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.617230334028136,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 80300,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6290312079945579,
+        "cpu_seconds": 0.3238956799999997,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.149119405897614,
+        "peak_rss_bytes": 1485602816,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2549743616,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 16384,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q5-validation",
+    "case": {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 99}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"海浪\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6991759999655187,
+        "ttft_seconds": 0.3579631670145318,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 927,
+          "total_tokens": 970,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 270.642,
+          "prompt_per_token_ms": 0.2919546925566343,
+          "prompt_per_second": 3425.1889950562,
+          "predicted_n": 43,
+          "predicted_ms": 421.084,
+          "predicted_per_token_ms": 10.025809523809524,
+          "predicted_per_second": 99.7425691785962
+        },
+        "cache_prompt": false,
+        "output_tokens": 43,
+        "prefill_seconds": 0.270642,
+        "decode_seconds": 0.421084,
+        "prefill_tokens_per_second": 3425.1889950562,
+        "decode_tokens_per_second": 99.7425691785962,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.9474796249996871,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 80300,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.9605521250050515,
+        "cpu_seconds": 0.800116383999999,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.329754972909889,
+        "peak_rss_bytes": 1487437824,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2649456640,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 15351808,
+        "host_swap_out_delta_bytes": 442368,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q5-validation",
+    "case": {
+      "id": "valid_031",
+      "user": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 23.5}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"a\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6684339579660445,
+        "ttft_seconds": 0.343189540959429,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 44,
+          "prompt_tokens": 927,
+          "total_tokens": 971,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 267.501,
+          "prompt_per_token_ms": 0.2885663430420712,
+          "prompt_per_second": 3465.407605952875,
+          "predicted_n": 44,
+          "predicted_ms": 394.663,
+          "predicted_per_token_ms": 9.178209302325582,
+          "predicted_per_second": 108.9537149416084
+        },
+        "cache_prompt": false,
+        "output_tokens": 44,
+        "prefill_seconds": 0.267501,
+        "decode_seconds": 0.394663,
+        "prefill_tokens_per_second": 3465.407605952875,
+        "decode_tokens_per_second": 108.9537149416084,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8891454580007121,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 80300,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.8983426670311019,
+        "cpu_seconds": 0.9543612800000005,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 10.623577338857034,
+        "peak_rss_bytes": 1487126528,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2677817344,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 29425664,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q5-validation",
+    "case": {
+      "id": "valid_032",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 99}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"海浪\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.7126086669741198,
+        "ttft_seconds": 0.36806725000496954,
+        "prompt_tokens": 926,
+        "evaluated_prefill_tokens": 926,
+        "native_usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 926,
+          "total_tokens": 969,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 926,
+          "prompt_ms": 285.22,
+          "prompt_per_token_ms": 0.30801295896328296,
+          "prompt_per_second": 3246.616646798962,
+          "predicted_n": 43,
+          "predicted_ms": 422.059,
+          "predicted_per_token_ms": 10.04902380952381,
+          "predicted_per_second": 99.51215351408214
+        },
+        "cache_prompt": false,
+        "output_tokens": 43,
+        "prefill_seconds": 0.28522000000000003,
+        "decode_seconds": 0.422059,
+        "prefill_tokens_per_second": 3246.616646798962,
+        "decode_tokens_per_second": 99.51215351408214,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.9767619170015678,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 80300,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.9875979999778792,
+        "cpu_seconds": 0.9402358400000015,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.520430782778636,
+        "peak_rss_bytes": 1487126528,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2624487424,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1851392,
+        "host_swap_out_delta_bytes": 1228800,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_001",
+      "user": "收到指令后，请完成以下操作——相机停止采集图像。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——相机停止采集图像。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "停止相机采集图像。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.30294458399293944,
+        "ttft_seconds": 0.26326512498781085,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 920,
+          "total_tokens": 926,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 257.538,
+          "prompt_per_token_ms": 0.2799326086956522,
+          "prompt_per_second": 3572.2883613292015,
+          "predicted_n": 6,
+          "predicted_ms": 39.662,
+          "predicted_per_token_ms": 7.9323999999999995,
+          "predicted_per_second": 126.06525137411124
+        },
+        "cache_prompt": false,
+        "output_tokens": 6,
+        "prefill_seconds": 0.257538,
+        "decode_seconds": 0.039661999999999996,
+        "prefill_tokens_per_second": 3572.2883613292015,
+        "decode_tokens_per_second": 126.06525137411124,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "停止相机采集图像。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.315850084007252,
+        "cpu_seconds": 0.10551949599999988,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.3408094961145274,
+        "peak_rss_bytes": 1502461952,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3454795776,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_004",
+      "user": "收到指令后，请完成以下操作——进入目标跟随。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——进入目标跟随。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "进入目标跟随。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.33067779103294015,
+        "ttft_seconds": 0.29723600001307204,
+        "prompt_tokens": 919,
+        "evaluated_prefill_tokens": 919,
+        "native_usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 919,
+          "total_tokens": 924,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 919,
+          "prompt_ms": 290.389,
+          "prompt_per_token_ms": 0.3159836779107726,
+          "prompt_per_second": 3164.720426737927,
+          "predicted_n": 5,
+          "predicted_ms": 33.313,
+          "predicted_per_token_ms": 8.32825,
+          "predicted_per_second": 120.07324467925433
+        },
+        "cache_prompt": false,
+        "output_tokens": 5,
+        "prefill_seconds": 0.290389,
+        "decode_seconds": 0.033313,
+        "prefill_tokens_per_second": 3164.720426737927,
+        "decode_tokens_per_second": 120.07324467925433,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "进入目标跟随。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.3433716250001453,
+        "cpu_seconds": 0.108268048,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.153086630264053,
+        "peak_rss_bytes": 1502445568,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3450322944,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 327680,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_005",
+      "user": "收到指令后，请完成以下操作——进入跟随待机。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "收到指令后，请完成以下操作——进入跟随待机。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "进入跟随待机。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.3670696659828536,
+        "ttft_seconds": 0.32518191600684077,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 920,
+          "total_tokens": 926,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 320.11,
+          "prompt_per_token_ms": 0.34794565217391304,
+          "prompt_per_second": 2874.01205835494,
+          "predicted_n": 6,
+          "predicted_ms": 41.815,
+          "predicted_per_token_ms": 8.363,
+          "predicted_per_second": 119.57431543704413
+        },
+        "cache_prompt": false,
+        "output_tokens": 6,
+        "prefill_seconds": 0.32011,
+        "decode_seconds": 0.041815,
+        "prefill_tokens_per_second": 2874.01205835494,
+        "decode_tokens_per_second": 119.57431543704413,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "进入跟随待机。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.37687795801321045,
+        "cpu_seconds": 0.09979217600000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 2.647864484462688,
+        "peak_rss_bytes": 1502330880,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3450322944,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_013",
+      "user": "当前环节改为进入目标跟随，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为进入目标跟随，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请确认当前环节是否需要进入目标跟随状态。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.3887068750336766,
+        "ttft_seconds": 0.2992310830159113,
+        "prompt_tokens": 919,
+        "evaluated_prefill_tokens": 919,
+        "native_usage": {
+          "completion_tokens": 12,
+          "prompt_tokens": 919,
+          "total_tokens": 931,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 919,
+          "prompt_ms": 293.37,
+          "prompt_per_token_ms": 0.3192274211099021,
+          "prompt_per_second": 3132.5629750826597,
+          "predicted_n": 12,
+          "predicted_ms": 89.388,
+          "predicted_per_token_ms": 8.126181818181818,
+          "predicted_per_second": 123.05902358258378
+        },
+        "cache_prompt": false,
+        "output_tokens": 12,
+        "prefill_seconds": 0.29337,
+        "decode_seconds": 0.08938800000000001,
+        "prefill_tokens_per_second": 3132.5629750826597,
+        "decode_tokens_per_second": 123.05902358258378,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请确认当前环节是否需要进入目标跟随状态。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.3990006250096485,
+        "cpu_seconds": 0.1915195039999995,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.79998005004048,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3513040896,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1081344,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_014",
+      "user": "当前环节改为进入跟随待机，请调用相应能力。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "当前环节改为进入跟随待机，请调用相应能力。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请确认当前环节是否需要进入跟随待机状态。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.49125941697275266,
+        "ttft_seconds": 0.3584776669740677,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 13,
+          "prompt_tokens": 920,
+          "total_tokens": 933,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 353.348,
+          "prompt_per_token_ms": 0.38407391304347827,
+          "prompt_per_second": 2603.665508224187,
+          "predicted_n": 13,
+          "predicted_ms": 132.717,
+          "predicted_per_token_ms": 11.059750000000001,
+          "predicted_per_second": 90.41795700626143
+        },
+        "cache_prompt": false,
+        "output_tokens": 13,
+        "prefill_seconds": 0.353348,
+        "decode_seconds": 0.132717,
+        "prefill_tokens_per_second": 2603.665508224187,
+        "decode_tokens_per_second": 90.41795700626143,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请确认当前环节是否需要进入跟随待机状态。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5017372920410708,
+        "cpu_seconds": 0.3486826399999998,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.9495061565297735,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3517169664,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_018",
+      "user": "能否把任务切换到相机重新采集图像？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到相机重新采集图像？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "可以，您可以通过以下方式切换到相机进行图像采集。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.3960811250144616,
+        "ttft_seconds": 0.29414170898962766,
+        "prompt_tokens": 917,
+        "evaluated_prefill_tokens": 917,
+        "native_usage": {
+          "completion_tokens": 14,
+          "prompt_tokens": 917,
+          "total_tokens": 931,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 917,
+          "prompt_ms": 286.893,
+          "prompt_per_token_ms": 0.31286041439476553,
+          "prompt_per_second": 3196.313608209333,
+          "predicted_n": 14,
+          "predicted_ms": 101.848,
+          "predicted_per_token_ms": 7.834461538461539,
+          "predicted_per_second": 127.64119079412458
+        },
+        "cache_prompt": false,
+        "output_tokens": 14,
+        "prefill_seconds": 0.28689299999999995,
+        "decode_seconds": 0.101848,
+        "prefill_tokens_per_second": 3196.313608209333,
+        "decode_tokens_per_second": 127.64119079412458,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "可以，您可以通过以下方式切换到相机进行图像采集。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.4092475000070408,
+        "cpu_seconds": 0.21504772799999916,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.254710853366226,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3508535296,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 12222464,
+        "host_swap_out_delta_bytes": 65536,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_019",
+      "user": "能否把任务切换到相机停止采集图像？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到相机停止采集图像？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "无法直接切换任务，但可以尝试停止相机采集图像。如果您有其他问题或需要进一步操作，请告诉我。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5747869159677066,
+        "ttft_seconds": 0.33333624998340383,
+        "prompt_tokens": 917,
+        "evaluated_prefill_tokens": 917,
+        "native_usage": {
+          "completion_tokens": 25,
+          "prompt_tokens": 917,
+          "total_tokens": 942,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 917,
+          "prompt_ms": 328.741,
+          "prompt_per_token_ms": 0.3584961832061069,
+          "prompt_per_second": 2789.4299767902394,
+          "predicted_n": 25,
+          "predicted_ms": 241.25,
+          "predicted_per_token_ms": 10.052083333333334,
+          "predicted_per_second": 99.48186528497408
+        },
+        "cache_prompt": false,
+        "output_tokens": 25,
+        "prefill_seconds": 0.328741,
+        "decode_seconds": 0.24125,
+        "prefill_tokens_per_second": 2789.4299767902394,
+        "decode_tokens_per_second": 99.48186528497408,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "无法直接切换任务，但可以尝试停止相机采集图像。如果您有其他问题或需要进一步操作，请告诉我。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5893496659700759,
+        "cpu_seconds": 0.5770907519999993,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.79199251856878,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3465412608,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1900544,
+        "host_swap_out_delta_bytes": 327680,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_020",
+      "user": "能否把任务切换到把扫描融合打开？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到把扫描融合打开？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请提供您需要执行的具体任务或操作，以便我更好地协助您。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.6040315419668332,
+        "ttft_seconds": 0.39568529196549207,
+        "prompt_tokens": 917,
+        "evaluated_prefill_tokens": 917,
+        "native_usage": {
+          "completion_tokens": 17,
+          "prompt_tokens": 917,
+          "total_tokens": 934,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 917,
+          "prompt_ms": 388.589,
+          "prompt_per_token_ms": 0.42376117775354416,
+          "prompt_per_second": 2359.8197581506424,
+          "predicted_n": 17,
+          "predicted_ms": 208.082,
+          "predicted_per_token_ms": 13.005125,
+          "predicted_per_second": 76.89276342980172
+        },
+        "cache_prompt": false,
+        "output_tokens": 17,
+        "prefill_seconds": 0.388589,
+        "decode_seconds": 0.208082,
+        "prefill_tokens_per_second": 2359.8197581506424,
+        "decode_tokens_per_second": 76.89276342980172,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请提供您需要执行的具体任务或操作，以便我更好地协助您。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6188901250134222,
+        "cpu_seconds": 0.44108864000000025,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.127091258572499,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3465412608,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 7127040,
+        "host_swap_out_delta_bytes": 114688,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_021",
+      "user": "能否把任务切换到把扫描融合关掉？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到把扫描融合关掉？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "无法直接切换任务，但如果您有其他问题或需要帮助，请随时告诉我！",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.6111987080075778,
+        "ttft_seconds": 0.4078907920047641,
+        "prompt_tokens": 918,
+        "evaluated_prefill_tokens": 918,
+        "native_usage": {
+          "completion_tokens": 18,
+          "prompt_tokens": 918,
+          "total_tokens": 936,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 918,
+          "prompt_ms": 398.93,
+          "prompt_per_token_ms": 0.4345642701525054,
+          "prompt_per_second": 2301.1555912064773,
+          "predicted_n": 18,
+          "predicted_ms": 201.59,
+          "predicted_per_token_ms": 11.858235294117648,
+          "predicted_per_second": 84.32957984026984
+        },
+        "cache_prompt": false,
+        "output_tokens": 18,
+        "prefill_seconds": 0.39893,
+        "decode_seconds": 0.20159,
+        "prefill_tokens_per_second": 2301.1555912064773,
+        "decode_tokens_per_second": 84.32957984026984,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "无法直接切换任务，但如果您有其他问题或需要帮助，请随时告诉我！",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6256926670321263,
+        "cpu_seconds": 0.4503908479999996,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.198275954493075,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3514449920,
+        "host_swap_delta_bytes": -8388608,
+        "host_swap_in_delta_bytes": 11878400,
+        "host_swap_out_delta_bytes": 606208,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请提供任务名称以便我进行操作。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5030969160143286,
+        "ttft_seconds": 0.40091408300213516,
+        "prompt_tokens": 916,
+        "evaluated_prefill_tokens": 916,
+        "native_usage": {
+          "completion_tokens": 10,
+          "prompt_tokens": 916,
+          "total_tokens": 926,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 916,
+          "prompt_ms": 392.679,
+          "prompt_per_token_ms": 0.42868886462882094,
+          "prompt_per_second": 2332.69413439476,
+          "predicted_n": 10,
+          "predicted_ms": 102.075,
+          "predicted_per_token_ms": 11.341666666666667,
+          "predicted_per_second": 88.1704628949302
+        },
+        "cache_prompt": false,
+        "output_tokens": 10,
+        "prefill_seconds": 0.392679,
+        "decode_seconds": 0.102075,
+        "prefill_tokens_per_second": 2332.69413439476,
+        "decode_tokens_per_second": 88.1704628949302,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请提供任务名称以便我进行操作。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5185070000006817,
+        "cpu_seconds": 0.23708288000000088,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.572414258625036,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3588210688,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 3375104,
+        "host_swap_out_delta_bytes": 180224,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_023",
+      "user": "能否把任务切换到进入跟随待机？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入跟随待机？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请确认您需要进入跟随待机状态。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5002667500521056,
+        "ttft_seconds": 0.3896372920135036,
+        "prompt_tokens": 917,
+        "evaluated_prefill_tokens": 917,
+        "native_usage": {
+          "completion_tokens": 11,
+          "prompt_tokens": 917,
+          "total_tokens": 928,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 917,
+          "prompt_ms": 382.85,
+          "prompt_per_token_ms": 0.41750272628135227,
+          "prompt_per_second": 2395.193940185451,
+          "predicted_n": 11,
+          "predicted_ms": 110.522,
+          "predicted_per_token_ms": 11.052200000000001,
+          "predicted_per_second": 90.479723493965
+        },
+        "cache_prompt": false,
+        "output_tokens": 11,
+        "prefill_seconds": 0.38285,
+        "decode_seconds": 0.11052200000000001,
+        "prefill_tokens_per_second": 2395.193940185451,
+        "decode_tokens_per_second": 90.479723493965,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请确认您需要进入跟随待机状态。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5102911249850877,
+        "cpu_seconds": 0.26389068800000004,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.171375222481319,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3604021248,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 917504,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_024",
+      "user": "能否把任务切换到查看目标跟随的当前状态？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到查看目标跟随的当前状态？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请告诉我您需要查看的目标跟随当前状态是什么。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.47712812502868474,
+        "ttft_seconds": 0.37368404102744535,
+        "prompt_tokens": 919,
+        "evaluated_prefill_tokens": 919,
+        "native_usage": {
+          "completion_tokens": 12,
+          "prompt_tokens": 919,
+          "total_tokens": 931,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 919,
+          "prompt_ms": 367.08,
+          "prompt_per_token_ms": 0.3994341675734494,
+          "prompt_per_second": 2503.541462351531,
+          "predicted_n": 12,
+          "predicted_ms": 103.249,
+          "predicted_per_token_ms": 9.386272727272727,
+          "predicted_per_second": 106.53856211682438
+        },
+        "cache_prompt": false,
+        "output_tokens": 12,
+        "prefill_seconds": 0.36707999999999996,
+        "decode_seconds": 0.103249,
+        "prefill_tokens_per_second": 2503.541462351531,
+        "decode_tokens_per_second": 106.53856211682438,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请告诉我您需要查看的目标跟随当前状态是什么。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.4875929999980144,
+        "cpu_seconds": 0.2625154880000009,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.3839060035945945,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3682451456,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 163840,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_025",
+      "user": "能否把任务切换到将音量设为17.5？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 17.5
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到将音量设为17.5？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请告诉我您需要设置的音量值，以便我为您执行相应的操作。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5194734589895234,
+        "ttft_seconds": 0.3679899589624256,
+        "prompt_tokens": 922,
+        "evaluated_prefill_tokens": 922,
+        "native_usage": {
+          "completion_tokens": 18,
+          "prompt_tokens": 922,
+          "total_tokens": 940,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 922,
+          "prompt_ms": 363.529,
+          "prompt_per_token_ms": 0.3942830802603037,
+          "prompt_per_second": 2536.2488274663096,
+          "predicted_n": 18,
+          "predicted_ms": 151.386,
+          "predicted_per_token_ms": 8.905058823529412,
+          "predicted_per_second": 112.2957208724717
+        },
+        "cache_prompt": false,
+        "output_tokens": 18,
+        "prefill_seconds": 0.363529,
+        "decode_seconds": 0.151386,
+        "prefill_tokens_per_second": 2536.2488274663096,
+        "decode_tokens_per_second": 112.2957208724717,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请告诉我您需要设置的音量值，以便我为您执行相应的操作。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5326181250275113,
+        "cpu_seconds": 0.31201043199999745,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.8580513380741825,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3643719680,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1785856,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_026",
+      "user": "能否把任务切换到播放歌曲\"海阔天空\"？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海阔天空"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到播放歌曲\"海阔天空\"？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "请提供歌曲名称以便我为您播放音乐。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.44961099995998666,
+        "ttft_seconds": 0.3609602079959586,
+        "prompt_tokens": 920,
+        "evaluated_prefill_tokens": 920,
+        "native_usage": {
+          "completion_tokens": 11,
+          "prompt_tokens": 920,
+          "total_tokens": 931,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 920,
+          "prompt_ms": 356.274,
+          "prompt_per_token_ms": 0.387254347826087,
+          "prompt_per_second": 2582.2821760779625,
+          "predicted_n": 11,
+          "predicted_ms": 88.536,
+          "predicted_per_token_ms": 8.8536,
+          "predicted_per_second": 112.94840516851903
+        },
+        "cache_prompt": false,
+        "output_tokens": 11,
+        "prefill_seconds": 0.356274,
+        "decode_seconds": 0.088536,
+        "prefill_tokens_per_second": 2582.2821760779625,
+        "decode_tokens_per_second": 112.94840516851903,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "请提供歌曲名称以便我为您播放音乐。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.4636550829745829,
+        "cpu_seconds": 0.19250329599999993,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 4.1518642428115635,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3603316736,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 114688,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_027",
+      "user": "有两项请求：音量调成3，然后点播\"星晴\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成3，然后点播\"星晴\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "- 音量调成3\n- 点播\"星晴\"",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5202125840005465,
+        "ttft_seconds": 0.3702133749611676,
+        "prompt_tokens": 925,
+        "evaluated_prefill_tokens": 925,
+        "native_usage": {
+          "completion_tokens": 17,
+          "prompt_tokens": 925,
+          "total_tokens": 942,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 925,
+          "prompt_ms": 365.816,
+          "prompt_per_token_ms": 0.39547675675675675,
+          "prompt_per_second": 2528.593609902246,
+          "predicted_n": 17,
+          "predicted_ms": 149.876,
+          "predicted_per_token_ms": 9.36725,
+          "predicted_per_second": 106.75491739838266
+        },
+        "cache_prompt": false,
+        "output_tokens": 17,
+        "prefill_seconds": 0.365816,
+        "decode_seconds": 0.149876,
+        "prefill_tokens_per_second": 2528.593609902246,
+        "decode_tokens_per_second": 106.75491739838266,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "- 音量调成3\n- 点播\"星晴\"",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5311308340169489,
+        "cpu_seconds": 0.29619273600000007,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 5.576643588169996,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3603316736,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 8355840,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_028",
+      "user": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "- volume_set: Level=23.5\n- play_music: Song Name=\"a\"",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.6647579169948585,
+        "ttft_seconds": 0.42165650002425537,
+        "prompt_tokens": 928,
+        "evaluated_prefill_tokens": 928,
+        "native_usage": {
+          "completion_tokens": 21,
+          "prompt_tokens": 928,
+          "total_tokens": 949,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 928,
+          "prompt_ms": 416.166,
+          "prompt_per_token_ms": 0.44845474137931035,
+          "prompt_per_second": 2229.879423114815,
+          "predicted_n": 21,
+          "predicted_ms": 230.607,
+          "predicted_per_token_ms": 11.53035,
+          "predicted_per_second": 86.7276361949117
+        },
+        "cache_prompt": false,
+        "output_tokens": 21,
+        "prefill_seconds": 0.416166,
+        "decode_seconds": 0.230607,
+        "prefill_tokens_per_second": 2229.879423114815,
+        "decode_tokens_per_second": 86.7276361949117,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "- volume_set: Level=23.5\n- play_music: Song Name=\"a\"",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.6793912920402363,
+        "cpu_seconds": 0.5540471360000012,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.155052066330994,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3734831104,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "- volume_set: Level=99\n- play_music: Song Name=海浪",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5678675000090152,
+        "ttft_seconds": 0.3576822499744594,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 19,
+          "prompt_tokens": 927,
+          "total_tokens": 946,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 350.495,
+          "prompt_per_token_ms": 0.3780960086299892,
+          "prompt_per_second": 2644.83088203826,
+          "predicted_n": 19,
+          "predicted_ms": 209.887,
+          "predicted_per_token_ms": 11.660388888888889,
+          "predicted_per_second": 85.76043299489726
+        },
+        "cache_prompt": false,
+        "output_tokens": 19,
+        "prefill_seconds": 0.350495,
+        "decode_seconds": 0.209887,
+        "prefill_tokens_per_second": 2644.83088203826,
+        "decode_tokens_per_second": 85.76043299489726,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "- volume_set: Level=99\n- play_music: Song Name=海浪",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5856821670313366,
+        "cpu_seconds": 0.44225126400000114,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.551045411569425,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3693477888,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 7880704,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_031",
+      "user": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量23.5和歌曲\"a\\\"b\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 23.5}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"a\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6586096250102855,
+        "ttft_seconds": 0.3188287910306826,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 44,
+          "prompt_tokens": 927,
+          "total_tokens": 971,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 236.236,
+          "prompt_per_token_ms": 0.2548392664509169,
+          "prompt_per_second": 3924.04205963528,
+          "predicted_n": 44,
+          "predicted_ms": 416.007,
+          "predicted_per_token_ms": 9.674581395348838,
+          "predicted_per_second": 103.3636453232758
+        },
+        "cache_prompt": false,
+        "output_tokens": 44,
+        "prefill_seconds": 0.236236,
+        "decode_seconds": 0.416007,
+        "prefill_tokens_per_second": 3924.04205963528,
+        "decode_tokens_per_second": 103.3636453232758,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 23.5
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "a"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 23.5
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "a"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.9590037090238184,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.9751122500165366,
+        "cpu_seconds": 0.8066304960000004,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.272180930824332,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3661463552,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 2703360,
+        "host_swap_out_delta_bytes": 32768,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_033",
+      "user": "播放前先设置音量3，所选歌曲是\"星晴\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 3
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星晴"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "播放前先设置音量3，所选歌曲是\"星晴\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.40238312497967854,
+        "ttft_seconds": 0.2383044579764828,
+        "prompt_tokens": 924,
+        "evaluated_prefill_tokens": 924,
+        "native_usage": {
+          "completion_tokens": 17,
+          "prompt_tokens": 924,
+          "total_tokens": 941,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 924,
+          "prompt_ms": 232.097,
+          "prompt_per_token_ms": 0.25118722943722943,
+          "prompt_per_second": 3981.0941115137202,
+          "predicted_n": 17,
+          "predicted_ms": 162.693,
+          "predicted_per_token_ms": 10.1683125,
+          "predicted_per_second": 98.3447351760678
+        },
+        "cache_prompt": false,
+        "output_tokens": 17,
+        "prefill_seconds": 0.232097,
+        "decode_seconds": 0.162693,
+        "prefill_tokens_per_second": 3981.0941115137202,
+        "decode_tokens_per_second": 98.3447351760678,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "{\"name\": \"volume_set\", \"arguments\": {\"level\": 3}}",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.4183153340127319,
+        "cpu_seconds": 0.38303126399999954,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.156519803511232,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3742793728,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1441792,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_034",
+      "user": "播放前先设置音量23.5，所选歌曲是\"a\\\"b\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23.5
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "a\"b"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "播放前先设置音量23.5，所选歌曲是\"a\\\"b\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "{\"name\": \"volume_set\", \"arguments\": {\"level\": 23.5}}",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5573480000020936,
+        "ttft_seconds": 0.29130766697926447,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 20,
+          "prompt_tokens": 927,
+          "total_tokens": 947,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 284.454,
+          "prompt_per_token_ms": 0.3068543689320388,
+          "prompt_per_second": 3258.874897171423,
+          "predicted_n": 20,
+          "predicted_ms": 264.932,
+          "predicted_per_token_ms": 13.94378947368421,
+          "predicted_per_second": 71.71651593616474
+        },
+        "cache_prompt": false,
+        "output_tokens": 20,
+        "prefill_seconds": 0.284454,
+        "decode_seconds": 0.264932,
+        "prefill_tokens_per_second": 3258.874897171423,
+        "decode_tokens_per_second": 71.71651593616474,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "{\"name\": \"volume_set\", \"arguments\": {\"level\": 23.5}}",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5780976249952801,
+        "cpu_seconds": 0.5888992000000002,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 10.186846901590512,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3676274688,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 3719168,
+        "host_swap_out_delta_bytes": 32768,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-baseq4matched-validation",
+    "case": {
+      "id": "valid_035",
+      "user": "播放前先设置音量99，所选歌曲是\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "播放前先设置音量99，所选歌曲是\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.5695834580110386,
+        "ttft_seconds": 0.3225927919847891,
+        "prompt_tokens": 926,
+        "evaluated_prefill_tokens": 926,
+        "native_usage": {
+          "completion_tokens": 18,
+          "prompt_tokens": 926,
+          "total_tokens": 944,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 926,
+          "prompt_ms": 315.418,
+          "prompt_per_token_ms": 0.34062419006479483,
+          "prompt_per_second": 2935.7867972024424,
+          "predicted_n": 18,
+          "predicted_ms": 246.61,
+          "predicted_per_token_ms": 14.506470588235295,
+          "predicted_per_second": 68.93475528161875
+        },
+        "cache_prompt": false,
+        "output_tokens": 18,
+        "prefill_seconds": 0.31541800000000003,
+        "decode_seconds": 0.24661000000000002,
+        "prefill_tokens_per_second": 2935.7867972024424,
+        "decode_tokens_per_second": 68.93475528161875,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "{\"name\": \"volume_set\", \"arguments\": {\"level\": 99}}",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 83435,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5907356659881771,
+        "cpu_seconds": 0.4802928959999999,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.130419807928314,
+        "peak_rss_bytes": 1502068736,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3685236736,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q8-validation",
+    "case": {
+      "id": "valid_022",
+      "user": "能否把任务切换到进入目标跟随？",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "能否把任务切换到进入目标跟随？"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.42782208404969424,
+        "ttft_seconds": 0.35324520902941003,
+        "prompt_tokens": 916,
+        "evaluated_prefill_tokens": 916,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 916,
+          "total_tokens": 932,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 916,
+          "prompt_ms": 266.466,
+          "prompt_per_token_ms": 0.29090174672489083,
+          "prompt_per_second": 3437.5867840550013,
+          "predicted_n": 16,
+          "predicted_ms": 155.208,
+          "predicted_per_token_ms": 10.347199999999999,
+          "predicted_per_second": 96.64450286067729
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.266466,
+        "decode_seconds": 0.15520799999999998,
+        "prefill_tokens_per_second": 3437.5867840550013,
+        "decode_tokens_per_second": 96.64450286067729,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.6300842079799622,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 81474,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.6423835000023246,
+        "cpu_seconds": 0.40989353599999845,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.380822919619125,
+        "peak_rss_bytes": 1681588224,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2531508224,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 1097728,
+        "host_swap_out_delta_bytes": 32768,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q8-validation",
+    "case": {
+      "id": "valid_029",
+      "user": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "有两项请求：音量调成99，然后点播\"海\\\\浪\"。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 99}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"海浪\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.7016388329793699,
+        "ttft_seconds": 0.33257374999811873,
+        "prompt_tokens": 927,
+        "evaluated_prefill_tokens": 927,
+        "native_usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 927,
+          "total_tokens": 970,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 927,
+          "prompt_ms": 239.145,
+          "prompt_per_token_ms": 0.25797734627831714,
+          "prompt_per_second": 3876.3093520667376,
+          "predicted_n": 43,
+          "predicted_ms": 455.426,
+          "predicted_per_token_ms": 10.84347619047619,
+          "predicted_per_second": 92.22134880309864
+        },
+        "cache_prompt": false,
+        "output_tokens": 43,
+        "prefill_seconds": 0.239145,
+        "decode_seconds": 0.455426,
+        "prefill_tokens_per_second": 3876.3093520667376,
+        "decode_tokens_per_second": 92.22134880309864,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.963779459008947,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 81474,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.9767220829962753,
+        "cpu_seconds": 0.9370089919999991,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.593404391201549,
+        "peak_rss_bytes": 1682440192,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2496839680,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 2179072,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  },
+  {
+    "run_id": "precision13-q8-validation",
+    "case": {
+      "id": "valid_032",
+      "user": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 99
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "海\\浪"
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+        },
+        {
+          "role": "user",
+          "content": "请同时安排音量99和歌曲\"海\\\\浪\"，按顺序提交。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 99}"
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "play_music",
+              "arguments": "{\"song_name\": \"海浪\"}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6860559589695185,
+        "ttft_seconds": 0.2920704169664532,
+        "prompt_tokens": 926,
+        "evaluated_prefill_tokens": 926,
+        "native_usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 926,
+          "total_tokens": 969,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 926,
+          "prompt_ms": 200.89,
+          "prompt_per_token_ms": 0.21694384449244059,
+          "prompt_per_second": 4609.487779381751,
+          "predicted_n": 43,
+          "predicted_ms": 476.602,
+          "predicted_per_token_ms": 11.347666666666665,
+          "predicted_per_second": 88.12384337455572
+        },
+        "cache_prompt": false,
+        "output_tokens": 43,
+        "prefill_seconds": 0.20088999999999999,
+        "decode_seconds": 0.47660199999999997,
+        "prefill_tokens_per_second": 4609.487779381751,
+        "decode_tokens_per_second": 88.12384337455572,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 99
+              }
+            },
+            {
+              "call_id": "local_call_1",
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海浪"
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 99
+              },
+              "tool_call_id": "local_call_0"
+            },
+            {
+              "name": "play_music",
+              "parameters": {
+                "song_name": "海浪"
+              },
+              "tool_call_id": "local_call_1"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.0081583330174908,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 81474,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 1.0198394590406679,
+        "cpu_seconds": 0.929244704000002,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.111676311035408,
+        "peak_rss_bytes": 1682587648,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2545205248,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 5734400,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  }
+]

@@ -1,0 +1,87 @@
+{
+  "id": "valid_001",
+  "user": "收到指令后，请完成以下操作——相机停止采集图像。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "stop_camera",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。操作使用提供工具；聊天正常回答。角色设定与底层Qwen模型来源分开，用户创造角色不表示研发模型。未提供的姓名、生日、年龄、地点和履历请说明未知，禁止编造。"
+    },
+    {
+      "role": "user",
+      "content": "收到指令后，请完成以下操作——相机停止采集图像。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"stop_camera\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.16196691698860377,
+    "wall_seconds": 0.370900709007401,
+    "prompt_tokens": 924,
+    "output_tokens": 16,
+    "prefill_tokens_per_second": 5734.8604580762585,
+    "decode_tokens_per_second": 79.81290539013993,
+    "prefill_seconds": 0.16111987497424707,
+    "decode_seconds": 0.20046883297618479,
+    "mlx_peak_allocated_bytes": 1704586048,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "stop_camera",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "stop_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.6232465829816647,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 62650,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.6386853330186568,
+    "cpu_seconds": 0.3146303289999999,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.926218166196861,
+    "peak_rss_bytes": 352436224,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3336339456,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "id": "final_multi_11",
+  "user": "依次开启摄像头、开启雷达融合、开启跟随；三个请求都要列出来。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "start_camera",
+        "arguments": {}
+      },
+      {
+        "name": "enable_lidar",
+        "arguments": {}
+      },
+      {
+        "name": "enable_tracking",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "依次开启摄像头、开启雷达融合、开启跟随；三个请求都要列出来。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_tracking",
+          "arguments": "{}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_lidar",
+          "arguments": "{}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_tracking",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 25.256973495997954,
+    "ttft_seconds": 9.728350339995814,
+    "prompt_tokens": 924,
+    "evaluated_prefill_tokens": 26,
+    "native_usage": {
+      "completion_tokens": 49,
+      "prompt_tokens": 924,
+      "total_tokens": 973,
+      "prompt_tokens_details": {
+        "cached_tokens": 898
+      }
+    },
+    "native_timings": {
+      "cache_n": 898,
+      "prompt_n": 26,
+      "prompt_ms": 6547.419,
+      "prompt_per_token_ms": 251.8238076923077,
+      "prompt_per_second": 3.9710304167184045,
+      "predicted_n": 49,
+      "predicted_ms": 18677.561,
+      "predicted_per_token_ms": 389.1158541666667,
+      "predicted_per_second": 2.569928696792905
+    },
+    "cache_prompt": true,
+    "output_tokens": 49,
+    "prefill_seconds": 6.547419,
+    "decode_seconds": 18.677561,
+    "prefill_tokens_per_second": 3.9710304167184045,
+    "decode_tokens_per_second": 2.569928696792905,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "enable_tracking",
+          "arguments": {}
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "enable_lidar",
+          "arguments": {}
+        },
+        {
+          "call_id": "local_call_2",
+          "name": "enable_tracking",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "enable_tracking",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "enable_lidar",
+          "parameters": {},
+          "tool_call_id": "local_call_1"
+        },
+        {
+          "name": "enable_tracking",
+          "parameters": {},
+          "tool_call_id": "local_call_2"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 26.837140894000186,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 163678,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 101,
+    "wall_seconds": 26.896657127013896,
+    "cpu_seconds": 49.86999999999989,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 46.35334399038804,
+    "peak_rss_bytes": 630575104,
+    "peak_pss_bytes": 629463040,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2816733184,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

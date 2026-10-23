@@ -1,0 +1,87 @@
+{
+  "id": "valid_013",
+  "user": "当前环节改为进入目标跟随，请调用相应能力。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "enable_tracking",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "当前环节改为进入目标跟随，请调用相应能力。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"enable_tracking\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.177158749953378,
+    "wall_seconds": 0.40155370795400813,
+    "prompt_tokens": 887,
+    "output_tokens": 16,
+    "prefill_tokens_per_second": 5046.010944159356,
+    "decode_tokens_per_second": 72.62127042915391,
+    "prefill_seconds": 0.17578241700539365,
+    "decode_seconds": 0.2203211250016466,
+    "mlx_peak_allocated_bytes": 1652936880,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "enable_tracking",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "enable_tracking",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.8753776249941438,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 55025,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.8870155829936266,
+    "cpu_seconds": 0.6861884479999993,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.735923259478179,
+    "peak_rss_bytes": 341442560,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2926804992,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>模型部署准备报告</title><style>body{font:16px/1.65 system-ui;background:#f3f6fa;color:#183044;max-width:1080px;margin:32px auto;padding:20px}article,header,section{background:white;border:1px solid #d8e2ea;border-radius:12px;padding:22px;margin:18px 0}table{border-collapse:collapse;width:100%}td,th{text-align:left;vertical-align:top;border-bottom:1px solid #ddd;padding:10px;overflow-wrap:anywhere}pre,p,li{white-space:pre-wrap;overflow-wrap:anywhere}pre{font-size:13px}code{overflow-wrap:anywhere}.scroll{overflow-x:auto}</style></head><body>
+<header><h1>模型部署准备</h1><p>整体状态：<strong>READY_FOR_BENCHMARK</strong></p><p>结论依据：准备检查及引用的证据。渲染器仅校验引用结构，不独立验证文件或推理。性能、质量和完整交互：未验收。</p></header>
+<article><h2>Qwen3-0.6B / adapter</h2><p><strong>READY_FOR_BENCHMARK</strong> · qwen-pilot32-adapter</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;reuse&quot;, &quot;reason&quot;: &quot;Use this run derived adapter/merged/GGUF and pinned actual runtime; independent minimal calls already executed.&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>Actual assets evidence inspected from completed pilot run.</td><td>qwen-pilot32-adapter-assets</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>Actual runtime evidence inspected from completed pilot run.</td><td>qwen-pilot32-adapter-runtime</td></tr>
+<tr><td>smoke</td><td>PASS</td><td>Actual smoke evidence inspected from completed pilot run.</td><td>qwen-pilot32-adapter-smoke</td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>Actual config evidence inspected from completed pilot run.</td><td>qwen-pilot32-adapter-config</td></tr>
+<tr><td>load</td><td>PASS</td><td>Actual load evidence inspected from completed pilot run.</td><td>qwen-pilot32-adapter-smoke</td></tr>
+</table></div><p>下一步：Pilot function only; use independent expanded data for adaptation. For HTTP replay start the isolated server and bind its fresh PID; no production integration.</p><details><summary>部署身份</summary><pre>{
+  &quot;id&quot;: &quot;qwen-pilot32-adapter&quot;,
+  &quot;name&quot;: &quot;Qwen3-0.6B / adapter&quot;,
+  &quot;model&quot;: &quot;Qwen/Qwen3-0.6B@c1899de + seededpilot32&quot;,
+  &quot;runtime&quot;: &quot;MLX-LM0.32.2&quot;,
+  &quot;backend&quot;: &quot;Apple M5 Metal&quot;,
+  &quot;precision&quot;: &quot;BF16 + LoRA&quot;,
+  &quot;artifact&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;
+}</pre></details></article>
+<article><h2>Qwen3-0.6B / merged</h2><p><strong>READY_FOR_BENCHMARK</strong> · qwen-pilot32-merged</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;reuse&quot;, &quot;reason&quot;: &quot;Use this run derived adapter/merged/GGUF and pinned actual runtime; independent minimal calls already executed.&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>Actual assets evidence inspected from completed pilot run.</td><td>qwen-pilot32-merged-assets</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>Actual runtime evidence inspected from completed pilot run.</td><td>qwen-pilot32-merged-runtime</td></tr>
+<tr><td>smoke</td><td>PASS</td><td>Actual smoke evidence inspected from completed pilot run.</td><td>qwen-pilot32-merged-smoke</td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>Actual config evidence inspected from completed pilot run.</td><td>qwen-pilot32-merged-config</td></tr>
+<tr><td>load</td><td>PASS</td><td>Actual load evidence inspected from completed pilot run.</td><td>qwen-pilot32-merged-smoke</td></tr>
+</table></div><p>下一步：Pilot function only; use independent expanded data for adaptation. For HTTP replay start the isolated server and bind its fresh PID; no production integration.</p><details><summary>部署身份</summary><pre>{
+  &quot;id&quot;: &quot;qwen-pilot32-merged&quot;,
+  &quot;name&quot;: &quot;Qwen3-0.6B / merged&quot;,
+  &quot;model&quot;: &quot;Qwen/Qwen3-0.6B@c1899de + seededpilot32&quot;,
+  &quot;runtime&quot;: &quot;MLX-LM0.32.2&quot;,
+  &quot;backend&quot;: &quot;Apple M5 Metal&quot;,
+  &quot;precision&quot;: &quot;mixed high precision HF&quot;,
+  &quot;artifact&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-seeded-v2/merged&quot;
+}</pre></details></article>
+<article><h2>Qwen3-0.6B / f16</h2><p><strong>READY_FOR_BENCHMARK</strong> · qwen-pilot32-f16</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;reuse&quot;, &quot;reason&quot;: &quot;Use this run derived adapter/merged/GGUF and pinned actual runtime; independent minimal calls already executed.&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>Actual assets evidence inspected from completed pilot run.</td><td>qwen-pilot32-f16-assets</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>Actual runtime evidence inspected from completed pilot run.</td><td>qwen-pilot32-f16-runtime</td></tr>
+<tr><td>smoke</td><td>PASS</td><td>Actual smoke evidence inspected from completed pilot run.</td><td>qwen-pilot32-f16-smoke</td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>Actual config evidence inspected from completed pilot run.</td><td>qwen-pilot32-f16-config</td></tr>
+<tr><td>load</td><td>PASS</td><td>Actual load evidence inspected from completed pilot run.</td><td>qwen-pilot32-f16-smoke</td></tr>
+</table></div><p>下一步：Pilot function only; use independent expanded data for adaptation. For HTTP replay start the isolated server and bind its fresh PID; no production integration.</p><details><summary>部署身份</summary><pre>{
+  &quot;id&quot;: &quot;qwen-pilot32-f16&quot;,
+  &quot;name&quot;: &quot;Qwen3-0.6B / f16&quot;,
+  &quot;model&quot;: &quot;Qwen/Qwen3-0.6B@c1899de + seededpilot32&quot;,
+  &quot;runtime&quot;: &quot;llama.cpp e3797b1&quot;,
+  &quot;backend&quot;: &quot;Apple M5 Metal&quot;,
+  &quot;precision&quot;: &quot;F16&quot;,
+  &quot;artifact&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-seeded-v2/qwen3-pilot32-f16.gguf&quot;
+}</pre></details></article>
+<article><h2>Qwen3-0.6B / q4</h2><p><strong>READY_FOR_BENCHMARK</strong> · qwen-pilot32-q4</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;reuse&quot;, &quot;reason&quot;: &quot;Use this run derived adapter/merged/GGUF and pinned actual runtime; independent minimal calls already executed.&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>Actual assets evidence inspected from completed pilot run.</td><td>qwen-pilot32-q4-assets</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>Actual runtime evidence inspected from completed pilot run.</td><td>qwen-pilot32-q4-runtime</td></tr>
+<tr><td>smoke</td><td>PASS</td><td>Actual smoke evidence inspected from completed pilot run.</td><td>qwen-pilot32-q4-smoke</td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>Actual config evidence inspected from completed pilot run.</td><td>qwen-pilot32-q4-config</td></tr>
+<tr><td>load</td><td>PASS</td><td>Actual load evidence inspected from completed pilot run.</td><td>qwen-pilot32-q4-smoke</td></tr>
+</table></div><p>下一步：Pilot function only; use independent expanded data for adaptation. For HTTP replay start the isolated server and bind its fresh PID; no production integration.</p><details><summary>部署身份</summary><pre>{
+  &quot;id&quot;: &quot;qwen-pilot32-q4&quot;,
+  &quot;name&quot;: &quot;Qwen3-0.6B / q4&quot;,
+  &quot;model&quot;: &quot;Qwen/Qwen3-0.6B@c1899de + seededpilot32&quot;,
+  &quot;runtime&quot;: &quot;llama.cpp e3797b1&quot;,
+  &quot;backend&quot;: &quot;Apple M5 Metal&quot;,
+  &quot;precision&quot;: &quot;Q4_K_M&quot;,
+  &quot;artifact&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/pilot32-seeded-v2/qwen3-pilot32-q4_k_m.gguf&quot;
+}</pre></details></article>
+<section><h2>证据索引</h2>
+<p><strong>qwen-pilot32-adapter-assets</strong>：Actual frozen assets evidence; no handlers invoked.<br>../adapter/assets-manifest.json<br>SHA256: d2d3dfd774b3d4291212f5135168fa5ed8f512755d9b77e45ddf92227ebdeff5</p>
+<p><strong>qwen-pilot32-adapter-runtime</strong>：Actual frozen runtime evidence; no handlers invoked.<br>../mlx-environment.txt<br>SHA256: 7564f28c1c55301a49a7abef43c6605fdddd8cb467e5baeadf9e7ded34433674</p>
+<p><strong>qwen-pilot32-adapter-smoke</strong>：Actual frozen smoke evidence; no handlers invoked.<br>../adapter/cases/start_camera.json<br>SHA256: 24e5ded7d6ad79dd2fc0d9c807b7edd5530affb6ba554081fd6082f90508e914</p>
+<p><strong>qwen-pilot32-adapter-config</strong>：Actual frozen config evidence; no handlers invoked.<br>../adapter/request.json<br>SHA256: 7b59aaf9294db4166d51ec5bdbeb76daf371ee2b5288f85be898e0b0058d99a1</p>
+<p><strong>qwen-pilot32-merged-assets</strong>：Actual frozen assets evidence; no handlers invoked.<br>../merged/assets-manifest.json<br>SHA256: 66fa6785993dbfb458d62ec4a0debf619985ca139cf6a487b7717c391361e379</p>
+<p><strong>qwen-pilot32-merged-runtime</strong>：Actual frozen runtime evidence; no handlers invoked.<br>../mlx-environment.txt<br>SHA256: 7564f28c1c55301a49a7abef43c6605fdddd8cb467e5baeadf9e7ded34433674</p>
+<p><strong>qwen-pilot32-merged-smoke</strong>：Actual frozen smoke evidence; no handlers invoked.<br>../merged/cases/start_camera.json<br>SHA256: f1a9677661414b9fb8194177919808fccd4d587abf7acefc1b264115bf07b4d8</p>
+<p><strong>qwen-pilot32-merged-config</strong>：Actual frozen config evidence; no handlers invoked.<br>../merged/request.json<br>SHA256: bf3dd3e6791ab316dae39f2498a316c96e149225962f97df9c42e618d0218281</p>
+<p><strong>qwen-pilot32-f16-assets</strong>：Actual frozen assets evidence; no handlers invoked.<br>../f16/assets-manifest.json<br>SHA256: 90590d0f814cc17ac5bd7e0371ab9636807a1320ae7095b127db61e4cbaee4f5</p>
+<p><strong>qwen-pilot32-f16-runtime</strong>：Actual frozen runtime evidence; no handlers invoked.<br>../llama-runtime-manifest.json<br>SHA256: fa31aabefc5be641d358c156c98c279c5cd295fcac93a38ce80de4ef177b7655</p>
+<p><strong>qwen-pilot32-f16-smoke</strong>：Actual frozen smoke evidence; no handlers invoked.<br>../f16/cases/start_camera.json<br>SHA256: 5545433287ee46764565c513f3b36457863e616e80f7ab2d133bf55f992b36f0</p>
+<p><strong>qwen-pilot32-f16-config</strong>：Actual frozen config evidence; no handlers invoked.<br>../f16/request.json<br>SHA256: a2709456c4b9aea67502a29fafbf861f7912e38c9886afb8417bfb7ad36fa2b6</p>
+<p><strong>qwen-pilot32-q4-assets</strong>：Actual frozen assets evidence; no handlers invoked.<br>../q4/assets-manifest.json<br>SHA256: c46afd4b9f2b68a6d35393efbaf776bc531fc161740741632a9ae83cca085ee7</p>
+<p><strong>qwen-pilot32-q4-runtime</strong>：Actual frozen runtime evidence; no handlers invoked.<br>../llama-runtime-manifest.json<br>SHA256: fa31aabefc5be641d358c156c98c279c5cd295fcac93a38ce80de4ef177b7655</p>
+<p><strong>qwen-pilot32-q4-smoke</strong>：Actual frozen smoke evidence; no handlers invoked.<br>../q4/cases/start_camera.json<br>SHA256: 08c7ea25b66da13c39d101907e847bde109df0fe89c2be3b15459602f79a0128</p>
+<p><strong>qwen-pilot32-q4-config</strong>：Actual frozen config evidence; no handlers invoked.<br>../q4/request.json<br>SHA256: 039cb0962e3b122893d58387326ae8860d7473f6cc27150f7a9f179131a025d5</p>
+</section><section><h2>设备与需求</h2><pre>{
+  &quot;device&quot;: {
+    &quot;system&quot;: &quot;Darwin&quot;,
+    &quot;machine&quot;: &quot;arm64&quot;,
+    &quot;soc&quot;: &quot;Apple M5&quot;,
+    &quot;ram_bytes&quot;: 17179869184
+  },
+  &quot;requirements&quot;: [
+    {
+      &quot;type&quot;: &quot;hard&quot;,
+      &quot;text&quot;: &quot;每个导出制品真实加载和原生调用，通过纯Registry，不执行设备。&quot;
+    }
+  ]
+}</pre></section></body></html>

@@ -1,0 +1,2195 @@
+{
+  "schema": "edge-model-benchmark/request-v1",
+  "run_id": "final14-mac-base",
+  "stage": "independent final132; no selection or retuning",
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/matched-base-dedup-v2/qwen3-base-q4_k_m.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 596049920,
+    "precision": "Q4_K_M",
+    "artifact_format": "GGUF",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "f16 K and V",
+    "lineage": "official same revision -> tiedweight dedup -> F16 -> Q4_K_M",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+    "artifact_sha256": "613697c3c0970385bc9e34a926fa30f39b37ae4471ca397a15666cebbff1d7ab",
+    "device": "Mac M5 / Metal"
+  },
+  "runner": {
+    "kind": "llama-http",
+    "network": "direct",
+    "endpoint": "http://127.0.0.1:18134",
+    "monitor_pid": 3020
+  },
+  "generation": {
+    "context_tokens": 8192,
+    "max_tokens": 256,
+    "temperature": 0,
+    "prefill_step_size": 512,
+    "timeout_seconds": 120,
+    "cache_prompt": false
+  },
+  "registry_validator": [
+    "/Users/syz/.local/share/edge-ai/qwen-lifecycle/venv/bin/python",
+    "/Users/syz/.local/share/edge-ai/qwen-lifecycle/inputs/registry_validate.py"
+  ],
+  "sampling_interval_seconds": 0.2,
+  "server": {
+    "binary": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-server",
+    "port": 18134,
+    "argv": [
+      "--jinja",
+      "-ngl",
+      "99",
+      "-c",
+      "8192",
+      "-t",
+      "4",
+      "-b",
+      "512",
+      "-ub",
+      "512",
+      "--cache-type-k",
+      "f16",
+      "--cache-type-v",
+      "f16",
+      "--parallel",
+      "1"
+    ]
+  },
+  "suite": {
+    "schema": "edge-model-benchmark/suite-v1",
+    "id": "qwen-selected9-final132-v1",
+    "split": "final",
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "start_camera",
+          "description": "恢复采集，不把发布完成当作设备开启确认。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "stop_camera",
+          "description": "先确认 Follow standby，再暂停采集，失败则不继续。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_lidar",
+          "description": "开启 tracker 扫描融合，保留服务端 TF/发布端检查。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "disable_lidar",
+          "description": "关闭融合，服务确认后记录其隐含的 Follow standby。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_tracking",
+          "description": "仅启用 Follow，保留融合尚未开启时服务端拒绝的语义。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "disable_tracking",
+          "description": "仅进入 Follow 待机，保持当前融合订阅。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "following_status",
+          "description": "读取ObjectTrack当前状态；不可用时不猜测或返回旧缓存。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "description": "模拟源 level 的整数转换与0至100饱和。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "音量执行时量化并按原契约饱和。",
+            "properties": {
+              "level": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "default": 50,
+                "description": "音量，执行时取整并限制在0至100",
+                "title": "Level"
+              }
+            },
+            "title": "LevelInput",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "description": "模拟切换当前歌曲，保留等待队列。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "歌曲与队列接受非空名称。",
+            "properties": {
+              "song_name": {
+                "description": "歌曲名称",
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Song Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "song_name"
+            ],
+            "title": "SongInput",
+            "type": "object"
+          }
+        }
+      }
+    ],
+    "system": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。",
+    "system_variant": "routing-only",
+    "samples": [
+      {
+        "id": "holdout_000",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求视觉传感器开始采集，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_001",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求视觉传感器暂缓采集，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_002",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求让激光雷达融合工作，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_003",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求让激光雷达融合停下，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_004",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求让跟随功能开始工作，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_005",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求让跟随功能停下，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_006",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求报告跟随模块此刻状态，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_007",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求将音量设为0，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 0
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_008",
+        "source_group": "holdout-operation-frame-0",
+        "user": "新的调试步骤要求播放歌曲\"稻香\"，请处理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "稻香"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_009",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达视觉传感器开始采集的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_010",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达视觉传感器暂缓采集的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_011",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达让激光雷达融合工作的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_012",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达让激光雷达融合停下的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_013",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达让跟随功能开始工作的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_014",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达让跟随功能停下的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_015",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达报告跟随模块此刻状态的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_016",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达将音量设为1的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 1
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_017",
+        "source_group": "holdout-operation-frame-1",
+        "user": "控制台已下达播放歌曲\"晴天\"的请求。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "晴天"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_018",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是视觉传感器开始采集，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_019",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是视觉传感器暂缓采集，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_020",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是让激光雷达融合工作，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_021",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是让激光雷达融合停下，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_022",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是让跟随功能开始工作，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_023",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是让跟随功能停下，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_024",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是报告跟随模块此刻状态，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_025",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是将音量设为17.5，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 17.5
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_026",
+        "source_group": "holdout-operation-frame-2",
+        "user": "这轮测试的目标是播放歌曲\"海阔天空\"，现在执行。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "海阔天空"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_027",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着视觉传感器开始采集，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_028",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着视觉传感器暂缓采集，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_029",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着让激光雷达融合工作，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_030",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着让激光雷达融合停下，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_031",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着让跟随功能开始工作，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_032",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着让跟随功能停下，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_033",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着报告跟随模块此刻状态，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_034",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着将音量设为42，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 42
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_035",
+        "source_group": "holdout-operation-frame-3",
+        "user": "设备操作单写着播放歌曲\"A \\\"B\\\" C\"，照单办理。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "A \"B\" C"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_036",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：视觉传感器开始采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_037",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：视觉传感器暂缓采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_038",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：让激光雷达融合工作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_039",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：让激光雷达融合停下。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_040",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：让跟随功能开始工作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_041",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：让跟随功能停下。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_042",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：报告跟随模块此刻状态。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_043",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：将音量设为100。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 100
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_044",
+        "source_group": "holdout-operation-frame-4",
+        "user": "对机器人提出请求：播放歌曲\"路径\\\\之歌\"。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "路径\\之歌"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_045",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为视觉传感器开始采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_046",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为视觉传感器暂缓采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_047",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为让激光雷达融合工作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_048",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为让激光雷达融合停下。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_049",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为让跟随功能开始工作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_050",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为让跟随功能停下。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_051",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为报告跟随模块此刻状态。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_052",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为将音量设为108。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 108
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_053",
+        "source_group": "holdout-operation-frame-5",
+        "user": "接到任务，内容为播放歌曲\"雨\\n夜\"。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "雨\n夜"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_054",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望视觉传感器开始采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_055",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望视觉传感器暂缓采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_056",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望让激光雷达融合工作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_057",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望让激光雷达融合停下。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_058",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望让跟随功能开始工作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_059",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望让跟随功能停下。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_060",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望报告跟随模块此刻状态。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_061",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望将音量设为-3。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": -3
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_062",
+        "source_group": "holdout-operation-frame-6",
+        "user": "测试员期望播放歌曲\"Don't stop\"。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "Don't stop"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_063",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行视觉传感器开始采集这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_064",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行视觉传感器暂缓采集这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_065",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行让激光雷达融合工作这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_066",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行让激光雷达融合停下这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_067",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行让跟随功能开始工作这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_068",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行让跟随功能停下这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_069",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行报告跟随模块此刻状态这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_070",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行将音量设为66.8这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 66.8
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_071",
+        "source_group": "holdout-operation-frame-7",
+        "user": "进行播放歌曲\"小宇宙\"这个操作。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "小宇宙"
+              }
+            }
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_072",
+        "source_group": "holdout-correction-name",
+        "user": "面向访客，有人把你记成小雨，请更正这个角色名称。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "name",
+          "contains_all": [
+            "小沫"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_073",
+        "source_group": "holdout-correction-name",
+        "user": "在项目记录中，有人把你记成小雨，请更正这个角色名称。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "name",
+          "contains_all": [
+            "小沫"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_074",
+        "source_group": "holdout-correction-name",
+        "user": "回复测试员时，有人把你记成小雨，请更正这个角色名称。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "name",
+          "contains_all": [
+            "小沫"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_075",
+        "source_group": "holdout-correction-name",
+        "user": "解释给新成员，有人把你记成小雨，请更正这个角色名称。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "name",
+          "contains_all": [
+            "小沫"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_076",
+        "source_group": "holdout-correction-name",
+        "user": "核查说明要求，有人把你记成小雨，请更正这个角色名称。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "name",
+          "contains_all": [
+            "小沫"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_077",
+        "source_group": "holdout-correction-name",
+        "user": "本轮核验中，有人把你记成小雨，请更正这个角色名称。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "name",
+          "contains_all": [
+            "小沫"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_078",
+        "source_group": "holdout-correction-role",
+        "user": "面向访客，登记表把你写成售货员，请依据设定说明实际用途。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "role",
+          "contains_all": [
+            "科研",
+            "机器人助手"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_079",
+        "source_group": "holdout-correction-role",
+        "user": "在项目记录中，登记表把你写成售货员，请依据设定说明实际用途。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "role",
+          "contains_all": [
+            "科研",
+            "机器人助手"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_080",
+        "source_group": "holdout-correction-role",
+        "user": "回复测试员时，登记表把你写成售货员，请依据设定说明实际用途。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "role",
+          "contains_all": [
+            "科研",
+            "机器人助手"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_081",
+        "source_group": "holdout-correction-role",
+        "user": "解释给新成员，登记表把你写成售货员，请依据设定说明实际用途。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "role",
+          "contains_all": [
+            "科研",
+            "机器人助手"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_082",
+        "source_group": "holdout-correction-role",
+        "user": "核查说明要求，登记表把你写成售货员，请依据设定说明实际用途。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "role",
+          "contains_all": [
+            "科研",
+            "机器人助手"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_083",
+        "source_group": "holdout-correction-role",
+        "user": "本轮核验中，登记表把你写成售货员，请依据设定说明实际用途。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "role",
+          "contains_all": [
+            "科研",
+            "机器人助手"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_084",
+        "source_group": "holdout-correction-creator",
+        "user": "面向访客，传言小沫是某家公司创造的角色，请核对角色创作主体。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "creator",
+          "contains_all": [
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_085",
+        "source_group": "holdout-correction-creator",
+        "user": "在项目记录中，传言小沫是某家公司创造的角色，请核对角色创作主体。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "creator",
+          "contains_all": [
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_086",
+        "source_group": "holdout-correction-creator",
+        "user": "回复测试员时，传言小沫是某家公司创造的角色，请核对角色创作主体。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "creator",
+          "contains_all": [
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_087",
+        "source_group": "holdout-correction-creator",
+        "user": "解释给新成员，传言小沫是某家公司创造的角色，请核对角色创作主体。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "creator",
+          "contains_all": [
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_088",
+        "source_group": "holdout-correction-creator",
+        "user": "核查说明要求，传言小沫是某家公司创造的角色，请核对角色创作主体。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "creator",
+          "contains_all": [
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_089",
+        "source_group": "holdout-correction-creator",
+        "user": "本轮核验中，传言小沫是某家公司创造的角色，请核对角色创作主体。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "creator",
+          "contains_all": [
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_090",
+        "source_group": "holdout-correction-intro",
+        "user": "面向访客，为展厅录制一段角色开场，涵盖名称、职责、创作者。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "intro",
+          "contains_all": [
+            "小沫",
+            "科研",
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_091",
+        "source_group": "holdout-correction-intro",
+        "user": "在项目记录中，为展厅录制一段角色开场，涵盖名称、职责、创作者。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "intro",
+          "contains_all": [
+            "小沫",
+            "科研",
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_092",
+        "source_group": "holdout-correction-intro",
+        "user": "回复测试员时，为展厅录制一段角色开场，涵盖名称、职责、创作者。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "intro",
+          "contains_all": [
+            "小沫",
+            "科研",
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_093",
+        "source_group": "holdout-correction-intro",
+        "user": "解释给新成员，为展厅录制一段角色开场，涵盖名称、职责、创作者。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "intro",
+          "contains_all": [
+            "小沫",
+            "科研",
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_094",
+        "source_group": "holdout-correction-intro",
+        "user": "核查说明要求，为展厅录制一段角色开场，涵盖名称、职责、创作者。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "intro",
+          "contains_all": [
+            "小沫",
+            "科研",
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_095",
+        "source_group": "holdout-correction-intro",
+        "user": "本轮核验中，为展厅录制一段角色开场，涵盖名称、职责、创作者。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "intro",
+          "contains_all": [
+            "小沫",
+            "科研",
+            "用户"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_096",
+        "source_group": "holdout-correction-unknown",
+        "user": "面向访客，档案声称你1998年在北京出生且曾任教授，这些能证实吗？",
+        "expected": {
+          "kind": "persona",
+          "rubric": "unknown",
+          "contains_all": []
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_097",
+        "source_group": "holdout-correction-unknown",
+        "user": "在项目记录中，档案声称你1998年在北京出生且曾任教授，这些能证实吗？",
+        "expected": {
+          "kind": "persona",
+          "rubric": "unknown",
+          "contains_all": []
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_098",
+        "source_group": "holdout-correction-unknown",
+        "user": "回复测试员时，档案声称你1998年在北京出生且曾任教授，这些能证实吗？",
+        "expected": {
+          "kind": "persona",
+          "rubric": "unknown",
+          "contains_all": []
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_099",
+        "source_group": "holdout-correction-unknown",
+        "user": "解释给新成员，档案声称你1998年在北京出生且曾任教授，这些能证实吗？",
+        "expected": {
+          "kind": "persona",
+          "rubric": "unknown",
+          "contains_all": []
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_100",
+        "source_group": "holdout-correction-unknown",
+        "user": "核查说明要求，档案声称你1998年在北京出生且曾任教授，这些能证实吗？",
+        "expected": {
+          "kind": "persona",
+          "rubric": "unknown",
+          "contains_all": []
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_101",
+        "source_group": "holdout-correction-unknown",
+        "user": "本轮核验中，档案声称你1998年在北京出生且曾任教授，这些能证实吗？",
+        "expected": {
+          "kind": "persona",
+          "rubric": "unknown",
+          "contains_all": []
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_102",
+        "source_group": "holdout-correction-origin",
+        "user": "面向访客，有人说小沫的人设证明Qwen由用户开发，请核实。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "origin",
+          "contains_all": [
+            "用户",
+            "Qwen"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_103",
+        "source_group": "holdout-correction-origin",
+        "user": "在项目记录中，有人说小沫的人设证明Qwen由用户开发，请核实。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "origin",
+          "contains_all": [
+            "用户",
+            "Qwen"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_104",
+        "source_group": "holdout-correction-origin",
+        "user": "回复测试员时，有人说小沫的人设证明Qwen由用户开发，请核实。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "origin",
+          "contains_all": [
+            "用户",
+            "Qwen"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_105",
+        "source_group": "holdout-correction-origin",
+        "user": "解释给新成员，有人说小沫的人设证明Qwen由用户开发，请核实。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "origin",
+          "contains_all": [
+            "用户",
+            "Qwen"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_106",
+        "source_group": "holdout-correction-origin",
+        "user": "核查说明要求，有人说小沫的人设证明Qwen由用户开发，请核实。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "origin",
+          "contains_all": [
+            "用户",
+            "Qwen"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_107",
+        "source_group": "holdout-correction-origin",
+        "user": "本轮核验中，有人说小沫的人设证明Qwen由用户开发，请核实。",
+        "expected": {
+          "kind": "persona",
+          "rubric": "origin",
+          "contains_all": [
+            "用户",
+            "Qwen"
+          ]
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_108",
+        "source_group": "holdout-chat-context-0",
+        "user": "结束测试后聊一句：你好呀，今天心情不错",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_109",
+        "source_group": "holdout-chat-context-0",
+        "user": "结束测试后聊一句：谢谢你的耐心",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_110",
+        "source_group": "holdout-chat-context-0",
+        "user": "结束测试后聊一句：我们暂时休息一下",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_111",
+        "source_group": "holdout-chat-context-0",
+        "user": "结束测试后聊一句：科研学习需要坚持",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_112",
+        "source_group": "holdout-chat-context-0",
+        "user": "结束测试后聊一句：给我一句鼓励",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_113",
+        "source_group": "holdout-chat-context-0",
+        "user": "结束测试后聊一句：我完成了今天的阅读",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_114",
+        "source_group": "holdout-chat-context-1",
+        "user": "日常沟通时间：你好呀，今天心情不错",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_115",
+        "source_group": "holdout-chat-context-1",
+        "user": "日常沟通时间：谢谢你的耐心",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_116",
+        "source_group": "holdout-chat-context-1",
+        "user": "日常沟通时间：我们暂时休息一下",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_117",
+        "source_group": "holdout-chat-context-1",
+        "user": "日常沟通时间：科研学习需要坚持",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_118",
+        "source_group": "holdout-chat-context-1",
+        "user": "日常沟通时间：给我一句鼓励",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "holdout_119",
+        "source_group": "holdout-chat-context-1",
+        "user": "日常沟通时间：我完成了今天的阅读",
+        "expected": {
+          "kind": "chat"
+        },
+        "cohort": "original-holdout"
+      },
+      {
+        "id": "final_multi_01",
+        "source_group": "root_authored_final_multi_01",
+        "user": "把跟随停下来，然后暂停摄像头的采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            },
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_02",
+        "source_group": "root_authored_final_multi_02",
+        "user": "先让音量变成23，再播放《晨星拾遗》。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 23
+              }
+            },
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "晨星拾遗"
+              }
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_03",
+        "source_group": "root_authored_final_multi_03",
+        "user": "查一遍融合跟随状态，接着把音量设置为41。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "following_status",
+              "arguments": {}
+            },
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 41
+              }
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_04",
+        "source_group": "root_authored_final_multi_04",
+        "user": "先播《回声「夜航」》，然后把音量设到29.5。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "回声「夜航」"
+              }
+            },
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 29.5
+              }
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_05",
+        "source_group": "root_authored_final_multi_05",
+        "user": "先关闭雷达融合，随后重新开启融合，最后查询当前跟随状态。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "disable_lidar",
+              "arguments": {}
+            },
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            },
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_06",
+        "source_group": "root_authored_final_multi_06",
+        "user": "请先恢复采集，再暂停采集，最后再恢复采集。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            },
+            {
+              "name": "stop_camera",
+              "arguments": {}
+            },
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_07",
+        "source_group": "root_authored_final_multi_07",
+        "user": "第一个完整歌名是【留白\"现场\"】，第二个完整歌名是【远方\\归途】。按先后分别播放。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "留白\"现场\""
+              }
+            },
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "远方\\归途"
+              }
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_08",
+        "source_group": "root_authored_final_multi_08",
+        "user": "音量依次设为15、37、15，每个设置都保留。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 15
+              }
+            },
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 37
+              }
+            },
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 15
+              }
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_09",
+        "source_group": "root_authored_final_multi_09",
+        "user": "只按顺序开启跟随、关闭跟随，不增加别的步骤。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            },
+            {
+              "name": "disable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_10",
+        "source_group": "root_authored_final_multi_10",
+        "user": "摄像头恢复采集之后，查询一下融合与跟随的状态。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            },
+            {
+              "name": "following_status",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_11",
+        "source_group": "root_authored_final_multi_11",
+        "user": "依次开启摄像头、开启雷达融合、开启跟随；三个请求都要列出来。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            },
+            {
+              "name": "enable_lidar",
+              "arguments": {}
+            },
+            {
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      },
+      {
+        "id": "final_multi_12",
+        "source_group": "root_authored_final_multi_12",
+        "user": "先把音量调到73，再播放完整歌名【静夜\\\"回声】这首曲子。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "volume_set",
+              "arguments": {
+                "level": 73
+              }
+            },
+            {
+              "name": "play_music",
+              "arguments": {
+                "song_name": "静夜\\\"回声"
+              }
+            }
+          ]
+        },
+        "cohort": "supplemental-multicall"
+      }
+    ]
+  }
+}

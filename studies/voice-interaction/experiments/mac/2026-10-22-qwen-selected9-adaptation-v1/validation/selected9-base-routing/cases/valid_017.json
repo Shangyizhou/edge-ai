@@ -1,0 +1,72 @@
+{
+  "id": "valid_017",
+  "user": "当前环节改为播放歌曲\"晴天\"，请调用相应能力。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "晴天"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "当前环节改为播放歌曲\"晴天\"，请调用相应能力。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "请调用 play_music 功能，歌曲名称为 \"晴天\"。",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.2529433330055326,
+    "wall_seconds": 0.6660585000063293,
+    "prompt_tokens": 923,
+    "output_tokens": 17,
+    "prefill_tokens_per_second": 3657.9656730749603,
+    "decode_tokens_per_second": 41.79138783889477,
+    "prefill_seconds": 0.2523260419839062,
+    "decode_seconds": 0.4067823750083335,
+    "mlx_peak_allocated_bytes": 1702777048,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请调用 play_music 功能，歌曲名称为 \"晴天\"。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 71140,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 4,
+    "wall_seconds": 0.6908297080080956,
+    "cpu_seconds": 0.32153318399999975,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 4.654304530809665,
+    "peak_rss_bytes": 634650624,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3041001472,
+    "host_swap_delta_bytes": -8388608,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "id": "valid_028",
+  "user": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 23.5
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "a\"b"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "有两项请求：音量调成23.5，然后点播\"a\\\"b\"。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "arguments": "{\"level\": 23.5}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"a\\\"b\"}"
+        }
+      }
+    ],
+    "wall_seconds": 0.7291732499725185,
+    "ttft_seconds": 0.36164641700452194,
+    "prompt_tokens": 928,
+    "evaluated_prefill_tokens": 928,
+    "native_usage": {
+      "completion_tokens": 46,
+      "prompt_tokens": 928,
+      "total_tokens": 974,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 928,
+      "prompt_ms": 273.261,
+      "prompt_per_token_ms": 0.29446228448275863,
+      "prompt_per_second": 3396.0206542463065,
+      "predicted_n": 46,
+      "predicted_ms": 446.614,
+      "predicted_per_token_ms": 9.924755555555555,
+      "predicted_per_second": 100.75814909519183
+    },
+    "cache_prompt": false,
+    "output_tokens": 46,
+    "prefill_seconds": 0.27326100000000003,
+    "decode_seconds": 0.44661399999999996,
+    "prefill_tokens_per_second": 3396.0206542463065,
+    "decode_tokens_per_second": 100.75814909519183,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 23.5
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "a\"b"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 23.5
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "a\"b"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 1.0076121669844724,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 80300,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 6,
+    "wall_seconds": 1.0194256250397302,
+    "cpu_seconds": 0.8556199360000001,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 8.393157038471088,
+    "peak_rss_bytes": 1487421440,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2626945024,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 11583488,
+    "host_swap_out_delta_bytes": 49152,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "id": "valid_015",
+  "user": "当前环节改为查看目标跟随的当前状态，请调用相应能力。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "following_status",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是小沫，是用户创造的科研AI与机器人助手角色；底层模型是Qwen，用户创造角色不代表研发模型。角色生日、年龄、出生地、履历及创建者实名均未提供。按已知事实回答身份问题，未知就说未提供。操作用当前工具，聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "当前环节改为查看目标跟随的当前状态，请调用相应能力。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"following_status\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.20693262497661635,
+    "wall_seconds": 0.429448707960546,
+    "prompt_tokens": 944,
+    "output_tokens": 16,
+    "prefill_tokens_per_second": 4585.138647750691,
+    "decode_tokens_per_second": 73.1277161048177,
+    "prefill_seconds": 0.2058825419517234,
+    "decode_seconds": 0.21879529202124107,
+    "mlx_peak_allocated_bytes": 1716437792,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "following_status",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "following_status",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.689094458008185,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 70090,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.7080749589949846,
+    "cpu_seconds": 0.5239907519999996,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.400215829461511,
+    "peak_rss_bytes": 686063616,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3168894976,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

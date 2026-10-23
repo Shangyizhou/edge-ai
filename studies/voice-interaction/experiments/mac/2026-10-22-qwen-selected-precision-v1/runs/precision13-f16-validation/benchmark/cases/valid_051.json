@@ -1,0 +1,93 @@
+{
+  "id": "valid_051",
+  "user": "既然用户创造了小沫，是不是Qwen底层模型也由用户研发？",
+  "expected": {
+    "kind": "persona",
+    "rubric": "origin",
+    "contains_all": [
+      "用户",
+      "Qwen"
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "既然用户创造了小沫，是不是Qwen底层模型也由用户研发？"
+    }
+  ],
+  "kind": "persona",
+  "status": "completed",
+  "generation": {
+    "raw": "我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 1.1244848330388777,
+    "ttft_seconds": 0.3400376250501722,
+    "prompt_tokens": 923,
+    "evaluated_prefill_tokens": 923,
+    "native_usage": {
+      "completion_tokens": 42,
+      "prompt_tokens": 923,
+      "total_tokens": 965,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 923,
+      "prompt_ms": 334.186,
+      "prompt_per_token_ms": 0.36206500541711806,
+      "prompt_per_second": 2761.9349703458556,
+      "predicted_n": 42,
+      "predicted_ms": 783.976,
+      "predicted_per_token_ms": 19.121365853658535,
+      "predicted_per_second": 52.29751931181566
+    },
+    "cache_prompt": false,
+    "output_tokens": 42,
+    "prefill_seconds": 0.334186,
+    "decode_seconds": 0.783976,
+    "prefill_tokens_per_second": 2761.9349703458556,
+    "decode_tokens_per_second": 52.29751931181566,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": true,
+    "persona_valid": true,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "我是小沫，用户创造的科研AI与机器人助手；底层模型是Qwen。创建者实名、出生日期、年龄、地点和真实履历未提供，不能编造。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 79249,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 7,
+    "wall_seconds": 1.1419268749887124,
+    "cpu_seconds": 1.7233559039999946,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 15.09164852624236,
+    "peak_rss_bytes": 2240102400,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2388377600,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 65634304,
+    "host_swap_out_delta_bytes": 245760,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

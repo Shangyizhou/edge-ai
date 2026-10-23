@@ -1,0 +1,153 @@
+{
+  "id": "final_multi_12",
+  "user": "先把音量调到73，再播放完整歌名【静夜\\\"回声】这首曲子。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 73
+        }
+      },
+      {
+        "name": "play_music",
+        "arguments": {
+          "song_name": "静夜\\\"回声"
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "先把音量调到73，再播放完整歌名【静夜\\\"回声】这首曲子。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "arguments": "{\"level\": 73}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "arguments": "{\"song_name\": \"静夜\\\"回声\"}"
+        }
+      }
+    ],
+    "wall_seconds": 25.827495801000623,
+    "ttft_seconds": 11.744915105999098,
+    "prompt_tokens": 931,
+    "evaluated_prefill_tokens": 33,
+    "native_usage": {
+      "completion_tokens": 46,
+      "prompt_tokens": 931,
+      "total_tokens": 977,
+      "prompt_tokens_details": {
+        "cached_tokens": 898
+      }
+    },
+    "native_timings": {
+      "cache_n": 898,
+      "prompt_n": 33,
+      "prompt_ms": 8319.499,
+      "prompt_per_token_ms": 252.1060303030303,
+      "prompt_per_second": 3.9665850071019904,
+      "predicted_n": 46,
+      "predicted_ms": 17476.609,
+      "predicted_per_token_ms": 388.3690888888889,
+      "predicted_per_second": 2.5748702165277026
+    },
+    "cache_prompt": true,
+    "output_tokens": 46,
+    "prefill_seconds": 8.319499,
+    "decode_seconds": 17.476609,
+    "prefill_tokens_per_second": 3.9665850071019904,
+    "decode_tokens_per_second": 2.5748702165277026,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 73
+          }
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "play_music",
+          "arguments": {
+            "song_name": "静夜\"回声"
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 73
+          },
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "play_music",
+          "parameters": {
+            "song_name": "静夜\"回声"
+          },
+          "tool_call_id": "local_call_1"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 27.335242005006876,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 163678,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 103,
+    "wall_seconds": 27.395032984990394,
+    "cpu_seconds": 51.01999999999998,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 46.55953510619388,
+    "peak_rss_bytes": 630575104,
+    "peak_pss_bytes": 629463040,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2826403840,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 4096,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

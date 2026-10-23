@@ -1,0 +1,162 @@
+{
+  "id": "final_multi_06",
+  "user": "请先恢复采集，再暂停采集，最后再恢复采集。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "start_camera",
+        "arguments": {}
+      },
+      {
+        "name": "stop_camera",
+        "arguments": {}
+      },
+      {
+        "name": "start_camera",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "请先恢复采集，再暂停采集，最后再恢复采集。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "start_camera",
+          "arguments": "{}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "stop_camera",
+          "arguments": "{}"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "start_camera",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 23.765358693999588,
+    "ttft_seconds": 8.826602918998105,
+    "prompt_tokens": 921,
+    "evaluated_prefill_tokens": 23,
+    "native_usage": {
+      "completion_tokens": 48,
+      "prompt_tokens": 921,
+      "total_tokens": 969,
+      "prompt_tokens_details": {
+        "cached_tokens": 898
+      }
+    },
+    "native_timings": {
+      "cache_n": 898,
+      "prompt_n": 23,
+      "prompt_ms": 5801.228,
+      "prompt_per_token_ms": 252.22730434782608,
+      "prompt_per_second": 3.9646778233849798,
+      "predicted_n": 48,
+      "predicted_ms": 17933.099,
+      "predicted_per_token_ms": 381.5552978723404,
+      "predicted_per_second": 2.6208520903163475
+    },
+    "cache_prompt": true,
+    "output_tokens": 48,
+    "prefill_seconds": 5.801228,
+    "decode_seconds": 17.933099,
+    "prefill_tokens_per_second": 3.9646778233849798,
+    "decode_tokens_per_second": 2.6208520903163475,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "start_camera",
+          "arguments": {}
+        },
+        {
+          "call_id": "local_call_1",
+          "name": "stop_camera",
+          "arguments": {}
+        },
+        {
+          "call_id": "local_call_2",
+          "name": "start_camera",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "start_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        },
+        {
+          "name": "stop_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_1"
+        },
+        {
+          "name": "start_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_2"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 25.31904344400391,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 94,
+    "wall_seconds": 25.380463063003845,
+    "cpu_seconds": 47.08000000000038,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 46.37425239556321,
+    "peak_rss_bytes": 595087360,
+    "peak_pss_bytes": 593682432,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2854715392,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 4096,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

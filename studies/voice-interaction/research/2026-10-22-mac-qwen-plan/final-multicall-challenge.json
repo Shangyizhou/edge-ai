@@ -1,0 +1,272 @@
+{
+  "schema": "edge-model-final-challenge/v1",
+  "id": "qwen-native-multicall-final-20261022",
+  "created_date": "2026-10-22",
+  "author": "root implementation coordinator, independent authored prompts",
+  "status": "frozen before final candidate or quantization selection; not evaluated",
+  "purpose": "supplement original sealed120 (which lacks multicall); original120 remains unchanged",
+  "not_for_training_or_selection": true,
+  "samples": [
+    {
+      "id": "final_multi_01",
+      "source_group": "root_authored_final_multi_01",
+      "user": "把跟随停下来，然后暂停摄像头的采集。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          },
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_02",
+      "source_group": "root_authored_final_multi_02",
+      "user": "先让音量变成23，再播放《晨星拾遗》。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 23
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "晨星拾遗"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_03",
+      "source_group": "root_authored_final_multi_03",
+      "user": "查一遍融合跟随状态，接着把音量设置为41。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "following_status",
+            "arguments": {}
+          },
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 41
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_04",
+      "source_group": "root_authored_final_multi_04",
+      "user": "先播《回声「夜航」》，然后把音量设到29.5。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "回声「夜航」"
+            }
+          },
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 29.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_05",
+      "source_group": "root_authored_final_multi_05",
+      "user": "先关闭雷达融合，随后重新开启融合，最后查询当前跟随状态。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          },
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          },
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_06",
+      "source_group": "root_authored_final_multi_06",
+      "user": "请先恢复采集，再暂停采集，最后再恢复采集。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          },
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          },
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_07",
+      "source_group": "root_authored_final_multi_07",
+      "user": "第一个完整歌名是【留白\"现场\"】，第二个完整歌名是【远方\\归途】。按先后分别播放。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "留白\"现场\""
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "远方\\归途"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_08",
+      "source_group": "root_authored_final_multi_08",
+      "user": "音量依次设为15、37、15，每个设置都保留。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 15
+            }
+          },
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 37
+            }
+          },
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 15
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_09",
+      "source_group": "root_authored_final_multi_09",
+      "user": "只按顺序开启跟随、关闭跟随，不增加别的步骤。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          },
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_10",
+      "source_group": "root_authored_final_multi_10",
+      "user": "摄像头恢复采集之后，查询一下融合与跟随的状态。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          },
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_11",
+      "source_group": "root_authored_final_multi_11",
+      "user": "依次开启摄像头、开启雷达融合、开启跟随；三个请求都要列出来。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          },
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          },
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "final_multi_12",
+      "source_group": "root_authored_final_multi_12",
+      "user": "先把音量调到73，再播放完整歌名【静夜\\\"回声】这首曲子。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 73
+            }
+          },
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "静夜\\\"回声"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "preflight": {
+    "schema": "12/12 targets valid",
+    "actual_registry": "12/12 batches passed pure validation, no handlers invoked"
+  },
+  "evaluation_policy": "report separately from original120; same frozen candidates/settings; do not use predictions for tuning; raw outputs retained"
+}

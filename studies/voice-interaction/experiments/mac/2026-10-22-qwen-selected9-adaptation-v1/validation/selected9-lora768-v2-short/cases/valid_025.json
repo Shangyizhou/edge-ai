@@ -1,0 +1,93 @@
+{
+  "id": "valid_025",
+  "user": "能否把任务切换到将音量设为17.5？",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 17.5
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "能否把任务切换到将音量设为17.5？"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 17.5}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.17848108301404864,
+    "wall_seconds": 0.48236037499736995,
+    "prompt_tokens": 890,
+    "output_tokens": 23,
+    "prefill_tokens_per_second": 5008.373070831014,
+    "decode_tokens_per_second": 77.8032313124771,
+    "prefill_seconds": 0.17770241701509804,
+    "decode_seconds": 0.29561754199676216,
+    "mlx_peak_allocated_bytes": 1687523528,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 17.5
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 17.5
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.7103056659689173,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 61244,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.7251823340193368,
+    "cpu_seconds": 0.5128788459999996,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 7.072412301570543,
+    "peak_rss_bytes": 1426079744,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3530309632,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

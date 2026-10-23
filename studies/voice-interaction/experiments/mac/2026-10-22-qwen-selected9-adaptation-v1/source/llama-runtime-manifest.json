@@ -1,0 +1,26 @@
+{
+  "source_sha": "e3797b184d428c7a019362612b76971f60af6670",
+  "source": "https://github.com/ggml-org/llama.cpp",
+  "build": "cmake -G Ninja -DGGML_METAL=ON -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release; cmake --build --target llama-server llama-quantize -j 4",
+  "files": [
+    {
+      "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-server",
+      "bytes": 49984,
+      "sha256": "c2cd7c1842d6b7b35c6ba8e202ab2525e86de52dfd98749e635b4372c930490d"
+    },
+    {
+      "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+      "bytes": 33472,
+      "sha256": "7b59ae2d5659f9e9d1a9946a970a28a86ff2bb1e6c2a73d8e5cd9f442739df39"
+    },
+    {
+      "path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/CMakeCache.txt",
+      "bytes": 36350,
+      "sha256": "de5965858d847e8df38f6e83c89bf9dd44aaeda1d91a92b1a5e8eba13004c9b5"
+    }
+  ],
+  "notes": [
+    "Mac Metal/CPU build for experiments, board uses separate existing ARM build",
+    "Server UI build fetched official latest fallback after b1 checksum fetch failed; binary hashes identify actual outputs, core model measurements do not depend on GUI"
+  ]
+}

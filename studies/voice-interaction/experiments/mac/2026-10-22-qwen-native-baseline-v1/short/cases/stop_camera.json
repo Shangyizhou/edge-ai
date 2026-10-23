@@ -1,0 +1,87 @@
+{
+  "id": "stop_camera",
+  "user": "停止摄像头。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "stop_camera",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "停止摄像头。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"stop_camera\", \"arguments\": {}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.19285183300962672,
+    "wall_seconds": 0.4311007499927655,
+    "prompt_tokens": 878,
+    "output_tokens": 16,
+    "prefill_tokens_per_second": 4585.348238379455,
+    "decode_tokens_per_second": 71.11169074157172,
+    "prefill_seconds": 0.19147945899749177,
+    "decode_seconds": 0.22499816602794454,
+    "mlx_peak_allocated_bytes": 1613713032,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "stop_camera",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "stop_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.9028914580121636,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 22640,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 6,
+    "wall_seconds": 0.9283782909624279,
+    "cpu_seconds": 0.34126707199999995,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 3.675948428804991,
+    "peak_rss_bytes": 452771840,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2112618496,
+    "host_swap_delta_bytes": 0,
+    "limitation": "sampled peak, not kernel high-water mark; RSS and accelerator allocations may overlap"
+  }
+}

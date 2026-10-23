@@ -1,0 +1,109 @@
+{
+  "schema": "edge-model-export/result-v1",
+  "run_id": "precision13-q8-export",
+  "status": "completed",
+  "source": {
+    "kind": "device_measurement"
+  },
+  "request_sha256": "52086b21cd36b68190cea2487aa7b1d1522bc24836f29e60c32c782650a5bf5c",
+  "artifacts": {
+    "selected-f16": {
+      "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+      "total_bytes": 1198182336,
+      "files": [
+        {
+          "name": "qwen3-selected9-768-v3-f16.gguf",
+          "bytes": 1198182336,
+          "sha256": "e5ab9acb7cd47b495e2c337a57be2a0b162754d8adcbba3b21ec183c89012f2a"
+        }
+      ]
+    },
+    "selected-q8": {
+      "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+      "total_bytes": 639446976,
+      "files": [
+        {
+          "name": "qwen3-selected9-768-v3-q8_0.gguf",
+          "bytes": 639446976,
+          "sha256": "46a2443dd2757c272819874fbf0caa2ea64d57f6b59335d61a4a07c2f9120379"
+        }
+      ]
+    }
+  },
+  "stages": [
+    {
+      "operation": "quantize",
+      "command": [
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/llama.cpp/build/bin/llama-quantize",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-f16.gguf",
+        "/Users/syz/.local/share/edge-ai/qwen-lifecycle/artifacts/selected9-768-v3/qwen3-selected9-768-v3-q8_0.gguf",
+        "Q8_0",
+        "4"
+      ],
+      "inputs": [
+        "selected-f16"
+      ],
+      "output_id": "selected-q8",
+      "status": "completed",
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 81412,
+        "sampling_interval_seconds": 0.1,
+        "sample_count": 18,
+        "wall_seconds": 1.9445803749840707,
+        "cpu_seconds": 2.065534754,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 10.622007609312217,
+        "peak_rss_bytes": 1193000960,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 3198058496,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 208879616,
+        "host_swap_out_delta_bytes": 2654208,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      },
+      "wall_seconds": 1.9670725420000963,
+      "exit_code": 0
+    }
+  ],
+  "measurement_sources": [
+    {
+      "path": "collector-source/stages.py",
+      "sha256": "28a55347cbbc20081c2754ec8693752ce099adb190166c4cc99ccba2a4cb687a"
+    },
+    {
+      "path": "collector-source/measure.py",
+      "sha256": "bc0a8d1dd9542332c4d3bfce718ed61cec60906eb55fb078f0556639ea0d1009"
+    },
+    {
+      "path": "collector-source/benchmark.py",
+      "sha256": "b1d3ff902371b33d50428011f0426d675067b0fc67b4d458621c2cb0d377e881"
+    },
+    {
+      "path": "collector-source/convert_hf.py",
+      "sha256": "9dcfc3776ae4e6e030e0e9503620d9bb0f7a41e2ba496a2d8f73181cfb61e3b3"
+    },
+    {
+      "path": "collector-source/lineage.py",
+      "sha256": "9b7f3ef3eb53753abdcb3aaa7bf7cb67d8092615786e81fe0d0a2e199c05c450"
+    }
+  ],
+  "quality_status": "NOT_EVALUATED",
+  "next_step": "prepare output artifact with actual loading/smoke, then benchmark using the frozen task suite",
+  "evidence": [
+    {
+      "path": "00-quantize.log",
+      "sha256": "0b06251a3471badd9f14b4dedbc8b6f41aa7debc2d00d7e9ea55c57437591486"
+    },
+    {
+      "path": "00-resources.json",
+      "sha256": "bddff12452906b1909c5b99d3fc8affce6cfddc5465e56966021d7c269e3808a"
+    },
+    {
+      "path": "request.json",
+      "sha256": "52086b21cd36b68190cea2487aa7b1d1522bc24836f29e60c32c782650a5bf5c"
+    }
+  ]
+}

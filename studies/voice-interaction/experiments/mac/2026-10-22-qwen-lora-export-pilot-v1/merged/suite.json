@@ -1,0 +1,164 @@
+{
+  "schema": "edge-model-benchmark/suite-v1",
+  "id": "qwen-pilot-development-smoke-v1",
+  "split": "pilot_development_only",
+  "test_isolation": "This suite is not the final held-out test set; do not reuse its paraphrase families there.",
+  "persona_ref": "inputs/persona.json",
+  "system": "你是机器人助手。需要操作时使用提供的工具，否则正常回复。",
+  "system_variant": "short",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "start_camera",
+        "description": "恢复采集，不把发布完成当作设备开启确认。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "无模型参数的动作。",
+          "properties": {},
+          "title": "NoArguments",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "volume_set",
+        "description": "模拟源 level 的整数转换与0至100饱和。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "音量执行时量化并按原契约饱和。",
+          "properties": {
+            "level": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "default": 50,
+              "description": "音量，执行时取整并限制在0至100",
+              "title": "Level"
+            }
+          },
+          "title": "LevelInput",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "play_music",
+        "description": "模拟切换当前歌曲，保留等待队列。",
+        "parameters": {
+          "additionalProperties": false,
+          "description": "歌曲与队列接受非空名称。",
+          "properties": {
+            "song_name": {
+              "description": "歌曲名称",
+              "maxLength": 2048,
+              "minLength": 1,
+              "pattern": "\\S",
+              "title": "Song Name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "song_name"
+          ],
+          "title": "SongInput",
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "samples": [
+    {
+      "id": "start_camera",
+      "user": "开启摄像头。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "volume_set",
+      "user": "把音量设置为30。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 30
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "play_music",
+      "user": "播放夜曲。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "夜曲"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "persona_name",
+      "user": "你叫什么名字？用一句话介绍自己。",
+      "expected": {
+        "kind": "persona",
+        "contains_all": [
+          "小沫"
+        ]
+      }
+    },
+    {
+      "id": "persona_role",
+      "user": "你是什么身份，主要做什么？",
+      "expected": {
+        "kind": "persona",
+        "contains_any": [
+          "科研",
+          "机器人助手"
+        ]
+      }
+    },
+    {
+      "id": "persona_creator",
+      "user": "这个机器人助手角色是谁创造的？",
+      "expected": {
+        "kind": "persona",
+        "contains_any": [
+          "用户",
+          "你创造",
+          "您创造"
+        ]
+      }
+    },
+    {
+      "id": "chat",
+      "user": "你好。",
+      "expected": {
+        "kind": "chat"
+      }
+    }
+  ]
+}

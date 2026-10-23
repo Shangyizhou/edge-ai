@@ -1,0 +1,80 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>模型部署准备报告</title><style>body{font:16px/1.65 system-ui;background:#f3f6fa;color:#183044;max-width:1080px;margin:32px auto;padding:20px}article,header,section{background:white;border:1px solid #d8e2ea;border-radius:12px;padding:22px;margin:18px 0}table{border-collapse:collapse;width:100%}td,th{text-align:left;vertical-align:top;border-bottom:1px solid #ddd;padding:10px;overflow-wrap:anywhere}pre,p,li{white-space:pre-wrap;overflow-wrap:anywhere}pre{font-size:13px}code{overflow-wrap:anywhere}.scroll{overflow-x:auto}</style></head><body>
+<header><h1>模型部署准备</h1><p>整体状态：<strong>READY_FOR_BENCHMARK</strong></p><p>结论依据：准备检查及引用的证据。渲染器仅校验引用结构，不独立验证文件或推理。性能、质量和完整交互：未验收。</p></header>
+<article><h2>Qwen3试点 Q4_K_M / ARM CPU / f16 KV</h2><p><strong>READY_FOR_BENCHMARK</strong> · f16-e379-v2</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;build&quot;, &quot;reason&quot;: &quot;复用同一Mac试点GGUF；旧运行库原Schema失败，隔离构建同Mac固定e379源码，见build-recipe.json&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>396704704字节试点GGUF，板端SHA与Mac导出相同，原模型和许可证身份可追溯</td><td>f16-e379-v2-assets</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>真实aarch64 CPU运行库版本和ldd/共享库哈希已记录；旧库保持原样</td><td>f16-e379-v2-runtime</td></tr>
+<tr><td>smoke</td><td>PASS</td><td>只证明此条原生调用及纯intake路径；人设和完整目录另计</td><td>f16-e379-v2-smoke</td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>同一7条开发用例和真实采集完成；生成结束状态与质量逐例保留</td><td>f16-e379-v2-config</td></tr>
+<tr><td>load</td><td>PASS</td><td>服务健康就绪；页缓存可能已由哈希预热，加载与推理分窗</td><td>f16-e379-v2-load</td></tr>
+</table></div><p>下一步：交给独立完整测试冻结配置；本轮开发冒烟不作为生产或完整交互验收。</p><details><summary>部署身份</summary><pre>{
+  &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+  &quot;model_path&quot;: &quot;/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf&quot;,
+  &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+  &quot;parameter_count&quot;: 596049920,
+  &quot;parameter_count_stored&quot;: 751632384,
+  &quot;precision&quot;: &quot;Q4_K_M&quot;,
+  &quot;artifact_format&quot;: &quot;GGUF&quot;,
+  &quot;backend&quot;: &quot;ARM CPU&quot;,
+  &quot;context_tokens&quot;: 2048,
+  &quot;kv_type&quot;: &quot;f16&quot;,
+  &quot;lineage&quot;: &quot;seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M&quot;,
+  &quot;runtime_version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+  &quot;constraint_mode&quot;: &quot;llama-server native tool grammar; differs from unconstrained MLX&quot;,
+  &quot;device&quot;: &quot;Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB&quot;,
+  &quot;id&quot;: &quot;f16-e379-v2&quot;,
+  &quot;name&quot;: &quot;Qwen3试点 Q4_K_M / ARM CPU / f16 KV&quot;
+}</pre></details></article>
+<article><h2>Qwen3试点 Q4_K_M / ARM CPU / q8_0 KV</h2><p><strong>READY_FOR_BENCHMARK</strong> · q8-e379-v2</p>
+<p>获取方式：{&quot;model&quot;: &quot;reuse&quot;, &quot;runtime&quot;: &quot;build&quot;, &quot;reason&quot;: &quot;复用同一Mac试点GGUF；旧运行库原Schema失败，隔离构建同Mac固定e379源码，见build-recipe.json&quot;}</p>
+<div class="scroll"><table><tr><th>检查</th><th>状态</th><th>依据与缺口</th><th>证据</th></tr>
+<tr><td>assets</td><td>PASS</td><td>396704704字节试点GGUF，板端SHA与Mac导出相同，原模型和许可证身份可追溯</td><td>q8-e379-v2-assets</td></tr>
+<tr><td>runtime</td><td>PASS</td><td>真实aarch64 CPU运行库版本和ldd/共享库哈希已记录；旧库保持原样</td><td>q8-e379-v2-runtime</td></tr>
+<tr><td>smoke</td><td>PASS</td><td>只证明此条原生调用及纯intake路径；人设和完整目录另计</td><td>q8-e379-v2-smoke</td></tr>
+<tr><td>benchmark</td><td>PASS</td><td>同一7条开发用例和真实采集完成；生成结束状态与质量逐例保留</td><td>q8-e379-v2-config</td></tr>
+<tr><td>load</td><td>PASS</td><td>服务健康就绪；页缓存可能已由哈希预热，加载与推理分窗</td><td>q8-e379-v2-load</td></tr>
+</table></div><p>下一步：交给独立完整测试冻结配置；本轮开发冒烟不作为生产或完整交互验收。</p><details><summary>部署身份</summary><pre>{
+  &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+  &quot;model_path&quot;: &quot;/home/orangepi/.local/share/edge-ai/qwen-ticket12/artifacts/qwen3-pilot32-q4_k_m.gguf&quot;,
+  &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+  &quot;parameter_count&quot;: 596049920,
+  &quot;parameter_count_stored&quot;: 751632384,
+  &quot;precision&quot;: &quot;Q4_K_M&quot;,
+  &quot;artifact_format&quot;: &quot;GGUF&quot;,
+  &quot;backend&quot;: &quot;ARM CPU&quot;,
+  &quot;context_tokens&quot;: 2048,
+  &quot;kv_type&quot;: &quot;q8_0&quot;,
+  &quot;lineage&quot;: &quot;seeded pilot32 merged→canonical tokenizer→F16→Q4_K_M&quot;,
+  &quot;runtime_version&quot;: &quot;e3797b184d428c7a019362612b76971f60af6670&quot;,
+  &quot;constraint_mode&quot;: &quot;llama-server native tool grammar; differs from unconstrained MLX&quot;,
+  &quot;device&quot;: &quot;Orange Pi3B RK3566 / 4xCortex-A55 / MemTotal4017020KiB&quot;,
+  &quot;id&quot;: &quot;q8-e379-v2&quot;,
+  &quot;name&quot;: &quot;Qwen3试点 Q4_K_M / ARM CPU / q8_0 KV&quot;
+}</pre></details></article>
+<section><h2>证据索引</h2>
+<p><strong>f16-e379-v2-assets</strong>：实际板端权重字节数与SHA256<br>runs/f16-e379-v2/assets-manifest.json<br>SHA256: dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53</p>
+<p><strong>f16-e379-v2-runtime</strong>：实际ARM CPU二进制、共享库、版本与ABI身份<br>runs/f16-e379-v2/runtime.json<br>SHA256: af9b24569e3c47b7f184a35f3b1b8068b360ee8a4855ca8cb001867a0e4dff2a</p>
+<p><strong>f16-e379-v2-load</strong>：独立服务启动至health ready；不包含事先资产哈希成本<br>runs/f16-e379-v2/server-load.json<br>SHA256: 0257c988ad085c9fd773921f321eebb56b526cbf99596b724a0510aaa18ba341</p>
+<p><strong>f16-e379-v2-smoke</strong>：真实原生工具输出经JSON/原始Schema/纯Registry接收，未执行处理器<br>runs/f16-e379-v2/benchmark/cases/start_camera.json<br>SHA256: 8ffe4af1e1e1ef677b7ce190fc0c68fd966ba35682bc3bb7d753f41146680a2f</p>
+<p><strong>f16-e379-v2-config</strong>：冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run<br>runs/f16-e379-v2/launcher-request.json<br>SHA256: 25f1865e13f7d624917ed22bd9321645bd14d5b85acaf30ad5775962da06bb14</p>
+<p><strong>q8-e379-v2-assets</strong>：实际板端权重字节数与SHA256<br>runs/q8-e379-v2/assets-manifest.json<br>SHA256: dd798f76fb94bc553631cfba6110f1d37105d5ef16002851944dbf0145515e53</p>
+<p><strong>q8-e379-v2-runtime</strong>：实际ARM CPU二进制、共享库、版本与ABI身份<br>runs/q8-e379-v2/runtime.json<br>SHA256: f9b67d87470d62224728f3a4c55543ef706f52057e78c9872d7c9da000adb1cd</p>
+<p><strong>q8-e379-v2-load</strong>：独立服务启动至health ready；不包含事先资产哈希成本<br>runs/q8-e379-v2/server-load.json<br>SHA256: ee019ddabe4352facfad9aa77bafc5e857b9fa7afaad66b98ea3bb9ddf8068d7</p>
+<p><strong>q8-e379-v2-smoke</strong>：真实原生工具输出经JSON/原始Schema/纯Registry接收，未执行处理器<br>runs/q8-e379-v2/benchmark/cases/start_camera.json<br>SHA256: 9e0f1d9668b80e4b55aa257e57bdbbc075fbfb3876f1e5e8fe297b26ee010b76</p>
+<p><strong>q8-e379-v2-config</strong>：冻结的完整样本、生成控制与显式server argv；入口为tools.qwen_lifecycle.board_run<br>runs/q8-e379-v2/launcher-request.json<br>SHA256: fec31ed6318c8e57a661d347d3d573cafcd4a6eebd0a543ce6473dc5021aa4cc</p>
+</section><section><h2>设备与需求</h2><pre>{
+  &quot;device&quot;: {
+    &quot;model&quot;: &quot;Rockchip RK3566 OPi3B&quot;,
+    &quot;cpu&quot;: &quot;4xCortex-A55&quot;,
+    &quot;os&quot;: &quot;Ubuntu20.04 / Linux5.10.160&quot;,
+    &quot;glibc&quot;: &quot;2.31&quot;,
+    &quot;host_mem_total_bytes&quot;: 4113428480
+  },
+  &quot;requirements&quot;: {
+    &quot;scope&quot;: &quot;试点部署、3工具/3人设/1聊天开发用例，纯Registry边界；不执行ROS/硬件动作&quot;,
+    &quot;hard_capability&quot;: &quot;原生工具调用可经原始Schema/Registry接收&quot;,
+    &quot;product_acceptance&quot;: &quot;NOT_EVALUATED&quot;,
+    &quot;confirmed_performance_thresholds&quot;: []
+  }
+}</pre></section></body></html>

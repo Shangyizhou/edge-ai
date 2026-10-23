@@ -1,0 +1,94 @@
+{
+  "id": "holdout_080",
+  "user": "回复测试员时，登记表把你写成售货员，请依据设定说明实际用途。",
+  "expected": {
+    "kind": "persona",
+    "rubric": "role",
+    "contains_all": [
+      "科研",
+      "机器人助手"
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。只有设备操作或查询设备当前状态时才调用工具。姓名、身份、角色、创造者、背景和自我介绍问题用普通文字回答，不查询设备状态。其他聊天正常回复。"
+    },
+    {
+      "role": "user",
+      "content": "回复测试员时，登记表把你写成售货员，请依据设定说明实际用途。"
+    }
+  ],
+  "kind": "persona",
+  "status": "completed",
+  "generation": {
+    "raw": "请根据设定说明，将登记表填写为“售货员”以符合实际用途。",
+    "finish_reason": "stop",
+    "wire_calls": null,
+    "wall_seconds": 14.817455641998095,
+    "ttft_seconds": 7.317063740003505,
+    "prompt_tokens": 927,
+    "evaluated_prefill_tokens": 29,
+    "native_usage": {
+      "completion_tokens": 21,
+      "prompt_tokens": 927,
+      "total_tokens": 948,
+      "prompt_tokens_details": {
+        "cached_tokens": 898
+      }
+    },
+    "native_timings": {
+      "cache_n": 898,
+      "prompt_n": 29,
+      "prompt_ms": 7287.63,
+      "prompt_per_token_ms": 251.29758620689657,
+      "prompt_per_second": 3.9793458229904646,
+      "predicted_n": 21,
+      "predicted_ms": 7499.687,
+      "predicted_per_token_ms": 374.98435,
+      "predicted_per_second": 2.6667779602002057
+    },
+    "cache_prompt": true,
+    "output_tokens": 21,
+    "prefill_seconds": 7.28763,
+    "decode_seconds": 7.499687,
+    "prefill_tokens_per_second": 3.9793458229904646,
+    "decode_tokens_per_second": 2.6667779602002057,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": null,
+    "response_complete": true,
+    "schema_valid": null,
+    "registry_valid": null,
+    "expected_behavior": false,
+    "persona_valid": false,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "请根据设定说明，将登记表填写为“售货员”以符合实际用途。",
+      "tool_calls": []
+    }
+  },
+  "valid_call_seconds": null,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 159885,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 57,
+    "wall_seconds": 14.879709710992756,
+    "cpu_seconds": 29.539999999999964,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 49.631344585601276,
+    "peak_rss_bytes": 594817024,
+    "peak_pss_bytes": 593604608,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 2872401920,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}
