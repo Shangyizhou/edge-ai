@@ -1,92 +1,195 @@
-"""Publish standalone HTML reports with a small static report index."""
-import argparse
-import html
-import os
-from pathlib import Path
-import shutil
+"""Publish only explicit curated report files; never traverse study evidence."""
 
-from report_navigation import add_navigation
+import argparse
+import hashlib
+import html
+import json
+import shutil
+from html.parser import HTMLParser
+from pathlib import Path, PurePosixPath
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
-VOICE = Path('studies/voice-interaction')
-REPORTS = [
-    ('selection.html', '模型选型', '候选模型、来源与本轮筛选结果；不代表板端验收通过。',
-     VOICE / 'research/2026-10-22-local-stack/report.html'),
-    ('readiness.html', '最小推理就绪', 'ASR 解码、LLM 生成和 TTS 合成的最小真实推理记录。',
-     VOICE / 'experiments/rk3566/2026-10-22-preparation-smoke-v1/readiness/report.html'),
-    ('voice-screening/report.html', '语音单模块评测',
-     '主报告 · 结论、模型与后端、3 条样例、实际转写、速度和 CPU / 内存对照。公开版不含录音。',
-     VOICE / 'reports/2026-10-22-voice-screening/report.html'),
-]
+MANIFEST = Path("tools/research_site/publication.json")
+ALLOWED = {
+    ".html",
+    ".svg",
+    ".css",
+    ".js",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".json",
+}
 
 
-# Repository-relative directory prefixes. These Qwen deliveries are offline-only;
-# a separate publication decision must explicitly remove their exclusions.
-UNPUBLISHED_DIRECTORIES = (
-    VOICE / 'experiments/mac',
-    VOICE / 'experiments/rk3566/2026-10-22-qwen-pilot32-board-v1',
-    VOICE / 'research/2026-10-22-mac-qwen-plan',
-    VOICE / 'experiments/final/2026-10-22-qwen-final132-v1',
-)
+def confined(base, value):
+    value = unquote(value)
+    relative = PurePosixPath(value)
+    if (
+        relative.is_absolute()
+        or ".." in relative.parts
+        or "\\" in value
+        or not value
+        or urlsplit(value).scheme
+    ):
+        raise ValueError("unsafe publication path")
+    target = (base / str(relative)).resolve()
+    try:
+        target.relative_to(base.resolve())
+    except ValueError:
+        raise ValueError("publication path escapes root")
+    return target
 
 
-def public_evidence_files():
-    # Prune before descending: no nested HTML, JSON or source snapshots from
-    # an offline directory may reach the export, even without a catalog card.
-    for directory, subdirectories, filenames in os.walk(ROOT / 'studies'):
-        directory = Path(directory)
-        subdirectories[:] = [name for name in subdirectories
-                             if name != '__pycache__'
-                             and (directory / name).relative_to(ROOT)
-                             not in UNPUBLISHED_DIRECTORIES]
-        for name in filenames:
-            path = directory / name
-            if path.suffix not in ('.pyc', '.pyo'):
-                yield path
+class Links(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.links = []
+
+    def handle_starttag(self, tag, attrs):
+        for key, value in attrs:
+            if key in ("href", "src", "poster", "xlink:href") and value:
+                self.links.append((tag, key, value))
 
 
-def build(output):
-    output = output.resolve()
+def validate_html(path, output):
+    text = path.read_text()
+    if any(
+        s in text
+        for s in (
+            "file://",
+            "/Users/",
+            "/home/orangepi/",
+            "data:application/",
+            "data:audio/",
+        )
+    ):
+        raise ValueError(
+            "local/private evidence reference in public report: " + str(path)
+        )
+    parser = Links()
+    parser.feed(text)
+    for tag, key, value in parser.links:
+        url = urlsplit(value)
+        if value.startswith("#"):
+            continue
+        if url.scheme in ("https", "http"):
+            if tag != "a" or key != "href":
+                raise ValueError("network resource required by offline report")
+            continue
+        if value.startswith("data:image/"):
+            continue
+        if url.scheme or url.netloc or value.startswith("/"):
+            raise ValueError("unsupported public link")
+        target = (path.parent / unquote(url.path)).resolve()
+        try:
+            target.relative_to(output.resolve())
+        except ValueError:
+            raise ValueError("link escapes published site")
+        if not target.is_file():
+            raise ValueError("broken public link: " + value)
+
+
+def build(output, root=None):
+    root = Path(root or ROOT).resolve()
+    output = Path(output).resolve()
     if output.exists():
-        raise FileExistsError('Use a new output directory: ' + str(output))
-    if output == ROOT or ROOT in output.parents and not output.name.startswith('_site'):
-        raise ValueError('Build outside the repository or to an _site* directory')
-    # Keep evidence files available to frozen reports, without rendering SOP pages.
+        raise FileExistsError("use a fresh output directory")
+    if (
+        output == root
+        or root in output.parents
+        and not output.name.startswith("_site")
+    ):
+        raise ValueError("build outside repo or to _site*")
+    manifest = json.loads((root / MANIFEST).read_text())
+    if manifest.get("schema") != "edge-ai-publication/v1":
+        raise ValueError("unsupported publication schema")
+    plan = []
+    destinations = set()
+    for row in manifest["files"]:
+        source = confined(root, row["source"])
+        target = confined(output, row["destination"])
+        try:
+            source.relative_to(
+                (root / "studies/voice-interaction/reports").resolve()
+            )
+        except ValueError:
+            raise ValueError("only curated reports may be published")
+        if source.suffix not in ALLOWED or not source.is_file():
+            raise ValueError("unsupported report file")
+        if target.relative_to(
+            output
+        ).as_posix() in destinations or target.name in (
+            "index.html",
+            "reports.html",
+            ".nojekyll",
+        ):
+            raise ValueError("duplicate or reserved publication destination")
+        destinations.add(target.relative_to(output).as_posix())
+        if hashlib.sha256(source.read_bytes()).hexdigest() != row["sha256"]:
+            raise ValueError(
+                "public source changed; regenerate publication manifest"
+            )
+        plan.append((source, target))
+    aliases = manifest.get("aliases", {})
+    for name, dest in aliases.items():
+        confined(output, name)
+        confined(output, dest)
+        if name in destinations or name in ("index.html", "reports.html"):
+            raise ValueError("alias overwrites report")
+        if dest not in destinations:
+            raise ValueError("alias target is not published")
+    for card in manifest["catalog"]:
+        if card["href"] not in destinations:
+            raise ValueError("catalog points outside manifest")
     output.mkdir(parents=True)
-    for path in public_evidence_files():
-        target = output / 'evidence' / path.relative_to(ROOT)
+    for source, target in plan:
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(path, target)
-    cards = []
-    for step, (destination, title, description, source) in enumerate(REPORTS, start=1):
-        target = output / 'reports' / destination
+        shutil.copyfile(source, target)
+    for name, dest in aliases.items():
+        target = confined(output, name)
         target.parent.mkdir(parents=True, exist_ok=True)
-        # Frozen reports keep their original relative evidence links at their
-        # evidence URL. Only the self-contained presentation gets a short URL.
-        if destination == 'voice-screening/report.html':
-            shutil.copy2(ROOT / source, target)
-            href = 'reports/' + destination
-        else:
-            href = 'evidence/' + source.as_posix()
-        assert (output / href).is_file(), href
-        cards.append(f'<a class="card" href="{html.escape(href)}"><small>步骤 {step:02d}</small><h2>{html.escape(title)}</h2><p>{html.escape(description)}</p><span>打开独立 HTML 报告 →</span></a>')
-    page = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Edge AI · 报告</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f3f6f6;color:#18313b;font:16px/1.75 system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:60px 24px}small,span{color:#08776b}h1{font-size:38px;margin:8px 0}header p{color:#536873}nav{display:grid;gap:18px;margin-top:32px}.card{display:block;background:white;border:1px solid #dce5e7;border-radius:16px;padding:25px;color:inherit;text-decoration:none}.card:hover,.card:focus-visible{border-color:#08776b;outline:2px solid #08776b}h2{margin:0;font-size:23px}.card p{color:#536873}footer{margin-top:28px;color:#536873;font-size:14px}
-</style><main><header><small>EDGE AI / REPORTS</small><h1>机器人端侧模型报告</h1><p>RK3566 · 按执行流程阅读：模型选型 → 最小推理就绪 → 单模块评测。</p></header><nav aria-label="报告列表">''' + ''.join(cards) + '''</nav><footer>2026-10-22 · 单模块测试不等于完整交互验收。报告按执行顺序排列，详细操作记录保留在仓库。</footer></main></html>'''
-    (output / 'index.html').write_text(page)
-    # Dedicated entry avoids cached copies of the retired root dashboard.
-    (output / 'reports.html').write_text(page)
-    catalog = [('evidence/' + source.as_posix() if name != 'voice-screening/report.html'
-                else 'reports/' + name, title) for name, title, _, source in REPORTS]
-    for target in output.rglob('*.html'):
-        if 'sources' in target.relative_to(output).parts:
-            continue  # Upstream source snapshots are evidence, not our reports.
-        target.write_text(add_navigation(target.read_text(), target, output, catalog))
-    (output / '.nojekyll').touch()
-    print(f'Built report index and {len(REPORTS)} standalone report entries; no SOP pages rendered.')
+        import os
+
+        href = os.path.relpath(confined(output, dest), target.parent)
+        target.write_text(
+            '<!doctype html><meta charset="utf-8"><title>报告入口已整理</title><p><a href="'
+            + html.escape(href)
+            + '">打开当前公开报告</a></p>'
+        )
+    cards = "".join(
+        '<a class="card" href="'
+        + html.escape(row["href"])
+        + '"><h2>'
+        + html.escape(row["title"])
+        + "</h2><p>"
+        + html.escape(row["description"])
+        + "</p></a>"
+        for row in manifest["catalog"]
+    )
+    page = (
+        '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Edge AI 报告</title><style>body{font:16px/1.8 system-ui;background:#f3f6f7;color:#203b43;max-width:960px;margin:50px auto;padding:24px}.card{display:block;background:white;border:1px solid #dce5e7;border-radius:10px;padding:24px;margin:20px 0;color:inherit;text-decoration:none}h2{margin:0}a:focus-visible{outline:3px solid #087f77}</style><h1>端侧模型研究与工作流</h1><p>正式模型结论与工作流技术示例分开阅读。公开报告不自动包含原始实验、录音或内部文件。</p>'
+        + cards
+        + "</html>"
+    )
+    for name in ("index.html", "reports.html"):
+        (output / name).write_text(page)
+    (output / ".nojekyll").touch()
+    for path in output.rglob("*.html"):
+        validate_html(path, output)
+    print(
+        "Built",
+        len(plan),
+        "explicit public files;",
+        len(manifest["catalog"]),
+        "topic entries; no evidence traversal.",
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('output', type=Path)
-    build(parser.parse_args().output)
+    parser.add_argument("output", type=Path)
+    args = parser.parse_args()
+    build(args.output)

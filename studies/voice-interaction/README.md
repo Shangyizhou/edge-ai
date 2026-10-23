@@ -49,3 +49,16 @@ M5/16GB已实际完成0.6B LoRA，无需LLaMA-Factory；选定768微步/96次优
 当前认可格式已固化为[独立HTML主报告](reports/2026-10-22-voice-screening/report.html)，公开版不携带录音；网站只提供报告列表。可试听的Mac离线版仍在临时目录 `/tmp/edge-voice-report-draft/report-mac.html`；它支持Mac离线查看和试听。原实验HTML/JSON未修改；当前展示格式已写入本机edge-model-selection。
 
 新Qwen离线目录由静态导出排除列表保护，公开发布是单独步骤。HTML完成静态引用/核心离线/响应式规则检查，浏览器视觉未验证。
+
+## 2026-10-23 工作流适配验证
+
+[数据与任务化工作流](experiments/mac/2026-10-23-workflow-pilot-v1/README.md)及[板端Qwen/ASR](experiments/rk3566/2026-10-23-workflow-validation-v1/README.md)已完成新执行与交接验证，保留ASR首次报告失败。32微步模型只作技术试跑，未替换上表主候选；最终新集未开启，机器人动作与共跑未执行。[分环节总报告](experiments/mac/2026-10-23-workflow-pilot-v1/workflow-overview/report.html)。
+
+## 数据与正式报告入口
+
+- [数据版本及备份恢复](datasets/README.md)：四组已登记数据、用途与隔离限制。
+- [保存的实验索引](experiments/index.json)：派生目录，历史未登记关联保留为未知。
+- [公开报告生成及 Pages 白名单](../../tools/research_site/README.md)：正式报告与原始证据分开管理。
+- [工作流报告总览](reports/2026-10-23-curated/workflow/report.html)：只读回放；32微步试跑不能替代原正式模型验收。
+
+- [HF模型下载](https://huggingface.co/Shangyizhou/xiaomo-qwen3-0.6b/tree/0bd09b627bb133b8a9f5a71cfeb8225a421d33ba) · [模型固定版本清单](releases/selected9-768-v3.json) · [HF数据归档](https://huggingface.co/datasets/Shangyizhou/xiaomo-robotics-data/tree/3f78791304c9c0b1457d6674273ba3e46927f4b5)（均需授权访问）。

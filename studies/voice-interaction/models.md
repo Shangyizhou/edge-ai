@@ -16,3 +16,21 @@ ASR混合INT8的decoder仍是FP32；文件精度不能等同整个执行图精�
 同模型不同精度要固定输入、运行库、参数及场景；吞吐和实时送入分开。显示实际输入/输出、速度、质量检查、CPU容量占比、PSS MiB与实际内存比例；结论同时引用资源。更换模型/训练/精度后是部署方案对照，不能把差异单独归因某一种因素。
 
 每模块轻量展示3条有意义用例，额外材料保留证据；样本数、进程轮次、资源窗口和是否试听要明确。当前各轮原始记录及哈希不变。
+
+
+## 已上传的选定模型制品
+
+正式768微步版本的MLX adapter和对应Q4已存入 [Hugging Face模型仓库](https://huggingface.co/Shangyizhou/xiaomo-qwen3-0.6b/tree/0bd09b627bb133b8a9f5a71cfeb8225a421d33ba)，固定文件URL与SHA256见 [发布清单](releases/selected9-768-v3.json)。仓库为Private；下载需要有权限的HF账号。基座从官方固定版本取回，Q4已经包含微调效果，无需叠加adapter。
+
+```sh
+hf auth login
+hf download Shangyizhou/xiaomo-qwen3-0.6b \
+  adapter/adapters.safetensors adapter/adapter_config.json \
+  --revision 0bd09b627bb133b8a9f5a71cfeb8225a421d33ba --local-dir ./xiaomo-model
+# 只部署Q4时，改为下载这一文件
+hf download Shangyizhou/xiaomo-qwen3-0.6b \
+  gguf/xiaomo-qwen3-0.6b-Q4_K_M.gguf \
+  --revision 0bd09b627bb133b8a9f5a71cfeb8225a421d33ba --local-dir ./xiaomo-model
+```
+
+adapter为MLX原生格式；重新训练还需要实际数据及项目非思考模板/掩码预检，原配置内未使用的WikiSQL默认字段不是本轮训练来源。权重恢复不包含优化器状态。32微步工作流试跑权重未混入这个选定版本。
