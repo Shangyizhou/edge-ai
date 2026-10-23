@@ -1,0 +1,323 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qwen 原生调用 · 模型生命周期实测</title>
+<style>
+:root{--ink:#18313b;--muted:#536873;--line:#dce5e7;--teal:#08776b;--paper:#fff;--bg:#f2f5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}main{max-width:1150px;margin:0 auto;padding:42px 30px 80px}body{padding-right:230px}.rail{position:fixed;right:0;top:0;height:100vh;width:230px;border-left:1px solid var(--line);padding:42px 22px;background:#fbfcfc;overflow-y:auto}.rail strong{display:block;margin-bottom:18px}.rail a{display:block;color:var(--muted);text-decoration:none;padding:11px 12px;border-radius:8px;margin:4px 0;font-size:14px}.rail a.active{background:#e2f1ed;color:#066457;font-weight:700}.rail small{display:block;margin-top:24px;color:var(--muted)}header{padding:0 0 18px}h1{font-size:clamp(29px,3.6vw,42px);line-height:1.3;margin:14px 0;letter-spacing:-.7px}h2{font-size:27px;line-height:1.4;margin:8px 0 16px}h3{font-size:20px;margin:24px 0 12px}h4{font-size:17px;margin:8px 0}p{margin:10px 0}.eyebrow,.badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--teal)}.badge{display:inline-block;padding:3px 10px;border:1px solid #bedbd3;border-radius:15px;letter-spacing:0}.muted,small{color:var(--muted)}section{background:var(--paper);padding:30px;border:1px solid var(--line);border-radius:16px;margin:20px 0;scroll-margin-top:24px}.deployment-table td:first-child{min-width:285px;white-space:pre-line;font-size:13px;line-height:1.85}.lead{font-size:22px;font-weight:650;line-height:1.6}.scroll{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf4f3;white-space:nowrap}td{min-width:92px}tr:last-child td{border:0}.sample{padding:20px;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:#fcfdfd}.sample-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.number{font-weight:700;color:var(--teal)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.output{padding:14px;background:#edf4f3;border-radius:8px;white-space:pre-wrap;font-size:17px;margin:8px 0}.fail{background:#fff1e6;border-left:3px solid #b6671f}.reference{padding:10px 0;font-size:14px;color:var(--muted)}audio{width:100%;max-width:540px;display:block;margin:12px 0}.finding{border-left:4px solid var(--teal);background:#e9f4ef;border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}.finding strong{font-size:18px}.finding p{margin:7px 0}.method{font-size:14px;color:var(--muted);background:#f5f7f8;padding:14px 18px;border-radius:10px}.stats{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin:12px 0}.stats span{padding:4px 9px;background:#f1f4f6;border-radius:6px}a{color:var(--teal);text-underline-offset:3px}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal)}pre{font-size:12px;background:#f4f6f7;padding:15px;white-space:pre-wrap;max-height:400px;overflow:auto}p,td,pre,.output{overflow-wrap:anywhere}.foot{font-size:13px;color:var(--muted)}.warning{color:#97541d;font-weight:600}.meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meter{padding:14px;border:1px solid var(--line);border-radius:10px}.track{height:9px;background:#e5ebed;border-radius:10px;overflow:hidden;margin:10px 0}.track b{display:block;height:100%;background:var(--teal);border-radius:10px}.meter small{font-size:12px}@media(max-width:1100px){body{padding-right:190px}.rail{width:190px;padding:30px 14px}main{padding:30px 20px}section{padding:24px}}@media(max-width:760px){body{padding-right:0}.rail{position:sticky;top:0;width:100%;height:auto;padding:8px 12px;border:0;border-bottom:1px solid var(--line);z-index:10;display:flex;gap:4px;overflow-x:auto}.rail a{display:inline-block;white-space:nowrap;padding:8px 12px;margin:0}.rail strong,.rail small{display:none}main{padding:20px 12px}section{padding:20px 15px;scroll-margin-top:76px}.pair,.meters{grid-template-columns:1fr}h2{font-size:24px}.sample{padding:16px}.lead{font-size:20px}}@media print{body{padding:0}.rail{display:none}section{break-inside:avoid}audio{display:none}}
+</style></head><body>
+<nav class="rail" aria-label="章节导航"><strong>本页导航</strong>
+<a href="#summary">结论与选择</a>
+<a href="#run-0">workflow-smoke</a>
+<a href="#resources">精度与资源对比</a>
+<a href="#evidence">口径与原始证据</a>
+<a href="#top">回到顶部</a></nav><main id="top">
+<header><span class="badge">原生工具 / 角色事实 / 独立模型实验</span>
+<h1>Qwen：从未微调基线到部署制品</h1>
+<p class="muted">同一结构化结果生成 · 实际输入输出保留 · 无硬件动作或完整交互验收</p></header>
+<section id="summary"><div class="eyebrow">先给结论</div>
+<h2>原生调用、角色设定和硬件资源分别判断</h2>
+<div class="scroll"><table class="deployment-table"><thead><tr>
+<th>候选部署方案</th><th>本轮能力观察</th>
+<th>CPU / 整机容量</th><th>采样峰值内存 / 实际内存</th>
+</tr></thead><tbody>
+<tr><td>Qwen/Qwen3-0.6B · 596049920
+精度：BF16
+框架：mlx-lm 0.32.2
+后端：Metal / Darwin
+阶段：未微调基线 / short</td><td>工具 Schema 1/1；原生调用 1/1；角色固定规则 0/0</td><td>6.07%</td><td>RSS 562.06 MiB / 3.43%<br>MLX峰值分配 1597.02 MiB（不相加）</td></tr>
+</tbody></table></div><p class="foot">CPU为已声明进程树占整机逻辑核容量，内存为逐例窗口的采样峰值。CPU不包含Metal GPU利用率。Mac RSS 与 Linux PSS 不等价；资源窗口包含模板、推理、解析与纯校验。未将不同设备混成纯加速比较。</p></section>
+<section id="run-0"><div class="eyebrow">未微调基线 / short</div><h2>workflow-smoke</h2>
+<div class="method"><strong>怎样测：</strong>固定工具、system和输入；缓存策略：new MLX prompt cache per case / llama cache_prompt=false；计时记录：request to complete response; valid-call latency only if native+schema pass；非思考模式。真实响应完整解析后，只通过JSON Schema及可配置Registry纯校验，不执行设备。<br>
+<strong>怎样读：</strong>prefill与decode tokens/s采用运行时计时，完整输入量由adapter记录（HTTP优先usage，MLX使用完整prompt计数）；实际prefill量为运行时本次评估tokens，缓存开启时二者不同。TTFT为各adapter入口至首非空输出（HTTP含请求/传输，MLX从生成入口起算）；完整有效调用等待含模板/推理/解析/校验，不等于服务端prefill或decode计时；缺失字段为未测，失败/截断不是快速成功。角色采用预先固定文本规则，不是独立人工整体人设评审。</div>
+<h3>工具调用 · 实际输入与输出</h3>
+<article class="sample"><div class="sample-head"><h4>development_000</h4><span class="badge">固定检查通过</span></div><small>输入</small><p>现场测试单要求恢复摄像头采集，请生成对应调用。</p><small>实际输出</small><div class="output ">&lt;tool_call&gt;
+{&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: {}}
+&lt;/tool_call&gt;</div><small>预期</small><pre>{&quot;kind&quot;: &quot;tool&quot;, &quot;calls&quot;: [{&quot;name&quot;: &quot;start_camera&quot;, &quot;arguments&quot;: {}}]}</pre><div class="stats"><span>完整输入 usage 891 tokens</span><span>实际 prefill 未测 tokens</span><span>cache_prompt 未记录</span><span>首内容 0.41s</span><span>完整有效调用 1.02s</span><span>prefill 2597.00 tokens/s</span><span>decode 84.45 tokens/s</span></div><p class="foot">计时来源：MLX GenerationResponse; prompt time includes first model token; generation count includes EOS</p><details><summary>原生usage与计时（缓存命中仅以原生字段为准，不用输入减prefill推算）</summary><pre>{
+  &quot;native_usage&quot;: null,
+  &quot;native_timings&quot;: null
+}</pre></details><details><summary>解析、Schema与角色检查</summary><pre>{
+  &quot;native_parse&quot;: true,
+  &quot;json_valid&quot;: true,
+  &quot;response_complete&quot;: true,
+  &quot;schema_valid&quot;: true,
+  &quot;registry_valid&quot;: true,
+  &quot;expected_behavior&quot;: true,
+  &quot;persona_valid&quot;: null,
+  &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+  &quot;reply&quot;: {
+    &quot;content&quot;: &quot;&quot;,
+    &quot;tool_calls&quot;: [
+      {
+        &quot;call_id&quot;: &quot;local_call_0&quot;,
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;arguments&quot;: {}
+      }
+    ]
+  },
+  &quot;schema_errors&quot;: [],
+  &quot;registry_result&quot;: {
+    &quot;passed&quot;: true,
+    &quot;commands&quot;: [
+      {
+        &quot;name&quot;: &quot;start_camera&quot;,
+        &quot;parameters&quot;: {},
+        &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+      }
+    ]
+  }
+}</pre></details></article>
+<h3>角色 / 背景 / 自我介绍</h3>
+<h3>普通聊天 · 无调用</h3>
+<aside class="finding"><strong>本阶段发现</strong><p>工具调用Schema通过 1/1，与期望函数和参数一致 1/1；角色规则通过 0/0。这些是当前固定样例的观察，不能外推完整业务或所有人设已学入。失败输出保留，作为下一阶段数据与协议诊断依据。</p></aside></section>
+<section id="resources"><h2>精度与资源对比</h2><p>只有模型、输入、设备、运行时、context/KV和解码可比时才解释精度差异。模型文件大小不等于运行内存。没有测量的精度不推算成绩。</p><div class="scroll"><table><thead><tr><th>候选 / 阶段</th><th>文件MiB</th><th>完整输入 usage tokens 中位数</th><th>实际 prefill tokens 中位数</th><th>prefill tokens/s 中位数</th><th>decode tokens/s 中位数</th><th>TTFT中位数 s</th><th>CPU容量</th><th>采样峰值</th></tr></thead><tbody>
+<tr><td>workflow-smoke</td><td>1448.83</td><td>891</td><td>未测</td><td>2597.00</td><td>84.45</td><td>0.41</td><td>6.07%</td><td>RSS 562.06MiB / MLX 1597.02MiB</td></tr>
+</tbody></table></div></section><section id="evidence"><h2>口径与原始证据</h2><p>统计覆盖本页全部样例，而非挑选成功项；单轮小样本不能宣称稳定尾延迟。MLX峰值分配与RSS可能重叠，不相加。未执行生产集成、ROS共跑或完整交互验收。</p>
+<p><a download="benchmark-results.json" href="data:application/json;base64,WwogIHsKICAgICJzY2hlbWEiOiAiZWRnZS1tb2RlbC1iZW5jaG1hcmsvcmVzdWx0LXYxIiwKICAgICJydW5faWQiOiAid29ya2Zsb3ctc21va2UiLAogICAgInNvdXJjZSI6IHsKICAgICAgImtpbmQiOiAiZGV2aWNlX21lYXN1cmVtZW50IiwKICAgICAgInJhd19ldmlkZW5jZSI6ICJjYXNlcy8gYW5kIGV2ZW50cy8gd2l0aGluIHRoaXMgcnVuIgogICAgfSwKICAgICJjYW5kaWRhdGUiOiB7CiAgICAgICJtb2RlbCI6ICJRd2VuL1F3ZW4zLTAuNkIiLAogICAgICAibW9kZWxfcGF0aCI6ICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3F3ZW4tbGlmZWN5Y2xlL2hmLWNhY2hlL21vZGVscy0tUXdlbi0tUXdlbjMtMC42Qi9zbmFwc2hvdHMvYzE4OTlkZTI4OWEwNGQxMjEwMGRiMzcwZDgxNDg1Y2RmNzVlNDdjYSIsCiAgICAgICJyZXZpc2lvbiI6ICJjMTg5OWRlMjg5YTA0ZDEyMTAwZGIzNzBkODE0ODVjZGY3NWU0N2NhIiwKICAgICAgInBhcmFtZXRlcl9jb3VudCI6IDU5NjA0OTkyMCwKICAgICAgInBhcmFtZXRlcl9jb3VudF9zdG9yZWQiOiA3NTE2MzIzODQsCiAgICAgICJwcmVjaXNpb24iOiAiQkYxNiIsCiAgICAgICJhcnRpZmFjdF9mb3JtYXQiOiAiSEYgc2FmZXRlbnNvcnMiLAogICAgICAiYmFja2VuZCI6ICJNZXRhbCIsCiAgICAgICJjb250ZXh0X3Rva2VucyI6IDgxOTIsCiAgICAgICJrdl90eXBlIjogInJ1bnRpbWUgZGVmYXVsdCB1bnF1YW50aXplZCIsCiAgICAgICJsaW5lYWdlIjogIm9mZmljaWFsIHVudHJhaW5lZCBiYXNlIiwKICAgICAgImFjdHVhbF9ydW50aW1lIjogewogICAgICAgICJuYW1lIjogIm1seC1sbSIsCiAgICAgICAgInZlcnNpb24iOiAiMC4zMi4yIiwKICAgICAgICAibWx4X3ZlcnNpb24iOiAiMC4zMi40IiwKICAgICAgICAiYmFja2VuZCI6ICJNZXRhbCIKICAgICAgfQogICAgfSwKICAgICJzdGFnZSI6ICLmnKrlvq7osIPln7rnur8gLyBzaG9ydCIsCiAgICAicmVxdWVzdF9zaGEyNTYiOiAiMjcwZGExZWMwMzlmNWRmNWIzY2Y2MmJkM2JmN2M5ZWE0MTJlN2UxMTIzYzUzNmJlYThkYTdkZjE5ZjNhNTc4YSIsCiAgICAic3VpdGVfc2hhMjU2IjogImI0NzQ0NjBlOGZjY2NiODQ1ZDNkYWU0YTE3MmM5ODhlZjRmMjc1MjkxMjgxY2E4MDZhMmJjYzFmMWQyY2VmYTgiLAogICAgImFydGlmYWN0cyI6IHsKICAgICAgInJvb3QiOiAiL1VzZXJzL3N5ei8ubG9jYWwvc2hhcmUvZWRnZS1haS9xd2VuLWxpZmVjeWNsZS9oZi1jYWNoZS9tb2RlbHMtLVF3ZW4tLVF3ZW4zLTAuNkIvc25hcHNob3RzL2MxODk5ZGUyODlhMDRkMTIxMDBkYjM3MGQ4MTQ4NWNkZjc1ZTQ3Y2EiLAogICAgICAidG90YWxfYnl0ZXMiOiAxNTE5MjA3NjczLAogICAgICAiZmlsZXMiOiBbCiAgICAgICAgewogICAgICAgICAgIm5hbWUiOiAiTElDRU5TRSIsCiAgICAgICAgICAiYnl0ZXMiOiAxMTM0MywKICAgICAgICAgICJzaGEyNTYiOiAiODMyZGQ5ZTAwYTY4ZGQ4M2IzYzNmYjlmNTU4OGRhZDdkY2YzMzdhMGRiNTBmN2Q5NDgzZjMxMGNkMjkyZTkyZSIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJuYW1lIjogIlJFQURNRS5tZCIsCiAgICAgICAgICAiYnl0ZXMiOiAxMzk2NSwKICAgICAgICAgICJzaGEyNTYiOiAiMWFiNjRhMjZmY2IzYjQ2MTQyM2I4OWE0MzNhOGM4NThmMWJmOGQ0MDg2Zjk3OWNiYjNmZjg3OGQ0N2NmMjBlOSIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJuYW1lIjogImNvbmZpZy5qc29uIiwKICAgICAgICAgICJieXRlcyI6IDcyNiwKICAgICAgICAgICJzaGEyNTYiOiAiNjYwZGIzYjczZDc4ODExOWMwNDUzNWU0OGNmOWJlNWY1NWJjMzEwMDg0MWE3MTg2MzdhZTY5NWI0NDJmMjdkZCIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJuYW1lIjogImdlbmVyYXRpb25fY29uZmlnLmpzb24iLAogICAgICAgICAgImJ5dGVzIjogMjM5LAogICAgICAgICAgInNoYTI1NiI6ICIyMzI1ZGEwZjE1YmI4NDhlMDE4YzVhZTA3MWI3OTQzMzMyZTlmODcxZDZiNjBlMmVkMjJjYTk3ZDRjYjk5M2QyIgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIm5hbWUiOiAibWVyZ2VzLnR4dCIsCiAgICAgICAgICAiYnl0ZXMiOiAxNjcxODUzLAogICAgICAgICAgInNoYTI1NiI6ICI4ODMxZTRmMWEwNDQ0NzEzNDBmN2MwYTgzZDdiZDcxMzA2YTViODY3ZTk1ZmQ4NzBmNzRkMGM1MzA4YTkwNGQ1IgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIm5hbWUiOiAibW9kZWwuc2FmZXRlbnNvcnMiLAogICAgICAgICAgImJ5dGVzIjogMTUwMzMwMDMyOCwKICAgICAgICAgICJzaGEyNTYiOiAiZjQ3ZjcxMTc3ZjMyYmNkMTAxYjc1NzNlYzkxNzFlNmE1N2Y0ZjRkMzExNDhkMzhlMzgyMzA2ZjQyOTk2ODc0YiIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJuYW1lIjogInRva2VuaXplci5qc29uIiwKICAgICAgICAgICJieXRlcyI6IDExNDIyNjU0LAogICAgICAgICAgInNoYTI1NiI6ICJhZWIxMzMwN2E3MWFjZDhmZTgxODYxZDk0YWQ1NGFiNjg5ZGY3NzMzMTg4MDllZWQzY2JlNzk0YjQ0OTJkYWU0IgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgIm5hbWUiOiAidG9rZW5pemVyX2NvbmZpZy5qc29uIiwKICAgICAgICAgICJieXRlcyI6IDk3MzIsCiAgICAgICAgICAic2hhMjU2IjogImQ1ZDA5ZjA3YjQ4YzMwODZjNTA4YjMwZDFjOTExNGJkMTE4OTE0NWI3NGU5ODJhMjY1MzUwYzkyM2FjZDgxMDEiCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAibmFtZSI6ICJ2b2NhYi5qc29uIiwKICAgICAgICAgICJieXRlcyI6IDI3NzY4MzMsCiAgICAgICAgICAic2hhMjU2IjogImNhMTBkN2U5ZmIzZWQxODU3NWRkMWUyNzdhMjU3OWMxNmQxMDhlMzJmMjc0Mzk2ODRhZmEwZTEwYjE0NDA5MTAiCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgImVudmlyb25tZW50IjogewogICAgICAic3lzdGVtIjogIkRhcndpbiIsCiAgICAgICJtYWNoaW5lIjogImFybTY0IiwKICAgICAgInBsYXRmb3JtIjogIm1hY09TLTI2LjYuMi1hcm02NC1hcm0tNjRiaXQiLAogICAgICAicHl0aG9uIjogIjMuMTIuMTQiLAogICAgICAibG9naWNhbF9jcHVzIjogMTAKICAgIH0sCiAgICAibG9hZGluZyI6IHsKICAgICAgIndhbGxfc2Vjb25kcyI6IDIuOTgzNDA1NDU3OTg0MTkwNCwKICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAic2NvcGUiOiAiZGVjbGFyZWQgcHJvY2VzcyBhbmQgcmVjdXJzaXZlIGNoaWxkcmVuIiwKICAgICAgICAicGlkIjogNTYxMjksCiAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgInNhbXBsZV9jb3VudCI6IDE1LAogICAgICAgICJ3YWxsX3NlY29uZHMiOiAyLjk1NTgwMjIwNzk4NzI5LAogICAgICAgICJjcHVfc2Vjb25kcyI6IDIuMDkzMzY1NDg4LAogICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICJjcHVfY2FwYWNpdHlfcGVyY2VudCI6IDcuMDgyMjI0NTIyMTM4OTM3NSwKICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA4NzEyODQ3MzYsCiAgICAgICAgInBlYWtfcHNzX2J5dGVzIjogbnVsbCwKICAgICAgICAiaG9zdF9tZW1fdG90YWxfYnl0ZXMiOiAxNzE3OTg2OTE4NCwKICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAyNDM4OTcxMzkyLAogICAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiA2MjE4NzExMDQsCiAgICAgICAgImhvc3Rfc3dhcF9pbl9kZWx0YV9ieXRlcyI6IDg5MjEwODgwLAogICAgICAgICJob3N0X3N3YXBfb3V0X2RlbHRhX2J5dGVzIjogMjc4NTI4LAogICAgICAgICJzd2FwX3Njb3BlIjogInN5c3RlbS13aWRlIGNvdW50ZXJzOyBub3QgbW9kZWwtb25seSIsCiAgICAgICAgImxpbWl0YXRpb24iOiAic2FtcGxlZCBwZWFrLCBub3Qga2VybmVsIGhpZ2gtd2F0ZXIgbWFyazsgbGFzdCBvYnNlcnZlZCBDUFUgb2YgcmV0aXJlZCBjaGlsZHJlbiBpcyByZXRhaW5lZCwgc28gc2hvcnQgY2hpbGQgbGlmZXRpbWVzIGNhbiByZW1haW4gdW5kZXItc2FtcGxlZDsgUlNTIGFuZCBhY2NlbGVyYXRvciBhbGxvY2F0aW9ucyBtYXkgb3ZlcmxhcCIKICAgICAgfQogICAgfSwKICAgICJtZWFzdXJlbWVudCI6IHsKICAgICAgInJlc291cmNlcyI6ICJwZXItY2FzZSBzYW1wbGVkIHByb2Nlc3MgdHJlZSIsCiAgICAgICJjYWNoZSI6ICJuZXcgTUxYIHByb21wdCBjYWNoZSBwZXIgY2FzZSAvIGxsYW1hIGNhY2hlX3Byb21wdD1mYWxzZSIsCiAgICAgICJ0aW1pbmciOiAicmVxdWVzdCB0byBjb21wbGV0ZSByZXNwb25zZTsgdmFsaWQtY2FsbCBsYXRlbmN5IG9ubHkgaWYgbmF0aXZlK3NjaGVtYSBwYXNzIiwKICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICJxdWFsaXR5X3Njb3BlIjogImZyb3plbiBkZXRlcm1pbmlzdGljIGZpeHR1cmUgcnVsZXM7IG5vIGhhcmR3YXJlIGV4ZWN1dGlvbiBvciBwcm9kdWN0IGFjY2VwdGFuY2UiCiAgICB9LAogICAgImNhc2VzIjogWwogICAgICB7CiAgICAgICAgImlkIjogImRldmVsb3BtZW50XzAwMCIsCiAgICAgICAgInVzZXIiOiAi546w5Zy65rWL6K+V5Y2V6KaB5rGC5oGi5aSN5pGE5YOP5aS06YeH6ZuG77yM6K+355Sf5oiQ5a+55bqU6LCD55So44CCIiwKICAgICAgICAiZXhwZWN0ZWQiOiB7CiAgICAgICAgICAia2luZCI6ICJ0b29sIiwKICAgICAgICAgICJjYWxscyI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJuYW1lIjogInN0YXJ0X2NhbWVyYSIsCiAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHt9CiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9LAogICAgICAgICJtZXNzYWdlcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAic3lzdGVtIiwKICAgICAgICAgICAgImNvbnRlbnQiOiAi5L2g5piv5py65Zmo5Lq65Yqp5omL44CC6K6+5aSH5pON5L2c5L2/55So5o+Q5L6b55qE5bel5YW377yb6KeS6Imy5LiO5pmu6YCa6IGK5aSp55So5paH5a2X5Zue562U44CCIgogICAgICAgICAgfSwKICAgICAgICAgIHsKICAgICAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgICAgICJjb250ZW50IjogIueOsOWcuua1i+ivleWNleimgeaxguaBouWkjeaRhOWDj+WktOmHh+mbhu+8jOivt+eUn+aIkOWvueW6lOiwg+eUqOOAgiIKICAgICAgICAgIH0KICAgICAgICBdLAogICAgICAgICJraW5kIjogInRvb2wiLAogICAgICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICAgICAiZ2VuZXJhdGlvbiI6IHsKICAgICAgICAgICJyYXciOiAiPHRvb2xfY2FsbD5cbntcIm5hbWVcIjogXCJzdGFydF9jYW1lcmFcIiwgXCJhcmd1bWVudHNcIjoge319XG48L3Rvb2xfY2FsbD4iLAogICAgICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIsCiAgICAgICAgICAidHRmdF9zZWNvbmRzIjogMC40MDkzMzYxMjUwMTI0ODcyLAogICAgICAgICAgIndhbGxfc2Vjb25kcyI6IDAuNjA3NjY5MjQ5OTkxODg2MywKICAgICAgICAgICJwcm9tcHRfdG9rZW5zIjogODkxLAogICAgICAgICAgIm91dHB1dF90b2tlbnMiOiAxNiwKICAgICAgICAgICJwcmVmaWxsX3Rva2Vuc19wZXJfc2Vjb25kIjogMjU5Ni45OTg1MTM4ODk0MDIsCiAgICAgICAgICAiZGVjb2RlX3Rva2Vuc19wZXJfc2Vjb25kIjogODQuNDU0NTE4NTIzNzA5MTcsCiAgICAgICAgICAicHJlZmlsbF9zZWNvbmRzIjogMC4zNDMwODgzNzQ5OTcwMjM1LAogICAgICAgICAgImRlY29kZV9zZWNvbmRzIjogMC4xODk0NTEwODMwMTcwNDc1LAogICAgICAgICAgIm1seF9wZWFrX2FsbG9jYXRlZF9ieXRlcyI6IDE2NzQ1OTYwMzIsCiAgICAgICAgICAidGltaW5nX3NvdXJjZSI6ICJNTFggR2VuZXJhdGlvblJlc3BvbnNlOyBwcm9tcHQgdGltZSBpbmNsdWRlcyBmaXJzdCBtb2RlbCB0b2tlbjsgZ2VuZXJhdGlvbiBjb3VudCBpbmNsdWRlcyBFT1MiLAogICAgICAgICAgIndpcmVfY2FsbHMiOiBudWxsCiAgICAgICAgfSwKICAgICAgICAiYXNzZXNzbWVudCI6IHsKICAgICAgICAgICJuYXRpdmVfcGFyc2UiOiB0cnVlLAogICAgICAgICAgImpzb25fdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlc3BvbnNlX2NvbXBsZXRlIjogdHJ1ZSwKICAgICAgICAgICJzY2hlbWFfdmFsaWQiOiB0cnVlLAogICAgICAgICAgInJlZ2lzdHJ5X3ZhbGlkIjogdHJ1ZSwKICAgICAgICAgICJleHBlY3RlZF9iZWhhdmlvciI6IHRydWUsCiAgICAgICAgICAicGVyc29uYV92YWxpZCI6IG51bGwsCiAgICAgICAgICAicmV2aWV3ZXIiOiAiZGV0ZXJtaW5pc3RpYyBmcm96ZW4gZml4dHVyZSBydWxlcyIsCiAgICAgICAgICAicmVwbHkiOiB7CiAgICAgICAgICAgICJjb250ZW50IjogIiIsCiAgICAgICAgICAgICJ0b29sX2NhbGxzIjogWwogICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjYWxsX2lkIjogImxvY2FsX2NhbGxfMCIsCiAgICAgICAgICAgICAgICAibmFtZSI6ICJzdGFydF9jYW1lcmEiLAogICAgICAgICAgICAgICAgImFyZ3VtZW50cyI6IHt9CiAgICAgICAgICAgICAgfQogICAgICAgICAgICBdCiAgICAgICAgICB9LAogICAgICAgICAgInNjaGVtYV9lcnJvcnMiOiBbXSwKICAgICAgICAgICJyZWdpc3RyeV9yZXN1bHQiOiB7CiAgICAgICAgICAgICJwYXNzZWQiOiB0cnVlLAogICAgICAgICAgICAiY29tbWFuZHMiOiBbCiAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgIm5hbWUiOiAic3RhcnRfY2FtZXJhIiwKICAgICAgICAgICAgICAgICJwYXJhbWV0ZXJzIjoge30sCiAgICAgICAgICAgICAgICAidG9vbF9jYWxsX2lkIjogImxvY2FsX2NhbGxfMCIKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0KICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgICJ2YWxpZF9jYWxsX3NlY29uZHMiOiAxLjAyMTUzODY2NzAzMTU2MzgsCiAgICAgICAgInJlc291cmNlcyI6IHsKICAgICAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAgICAgInBpZCI6IDU2MTI5LAogICAgICAgICAgInNhbXBsaW5nX2ludGVydmFsX3NlY29uZHMiOiAwLjIsCiAgICAgICAgICAic2FtcGxlX2NvdW50IjogNiwKICAgICAgICAgICJ3YWxsX3NlY29uZHMiOiAxLjAzMjQyODM3NDk3OTY0NSwKICAgICAgICAgICJjcHVfc2Vjb25kcyI6IDAuNjI2MzQ3NzE2MDAwMDAwMiwKICAgICAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAgICAgImNwdV9jYXBhY2l0eV9wZXJjZW50IjogNi4wNjY3NDI1NTc0NDIyOTMsCiAgICAgICAgICAicGVha19yc3NfYnl0ZXMiOiA1ODkzNjUyNDgsCiAgICAgICAgICAicGVha19wc3NfYnl0ZXMiOiBudWxsLAogICAgICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICAgICAibWluaW11bV9ob3N0X21lbV9hdmFpbGFibGVfYnl0ZXMiOiAyNTQ5MjY4NDgwLAogICAgICAgICAgImhvc3Rfc3dhcF9kZWx0YV9ieXRlcyI6IDEzOTg1MzgyNCwKICAgICAgICAgICJob3N0X3N3YXBfaW5fZGVsdGFfYnl0ZXMiOiAyODgzNTg0LAogICAgICAgICAgImhvc3Rfc3dhcF9vdXRfZGVsdGFfYnl0ZXMiOiAwLAogICAgICAgICAgInN3YXBfc2NvcGUiOiAic3lzdGVtLXdpZGUgY291bnRlcnM7IG5vdCBtb2RlbC1vbmx5IiwKICAgICAgICAgICJsaW1pdGF0aW9uIjogInNhbXBsZWQgcGVhaywgbm90IGtlcm5lbCBoaWdoLXdhdGVyIG1hcms7IGxhc3Qgb2JzZXJ2ZWQgQ1BVIG9mIHJldGlyZWQgY2hpbGRyZW4gaXMgcmV0YWluZWQsIHNvIHNob3J0IGNoaWxkIGxpZmV0aW1lcyBjYW4gcmVtYWluIHVuZGVyLXNhbXBsZWQ7IFJTUyBhbmQgYWNjZWxlcmF0b3IgYWxsb2NhdGlvbnMgbWF5IG92ZXJsYXAiCiAgICAgICAgfQogICAgICB9CiAgICBdLAogICAgInN1bW1hcnkiOiB7CiAgICAgICJzYW1wbGVzIjogMSwKICAgICAgInRvb2xfc2FtcGxlcyI6IDEsCiAgICAgICJuYXRpdmVfY2FsbHMiOiAxLAogICAgICAianNvbl92YWxpZCI6IDEsCiAgICAgICJzY2hlbWFfdmFsaWQiOiAxLAogICAgICAicmVnaXN0cnlfdmFsaWQiOiAxLAogICAgICAidG9vbF9leHBlY3RlZF9iZWhhdmlvciI6IDEsCiAgICAgICJwZXJzb25hX3NhbXBsZXMiOiAwLAogICAgICAicGVyc29uYV92YWxpZCI6IDAsCiAgICAgICJjaGF0X3NhbXBsZXMiOiAwLAogICAgICAiY2hhdF92YWxpZCI6IDAKICAgIH0sCiAgICAic3RhdHVzIjogImNvbXBsZXRlZCIsCiAgICAiZXZpZGVuY2UiOiBbCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJhc3NldHMtbWFuaWZlc3QuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICJkMmQzZGZkNzc0YjNkNDI5MTIxMmY1MTM1MTY4ZmE1ZWQ4ZjUxMjc1NWQ5Yjc3ZTQ1ZGRmOTIyMjdlYmRlZmY1IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiY2FzZXMvZGV2ZWxvcG1lbnRfMDAwLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiZmJjOTMxYmZjMjA5MGQ1OTE1ZTEzNmFjOTA3YjliMTRlOTgxYWQ3ZmJkYTJmODM1YTYwZTIwOGI5ZTE3MDEwNSIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImV2ZW50cy9kZXZlbG9wbWVudF8wMDAuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICJkZTNhZmExMWI3MDE3ZWM4ODE1ZmFlMzVmMzNmOTI0NWZlY2MyNzE2YzBjOTdkMjA0ZDg2YTZmYzEyNGJlNDFlIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAicmVxdWVzdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjI3MGRhMWVjMDM5ZjVkZjViM2NmNjJiZDNiZjdjOWVhNDEyZTdlMTEyM2M1MzZiZWE4ZGE3ZGYxOWYzYTU3OGEiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJzdWl0ZS5qc29uIiwKICAgICAgICAic2hhMjU2IjogImI0NzQ0NjBlOGZjY2NiODQ1ZDNkYWU0YTE3MmM5ODhlZjRmMjc1MjkxMjgxY2E4MDZhMmJjYzFmMWQyY2VmYTgiCiAgICAgIH0KICAgIF0KICB9Cl0=">下载本页原始结果 JSON</a></p>
+<p><a download="raw-evidence.zip" href="data:application/zip;base64,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">下载冻结请求、逐例流事件与资源采样</a></p>
+<details><summary>完整配置、资产哈希与逐例结果</summary><pre>[
+  {
+    &quot;schema&quot;: &quot;edge-model-benchmark/result-v1&quot;,
+    &quot;run_id&quot;: &quot;workflow-smoke&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;device_measurement&quot;,
+      &quot;raw_evidence&quot;: &quot;cases/ and events/ within this run&quot;
+    },
+    &quot;candidate&quot;: {
+      &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+      &quot;model_path&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;parameter_count&quot;: 596049920,
+      &quot;parameter_count_stored&quot;: 751632384,
+      &quot;precision&quot;: &quot;BF16&quot;,
+      &quot;artifact_format&quot;: &quot;HF safetensors&quot;,
+      &quot;backend&quot;: &quot;Metal&quot;,
+      &quot;context_tokens&quot;: 8192,
+      &quot;kv_type&quot;: &quot;runtime default unquantized&quot;,
+      &quot;lineage&quot;: &quot;official untrained base&quot;,
+      &quot;actual_runtime&quot;: {
+        &quot;name&quot;: &quot;mlx-lm&quot;,
+        &quot;version&quot;: &quot;0.32.2&quot;,
+        &quot;mlx_version&quot;: &quot;0.32.4&quot;,
+        &quot;backend&quot;: &quot;Metal&quot;
+      }
+    },
+    &quot;stage&quot;: &quot;未微调基线 / short&quot;,
+    &quot;request_sha256&quot;: &quot;270da1ec039f5df5b3cf62bd3bf7c9ea412e7e1123c536bea8da7df19f3a578a&quot;,
+    &quot;suite_sha256&quot;: &quot;b474460e8fcccb845d3dae4a172c988ef4f275291281ca806a2bcc1f1d2cefa8&quot;,
+    &quot;artifacts&quot;: {
+      &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;total_bytes&quot;: 1519207673,
+      &quot;files&quot;: [
+        {
+          &quot;name&quot;: &quot;LICENSE&quot;,
+          &quot;bytes&quot;: 11343,
+          &quot;sha256&quot;: &quot;832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e&quot;
+        },
+        {
+          &quot;name&quot;: &quot;README.md&quot;,
+          &quot;bytes&quot;: 13965,
+          &quot;sha256&quot;: &quot;1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9&quot;
+        },
+        {
+          &quot;name&quot;: &quot;config.json&quot;,
+          &quot;bytes&quot;: 726,
+          &quot;sha256&quot;: &quot;660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd&quot;
+        },
+        {
+          &quot;name&quot;: &quot;generation_config.json&quot;,
+          &quot;bytes&quot;: 239,
+          &quot;sha256&quot;: &quot;2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2&quot;
+        },
+        {
+          &quot;name&quot;: &quot;merges.txt&quot;,
+          &quot;bytes&quot;: 1671853,
+          &quot;sha256&quot;: &quot;8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5&quot;
+        },
+        {
+          &quot;name&quot;: &quot;model.safetensors&quot;,
+          &quot;bytes&quot;: 1503300328,
+          &quot;sha256&quot;: &quot;f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b&quot;
+        },
+        {
+          &quot;name&quot;: &quot;tokenizer.json&quot;,
+          &quot;bytes&quot;: 11422654,
+          &quot;sha256&quot;: &quot;aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4&quot;
+        },
+        {
+          &quot;name&quot;: &quot;tokenizer_config.json&quot;,
+          &quot;bytes&quot;: 9732,
+          &quot;sha256&quot;: &quot;d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101&quot;
+        },
+        {
+          &quot;name&quot;: &quot;vocab.json&quot;,
+          &quot;bytes&quot;: 2776833,
+          &quot;sha256&quot;: &quot;ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910&quot;
+        }
+      ]
+    },
+    &quot;environment&quot;: {
+      &quot;system&quot;: &quot;Darwin&quot;,
+      &quot;machine&quot;: &quot;arm64&quot;,
+      &quot;platform&quot;: &quot;macOS-26.6.2-arm64-arm-64bit&quot;,
+      &quot;python&quot;: &quot;3.12.14&quot;,
+      &quot;logical_cpus&quot;: 10
+    },
+    &quot;loading&quot;: {
+      &quot;wall_seconds&quot;: 2.9834054579841904,
+      &quot;resources&quot;: {
+        &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+        &quot;pid&quot;: 56129,
+        &quot;sampling_interval_seconds&quot;: 0.2,
+        &quot;sample_count&quot;: 15,
+        &quot;wall_seconds&quot;: 2.95580220798729,
+        &quot;cpu_seconds&quot;: 2.093365488,
+        &quot;host_logical_cpus&quot;: 10,
+        &quot;cpu_capacity_percent&quot;: 7.0822245221389375,
+        &quot;peak_rss_bytes&quot;: 871284736,
+        &quot;peak_pss_bytes&quot;: null,
+        &quot;host_mem_total_bytes&quot;: 17179869184,
+        &quot;minimum_host_mem_available_bytes&quot;: 2438971392,
+        &quot;host_swap_delta_bytes&quot;: 621871104,
+        &quot;host_swap_in_delta_bytes&quot;: 89210880,
+        &quot;host_swap_out_delta_bytes&quot;: 278528,
+        &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+        &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+      }
+    },
+    &quot;measurement&quot;: {
+      &quot;resources&quot;: &quot;per-case sampled process tree&quot;,
+      &quot;cache&quot;: &quot;new MLX prompt cache per case / llama cache_prompt=false&quot;,
+      &quot;timing&quot;: &quot;request to complete response; valid-call latency only if native+schema pass&quot;,
+      &quot;sampling_interval_seconds&quot;: 0.2,
+      &quot;quality_scope&quot;: &quot;frozen deterministic fixture rules; no hardware execution or product acceptance&quot;
+    },
+    &quot;cases&quot;: [
+      {
+        &quot;id&quot;: &quot;development_000&quot;,
+        &quot;user&quot;: &quot;现场测试单要求恢复摄像头采集，请生成对应调用。&quot;,
+        &quot;expected&quot;: {
+          &quot;kind&quot;: &quot;tool&quot;,
+          &quot;calls&quot;: [
+            {
+              &quot;name&quot;: &quot;start_camera&quot;,
+              &quot;arguments&quot;: {}
+            }
+          ]
+        },
+        &quot;messages&quot;: [
+          {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。&quot;
+          },
+          {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;现场测试单要求恢复摄像头采集，请生成对应调用。&quot;
+          }
+        ],
+        &quot;kind&quot;: &quot;tool&quot;,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;generation&quot;: {
+          &quot;raw&quot;: &quot;&lt;tool_call&gt;\n{\&quot;name\&quot;: \&quot;start_camera\&quot;, \&quot;arguments\&quot;: {}}\n&lt;/tool_call&gt;&quot;,
+          &quot;finish_reason&quot;: &quot;stop&quot;,
+          &quot;ttft_seconds&quot;: 0.4093361250124872,
+          &quot;wall_seconds&quot;: 0.6076692499918863,
+          &quot;prompt_tokens&quot;: 891,
+          &quot;output_tokens&quot;: 16,
+          &quot;prefill_tokens_per_second&quot;: 2596.998513889402,
+          &quot;decode_tokens_per_second&quot;: 84.45451852370917,
+          &quot;prefill_seconds&quot;: 0.3430883749970235,
+          &quot;decode_seconds&quot;: 0.1894510830170475,
+          &quot;mlx_peak_allocated_bytes&quot;: 1674596032,
+          &quot;timing_source&quot;: &quot;MLX GenerationResponse; prompt time includes first model token; generation count includes EOS&quot;,
+          &quot;wire_calls&quot;: null
+        },
+        &quot;assessment&quot;: {
+          &quot;native_parse&quot;: true,
+          &quot;json_valid&quot;: true,
+          &quot;response_complete&quot;: true,
+          &quot;schema_valid&quot;: true,
+          &quot;registry_valid&quot;: true,
+          &quot;expected_behavior&quot;: true,
+          &quot;persona_valid&quot;: null,
+          &quot;reviewer&quot;: &quot;deterministic frozen fixture rules&quot;,
+          &quot;reply&quot;: {
+            &quot;content&quot;: &quot;&quot;,
+            &quot;tool_calls&quot;: [
+              {
+                &quot;call_id&quot;: &quot;local_call_0&quot;,
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;arguments&quot;: {}
+              }
+            ]
+          },
+          &quot;schema_errors&quot;: [],
+          &quot;registry_result&quot;: {
+            &quot;passed&quot;: true,
+            &quot;commands&quot;: [
+              {
+                &quot;name&quot;: &quot;start_camera&quot;,
+                &quot;parameters&quot;: {},
+                &quot;tool_call_id&quot;: &quot;local_call_0&quot;
+              }
+            ]
+          }
+        },
+        &quot;valid_call_seconds&quot;: 1.0215386670315638,
+        &quot;resources&quot;: {
+          &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+          &quot;pid&quot;: 56129,
+          &quot;sampling_interval_seconds&quot;: 0.2,
+          &quot;sample_count&quot;: 6,
+          &quot;wall_seconds&quot;: 1.032428374979645,
+          &quot;cpu_seconds&quot;: 0.6263477160000002,
+          &quot;host_logical_cpus&quot;: 10,
+          &quot;cpu_capacity_percent&quot;: 6.066742557442293,
+          &quot;peak_rss_bytes&quot;: 589365248,
+          &quot;peak_pss_bytes&quot;: null,
+          &quot;host_mem_total_bytes&quot;: 17179869184,
+          &quot;minimum_host_mem_available_bytes&quot;: 2549268480,
+          &quot;host_swap_delta_bytes&quot;: 139853824,
+          &quot;host_swap_in_delta_bytes&quot;: 2883584,
+          &quot;host_swap_out_delta_bytes&quot;: 0,
+          &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+          &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+        }
+      }
+    ],
+    &quot;summary&quot;: {
+      &quot;samples&quot;: 1,
+      &quot;tool_samples&quot;: 1,
+      &quot;native_calls&quot;: 1,
+      &quot;json_valid&quot;: 1,
+      &quot;schema_valid&quot;: 1,
+      &quot;registry_valid&quot;: 1,
+      &quot;tool_expected_behavior&quot;: 1,
+      &quot;persona_samples&quot;: 0,
+      &quot;persona_valid&quot;: 0,
+      &quot;chat_samples&quot;: 0,
+      &quot;chat_valid&quot;: 0
+    },
+    &quot;status&quot;: &quot;completed&quot;,
+    &quot;evidence&quot;: [
+      {
+        &quot;path&quot;: &quot;assets-manifest.json&quot;,
+        &quot;sha256&quot;: &quot;d2d3dfd774b3d4291212f5135168fa5ed8f512755d9b77e45ddf92227ebdeff5&quot;
+      },
+      {
+        &quot;path&quot;: &quot;cases/development_000.json&quot;,
+        &quot;sha256&quot;: &quot;fbc931bfc2090d5915e136ac907b9b14e981ad7fbda2f835a60e208b9e170105&quot;
+      },
+      {
+        &quot;path&quot;: &quot;events/development_000.json&quot;,
+        &quot;sha256&quot;: &quot;de3afa11b7017ec8815fae35f33f9245fecc2716c0c97d204d86a6fc124be41e&quot;
+      },
+      {
+        &quot;path&quot;: &quot;request.json&quot;,
+        &quot;sha256&quot;: &quot;270da1ec039f5df5b3cf62bd3bf7c9ea412e7e1123c536bea8da7df19f3a578a&quot;
+      },
+      {
+        &quot;path&quot;: &quot;suite.json&quot;,
+        &quot;sha256&quot;: &quot;b474460e8fcccb845d3dae4a172c988ef4f275291281ca806a2bcc1f1d2cefa8&quot;
+      }
+    ]
+  }
+]</pre></details></section><footer class="foot">Qwen lifecycle · 自包含离线报告 · 渲染只读数据，不执行模型</footer></main><script>const links=[...document.querySelectorAll(".rail a")];const chapters=links.filter(a=>a.getAttribute("href")!=="#top");function nav(){let id="summary";for(const a of chapters){const s=document.querySelector(a.getAttribute("href"));if(s&&s.getBoundingClientRect().top<=150)id=s.id;}for(const a of links)a.classList.toggle("active",a.getAttribute("href")==="#"+id);}addEventListener("scroll",nav,{passive:true});nav();</script></body></html>

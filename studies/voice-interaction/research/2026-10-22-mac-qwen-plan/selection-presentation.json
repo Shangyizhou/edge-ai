@@ -1,0 +1,39 @@
+{
+  "schema": "edge-ai-selection-presentation/v1",
+  "title": "让小模型在香橙派上调用工具",
+  "status": "历史选型 · 未新增实测",
+  "meta": "资料日期：2026-10-22 · 框架支持另附补充资料核对",
+  "intro": "先选值得尝试的路线，再用实验决定是否需要训练和量化。",
+  "sections": [
+    {
+      "label": "先看建议",
+      "subtitle": "选谁，为什么",
+      "html": "<h2>先试 Qwen3-0.6B，先确认它会不会正确调用工具</h2><p class=\"outcome\">这次选型要找一个能放进香橙派的小模型，让机器人把用户的话转换成程序能接收的工具调用。</p><div class=\"finding\"><strong>建议从官方原始模型开始，先测，再决定是否训练。</strong><p>在 Mac 上检查工具调用和普通聊天。如果现有模型已经满足要求，可以跳过微调；如果错误集中、目标明确，再做一轮小规模 LoRA。</p></div><h3>为什么先试它</h3><ul class=\"gap-list\"><li><b>规模小，适合先验证端侧路线</b>0.6B 约为 6 亿参数。但参数少不等于一定够快，仍需在香橙派上实测。</li><li><b>有原生工具调用的模板和协议</b>可以沿用 Qwen 的模板，再由解析器交给 Agent；是否稳定遵守，需要用我们的工具测试。</li><li><b>Mac 上有可用的训练路线</b>需要微调时优先评估 MLX-LM，利用 Apple 芯片运行；导出后再使用适合香橙派的运行框架。</li></ul><div class=\"notice\">这是 2026 年 10 月 22 日资料选型的重新排版，不是最新实测总结。此处的建议仍需实验验证；后续训练和板端结果没有回填成当时已知的结论。</div>"
+    },
+    {
+      "label": "目标与限制",
+      "subtitle": "硬件能承受什么",
+      "html": "<h2>能调用工具，也要给其他模块留空间</h2><p>首轮只验证选定的常用工具。模型输出交给现有 JSON 和参数规则校验，不执行机器人动作。</p><dl class=\"input-list\"><dt>Mac</dt><dd>MacBook Air M5，16GB 统一内存。用于下载、试跑；有需要时进行小规模训练和格式转换。</dd><dt>香橙派</dt><dd>Orange Pi 3B，RK3566，4 核 CPU，系统可见内存约 3.83GiB。此方案先评估 CPU 推理。</dd><dt>磁盘</dt><dd>当时板端只剩约 895MiB，传模型前必须重新检查空间；这个历史快照不能代表现在。</dd><dt>工具输入</dt><dd>继续提供本次可用工具的名称、参数定义和当前状态。微调不替代这些动态信息。</dd></dl><h3>我们真正要确认的三件事</h3><ul class=\"gap-list\"><li><b>调用能接收</b>工具调用可以解析，参数是合法 JSON，并通过当前工具的参数校验。</li><li><b>回答和调用合适</b>记录选错工具、填错参数和聊天误调用。格式合法与意图正确分别统计。</li><li><b>设备用得起</b>测完整调用等待时间、CPU、进程内存和整机余量。后续语音、视觉、ROS 共跑还要单独验证。</li></ul><p class=\"quiet\">原方案中的内存预算是建议值，尚未成为已确认的产品验收门槛。</p>"
+    },
+    {
+      "label": "框架与后端",
+      "subtitle": "CPU / GPU / NPU 怎么选",
+      "html": "<h2>推荐怎样运行这个模型</h2><p>选型要同时选定模型、运行框架和实际使用的处理器。框架能安装，不代表它能把这个模型交给板上的 NPU。</p><div class=\"scroll\"><table class=\"future\"><thead><tr><th>用途 / 设备</th><th>建议框架</th><th>推理后端</th><th>支持判断与下一步</th></tr></thead><tbody><tr><td>Mac 原始模型试跑<br>按需微调</td><td>MLX-LM</td><td>Apple GPU / Metal<br><small>使用统一内存</small></td><td>适合 Apple 芯片路线；冻结版本后检查 Qwen 模板和原生工具输出。</td></tr><tr><td>Mac 部署文件回归</td><td>llama.cpp</td><td>Metal GPU</td><td>用于先检查 GGUF 转换与量化后的输出；Mac 速度不能代替板端速度。</td></tr><tr class=\"selected\"><td>香橙派 RK3566<br>优先部署路线</td><td>llama.cpp</td><td>ARM CPU</td><td>作为本轮建议路线。固定构建版本后，实际测工具调用、等待时间、CPU 和进程内存。</td></tr><tr><td>香橙派 RK3566<br>NPU 路线</td><td>Rockchip RKLLM</td><td>NPU</td><td>当前官方支持平台列表没有 RK3566，因此不作为本轮可用方案。第三方移植需另立兼容性实验。</td></tr></tbody></table></div><div class=\"notice\"><b>RK3566 有 NPU，不等于这个 Qwen 模型就能用上。</b><p>RKNN-Toolkit2 支持 RK3566，但官方将大语言模型部署引向独立的 RKLLM 工具链。RKLLM 的平台名单没有 RK3566，不能拿普通 RKNN 的芯片支持来证明 LLM 可运行。</p></div><h3>选型报告应交代的支持状态</h3><p>每条路线标清：官方是否支持芯片与模型、所需文件格式、系统和驱动条件、有没有本机真实推理记录。没有实测时，写“建议验证”，不写“已可用”。GPU 或 NPU 也不预设一定比 CPU 更快。</p><details><summary>本次补充的官方依据（与历史研究分开）</summary><p>以下为本次补充核对的当前官方资料，不回写成 2026-10-22 已验证的事实。本次没有新跑硬件测试。</p><ul><li><a href=\"https://github.com/ml-explore/mlx-lm\">MLX-LM：Apple 芯片推理与训练</a></li><li><a href=\"https://github.com/ggml-org/llama.cpp\">llama.cpp：量化模型与推理后端</a></li><li><a href=\"https://github.com/airockchip/rknn-llm#support-platform\">RKLLM：官方支持平台</a></li><li><a href=\"https://github.com/airockchip/rknn-toolkit2#support-platform\">RKNN-Toolkit2：芯片支持及 LLM 工具链说明</a></li></ul></details>"
+    },
+    {
+      "label": "候选怎么比",
+      "subtitle": "收益与代价",
+      "html": "<h2>这里比较的是同一模型的部署版本</h2><p>Q4、Q5、Q8 是不同的权重量化方案，不是三个不同能力系列。要用同一份高精度权重生成它们，再用相同问题对比。</p><div class=\"scroll\"><table class=\"future\"><thead><tr><th>候选</th><th>为什么保留</th><th>要付出的代价</th><th>如何决定</th></tr></thead><tbody><tr class=\"selected\"><td>Q4_K_M<br><small>优先试跑</small></td><td>希望减少模型文件和权重内存</td><td>可能丢失部分回答或参数填写能力</td><td>质量可接受且板端资源合适，就保留</td></tr><tr><td>Q5_K_M<br><small>质量备选</small></td><td>观察比 Q4 多保留的精度是否有用</td><td>文件更大；速度和内存需实测</td><td>只有改善实际错误，额外开销才有价值</td></tr><tr><td>Q8_0<br><small>对照参照</small></td><td>帮助判断低位量化是否造成错误</td><td>占用通常更大，不预设为部署首选</td><td>对比 Q4 / Q5 的错误是否减少</td></tr></tbody></table></div><div class=\"explain\">先保留未微调模型作对照。只有训练确实带来收益，才继续比较微调模型的量化版本。训练和量化都可以跳过。</div><h3>别把这几件事混在一起</h3><dl class=\"input-list\"><dt>模型权重</dt><dd>Q4 / Q5 / Q8 主要改变权重存储。文件变小，不代表整机内存会同比下降。</dd><dt>对话缓存</dt><dd>KV 缓存保存推理中的上下文，精度和容量单独设置。对话越长，缓存通常越大。</dd><dt>运行框架</dt><dd>Mac 先用 MLX-LM；香橙派候选为 llama.cpp 的 ARM CPU 路线。Mac 的速度不能代替板端速度。</dd></dl>"
+    },
+    {
+      "label": "下一步怎么验证",
+      "subtitle": "按结果选择分支",
+      "html": "<h2>每一步回答一个问题，再决定要不要继续</h2><dl class=\"input-list\"><dt>先准备</dt><dd><b>模型能不能真正运行？</b><br>固定模型和工具目录，完成最小推理；检查模板与解析器是否匹配。</dd><dt>测原始模型</dt><dd><b>不训练能不能满足需求？</b><br>比较完整和精简提示，保留通过和失败的输出。</dd><dt>需要才训练</dt><dd><b>微调有没有修正已发现的问题？</b><br>先确认数据与参数，小步试跑，同时看损失曲线和任务表现。</dd><dt>需要才量化</dt><dd><b>省下多少资源，损失多少质量？</b><br>先比较高精度与量化版本，再到板端测等待时间、内存和 CPU。</dd><dt>再决定接入</dt><dd><b>是否值得接入机器人？</b><br>独立测试达标后，再验证真实业务、其他模块共跑和完整交互。</dd></dl><div class=\"finding\"><strong>选型的交付是“值得验证的候选和验证理由”。</strong><p>能下载、能转换、输出合法、意图正确和机器人可用，是不同层次的结论。</p></div>"
+    },
+    {
+      "label": "依据与记录",
+      "subtitle": "详细信息按需展开",
+      "html": "<h2>正文看结论，细节在这里查</h2><p>正文不展示提交哈希、内部运行编号和长路径。原始记录保持不变，需要复查时再打开。</p><ul class=\"gap-list\"><li><b>原始选型报告</b><a href=\"file:///Users/syz/code/edge-ai/studies/voice-interaction/research/2026-10-22-mac-qwen-plan/report-before-step-template-2026-10-23.html\">查看原报告及其来源链接</a></li><li><b>研究说明</b><a href=\"file:///Users/syz/code/edge-ai/studies/voice-interaction/research/2026-10-22-mac-qwen-plan/README.md\">查看当时的目标、硬件检查和建议依据</a></li><li><b>结构化研究记录</b><a href=\"file:///Users/syz/code/edge-ai/studies/voice-interaction/research/2026-10-22-mac-qwen-plan/research.json\">查看版本身份与配置细节</a></li></ul><details><summary>本次排版调整了什么</summary><p>将长段结论拆成建议、理由、限制和验证步骤；移除正文中的哈希；候选共用条件只写一次；训练与量化改为按实测决定的分支。原有事实未重新测量。</p></details>"
+    }
+  ]
+}

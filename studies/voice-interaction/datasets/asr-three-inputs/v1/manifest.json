@@ -1,0 +1,74 @@
+{
+  "schema": "edge-ai-dataset-release/v1",
+  "id": "asr-three-inputs",
+  "version": "v1",
+  "description": "3份已知录音的受控回归",
+  "splits": {
+    "development": {
+      "purpose": "development",
+      "samples": 3,
+      "independent_references": 2,
+      "artifact": {
+        "uri": "repo://studies/voice-interaction/experiments/rk3566/2026-10-22-asr-three-samples-v1/asr-fixtures.json",
+        "sha256": "0a3d5df88b79393a98a4e4baed6861a6b6fe9e674460d56c18605b3e24ede7bf",
+        "bytes": 6627
+      },
+      "selection_ids": [
+        "command",
+        "fleurs-1805-1",
+        "fleurs-1965-2"
+      ],
+      "media": [
+        {
+          "id": "command",
+          "uri": "ssh://orangepi-ts/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/fixtures/command.wav",
+          "sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+          "source_kind": "user_audio",
+          "replica": {
+            "uri": "edge-ai://dataset-store/asr-three-inputs/v1/audio/command.wav",
+            "sha256": "e4ca9007e39e663c3303138044272e35e1b74e0dc7ae92711b2546b499c61a09",
+            "bytes": 188460
+          }
+        },
+        {
+          "id": "fleurs-1805-1",
+          "uri": "ssh://orangepi-ts/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10112798408996336578-pcm16.wav",
+          "sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+          "source_kind": "public_reference",
+          "replica": {
+            "uri": "edge-ai://dataset-store/asr-three-inputs/v1/audio/fleurs-1805-1.wav",
+            "sha256": "443c7885ec4ac38b3e081d65521e221219d2a97ebb52d840d76a789f5913e1ce",
+            "bytes": 243918
+          }
+        },
+        {
+          "id": "fleurs-1965-2",
+          "uri": "ssh://orangepi-ts/home/orangepi/.cache/ros-robot-edge-benchmark/streaming/reference/10134195680525011353-pcm16.wav",
+          "sha256": "9c0144247ddb01cafd93d7d874fd61ab24012b8e75f2acd19dc8c2b106b2f945",
+          "source_kind": "public_reference",
+          "replica": {
+            "uri": "edge-ai://dataset-store/asr-three-inputs/v1/audio/fleurs-1965-2.wav",
+            "sha256": "9c0144247ddb01cafd93d7d874fd61ab24012b8e75f2acd19dc8c2b106b2f945",
+            "bytes": 218958
+          }
+        }
+      ]
+    },
+    "evaluation6": {
+      "purpose": "development",
+      "samples": 6,
+      "parent_split": "development",
+      "note": "Two precisions repeat the same three inputs; not six independent recordings.",
+      "artifact": {
+        "uri": "repo://studies/voice-interaction/experiments/rk3566/2026-10-23-workflow-validation-v1/asr-plan/suite.json",
+        "sha256": "5e09943c2b682b322d3f42ba66310865e27c2b25cdc856008b3cbff876640796",
+        "bytes": 3411
+      }
+    }
+  },
+  "notes": "The fixture manifest contains warmup/other material; only selection_ids belong to this release workload. Audio stays external; local manifest verification is not remote media verification.",
+  "backup": {
+    "receipt": "../../backups.json",
+    "policy": "Dataset metadata is not a backup. Verified replicas and restore receipts are recorded separately; no offsite guarantee."
+  }
+}

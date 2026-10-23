@@ -1,0 +1,120 @@
+{
+  "id": "development_005",
+  "user": "现场测试单要求停用目标跟随，请生成对应调用。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "disable_tracking",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+    },
+    {
+      "role": "user",
+      "content": "现场测试单要求停用目标跟随，请生成对应调用。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "stop_camera",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 10.460288981994381,
+    "ttft_seconds": 7.841790784994373,
+    "prompt_tokens": 892,
+    "evaluated_prefill_tokens": 19,
+    "native_usage": {
+      "completion_tokens": 16,
+      "prompt_tokens": 892,
+      "total_tokens": 908,
+      "prompt_tokens_details": {
+        "cached_tokens": 873
+      }
+    },
+    "native_timings": {
+      "cache_n": 873,
+      "prompt_n": 19,
+      "prompt_ms": 4820.496,
+      "prompt_per_token_ms": 253.7103157894737,
+      "prompt_per_second": 3.941503115032146,
+      "predicted_n": 16,
+      "predicted_ms": 5608.031,
+      "predicted_per_token_ms": 373.86873333333335,
+      "predicted_per_second": 2.67473557118354
+    },
+    "cache_prompt": true,
+    "output_tokens": 16,
+    "prefill_seconds": 4.820496,
+    "decode_seconds": 5.6080309999999995,
+    "prefill_tokens_per_second": 3.941503115032146,
+    "decode_tokens_per_second": 2.67473557118354,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": false,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "stop_camera",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "stop_camera",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 11.940664466004819,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 204254,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 46,
+    "wall_seconds": 12.002822615002515,
+    "cpu_seconds": 20.839999999999975,
+    "host_logical_cpus": 4,
+    "cpu_capacity_percent": 43.40645669034494,
+    "peak_rss_bytes": 593227776,
+    "peak_pss_bytes": 591972352,
+    "host_mem_total_bytes": 4113428480,
+    "minimum_host_mem_available_bytes": 1688403968,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 0,
+    "host_swap_out_delta_bytes": 0,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

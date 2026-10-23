@@ -1,0 +1,97 @@
+{
+  "id": "development_007",
+  "user": "现场测试单要求把音量调到百分之三十，请生成对应调用。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "volume_set",
+        "arguments": {
+          "level": 30
+        }
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+    },
+    {
+      "role": "user",
+      "content": "现场测试单要求把音量调到百分之三十，请生成对应调用。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "<tool_call>\n{\"name\": \"volume_set\", \"arguments\": {\"level\": 30}}\n</tool_call>",
+    "finish_reason": "stop",
+    "ttft_seconds": 0.18564308300847188,
+    "wall_seconds": 0.45654250000370666,
+    "prompt_tokens": 895,
+    "output_tokens": 21,
+    "prefill_tokens_per_second": 4876.257024663802,
+    "decode_tokens_per_second": 79.96118699554049,
+    "prefill_seconds": 0.18354241695487872,
+    "decode_seconds": 0.26262741698883474,
+    "mlx_peak_allocated_bytes": 1678196140,
+    "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+    "wire_calls": null
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "volume_set",
+          "arguments": {
+            "level": 30
+          }
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "volume_set",
+          "parameters": {
+            "level": 30
+          },
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.7400402500061318,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 57784,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 5,
+    "wall_seconds": 0.7487771249725483,
+    "cpu_seconds": 0.5019359959999994,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 6.70340985668334,
+    "peak_rss_bytes": 318029824,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 3483680768,
+    "host_swap_delta_bytes": 0,
+    "host_swap_in_delta_bytes": 18907136,
+    "host_swap_out_delta_bytes": 16384,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

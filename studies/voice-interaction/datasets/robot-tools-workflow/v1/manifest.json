@@ -1,0 +1,79 @@
+{
+  "schema": "edge-ai-dataset-release/v1",
+  "id": "robot-tools-workflow",
+  "version": "v1",
+  "description": "126条合成工作流技术样本；32微步试点",
+  "splits": {
+    "train": {
+      "purpose": "training",
+      "samples": 60,
+      "groups": 8,
+      "artifact": {
+        "uri": "edge-ai://workflow-20261023/frozen-training/train.jsonl",
+        "sha256": "00bee5272ebc6c8aeee5c5a4ec138381fe9e30fad244604dc7bf67cb27d18c03",
+        "bytes": 222426
+      }
+    },
+    "valid": {
+      "purpose": "validation",
+      "samples": 18,
+      "groups": 4,
+      "artifact": {
+        "uri": "edge-ai://workflow-20261023/frozen-training/valid.jsonl",
+        "sha256": "22742916794aaef76c9ea01bf85c769305b074fa8e8d7749bc43509dc6e01c97",
+        "bytes": 66839
+      }
+    },
+    "development": {
+      "purpose": "development",
+      "samples": 24,
+      "groups": 5,
+      "artifact": {
+        "uri": "edge-ai://workflow-20261023/development-data/development-suite.json",
+        "sha256": "1f8fbadb9d1408da7da5cbd37655a705dc5ffa81990b9ff75ff6eacc3f6beecf",
+        "bytes": 12788
+      },
+      "samples_sha256": "793456ed9b8b4c09d50368beddaffe89e731600d0fe6b8fed3b10862efcf3632"
+    },
+    "final": {
+      "purpose": "final_reserved",
+      "samples": 24,
+      "groups": 5,
+      "artifact": {
+        "uri": "edge-ai://workflow-20261023/heldout/final-suite.json",
+        "sha256": "14dc0cdbd4c02a467cd74d1ada4fde771c346312b281a05401aa8ce839eac2ea",
+        "bytes": 12605
+      },
+      "samples_sha256": "d7ab5ed51532d2ac1e787b9ca7aca375e7163cc4906ce5aded146b5b2e2ef027"
+    },
+    "development12": {
+      "purpose": "development",
+      "parent_split": "development",
+      "format": "benchmark_suite",
+      "samples": 12,
+      "samples_sha256": "48f4a19ac7339af8df4a56a9e7b6ae3bd5e3b6a648116b7fc6cc50b357b651d4",
+      "artifact": {
+        "uri": "repo://studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/subset12-plan/suite.json",
+        "sha256": "78957fcd2cbe0ef446cf28861f331b73932ae3b5c062ecf850d364310bb07e09",
+        "bytes": 8938
+      }
+    },
+    "validation_suite": {
+      "purpose": "validation",
+      "parent_split": "valid",
+      "format": "benchmark_suite",
+      "samples": 18,
+      "samples_sha256": "9697af9f3685b7bd0e136b83336bad0788f87ed56ed0ffee800476d79ed8d089",
+      "artifact": {
+        "uri": "repo://studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/validation-plan/suite.json",
+        "sha256": "d4cbe1f834c4c33b28ae0719ff1fdeb2c4741a084e2b8ff517cf8ae80126ab4c",
+        "bytes": 10285
+      }
+    }
+  },
+  "notes": "Final not model-evaluated; recipe visible and shared agent/filesystem is not a blind boundary.",
+  "backup": {
+    "receipt": "../../backups.json",
+    "policy": "Dataset metadata is not a backup. Verified replicas and restore receipts are recorded separately; no offsite guarantee."
+  }
+}

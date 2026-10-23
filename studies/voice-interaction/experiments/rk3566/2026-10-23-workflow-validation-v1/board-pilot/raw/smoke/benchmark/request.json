@@ -1,0 +1,249 @@
+{
+  "schema": "edge-model-benchmark/request-v1",
+  "run_id": "workflow-board-pilot-preparation",
+  "stage": "new diagnostic workflow subset",
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/home/orangepi/.local/share/edge-ai/workflow-20261023/artifacts/pilot32-q4.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 596049920,
+    "precision": "Q4_K_M",
+    "artifact_format": "GGUF",
+    "backend": "ARM CPU",
+    "context_tokens": 2048,
+    "kv_type": "q8_0 K and V",
+    "lineage": "pilot technical comparison; no final acceptance",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+    "device": "Orange Pi 3B RK3566 / ARM CPU"
+  },
+  "runner": {
+    "kind": "llama-http",
+    "network": "direct",
+    "endpoint": "http://127.0.0.1:18350",
+    "monitor_pid": 204906
+  },
+  "generation": {
+    "context_tokens": 2048,
+    "max_tokens": 128,
+    "temperature": 0,
+    "prefill_step_size": 512,
+    "timeout_seconds": 240,
+    "cache_prompt": true
+  },
+  "registry_validator": [
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/venv/bin/python",
+    "/home/orangepi/.local/share/edge-ai/qwen-ticket12/inputs/registry_validate.py"
+  ],
+  "sampling_interval_seconds": 0.2,
+  "server": {
+    "binary": "/home/orangepi/.local/share/edge-ai/qwen-ticket12/build-e379/bin/llama-server",
+    "port": 18350,
+    "argv": [
+      "-t",
+      "2",
+      "-tb",
+      "2",
+      "-c",
+      "2048",
+      "-np",
+      "1",
+      "-b",
+      "512",
+      "-ub",
+      "128",
+      "-ngl",
+      "0",
+      "--jinja",
+      "-ctk",
+      "q8_0",
+      "-ctv",
+      "q8_0",
+      "--no-repack",
+      "--load-mode",
+      "mmap",
+      "--fit",
+      "off",
+      "-fa",
+      "on"
+    ]
+  },
+  "cold_request_budget_note": "240s accommodates previously observed ~174s cold prefill; whole stage remains 600s",
+  "suite": {
+    "schema": "edge-model-benchmark/suite-v1",
+    "id": "workflow-diagnostic-subset12",
+    "split": "development",
+    "system": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。",
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "start_camera",
+          "description": "恢复采集，不把发布完成当作设备开启确认。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "stop_camera",
+          "description": "先确认 Follow standby，再暂停采集，失败则不继续。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_lidar",
+          "description": "开启 tracker 扫描融合，保留服务端 TF/发布端检查。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "disable_lidar",
+          "description": "关闭融合，服务确认后记录其隐含的 Follow standby。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "enable_tracking",
+          "description": "仅启用 Follow，保留融合尚未开启时服务端拒绝的语义。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "disable_tracking",
+          "description": "仅进入 Follow 待机，保持当前融合订阅。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "following_status",
+          "description": "读取ObjectTrack当前状态；不可用时不猜测或返回旧缓存。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "无模型参数的动作。",
+            "properties": {},
+            "title": "NoArguments",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_set",
+          "description": "模拟源 level 的整数转换与0至100饱和。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "音量执行时量化并按原契约饱和。",
+            "properties": {
+              "level": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "default": 50,
+                "description": "音量，执行时取整并限制在0至100",
+                "title": "Level"
+              }
+            },
+            "title": "LevelInput",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "play_music",
+          "description": "模拟切换当前歌曲，保留等待队列。",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "歌曲与队列接受非空名称。",
+            "properties": {
+              "song_name": {
+                "description": "歌曲名称",
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "\\S",
+                "title": "Song Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "song_name"
+            ],
+            "title": "SongInput",
+            "type": "object"
+          }
+        }
+      }
+    ],
+    "samples": [
+      {
+        "id": "development_000",
+        "source_group": "development_action_frame0",
+        "user": "现场测试单要求恢复摄像头采集，请生成对应调用。",
+        "expected": {
+          "kind": "tool",
+          "calls": [
+            {
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

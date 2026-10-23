@@ -1,0 +1,29 @@
+{
+  "schema": "edge-ai-experiment-report/request-v1",
+  "title": "数据准备到端侧测评：这次工作流走通了什么",
+  "question": "检验可停止的数据准备、冻结测评、真实训练和新制品回归能否组合；不是挑选新的生产模型。",
+  "conditions": "新合成数据；基座/adapter开发集24例；转换对照采用相同12例子集。MLX与llama.cpp属于不同运行组合；F16/Q4同一llama.cpp条件对比。",
+  "decision": "32微步技术训练完成，格式仍有失败、人设未达要求。保留旧主候选，新adapter仅用于链路验证；最终新测试集未开启。",
+  "runs": [
+    {
+      "label": "Mac 原始模型 · 开发诊断",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/base-development/results.json"
+    },
+    {
+      "label": "Mac 32微步 · 开发诊断",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/adapter-development/results.json"
+    },
+    {
+      "label": "Mac 合并权重 · 12例",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/merged12/results.json"
+    },
+    {
+      "label": "Mac F16 · 12例",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/mac-F16/results.json"
+    },
+    {
+      "label": "Mac Q4 · 冒烟后12例",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/mac-Q4-prepared/results.json"
+    }
+  ]
+}

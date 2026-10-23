@@ -1,0 +1,120 @@
+{
+  "id": "development_003",
+  "user": "现场测试单要求关闭雷达融合，请生成对应调用。",
+  "expected": {
+    "kind": "tool",
+    "calls": [
+      {
+        "name": "disable_lidar",
+        "arguments": {}
+      }
+    ]
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+    },
+    {
+      "role": "user",
+      "content": "现场测试单要求关闭雷达融合，请生成对应调用。"
+    }
+  ],
+  "kind": "tool",
+  "status": "completed",
+  "generation": {
+    "raw": "",
+    "finish_reason": "tool_calls",
+    "wire_calls": [
+      {
+        "type": "function",
+        "function": {
+          "name": "disable_lidar",
+          "arguments": "{}"
+        }
+      }
+    ],
+    "wall_seconds": 0.510005958029069,
+    "ttft_seconds": 0.4021652920055203,
+    "prompt_tokens": 891,
+    "evaluated_prefill_tokens": 891,
+    "native_usage": {
+      "completion_tokens": 17,
+      "prompt_tokens": 891,
+      "total_tokens": 908,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "native_timings": {
+      "cache_n": 0,
+      "prompt_n": 891,
+      "prompt_ms": 249.993,
+      "prompt_per_token_ms": 0.2805757575757576,
+      "prompt_per_second": 3564.0997947942537,
+      "predicted_n": 17,
+      "predicted_ms": 250.807,
+      "predicted_per_token_ms": 15.6754375,
+      "predicted_per_second": 63.79407273321718
+    },
+    "cache_prompt": false,
+    "output_tokens": 17,
+    "prefill_seconds": 0.249993,
+    "decode_seconds": 0.250807,
+    "prefill_tokens_per_second": 3564.0997947942537,
+    "decode_tokens_per_second": 63.79407273321718,
+    "mlx_peak_allocated_bytes": null,
+    "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+  },
+  "assessment": {
+    "native_parse": true,
+    "json_valid": true,
+    "response_complete": true,
+    "schema_valid": true,
+    "registry_valid": true,
+    "expected_behavior": true,
+    "persona_valid": null,
+    "reviewer": "deterministic frozen fixture rules",
+    "reply": {
+      "content": "",
+      "tool_calls": [
+        {
+          "call_id": "local_call_0",
+          "name": "disable_lidar",
+          "arguments": {}
+        }
+      ]
+    },
+    "schema_errors": [],
+    "registry_result": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "disable_lidar",
+          "parameters": {},
+          "tool_call_id": "local_call_0"
+        }
+      ]
+    }
+  },
+  "valid_call_seconds": 0.9662997919949703,
+  "resources": {
+    "scope": "declared process and recursive children",
+    "pid": 60243,
+    "sampling_interval_seconds": 0.2,
+    "sample_count": 6,
+    "wall_seconds": 0.9756092089810409,
+    "cpu_seconds": 0.6015846720000004,
+    "host_logical_cpus": 10,
+    "cpu_capacity_percent": 6.166246345996629,
+    "peak_rss_bytes": 1542537216,
+    "peak_pss_bytes": null,
+    "host_mem_total_bytes": 17179869184,
+    "minimum_host_mem_available_bytes": 2445672448,
+    "host_swap_delta_bytes": -8388608,
+    "host_swap_in_delta_bytes": 3014656,
+    "host_swap_out_delta_bytes": 131072,
+    "swap_scope": "system-wide counters; not model-only",
+    "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+  }
+}

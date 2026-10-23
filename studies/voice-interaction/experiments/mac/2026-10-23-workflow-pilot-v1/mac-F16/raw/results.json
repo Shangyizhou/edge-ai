@@ -1,0 +1,1552 @@
+{
+  "schema": "edge-model-benchmark/result-v1",
+  "run_id": "workflow-mac-F16",
+  "source": {
+    "kind": "device_measurement",
+    "raw_evidence": "benchmark/cases/ and benchmark/events/"
+  },
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/workflow-20261023/artifacts/qwen3-selected9-768-v3-f16.gguf",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 596049920,
+    "precision": "F16",
+    "artifact_format": "GGUF",
+    "backend": "Metal",
+    "context_tokens": 2048,
+    "kv_type": "f16 K and V",
+    "lineage": "workflow32 adapter -> merged -> GGUF; not selected production model",
+    "runtime_version": "e3797b184d428c7a019362612b76971f60af6670",
+    "constraint_mode": "llama-server native tool grammar; unconstrained MLX differs",
+    "device": "Mac M5 / Metal",
+    "actual_runtime": {
+      "name": "llama.cpp",
+      "version": "e3797b184d428c7a019362612b76971f60af6670",
+      "backend": "Metal",
+      "network": "direct"
+    }
+  },
+  "stage": "new technical diagnostic subset",
+  "request_sha256": "c616aefa77016abb556d212b4fec98f7d948213d96b6af1ae655c89314918229",
+  "suite_sha256": "df3d9d36ffee14c620796169f6b97d49a8c5828f9eb3bd1541f5f4275950ad5e",
+  "artifacts": {
+    "root": "/Users/syz/.local/share/edge-ai/workflow-20261023/artifacts/qwen3-selected9-768-v3-f16.gguf",
+    "total_bytes": 1198182336,
+    "files": [
+      {
+        "name": "qwen3-selected9-768-v3-f16.gguf",
+        "bytes": 1198182336,
+        "sha256": "3f95547fbd39a7589ea4b6eb02588cad25ea37af63bf4d5da105d0e2bddc2199"
+      }
+    ]
+  },
+  "environment": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10
+  },
+  "loading": {
+    "wall_seconds": 0.022796667006332427,
+    "resources": {
+      "scope": "declared process and recursive children",
+      "pid": 60243,
+      "sampling_interval_seconds": 0.2,
+      "sample_count": 2,
+      "wall_seconds": 0.01568775001214817,
+      "cpu_seconds": 3.6912000000000056e-05,
+      "host_logical_cpus": 10,
+      "cpu_capacity_percent": 0.02352918676764762,
+      "peak_rss_bytes": 1538670592,
+      "peak_pss_bytes": null,
+      "host_mem_total_bytes": 17179869184,
+      "minimum_host_mem_available_bytes": 2456469504,
+      "host_swap_delta_bytes": 0,
+      "host_swap_in_delta_bytes": 0,
+      "host_swap_out_delta_bytes": 0,
+      "swap_scope": "system-wide counters; not model-only",
+      "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+    }
+  },
+  "measurement": {
+    "resources": "per-case sampled process tree",
+    "cache": "new MLX prompt cache per case / llama cache_prompt=false",
+    "timing": "request to complete response; valid-call latency only if native+schema pass",
+    "sampling_interval_seconds": 0.2,
+    "quality_scope": "frozen deterministic fixture rules; no hardware execution or product acceptance"
+  },
+  "cases": [
+    {
+      "id": "development_000",
+      "user": "现场测试单要求恢复摄像头采集，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求恢复摄像头采集，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "start_camera",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.4284209159668535,
+        "ttft_seconds": 0.3410827909829095,
+        "prompt_tokens": 891,
+        "evaluated_prefill_tokens": 891,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 891,
+          "total_tokens": 907,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 891,
+          "prompt_ms": 236.37,
+          "prompt_per_token_ms": 0.2652861952861953,
+          "prompt_per_second": 3769.5138977027545,
+          "predicted_n": 16,
+          "predicted_ms": 186.372,
+          "predicted_per_token_ms": 12.424800000000001,
+          "predicted_per_second": 80.48419290451355
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.23637,
+        "decode_seconds": 0.186372,
+        "prefill_tokens_per_second": 3769.5138977027545,
+        "decode_tokens_per_second": 80.48419290451355,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.9062204580404796,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.9157307089772075,
+        "cpu_seconds": 0.5784722400000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.31705625168019,
+        "peak_rss_bytes": 1548615680,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2458075136,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_001",
+      "user": "现场测试单要求暂停摄像头采集，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "stop_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求暂停摄像头采集，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "stop_camera",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6329995419946499,
+        "ttft_seconds": 0.47351037501357496,
+        "prompt_tokens": 891,
+        "evaluated_prefill_tokens": 891,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 891,
+          "total_tokens": 907,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 891,
+          "prompt_ms": 290.429,
+          "prompt_per_token_ms": 0.32595847362514024,
+          "prompt_per_second": 3067.875453208874,
+          "predicted_n": 16,
+          "predicted_ms": 331.531,
+          "predicted_per_token_ms": 22.102066666666666,
+          "predicted_per_second": 45.24463775634858
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.290429,
+        "decode_seconds": 0.331531,
+        "prefill_tokens_per_second": 3067.875453208874,
+        "decode_tokens_per_second": 45.24463775634858,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "stop_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.8088661669753492,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 8,
+        "wall_seconds": 1.8185869579901919,
+        "cpu_seconds": 0.6589898240000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 3.6236365883118475,
+        "peak_rss_bytes": 1548615680,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2458075136,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 30588928,
+        "host_swap_out_delta_bytes": 81920,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_002",
+      "user": "现场测试单要求开启雷达融合，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求开启雷达融合，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "enable_lidar",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.5523131670197472,
+        "ttft_seconds": 0.37056520802434534,
+        "prompt_tokens": 891,
+        "evaluated_prefill_tokens": 891,
+        "native_usage": {
+          "completion_tokens": 17,
+          "prompt_tokens": 891,
+          "total_tokens": 908,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 891,
+          "prompt_ms": 215.768,
+          "prompt_per_token_ms": 0.2421638608305275,
+          "prompt_per_second": 4129.435319417152,
+          "predicted_n": 17,
+          "predicted_ms": 329.079,
+          "predicted_per_token_ms": 20.5674375,
+          "predicted_per_second": 48.62054400311171
+        },
+        "cache_prompt": false,
+        "output_tokens": 17,
+        "prefill_seconds": 0.215768,
+        "decode_seconds": 0.329079,
+        "prefill_tokens_per_second": 4129.435319417152,
+        "decode_tokens_per_second": 48.62054400311171,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8828612089855596,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8920468339929357,
+        "cpu_seconds": 0.583120192,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.5368786680164135,
+        "peak_rss_bytes": 1542586368,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2494070784,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 4128768,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_003",
+      "user": "现场测试单要求关闭雷达融合，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_lidar",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求关闭雷达融合，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "disable_lidar",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.510005958029069,
+        "ttft_seconds": 0.4021652920055203,
+        "prompt_tokens": 891,
+        "evaluated_prefill_tokens": 891,
+        "native_usage": {
+          "completion_tokens": 17,
+          "prompt_tokens": 891,
+          "total_tokens": 908,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 891,
+          "prompt_ms": 249.993,
+          "prompt_per_token_ms": 0.2805757575757576,
+          "prompt_per_second": 3564.0997947942537,
+          "predicted_n": 17,
+          "predicted_ms": 250.807,
+          "predicted_per_token_ms": 15.6754375,
+          "predicted_per_second": 63.79407273321718
+        },
+        "cache_prompt": false,
+        "output_tokens": 17,
+        "prefill_seconds": 0.249993,
+        "decode_seconds": 0.250807,
+        "prefill_tokens_per_second": 3564.0997947942537,
+        "decode_tokens_per_second": 63.79407273321718,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "disable_lidar",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "disable_lidar",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.9662997919949703,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.9756092089810409,
+        "cpu_seconds": 0.6015846720000004,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.166246345996629,
+        "peak_rss_bytes": 1542537216,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2445672448,
+        "host_swap_delta_bytes": -8388608,
+        "host_swap_in_delta_bytes": 3014656,
+        "host_swap_out_delta_bytes": 131072,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_004",
+      "user": "现场测试单要求启用目标跟随，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求启用目标跟随，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "enable_tracking",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.478540875017643,
+        "ttft_seconds": 0.3723794580437243,
+        "prompt_tokens": 891,
+        "evaluated_prefill_tokens": 891,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 891,
+          "total_tokens": 907,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 891,
+          "prompt_ms": 247.037,
+          "prompt_per_token_ms": 0.2772581369248036,
+          "prompt_per_second": 3606.747167428361,
+          "predicted_n": 16,
+          "predicted_ms": 224.107,
+          "predicted_per_token_ms": 14.940466666666667,
+          "predicted_per_second": 66.93231358235128
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.247037,
+        "decode_seconds": 0.224107,
+        "prefill_tokens_per_second": 3606.747167428361,
+        "decode_tokens_per_second": 66.93231358235128,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "enable_tracking",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "enable_tracking",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.7888081669807434,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.7978691250318661,
+        "cpu_seconds": 0.5456239680000001,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.838514624540816,
+        "peak_rss_bytes": 1530658816,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2445672448,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 6127616,
+        "host_swap_out_delta_bytes": 1163264,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_005",
+      "user": "现场测试单要求停用目标跟随，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "disable_tracking",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求停用目标跟随，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "stop_camera",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.5580842919880524,
+        "ttft_seconds": 0.4420397920184769,
+        "prompt_tokens": 892,
+        "evaluated_prefill_tokens": 892,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 892,
+          "total_tokens": 908,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 892,
+          "prompt_ms": 282.196,
+          "prompt_per_token_ms": 0.3163632286995516,
+          "prompt_per_second": 3160.923613375101,
+          "predicted_n": 16,
+          "predicted_ms": 268.199,
+          "predicted_per_token_ms": 17.879933333333334,
+          "predicted_per_second": 55.928620166369
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.282196,
+        "decode_seconds": 0.268199,
+        "prefill_tokens_per_second": 3160.923613375101,
+        "decode_tokens_per_second": 55.928620166369,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "stop_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "stop_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8481722500291653,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 5,
+        "wall_seconds": 0.8584809999447316,
+        "cpu_seconds": 0.6043474240000002,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 7.039729755683674,
+        "peak_rss_bytes": 1523499008,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2536144896,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 4784128,
+        "host_swap_out_delta_bytes": 16384,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_009",
+      "user": "下一张设备工单写着播放歌曲星光\"现场\"，现在处理。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "play_music",
+            "arguments": {
+              "song_name": "星光\"现场\""
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "下一张设备工单写着播放歌曲星光\"现场\"，现在处理。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "![](https://www.123456789.com/123456789.png)",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 1.0357729170355015,
+        "ttft_seconds": 0.38621279201470315,
+        "prompt_tokens": 894,
+        "evaluated_prefill_tokens": 894,
+        "native_usage": {
+          "completion_tokens": 29,
+          "prompt_tokens": 894,
+          "total_tokens": 923,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 894,
+          "prompt_ms": 378.788,
+          "prompt_per_token_ms": 0.4237002237136465,
+          "prompt_per_second": 2360.1592447490416,
+          "predicted_n": 29,
+          "predicted_ms": 649.115,
+          "predicted_per_token_ms": 23.18267857142857,
+          "predicted_per_second": 43.13565392881077
+        },
+        "cache_prompt": false,
+        "output_tokens": 29,
+        "prefill_seconds": 0.378788,
+        "decode_seconds": 0.649115,
+        "prefill_tokens_per_second": 2360.1592447490416,
+        "decode_tokens_per_second": 43.13565392881077,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "![](https://www.123456789.com/123456789.png)",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 1.0498809160199016,
+        "cpu_seconds": 1.026178528,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.774237366750532,
+        "peak_rss_bytes": 1523777536,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2524348416,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 3588096,
+        "host_swap_out_delta_bytes": 1409024,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_010",
+      "user": "下一张设备工单写着把音量调到百分之四十五，现在处理。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "volume_set",
+            "arguments": {
+              "level": 45
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "下一张设备工单写着把音量调到百分之四十五，现在处理。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "volume_set",
+              "arguments": "{\"level\": 45}"
+            }
+          }
+        ],
+        "wall_seconds": 0.6959439589991234,
+        "ttft_seconds": 0.44210958399344236,
+        "prompt_tokens": 896,
+        "evaluated_prefill_tokens": 896,
+        "native_usage": {
+          "completion_tokens": 26,
+          "prompt_tokens": 896,
+          "total_tokens": 922,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 896,
+          "prompt_ms": 260.973,
+          "prompt_per_token_ms": 0.2912645089285714,
+          "prompt_per_second": 3433.3053610909938,
+          "predicted_n": 26,
+          "predicted_ms": 418.088,
+          "predicted_per_token_ms": 16.72352,
+          "predicted_per_second": 59.79602380360115
+        },
+        "cache_prompt": false,
+        "output_tokens": 26,
+        "prefill_seconds": 0.260973,
+        "decode_seconds": 0.418088,
+        "prefill_tokens_per_second": 3433.3053610909938,
+        "decode_tokens_per_second": 59.79602380360115,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "volume_set",
+              "arguments": {
+                "level": 45
+              }
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "volume_set",
+              "parameters": {
+                "level": 45
+              },
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.0303602499770932,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 1.0421149169560522,
+        "cpu_seconds": 1.0181198719999998,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 9.769746651106958,
+        "peak_rss_bytes": 1524154368,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2522316800,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 2080768,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_011",
+      "user": "下一张设备工单写着先恢复摄像头采集，再查询跟随状态，现在处理。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          },
+          {
+            "name": "following_status",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "下一张设备工单写着先恢复摄像头采集，再查询跟随状态，现在处理。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "",
+        "finish_reason": "tool_calls",
+        "wire_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "start_camera",
+              "arguments": "{}"
+            }
+          }
+        ],
+        "wall_seconds": 0.5674157500034198,
+        "ttft_seconds": 0.44796429201960564,
+        "prompt_tokens": 897,
+        "evaluated_prefill_tokens": 897,
+        "native_usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 897,
+          "total_tokens": 913,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 897,
+          "prompt_ms": 303.085,
+          "prompt_per_token_ms": 0.33788740245261983,
+          "prompt_per_second": 2959.565798373394,
+          "predicted_n": 16,
+          "predicted_ms": 254.063,
+          "predicted_per_token_ms": 16.93753333333333,
+          "predicted_per_second": 59.040474213088885
+        },
+        "cache_prompt": false,
+        "output_tokens": 16,
+        "prefill_seconds": 0.303085,
+        "decode_seconds": 0.254063,
+        "prefill_tokens_per_second": 2959.565798373394,
+        "decode_tokens_per_second": 59.040474213088885,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": false,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 0.8631217089714482,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 0.8735846249619499,
+        "cpu_seconds": 0.7339769280000006,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.401898419766372,
+        "peak_rss_bytes": 1524187136,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2654355456,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 2080768,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_012",
+      "user": "如果叫你来帮忙，应该怎样称呼你？",
+      "expected": {
+        "kind": "persona",
+        "contains_all": [
+          "小沫"
+        ],
+        "rubric": "source-backed facts; automatic markers are diagnostic only"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "如果叫你来帮忙，应该怎样称呼你？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "我叫小智。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.3634927080129273,
+        "ttft_seconds": 0.28924466599710286,
+        "prompt_tokens": 889,
+        "evaluated_prefill_tokens": 889,
+        "native_usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 889,
+          "total_tokens": 895,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 889,
+          "prompt_ms": 281.655,
+          "prompt_per_token_ms": 0.316822272215973,
+          "prompt_per_second": 3156.3437538832973,
+          "predicted_n": 6,
+          "predicted_ms": 74.072,
+          "predicted_per_token_ms": 14.814400000000001,
+          "predicted_per_second": 67.50189005292148
+        },
+        "cache_prompt": false,
+        "output_tokens": 6,
+        "prefill_seconds": 0.281655,
+        "decode_seconds": 0.074072,
+        "prefill_tokens_per_second": 3156.3437538832973,
+        "decode_tokens_per_second": 67.50189005292148,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": false,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "我叫小智。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 3,
+        "wall_seconds": 0.3764696249854751,
+        "cpu_seconds": 0.3341247360000006,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.875211008401854,
+        "peak_rss_bytes": 1526267904,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2725265408,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_018",
+      "user": "别人给你换名字之前，你叫什么？",
+      "expected": {
+        "kind": "persona",
+        "contains_all": [
+          "小沫"
+        ],
+        "rubric": "source-backed facts; automatic markers are diagnostic only"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "别人给你换名字之前，你叫什么？"
+        }
+      ],
+      "kind": "persona",
+      "status": "completed",
+      "generation": {
+        "raw": "我叫小智。",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.46897195803467184,
+        "ttft_seconds": 0.32561412500217557,
+        "prompt_tokens": 888,
+        "evaluated_prefill_tokens": 888,
+        "native_usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 888,
+          "total_tokens": 894,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 888,
+          "prompt_ms": 317.6,
+          "prompt_per_token_ms": 0.35765765765765767,
+          "prompt_per_second": 2795.969773299748,
+          "predicted_n": 6,
+          "predicted_ms": 143.287,
+          "predicted_per_token_ms": 28.657400000000003,
+          "predicted_per_second": 34.89500094216502
+        },
+        "cache_prompt": false,
+        "output_tokens": 6,
+        "prefill_seconds": 0.31760000000000005,
+        "decode_seconds": 0.143287,
+        "prefill_tokens_per_second": 2795.969773299748,
+        "decode_tokens_per_second": 34.89500094216502,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": false,
+        "persona_valid": false,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "我叫小智。",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.49450229201465845,
+        "cpu_seconds": 0.3075669440000004,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.219727369653592,
+        "peak_rss_bytes": 1526267904,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2515615744,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 2637824,
+        "host_swap_out_delta_bytes": 294912,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    },
+    {
+      "id": "development_022",
+      "user": "我有点紧张，想听一句安慰。",
+      "expected": {
+        "kind": "chat"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "我有点紧张，想听一句安慰。"
+        }
+      ],
+      "kind": "chat",
+      "status": "completed",
+      "generation": {
+        "raw": "祝你顺利！",
+        "finish_reason": "stop",
+        "wire_calls": null,
+        "wall_seconds": 0.49543491599615663,
+        "ttft_seconds": 0.39363795798271894,
+        "prompt_tokens": 887,
+        "evaluated_prefill_tokens": 887,
+        "native_usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 887,
+          "total_tokens": 892,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "native_timings": {
+          "cache_n": 0,
+          "prompt_n": 887,
+          "prompt_ms": 379.188,
+          "prompt_per_token_ms": 0.42749492671927847,
+          "prompt_per_second": 2339.20904669979,
+          "predicted_n": 5,
+          "predicted_ms": 105.82,
+          "predicted_per_token_ms": 26.455,
+          "predicted_per_second": 37.8000378000378
+        },
+        "cache_prompt": false,
+        "output_tokens": 5,
+        "prefill_seconds": 0.37918799999999997,
+        "decode_seconds": 0.10582,
+        "prefill_tokens_per_second": 2339.20904669979,
+        "decode_tokens_per_second": 37.8000378000378,
+        "mlx_peak_allocated_bytes": null,
+        "timing_source": "llama-server timings use evaluated prefill; full prompt uses native usage; raw counters retained"
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": null,
+        "response_complete": true,
+        "schema_valid": null,
+        "registry_valid": null,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "祝你顺利！",
+          "tool_calls": []
+        }
+      },
+      "valid_call_seconds": null,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 60243,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 4,
+        "wall_seconds": 0.5064800410182215,
+        "cpu_seconds": 0.4442674879999995,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 8.771668220268845,
+        "peak_rss_bytes": 1525825536,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2515795968,
+        "host_swap_delta_bytes": 0,
+        "host_swap_in_delta_bytes": 0,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  ],
+  "summary": {
+    "samples": 12,
+    "tool_samples": 9,
+    "native_calls": 8,
+    "json_valid": 8,
+    "schema_valid": 8,
+    "registry_valid": 8,
+    "tool_expected_behavior": 6,
+    "persona_samples": 2,
+    "persona_valid": 0,
+    "chat_samples": 1,
+    "chat_valid": 1
+  },
+  "status": "completed",
+  "evidence": [
+    {
+      "path": "benchmark/assets-manifest.json",
+      "sha256": "03b1672a604b8bb390b47b3b635ac4388b7d6dee0c544d636a9ab02d8f9c2643"
+    },
+    {
+      "path": "benchmark/cases/development_000.json",
+      "sha256": "08f36b74fd84cc57c89b2d6c00d6d250ae1bb469d2f2a10b82934830704badae"
+    },
+    {
+      "path": "benchmark/cases/development_001.json",
+      "sha256": "54be926658f0b6d5b07ce14b287aac7350ae06760f64c1c1f871f282754cf778"
+    },
+    {
+      "path": "benchmark/cases/development_002.json",
+      "sha256": "3c6a28b68181e9d635a97fc0cfe389d47ab8d8b68380441f22860cce46fe935f"
+    },
+    {
+      "path": "benchmark/cases/development_003.json",
+      "sha256": "a8ea01dcf36edf66575011155f0922f2df315abc20a2c60c2e0166e9fbab0bb2"
+    },
+    {
+      "path": "benchmark/cases/development_004.json",
+      "sha256": "feb37e5638658c0afcfc9eeea834ff0b845e015d0d3617d41e610fb45ae53c20"
+    },
+    {
+      "path": "benchmark/cases/development_005.json",
+      "sha256": "2decf0ca8f0aa1599a53293a6c1d9d161c1fbcce87c88c65e1b074e8272a3a4d"
+    },
+    {
+      "path": "benchmark/cases/development_009.json",
+      "sha256": "bc83586b9e4dfbe97bac6809cddefdb85437a0074b249528b29c899b18a0735d"
+    },
+    {
+      "path": "benchmark/cases/development_010.json",
+      "sha256": "d80eb8bafebcf1c947cf6a677eda4e74235ab5b913887a53ce7576a0fa04f023"
+    },
+    {
+      "path": "benchmark/cases/development_011.json",
+      "sha256": "c8b95f353b366bcfa9357ee9fd1d749c3fde9103a5da60f3e10842e4f9d48be6"
+    },
+    {
+      "path": "benchmark/cases/development_012.json",
+      "sha256": "3cf21225c97945773967662bade50b0147a36f005296a06179305ef68acf827d"
+    },
+    {
+      "path": "benchmark/cases/development_018.json",
+      "sha256": "43ccb5895928eac06c521263dafad6041430598cb23117daf4f4b68a317b66fe"
+    },
+    {
+      "path": "benchmark/cases/development_022.json",
+      "sha256": "e47500fb092afa17f671b83dc153ffecf72e672418595a9e51191402a34aa75c"
+    },
+    {
+      "path": "benchmark/events/development_000.json",
+      "sha256": "4f3442bc6a7715d187ac3eb7e3536b324a7fc6debc2c50bde19e26d4088fc225"
+    },
+    {
+      "path": "benchmark/events/development_001.json",
+      "sha256": "5427e5f70a038c874b04d2b88371a3fc2db767363a090dcf30f3d238169671fc"
+    },
+    {
+      "path": "benchmark/events/development_002.json",
+      "sha256": "43ae709a5635b649c288233fc4073d085dd3ef82d13ff1124db7f1a884e83138"
+    },
+    {
+      "path": "benchmark/events/development_003.json",
+      "sha256": "90f13367a883fff9b01bf98e970181c3f906cb7fa25cc42dece3492cd728fe36"
+    },
+    {
+      "path": "benchmark/events/development_004.json",
+      "sha256": "32110077090c1e9ad3c6cb4962e6d33101f455be1e94b8fefc8a672aea3bc673"
+    },
+    {
+      "path": "benchmark/events/development_005.json",
+      "sha256": "35128654ea6dd225c8459c803b3cf3b4b83391cf8991c4d497e8fbc7f68d0eac"
+    },
+    {
+      "path": "benchmark/events/development_009.json",
+      "sha256": "242d92ab4ac6305aed4b3c6341c0511febc0da070cfd2cd647cad63a531c55d4"
+    },
+    {
+      "path": "benchmark/events/development_010.json",
+      "sha256": "0d7d226827175b1376a05a842c3f0f70c8d6e46faee7920911bfaf2cc9b4fc02"
+    },
+    {
+      "path": "benchmark/events/development_011.json",
+      "sha256": "95342bab47b6df9b88cc3de64ce70bb8a3411428e9d20a631f0bde352a1aa8ec"
+    },
+    {
+      "path": "benchmark/events/development_012.json",
+      "sha256": "b0685fb859aa0c96908d316bea9827d99bd47b0a180a81adeb56c3cc45ff6292"
+    },
+    {
+      "path": "benchmark/events/development_018.json",
+      "sha256": "b9260ccf72cf1d1d4ff0a4059b24f43cfa4644d49932564a27ddbd2e869439d6"
+    },
+    {
+      "path": "benchmark/events/development_022.json",
+      "sha256": "dd61cad405927c2fa40b6044ac991211531c663b404380e68a31f45bef115491"
+    },
+    {
+      "path": "benchmark/request.json",
+      "sha256": "c616aefa77016abb556d212b4fec98f7d948213d96b6af1ae655c89314918229"
+    },
+    {
+      "path": "benchmark/suite.json",
+      "sha256": "df3d9d36ffee14c620796169f6b97d49a8c5828f9eb3bd1541f5f4275950ad5e"
+    }
+  ],
+  "benchmark_result": {
+    "path": "benchmark/results.json",
+    "sha256": "428c99de7f8f30a839ef6ae98c371fd44634a998c9ec3de01bf9069a9c0212d3"
+  }
+}

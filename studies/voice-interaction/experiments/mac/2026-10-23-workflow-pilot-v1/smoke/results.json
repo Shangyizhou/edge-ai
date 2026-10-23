@@ -1,0 +1,246 @@
+{
+  "schema": "edge-model-benchmark/result-v1",
+  "run_id": "workflow-smoke",
+  "source": {
+    "kind": "device_measurement",
+    "raw_evidence": "cases/ and events/ within this run"
+  },
+  "candidate": {
+    "model": "Qwen/Qwen3-0.6B",
+    "model_path": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "parameter_count": 596049920,
+    "parameter_count_stored": 751632384,
+    "precision": "BF16",
+    "artifact_format": "HF safetensors",
+    "backend": "Metal",
+    "context_tokens": 8192,
+    "kv_type": "runtime default unquantized",
+    "lineage": "official untrained base",
+    "actual_runtime": {
+      "name": "mlx-lm",
+      "version": "0.32.2",
+      "mlx_version": "0.32.4",
+      "backend": "Metal"
+    }
+  },
+  "stage": "未微调基线 / short",
+  "request_sha256": "270da1ec039f5df5b3cf62bd3bf7c9ea412e7e1123c536bea8da7df19f3a578a",
+  "suite_sha256": "b474460e8fcccb845d3dae4a172c988ef4f275291281ca806a2bcc1f1d2cefa8",
+  "artifacts": {
+    "root": "/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca",
+    "total_bytes": 1519207673,
+    "files": [
+      {
+        "name": "LICENSE",
+        "bytes": 11343,
+        "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+      },
+      {
+        "name": "README.md",
+        "bytes": 13965,
+        "sha256": "1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9"
+      },
+      {
+        "name": "config.json",
+        "bytes": 726,
+        "sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd"
+      },
+      {
+        "name": "generation_config.json",
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      {
+        "name": "merges.txt",
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      {
+        "name": "model.safetensors",
+        "bytes": 1503300328,
+        "sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+      },
+      {
+        "name": "tokenizer.json",
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      {
+        "name": "tokenizer_config.json",
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      {
+        "name": "vocab.json",
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    ]
+  },
+  "environment": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10
+  },
+  "loading": {
+    "wall_seconds": 2.9834054579841904,
+    "resources": {
+      "scope": "declared process and recursive children",
+      "pid": 56129,
+      "sampling_interval_seconds": 0.2,
+      "sample_count": 15,
+      "wall_seconds": 2.95580220798729,
+      "cpu_seconds": 2.093365488,
+      "host_logical_cpus": 10,
+      "cpu_capacity_percent": 7.0822245221389375,
+      "peak_rss_bytes": 871284736,
+      "peak_pss_bytes": null,
+      "host_mem_total_bytes": 17179869184,
+      "minimum_host_mem_available_bytes": 2438971392,
+      "host_swap_delta_bytes": 621871104,
+      "host_swap_in_delta_bytes": 89210880,
+      "host_swap_out_delta_bytes": 278528,
+      "swap_scope": "system-wide counters; not model-only",
+      "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+    }
+  },
+  "measurement": {
+    "resources": "per-case sampled process tree",
+    "cache": "new MLX prompt cache per case / llama cache_prompt=false",
+    "timing": "request to complete response; valid-call latency only if native+schema pass",
+    "sampling_interval_seconds": 0.2,
+    "quality_scope": "frozen deterministic fixture rules; no hardware execution or product acceptance"
+  },
+  "cases": [
+    {
+      "id": "development_000",
+      "user": "现场测试单要求恢复摄像头采集，请生成对应调用。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "start_camera",
+            "arguments": {}
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是机器人助手。设备操作使用提供的工具；角色与普通聊天用文字回答。"
+        },
+        {
+          "role": "user",
+          "content": "现场测试单要求恢复摄像头采集，请生成对应调用。"
+        }
+      ],
+      "kind": "tool",
+      "status": "completed",
+      "generation": {
+        "raw": "<tool_call>\n{\"name\": \"start_camera\", \"arguments\": {}}\n</tool_call>",
+        "finish_reason": "stop",
+        "ttft_seconds": 0.4093361250124872,
+        "wall_seconds": 0.6076692499918863,
+        "prompt_tokens": 891,
+        "output_tokens": 16,
+        "prefill_tokens_per_second": 2596.998513889402,
+        "decode_tokens_per_second": 84.45451852370917,
+        "prefill_seconds": 0.3430883749970235,
+        "decode_seconds": 0.1894510830170475,
+        "mlx_peak_allocated_bytes": 1674596032,
+        "timing_source": "MLX GenerationResponse; prompt time includes first model token; generation count includes EOS",
+        "wire_calls": null
+      },
+      "assessment": {
+        "native_parse": true,
+        "json_valid": true,
+        "response_complete": true,
+        "schema_valid": true,
+        "registry_valid": true,
+        "expected_behavior": true,
+        "persona_valid": null,
+        "reviewer": "deterministic frozen fixture rules",
+        "reply": {
+          "content": "",
+          "tool_calls": [
+            {
+              "call_id": "local_call_0",
+              "name": "start_camera",
+              "arguments": {}
+            }
+          ]
+        },
+        "schema_errors": [],
+        "registry_result": {
+          "passed": true,
+          "commands": [
+            {
+              "name": "start_camera",
+              "parameters": {},
+              "tool_call_id": "local_call_0"
+            }
+          ]
+        }
+      },
+      "valid_call_seconds": 1.0215386670315638,
+      "resources": {
+        "scope": "declared process and recursive children",
+        "pid": 56129,
+        "sampling_interval_seconds": 0.2,
+        "sample_count": 6,
+        "wall_seconds": 1.032428374979645,
+        "cpu_seconds": 0.6263477160000002,
+        "host_logical_cpus": 10,
+        "cpu_capacity_percent": 6.066742557442293,
+        "peak_rss_bytes": 589365248,
+        "peak_pss_bytes": null,
+        "host_mem_total_bytes": 17179869184,
+        "minimum_host_mem_available_bytes": 2549268480,
+        "host_swap_delta_bytes": 139853824,
+        "host_swap_in_delta_bytes": 2883584,
+        "host_swap_out_delta_bytes": 0,
+        "swap_scope": "system-wide counters; not model-only",
+        "limitation": "sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap"
+      }
+    }
+  ],
+  "summary": {
+    "samples": 1,
+    "tool_samples": 1,
+    "native_calls": 1,
+    "json_valid": 1,
+    "schema_valid": 1,
+    "registry_valid": 1,
+    "tool_expected_behavior": 1,
+    "persona_samples": 0,
+    "persona_valid": 0,
+    "chat_samples": 0,
+    "chat_valid": 0
+  },
+  "status": "completed",
+  "evidence": [
+    {
+      "path": "assets-manifest.json",
+      "sha256": "d2d3dfd774b3d4291212f5135168fa5ed8f512755d9b77e45ddf92227ebdeff5"
+    },
+    {
+      "path": "cases/development_000.json",
+      "sha256": "fbc931bfc2090d5915e136ac907b9b14e981ad7fbda2f835a60e208b9e170105"
+    },
+    {
+      "path": "events/development_000.json",
+      "sha256": "de3afa11b7017ec8815fae35f33f9245fecc2716c0c97d204d86a6fc124be41e"
+    },
+    {
+      "path": "request.json",
+      "sha256": "270da1ec039f5df5b3cf62bd3bf7c9ea412e7e1123c536bea8da7df19f3a578a"
+    },
+    {
+      "path": "suite.json",
+      "sha256": "b474460e8fcccb845d3dae4a172c988ef4f275291281ca806a2bcc1f1d2cefa8"
+    }
+  ]
+}

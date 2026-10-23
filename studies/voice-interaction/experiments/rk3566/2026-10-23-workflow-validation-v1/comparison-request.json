@@ -1,0 +1,21 @@
+{
+  "schema": "edge-ai-experiment-report/request-v1",
+  "title": "香橙派：两类任务使用同一测评交接",
+  "question": "验证Qwen工具调用和ASR转写可以共享实验骨架，各用自己的评分与计时。",
+  "conditions": "Qwen基座/32微步Q4均为同一12例子集、CPU、2048上下文、q8 KV、前缀缓存；每候选先独立冒烟。ASR两种精度各3份已知录音，100ms实时送入；首次失败的额外3次推理另存，不混作成功轮次。",
+  "decision": "执行交接已完成；工具和角色仍有失败，试跑adapter不晋升主候选。ASR仅为已知小子集回归，CER相同不代表总体质量相同。",
+  "runs": [
+    {
+      "label": "香橙派 原始Q4",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-23-workflow-validation-v1/board-base/results.json"
+    },
+    {
+      "label": "香橙派 32微步Q4",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-23-workflow-validation-v1/board-pilot/results.json"
+    },
+    {
+      "label": "香橙派 ASR两种精度 · 各3例",
+      "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/rk3566/2026-10-23-workflow-validation-v1/asr-experiment-v2/results.json"
+    }
+  ]
+}

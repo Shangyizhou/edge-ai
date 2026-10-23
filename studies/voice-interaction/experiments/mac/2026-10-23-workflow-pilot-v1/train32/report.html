@@ -1,0 +1,296 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qwen 微调、合并与转换 · 阶段实测</title>
+<style>
+:root{--ink:#18313b;--muted:#536873;--line:#dce5e7;--teal:#08776b;--paper:#fff;--bg:#f2f5f5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}main{max-width:1150px;margin:0 auto;padding:42px 30px 80px}body{padding-right:230px}.rail{position:fixed;right:0;top:0;height:100vh;width:230px;border-left:1px solid var(--line);padding:42px 22px;background:#fbfcfc;overflow-y:auto}.rail strong{display:block;margin-bottom:18px}.rail a{display:block;color:var(--muted);text-decoration:none;padding:11px 12px;border-radius:8px;margin:4px 0;font-size:14px}.rail a.active{background:#e2f1ed;color:#066457;font-weight:700}.rail small{display:block;margin-top:24px;color:var(--muted)}header{padding:0 0 18px}h1{font-size:clamp(29px,3.6vw,42px);line-height:1.3;margin:14px 0;letter-spacing:-.7px}h2{font-size:27px;line-height:1.4;margin:8px 0 16px}h3{font-size:20px;margin:24px 0 12px}h4{font-size:17px;margin:8px 0}p{margin:10px 0}.eyebrow,.badge{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--teal)}.badge{display:inline-block;padding:3px 10px;border:1px solid #bedbd3;border-radius:15px;letter-spacing:0}.muted,small{color:var(--muted)}section{background:var(--paper);padding:30px;border:1px solid var(--line);border-radius:16px;margin:20px 0;scroll-margin-top:24px}.deployment-table td:first-child{min-width:285px;white-space:pre-line;font-size:13px;line-height:1.85}.lead{font-size:22px;font-weight:650;line-height:1.6}.scroll{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#edf4f3;white-space:nowrap}td{min-width:92px}tr:last-child td{border:0}.sample{padding:20px;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:#fcfdfd}.sample-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.number{font-weight:700;color:var(--teal)}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.output{padding:14px;background:#edf4f3;border-radius:8px;white-space:pre-wrap;font-size:17px;margin:8px 0}.fail{background:#fff1e6;border-left:3px solid #b6671f}.reference{padding:10px 0;font-size:14px;color:var(--muted)}audio{width:100%;max-width:540px;display:block;margin:12px 0}.finding{border-left:4px solid var(--teal);background:#e9f4ef;border-radius:0 10px 10px 0;padding:18px 22px;margin:24px 0}.finding strong{font-size:18px}.finding p{margin:7px 0}.method{font-size:14px;color:var(--muted);background:#f5f7f8;padding:14px 18px;border-radius:10px}.stats{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin:12px 0}.stats span{padding:4px 9px;background:#f1f4f6;border-radius:6px}a{color:var(--teal);text-underline-offset:3px}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;color:var(--teal)}pre{font-size:12px;background:#f4f6f7;padding:15px;white-space:pre-wrap;max-height:400px;overflow:auto}p,td,pre,.output{overflow-wrap:anywhere}.foot{font-size:13px;color:var(--muted)}.warning{color:#97541d;font-weight:600}.meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meter{padding:14px;border:1px solid var(--line);border-radius:10px}.track{height:9px;background:#e5ebed;border-radius:10px;overflow:hidden;margin:10px 0}.track b{display:block;height:100%;background:var(--teal);border-radius:10px}.meter small{font-size:12px}@media(max-width:1100px){body{padding-right:190px}.rail{width:190px;padding:30px 14px}main{padding:30px 20px}section{padding:24px}}@media(max-width:760px){body{padding-right:0}.rail{position:sticky;top:0;width:100%;height:auto;padding:8px 12px;border:0;border-bottom:1px solid var(--line);z-index:10;display:flex;gap:4px;overflow-x:auto}.rail a{display:inline-block;white-space:nowrap;padding:8px 12px;margin:0}.rail strong,.rail small{display:none}main{padding:20px 12px}section{padding:20px 15px;scroll-margin-top:76px}.pair,.meters{grid-template-columns:1fr}h2{font-size:24px}.sample{padding:16px}.lead{font-size:20px}}@media print{body{padding:0}.rail{display:none}section{break-inside:avoid}audio{display:none}}
+</style><nav class="rail"><strong>阶段导航</strong>
+<a href="#summary">结论与边界</a>
+<a href="#stage-0">workflow-pilot32</a>
+<a href="#evidence">原始证据</a></nav><main><header><span class="badge">实际训练 / 制品变换成本</span><h1>从 LoRA 到可加载的部署制品</h1></header><section id="summary"><h2>完成链路不等于能力验收</h2><p>下面分别记录训练、合并、格式转换、量化的实际成本；原生调用与角色效果应阅读配套推理报告。少量训练步不证明完整业务或人设已学入。</p></section>
+<section id="stage-0"><div class="eyebrow">edge-model-finetune/result-v1</div><h2>workflow-pilot32</h2><div class="method">训练tokens/s是监督token速率，不是生成tokens/s；CPU按整机逻辑核容量，内存是采样峰值，MLX分配与RSS可能重叠。每步输入与输出身份及原始日志保留，失败不会因渲染变为成功。</div>
+<p>Qwen/Qwen3-0.6B · 参数 596049920 · 基座精度 BF16 · MLX-LM 0.32.2 / Metal（训练），LoRA rank 8</p>
+<div class="stats"><span>状态 completed</span><span>微步 32</span><span>优化器更新 4</span><span>训练墙钟 47.46 s</span><span>CPU容量 2.49%</span><span>峰值RSS 719.08 MiB</span><span>MLX峰值 2607.29 MiB（不相加）</span></div>
+<div class="scroll"><table><tr><th>事件</th><th>上游微步</th><th>loss</th><th>监督tokens/s</th><th>距开始秒</th></tr>
+<tr><td>validation</td><td>0</td><td>2.5723</td><td>未测</td><td>9.03</td></tr>
+<tr><td>train</td><td>8</td><td>4.0146</td><td>17.84</td><td>15.54</td></tr>
+<tr><td>validation</td><td>16</td><td>1.4330</td><td>未测</td><td>28.38</td></tr>
+<tr><td>train</td><td>16</td><td>2.4619</td><td>21.47</td><td>29.20</td></tr>
+<tr><td>train</td><td>24</td><td>1.2577</td><td>21.51</td><td>35.81</td></tr>
+<tr><td>validation</td><td>32</td><td>0.6845</td><td>未测</td><td>48.50</td></tr>
+<tr><td>train</td><td>32</td><td>0.3213</td><td>26.23</td><td>49.27</td></tr>
+</table></div>
+<aside class="finding"><strong>本阶段发现</strong><p>记录状态：completed。转换正常退出只证明制品生成，加载、原生推理和独立能力验收继续分开。</p></aside></section>
+<section id="evidence"><h2>原始配置、指标与制品谱系</h2><a download="stage-results.json" href="data:application/json;base64,WwogIHsKICAgICJzY2hlbWEiOiAiZWRnZS1tb2RlbC1maW5ldHVuZS9yZXN1bHQtdjEiLAogICAgInJ1bl9pZCI6ICJ3b3JrZmxvdy1waWxvdDMyIiwKICAgICJzdGF0dXMiOiAiY29tcGxldGVkIiwKICAgICJzb3VyY2UiOiB7CiAgICAgICJraW5kIjogImRldmljZV9tZWFzdXJlbWVudCIKICAgIH0sCiAgICAiYmFzZV9hcnRpZmFjdCI6IHsKICAgICAgIm1vZGVsIjogIlF3ZW4vUXdlbjMtMC42QiIsCiAgICAgICJtb2RlbF9wYXRoIjogIi9Vc2Vycy9zeXovLmxvY2FsL3NoYXJlL2VkZ2UtYWkvcXdlbi1saWZlY3ljbGUvaGYtY2FjaGUvbW9kZWxzLS1Rd2VuLS1Rd2VuMy0wLjZCL3NuYXBzaG90cy9jMTg5OWRlMjg5YTA0ZDEyMTAwZGIzNzBkODE0ODVjZGY3NWU0N2NhIiwKICAgICAgInJldmlzaW9uIjogImMxODk5ZGUyODlhMDRkMTIxMDBkYjM3MGQ4MTQ4NWNkZjc1ZTQ3Y2EiLAogICAgICAicGFyYW1ldGVyX2NvdW50IjogNTk2MDQ5OTIwLAogICAgICAicGFyYW1ldGVyX2NvdW50X3N0b3JlZCI6IDc1MTYzMjM4NCwKICAgICAgInByZWNpc2lvbiI6ICJCRjE2IiwKICAgICAgImFydGlmYWN0X2Zvcm1hdCI6ICJIRiBzYWZldGVuc29ycyIsCiAgICAgICJiYWNrZW5kIjogIk1ldGFsIiwKICAgICAgImNvbnRleHRfdG9rZW5zIjogODE5MiwKICAgICAgImt2X3R5cGUiOiAicnVudGltZSBkZWZhdWx0IHVucXVhbnRpemVkIiwKICAgICAgImxpbmVhZ2UiOiAib2ZmaWNpYWwgdW50cmFpbmVkIGJhc2UiCiAgICB9LAogICAgInJlcXVlc3Rfc2hhMjU2IjogIjFhOGUyMTFjMzY0ZWI0ZDljOWE2ZDgxOGU1Nzc3MmJhNGM4NWZlMDgyMjM5MDNjNjZjZWYwOTVkOTRkOGQ2YzMiLAogICAgImRhdGFzZXQiOiB7CiAgICAgICJ0cmFpbl9zYW1wbGVzIjogNjAsCiAgICAgICJ2YWxpZF9zYW1wbGVzIjogMTgsCiAgICAgICJ0ZXN0X2xvYWRlZCI6IGZhbHNlLAogICAgICAidHJhaW5fc2hhMjU2IjogIjAwYmVlNTI3MmViYzZjOGFlZWU1YzVhNGVjMTM4MzgxZmU5ZTMwZmFkMjQ0NjA0ZGM3YmY2N2NiMjdkMThjMDMiLAogICAgICAidmFsaWRfc2hhMjU2IjogIjIyNzQyOTE2Nzk0YWFlZjc2YzllYTAxYmY4NWM3NjkzMDViMDc0ZmE4ZThkNzc0OWJjNDM1MDlkYzZlMDFjOTciCiAgICB9LAogICAgInJ1bnRpbWUiOiB7CiAgICAgICJtbHgiOiAiMC4zMi40IiwKICAgICAgIm1seC1sbSI6ICIwLjMyLjIiLAogICAgICAidHJhbnNmb3JtZXJzIjogIjUuMjAuMiIKICAgIH0sCiAgICAiY29uZmlnIjogewogICAgICAibW9kZWwiOiAiL1VzZXJzL3N5ei8ubG9jYWwvc2hhcmUvZWRnZS1haS9xd2VuLWxpZmVjeWNsZS9oZi1jYWNoZS9tb2RlbHMtLVF3ZW4tLVF3ZW4zLTAuNkIvc25hcHNob3RzL2MxODk5ZGUyODlhMDRkMTIxMDBkYjM3MGQ4MTQ4NWNkZjc1ZTQ3Y2EiLAogICAgICAidHJhaW4iOiB0cnVlLAogICAgICAiZmluZV90dW5lX3R5cGUiOiAibG9yYSIsCiAgICAgICJvcHRpbWl6ZXIiOiAiYWRhbSIsCiAgICAgICJvcHRpbWl6ZXJfY29uZmlnIjogewogICAgICAgICJhZGFtIjoge30sCiAgICAgICAgImFkYW13Ijoge30sCiAgICAgICAgIm11b24iOiB7fSwKICAgICAgICAic2dkIjoge30sCiAgICAgICAgImFkYWZhY3RvciI6IHt9CiAgICAgIH0sCiAgICAgICJkYXRhIjogIm1seC1jb21tdW5pdHkvV2lraVNRTCIsCiAgICAgICJzZWVkIjogNDIsCiAgICAgICJudW1fbGF5ZXJzIjogOCwKICAgICAgImJhdGNoX3NpemUiOiAxLAogICAgICAiaXRlcnMiOiAzMiwKICAgICAgInZhbF9iYXRjaGVzIjogMTgsCiAgICAgICJsZWFybmluZ19yYXRlIjogMC4wMDAxLAogICAgICAic3RlcHNfcGVyX3JlcG9ydCI6IDgsCiAgICAgICJzdGVwc19wZXJfZXZhbCI6IDE2LAogICAgICAicmVzdW1lX2FkYXB0ZXJfZmlsZSI6IG51bGwsCiAgICAgICJhZGFwdGVyX3BhdGgiOiAiL1VzZXJzL3N5ei8ubG9jYWwvc2hhcmUvZWRnZS1haS93b3JrZmxvdy0yMDI2MTAyMy90cmFpbjMyL2FkYXB0ZXIiLAogICAgICAic2F2ZV9ldmVyeSI6IDMyLAogICAgICAidGVzdCI6IGZhbHNlLAogICAgICAidGVzdF9iYXRjaGVzIjogNTAwLAogICAgICAibWF4X3NlcV9sZW5ndGgiOiAyMDQ4LAogICAgICAiY29uZmlnIjogbnVsbCwKICAgICAgImdyYWRfY2hlY2twb2ludCI6IHRydWUsCiAgICAgICJncmFkX2FjY3VtdWxhdGlvbl9zdGVwcyI6IDgsCiAgICAgICJjbGVhcl9jYWNoZV90aHJlc2hvbGQiOiAwLAogICAgICAibHJfc2NoZWR1bGUiOiBudWxsLAogICAgICAibG9yYV9wYXJhbWV0ZXJzIjogewogICAgICAgICJyYW5rIjogOCwKICAgICAgICAic2NhbGUiOiAxNi4wLAogICAgICAgICJkcm9wb3V0IjogMC4wLAogICAgICAgICJrZXlzIjogWwogICAgICAgICAgInNlbGZfYXR0bi5xX3Byb2oiLAogICAgICAgICAgInNlbGZfYXR0bi52X3Byb2oiCiAgICAgICAgXQogICAgICB9LAogICAgICAibWFza19wcm9tcHQiOiB0cnVlLAogICAgICAicmVwb3J0X3RvIjogbnVsbCwKICAgICAgInByb2plY3RfbmFtZSI6IG51bGwsCiAgICAgICJ0cnVzdF9yZW1vdGVfY29kZSI6IGZhbHNlCiAgICB9LAogICAgIm1ldHJpY3MiOiBbCiAgICAgIHsKICAgICAgICAia2luZCI6ICJ2YWxpZGF0aW9uIiwKICAgICAgICAiZWxhcHNlZF9zZWNvbmRzIjogOS4wMzE3Mzg1NDIwMjAzMjEsCiAgICAgICAgInVwc3RyZWFtIjogewogICAgICAgICAgIml0ZXJhdGlvbiI6IDAsCiAgICAgICAgICAidmFsX2xvc3MiOiAyLjU3MjI5MTM3NDIwNjU0MywKICAgICAgICAgICJ2YWxfdGltZSI6IDcuMDUwNjIxNDU4MDM4MjIyCiAgICAgICAgfSwKICAgICAgICAibWljcm9zdGVwIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgImtpbmQiOiAidHJhaW4iLAogICAgICAgICJlbGFwc2VkX3NlY29uZHMiOiAxNS41NDEwNzA0NTkwMDMwOTUsCiAgICAgICAgInVwc3RyZWFtIjogewogICAgICAgICAgIml0ZXJhdGlvbiI6IDgsCiAgICAgICAgICAidHJhaW5fbG9zcyI6IDQuMDE0NjE2OTY2MjQ3NTU5LAogICAgICAgICAgImxlYXJuaW5nX3JhdGUiOiA5Ljk5OTk5OTc0NzM3ODc1MmUtMDUsCiAgICAgICAgICAiaXRlcmF0aW9uc19wZXJfc2Vjb25kIjogMS4yMzAyNDU2NTA4OTA4NDI2LAogICAgICAgICAgInRva2Vuc19wZXJfc2Vjb25kIjogMTcuODM4NTYxOTM3OTE3MjE2LAogICAgICAgICAgInRyYWluZWRfdG9rZW5zIjogMTE2LAogICAgICAgICAgInBlYWtfbWVtb3J5IjogMi43MzEzMjMzNjYKICAgICAgICB9LAogICAgICAgICJtaWNyb3N0ZXAiOiA4CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAia2luZCI6ICJ2YWxpZGF0aW9uIiwKICAgICAgICAiZWxhcHNlZF9zZWNvbmRzIjogMjguMzgyNTM4NDU4OTcyNzA0LAogICAgICAgICJ1cHN0cmVhbSI6IHsKICAgICAgICAgICJpdGVyYXRpb24iOiAxNSwKICAgICAgICAgICJ2YWxfbG9zcyI6IDEuNDMzMDMxMzIwNTcxODk5NCwKICAgICAgICAgICJ2YWxfdGltZSI6IDcuMDgwODIzMDg0MDQ4NDYxCiAgICAgICAgfSwKICAgICAgICAibWljcm9zdGVwIjogMTYKICAgICAgfSwKICAgICAgewogICAgICAgICJraW5kIjogInRyYWluIiwKICAgICAgICAiZWxhcHNlZF9zZWNvbmRzIjogMjkuMjAyMTgxOTk5OTc5MDc1LAogICAgICAgICJ1cHN0cmVhbSI6IHsKICAgICAgICAgICJpdGVyYXRpb24iOiAxNiwKICAgICAgICAgICJ0cmFpbl9sb3NzIjogMi40NjE4NjMyNzkzNDI2NTE0LAogICAgICAgICAgImxlYXJuaW5nX3JhdGUiOiA5Ljk5OTk5OTc0NzM3ODc1MmUtMDUsCiAgICAgICAgICAiaXRlcmF0aW9uc19wZXJfc2Vjb25kIjogMS4yMTgxMTQ4NzU0Njk3NDM1LAogICAgICAgICAgInRva2Vuc19wZXJfc2Vjb25kIjogMjEuNDY5Mjc0NjgwMTU0MjMyLAogICAgICAgICAgInRyYWluZWRfdG9rZW5zIjogMjU3LAogICAgICAgICAgInBlYWtfbWVtb3J5IjogMi43MzM5NDMxNjYKICAgICAgICB9LAogICAgICAgICJtaWNyb3N0ZXAiOiAxNgogICAgICB9LAogICAgICB7CiAgICAgICAgImtpbmQiOiAidHJhaW4iLAogICAgICAgICJlbGFwc2VkX3NlY29uZHMiOiAzNS44MTQ5MDU1ODM5NzQ5MDUsCiAgICAgICAgInVwc3RyZWFtIjogewogICAgICAgICAgIml0ZXJhdGlvbiI6IDI0LAogICAgICAgICAgInRyYWluX2xvc3MiOiAxLjI1NzcyNzE0NjE0ODY4MTYsCiAgICAgICAgICAibGVhcm5pbmdfcmF0ZSI6IDkuOTk5OTk5NzQ3Mzc4NzUyZS0wNSwKICAgICAgICAgICJpdGVyYXRpb25zX3Blcl9zZWNvbmQiOiAxLjIxMTc1Njk3Mzc4NzkzNywKICAgICAgICAgICJ0b2tlbnNfcGVyX3NlY29uZCI6IDIxLjUwODY4NjI4NDczNTg4LAogICAgICAgICAgInRyYWluZWRfdG9rZW5zIjogMzk5LAogICAgICAgICAgInBlYWtfbWVtb3J5IjogMi43MzM5NDMyMTYKICAgICAgICB9LAogICAgICAgICJtaWNyb3N0ZXAiOiAyNAogICAgICB9LAogICAgICB7CiAgICAgICAgImtpbmQiOiAidmFsaWRhdGlvbiIsCiAgICAgICAgImVsYXBzZWRfc2Vjb25kcyI6IDQ4LjQ5NzcyNjQ1ODk5NzkzLAogICAgICAgICJ1cHN0cmVhbSI6IHsKICAgICAgICAgICJpdGVyYXRpb24iOiAzMSwKICAgICAgICAgICJ2YWxfbG9zcyI6IDAuNjg0NDc1ODM5MTM4MDMxLAogICAgICAgICAgInZhbF90aW1lIjogNy41NDEzMTU3NDk5ODYwOTcKICAgICAgICB9LAogICAgICAgICJtaWNyb3N0ZXAiOiAzMgogICAgICB9LAogICAgICB7CiAgICAgICAgImtpbmQiOiAidHJhaW4iLAogICAgICAgICJlbGFwc2VkX3NlY29uZHMiOiA0OS4yNzM4OTI1NDE5OTgwNjYsCiAgICAgICAgInVwc3RyZWFtIjogewogICAgICAgICAgIml0ZXJhdGlvbiI6IDMyLAogICAgICAgICAgInRyYWluX2xvc3MiOiAwLjMyMTMyMTI3ODgxMDUwMTEsCiAgICAgICAgICAibGVhcm5pbmdfcmF0ZSI6IDkuOTk5OTk5NzQ3Mzc4NzUyZS0wNSwKICAgICAgICAgICJpdGVyYXRpb25zX3Blcl9zZWNvbmQiOiAxLjM1Mzk4NDUzMDU4OTg5NDUsCiAgICAgICAgICAidG9rZW5zX3Blcl9zZWNvbmQiOiAyNi4yMzM0NTAyODAxNzkyMDYsCiAgICAgICAgICAidHJhaW5lZF90b2tlbnMiOiA1NTQsCiAgICAgICAgICAicGVha19tZW1vcnkiOiAyLjczMzk0NDk0NAogICAgICAgIH0sCiAgICAgICAgIm1pY3Jvc3RlcCI6IDMyCiAgICAgIH0KICAgIF0sCiAgICAibWVhc3VyZW1lbnRfc291cmNlcyI6IFsKICAgICAgewogICAgICAgICJwYXRoIjogImNvbGxlY3Rvci1zb3VyY2UvdHJhaW5pbmcucHkiLAogICAgICAgICJzaGEyNTYiOiAiNjQ1Mzc4YmM3ZjkzYzQyZjNlZjNlZDM2ZTBjYzg0ZDBlZjZmNzU0MTQ4Y2FjYWNiMmY3MmQzOThkOTg2ODNmMiIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImNvbGxlY3Rvci1zb3VyY2UvbWVhc3VyZS5weSIsCiAgICAgICAgInNoYTI1NiI6ICJiYzBhOGQxZGQ5NTQyMzMyYzRkM2JmY2U3MThlZDYxY2VjNjA5MDZlYjU1ZmIwNzhmMDU1NjYzOWVhMGQxMDA5IgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAiY29sbGVjdG9yLXNvdXJjZS9iZW5jaG1hcmsucHkiLAogICAgICAgICJzaGEyNTYiOiAiYjFkM2ZmOTAyMzcxYjMzZDUwNDI4MDExZjA0MjZkNjc1MDY3YjBmYzY3YjRkNDU4NjIxYzJjYjBkMzc3ZTg4MSIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogImNvbGxlY3Rvci1zb3VyY2UvbGluZWFnZS5weSIsCiAgICAgICAgInNoYTI1NiI6ICI5YjdmM2VmM2ViNTM3NTNhYmRjYjNhYWE3YmY3Y2I2N2Q4MDkyNjE1Nzg2ZTgxZmUwZDBhMmUxOTljMDVjNDUwIgogICAgICB9CiAgICBdLAogICAgIm1lYXN1cmVtZW50IjogIndob2xlIHJ1biByZXNvdXJjZXMgaW5jbHVkZSBtb2RlbCBsb2FkLCBwcmVmbGlnaHQsIHRyYWluaW5nIGFuZCB2YWxpZGF0aW9uOyBuYXRpdmUgdHJhaW5pbmcgdG9rZW5zL3MgY291bnRzIHN1cGVydmlzZWQgdG9rZW5zIGFuZCBleGNsdWRlcyB2YWxpZGF0aW9uOyBNTFggR0IgYXJlIGRlY2ltYWwsIG5vdCBSU1MiLAogICAgImxvYWRfc2Vjb25kcyI6IDEuNTE5MjE2NzA5MDEzNTYyNiwKICAgICJwcmVmbGlnaHQiOiB7CiAgICAgICJtYXhpbXVtX3Rva2VucyI6IDkyNiwKICAgICAgIm1hc2tfcHJlZml4X21hdGNoZXMiOiB0cnVlCiAgICB9LAogICAgInRyYWluYWJsZV9wYXJhbWV0ZXJzIjogMzI3NjgwLAogICAgInRyYWluaW5nX3dhbGxfc2Vjb25kcyI6IDQ3LjQ2MzM5ODA4Mjk5NjcyLAogICAgIm1seF9wZWFrX2FsbG9jYXRlZF9ieXRlcyI6IDI3MzM5NDQ5NDQsCiAgICAibWljcm9zdGVwcyI6IDMyLAogICAgIm9wdGltaXplcl91cGRhdGVzIjogNCwKICAgICJhZGFwdGVyIjogewogICAgICAicm9vdCI6ICIvVXNlcnMvc3l6Ly5sb2NhbC9zaGFyZS9lZGdlLWFpL3dvcmtmbG93LTIwMjYxMDIzL3RyYWluMzIvYWRhcHRlciIsCiAgICAgICJ0b3RhbF9ieXRlcyI6IDI2Mjk1MTUsCiAgICAgICJmaWxlcyI6IFsKICAgICAgICB7CiAgICAgICAgICAibmFtZSI6ICIwMDAwMDMyX2FkYXB0ZXJzLnNhZmV0ZW5zb3JzIiwKICAgICAgICAgICJieXRlcyI6IDEzMTQxNDMsCiAgICAgICAgICAic2hhMjU2IjogIjJkNWMxN2RlMjQ0MDJlMTI1N2E3MDg0YjdhNDI5MzYzYmYyZTAyNjMzNDcyYTQ2NGE5YWVmNDMxYTQ1NGQ5YjgiCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAibmFtZSI6ICJhZGFwdGVyX2NvbmZpZy5qc29uIiwKICAgICAgICAgICJieXRlcyI6IDEyMjksCiAgICAgICAgICAic2hhMjU2IjogIjg1YTBkZjMxOGJjYmMxN2FjYTcxZWI0NTUyYjlkODEzOGE5MDNlNzFjODlhNTRkZTkwNzJlOGU5NWVjYTEwZmEiCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAibmFtZSI6ICJhZGFwdGVycy5zYWZldGVuc29ycyIsCiAgICAgICAgICAiYnl0ZXMiOiAxMzE0MTQzLAogICAgICAgICAgInNoYTI1NiI6ICIyZDVjMTdkZTI0NDAyZTEyNTdhNzA4NGI3YTQyOTM2M2JmMmUwMjYzMzQ3MmE0NjRhOWFlZjQzMWE0NTRkOWI4IgogICAgICAgIH0KICAgICAgXQogICAgfSwKICAgICJyZXNvdXJjZXMiOiB7CiAgICAgICJzY29wZSI6ICJkZWNsYXJlZCBwcm9jZXNzIGFuZCByZWN1cnNpdmUgY2hpbGRyZW4iLAogICAgICAicGlkIjogNTY5NjgsCiAgICAgICJzYW1wbGluZ19pbnRlcnZhbF9zZWNvbmRzIjogMC4yLAogICAgICAic2FtcGxlX2NvdW50IjogMjI5LAogICAgICAid2FsbF9zZWNvbmRzIjogNDkuMzAwNjI5ODc0OTgyNDA1LAogICAgICAiY3B1X3NlY29uZHMiOiAxMi4yNzU4MDE2OTU5OTk5OTgsCiAgICAgICJob3N0X2xvZ2ljYWxfY3B1cyI6IDEwLAogICAgICAiY3B1X2NhcGFjaXR5X3BlcmNlbnQiOiAyLjQ4OTk4ODgxNDk3NjQ0OTMsCiAgICAgICJwZWFrX3Jzc19ieXRlcyI6IDc1NDAwODA2NCwKICAgICAgInBlYWtfcHNzX2J5dGVzIjogbnVsbCwKICAgICAgImhvc3RfbWVtX3RvdGFsX2J5dGVzIjogMTcxNzk4NjkxODQsCiAgICAgICJtaW5pbXVtX2hvc3RfbWVtX2F2YWlsYWJsZV9ieXRlcyI6IDE4Njc3NTk2MTYsCiAgICAgICJob3N0X3N3YXBfZGVsdGFfYnl0ZXMiOiAxMDY5NDgxOTg0LAogICAgICAiaG9zdF9zd2FwX2luX2RlbHRhX2J5dGVzIjogMTk0NDA5MjY3MiwKICAgICAgImhvc3Rfc3dhcF9vdXRfZGVsdGFfYnl0ZXMiOiA3OTI5ODU2LAogICAgICAic3dhcF9zY29wZSI6ICJzeXN0ZW0td2lkZSBjb3VudGVyczsgbm90IG1vZGVsLW9ubHkiLAogICAgICAibGltaXRhdGlvbiI6ICJzYW1wbGVkIHBlYWssIG5vdCBrZXJuZWwgaGlnaC13YXRlciBtYXJrOyBsYXN0IG9ic2VydmVkIENQVSBvZiByZXRpcmVkIGNoaWxkcmVuIGlzIHJldGFpbmVkLCBzbyBzaG9ydCBjaGlsZCBsaWZldGltZXMgY2FuIHJlbWFpbiB1bmRlci1zYW1wbGVkOyBSU1MgYW5kIGFjY2VsZXJhdG9yIGFsbG9jYXRpb25zIG1heSBvdmVybGFwIgogICAgfSwKICAgICJ3YWxsX3NlY29uZHMiOiA0OS4zMTE2MzM2NjY5NzcyODYsCiAgICAiZXZpZGVuY2UiOiBbCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJtZXRyaWNzLmpzb25sIiwKICAgICAgICAic2hhMjU2IjogImM5OTk3NDkzZDFkNTM4NjQwYjNiNDU3ZmE4MGUxODg2Y2RkODFjODg2ODY3MWJhNjI3OTYzZWNiN2U2ODhiMmIiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJwcmVmbGlnaHQuanNvbiIsCiAgICAgICAgInNoYTI1NiI6ICI1N2I0MWQ2ZTk2YzJlNWFkYWQ5YjQ2OWYyZWZkYTBjYjYzYmFiMWQxNTExOWQwOTliZmY0MzBiZjZkMzBmMzgwIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAicmVxdWVzdC5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjFhOGUyMTFjMzY0ZWI0ZDljOWE2ZDgxOGU1Nzc3MmJhNGM4NWZlMDgyMjM5MDNjNjZjZWYwOTVkOTRkOGQ2YzMiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJyZXNvdXJjZS1zYW1wbGVzLmpzb24iLAogICAgICAgICJzaGEyNTYiOiAiYWZjN2VjNDAzMzkyZGJiZmI1MmYwNTZmNzUzMDRhY2FjOGMwOWNlODgyZTg3NzVkYjIwNmQ3MDRhZmE4NDU3NyIKICAgICAgfSwKICAgICAgewogICAgICAgICJwYXRoIjogInRyYWluLWNvbmZpZy5qc29uIiwKICAgICAgICAic2hhMjU2IjogIjczZmFlYjJkZDJmMmE3ZjlhOWNiZDhiNWY0NGQxZDhiMmI5NDk0YTBjOTZkZDRlMDhiZWY5Y2UxMWNlY2Q4MzUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJ0cmFpbi5qc29ubCIsCiAgICAgICAgInNoYTI1NiI6ICIwMGJlZTUyNzJlYmM2YzhhZWVlNWM1YTRlYzEzODM4MWZlOWUzMGZhZDI0NDYwNGRjN2JmNjdjYjI3ZDE4YzAzIgogICAgICB9LAogICAgICB7CiAgICAgICAgInBhdGgiOiAidHJhaW5pbmcubG9nIiwKICAgICAgICAic2hhMjU2IjogImUxNTFmODY1M2Y3MGUyMTMxYzllYzgxOWI4N2I0OTQ5YzU1ODQyNTVlYmE3ODNmOWMwYzZkMTE5OTFjN2NkNDAiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAicGF0aCI6ICJ2YWxpZC5qc29ubCIsCiAgICAgICAgInNoYTI1NiI6ICIyMjc0MjkxNjc5NGFhZWY3NmM5ZWEwMWJmODVjNzY5MzA1YjA3NGZhOGU4ZDc3NDliYzQzNTA5ZGM2ZTAxYzk3IgogICAgICB9CiAgICBdCiAgfQpd">下载结果JSON</a><details><summary>展开完整阶段结果</summary><pre>[
+  {
+    &quot;schema&quot;: &quot;edge-model-finetune/result-v1&quot;,
+    &quot;run_id&quot;: &quot;workflow-pilot32&quot;,
+    &quot;status&quot;: &quot;completed&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;device_measurement&quot;
+    },
+    &quot;base_artifact&quot;: {
+      &quot;model&quot;: &quot;Qwen/Qwen3-0.6B&quot;,
+      &quot;model_path&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;revision&quot;: &quot;c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;parameter_count&quot;: 596049920,
+      &quot;parameter_count_stored&quot;: 751632384,
+      &quot;precision&quot;: &quot;BF16&quot;,
+      &quot;artifact_format&quot;: &quot;HF safetensors&quot;,
+      &quot;backend&quot;: &quot;Metal&quot;,
+      &quot;context_tokens&quot;: 8192,
+      &quot;kv_type&quot;: &quot;runtime default unquantized&quot;,
+      &quot;lineage&quot;: &quot;official untrained base&quot;
+    },
+    &quot;request_sha256&quot;: &quot;1a8e211c364eb4d9c9a6d818e57772ba4c85fe08223903c66cef095d94d8d6c3&quot;,
+    &quot;dataset&quot;: {
+      &quot;train_samples&quot;: 60,
+      &quot;valid_samples&quot;: 18,
+      &quot;test_loaded&quot;: false,
+      &quot;train_sha256&quot;: &quot;00bee5272ebc6c8aeee5c5a4ec138381fe9e30fad244604dc7bf67cb27d18c03&quot;,
+      &quot;valid_sha256&quot;: &quot;22742916794aaef76c9ea01bf85c769305b074fa8e8d7749bc43509dc6e01c97&quot;
+    },
+    &quot;runtime&quot;: {
+      &quot;mlx&quot;: &quot;0.32.4&quot;,
+      &quot;mlx-lm&quot;: &quot;0.32.2&quot;,
+      &quot;transformers&quot;: &quot;5.20.2&quot;
+    },
+    &quot;config&quot;: {
+      &quot;model&quot;: &quot;/Users/syz/.local/share/edge-ai/qwen-lifecycle/hf-cache/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca&quot;,
+      &quot;train&quot;: true,
+      &quot;fine_tune_type&quot;: &quot;lora&quot;,
+      &quot;optimizer&quot;: &quot;adam&quot;,
+      &quot;optimizer_config&quot;: {
+        &quot;adam&quot;: {},
+        &quot;adamw&quot;: {},
+        &quot;muon&quot;: {},
+        &quot;sgd&quot;: {},
+        &quot;adafactor&quot;: {}
+      },
+      &quot;data&quot;: &quot;mlx-community/WikiSQL&quot;,
+      &quot;seed&quot;: 42,
+      &quot;num_layers&quot;: 8,
+      &quot;batch_size&quot;: 1,
+      &quot;iters&quot;: 32,
+      &quot;val_batches&quot;: 18,
+      &quot;learning_rate&quot;: 0.0001,
+      &quot;steps_per_report&quot;: 8,
+      &quot;steps_per_eval&quot;: 16,
+      &quot;resume_adapter_file&quot;: null,
+      &quot;adapter_path&quot;: &quot;/Users/syz/.local/share/edge-ai/workflow-20261023/train32/adapter&quot;,
+      &quot;save_every&quot;: 32,
+      &quot;test&quot;: false,
+      &quot;test_batches&quot;: 500,
+      &quot;max_seq_length&quot;: 2048,
+      &quot;config&quot;: null,
+      &quot;grad_checkpoint&quot;: true,
+      &quot;grad_accumulation_steps&quot;: 8,
+      &quot;clear_cache_threshold&quot;: 0,
+      &quot;lr_schedule&quot;: null,
+      &quot;lora_parameters&quot;: {
+        &quot;rank&quot;: 8,
+        &quot;scale&quot;: 16.0,
+        &quot;dropout&quot;: 0.0,
+        &quot;keys&quot;: [
+          &quot;self_attn.q_proj&quot;,
+          &quot;self_attn.v_proj&quot;
+        ]
+      },
+      &quot;mask_prompt&quot;: true,
+      &quot;report_to&quot;: null,
+      &quot;project_name&quot;: null,
+      &quot;trust_remote_code&quot;: false
+    },
+    &quot;metrics&quot;: [
+      {
+        &quot;kind&quot;: &quot;validation&quot;,
+        &quot;elapsed_seconds&quot;: 9.031738542020321,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 0,
+          &quot;val_loss&quot;: 2.572291374206543,
+          &quot;val_time&quot;: 7.050621458038222
+        },
+        &quot;microstep&quot;: 0
+      },
+      {
+        &quot;kind&quot;: &quot;train&quot;,
+        &quot;elapsed_seconds&quot;: 15.541070459003095,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 8,
+          &quot;train_loss&quot;: 4.014616966247559,
+          &quot;learning_rate&quot;: 9.999999747378752e-05,
+          &quot;iterations_per_second&quot;: 1.2302456508908426,
+          &quot;tokens_per_second&quot;: 17.838561937917216,
+          &quot;trained_tokens&quot;: 116,
+          &quot;peak_memory&quot;: 2.731323366
+        },
+        &quot;microstep&quot;: 8
+      },
+      {
+        &quot;kind&quot;: &quot;validation&quot;,
+        &quot;elapsed_seconds&quot;: 28.382538458972704,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 15,
+          &quot;val_loss&quot;: 1.4330313205718994,
+          &quot;val_time&quot;: 7.080823084048461
+        },
+        &quot;microstep&quot;: 16
+      },
+      {
+        &quot;kind&quot;: &quot;train&quot;,
+        &quot;elapsed_seconds&quot;: 29.202181999979075,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 16,
+          &quot;train_loss&quot;: 2.4618632793426514,
+          &quot;learning_rate&quot;: 9.999999747378752e-05,
+          &quot;iterations_per_second&quot;: 1.2181148754697435,
+          &quot;tokens_per_second&quot;: 21.469274680154232,
+          &quot;trained_tokens&quot;: 257,
+          &quot;peak_memory&quot;: 2.733943166
+        },
+        &quot;microstep&quot;: 16
+      },
+      {
+        &quot;kind&quot;: &quot;train&quot;,
+        &quot;elapsed_seconds&quot;: 35.814905583974905,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 24,
+          &quot;train_loss&quot;: 1.2577271461486816,
+          &quot;learning_rate&quot;: 9.999999747378752e-05,
+          &quot;iterations_per_second&quot;: 1.211756973787937,
+          &quot;tokens_per_second&quot;: 21.50868628473588,
+          &quot;trained_tokens&quot;: 399,
+          &quot;peak_memory&quot;: 2.733943216
+        },
+        &quot;microstep&quot;: 24
+      },
+      {
+        &quot;kind&quot;: &quot;validation&quot;,
+        &quot;elapsed_seconds&quot;: 48.49772645899793,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 31,
+          &quot;val_loss&quot;: 0.684475839138031,
+          &quot;val_time&quot;: 7.541315749986097
+        },
+        &quot;microstep&quot;: 32
+      },
+      {
+        &quot;kind&quot;: &quot;train&quot;,
+        &quot;elapsed_seconds&quot;: 49.273892541998066,
+        &quot;upstream&quot;: {
+          &quot;iteration&quot;: 32,
+          &quot;train_loss&quot;: 0.3213212788105011,
+          &quot;learning_rate&quot;: 9.999999747378752e-05,
+          &quot;iterations_per_second&quot;: 1.3539845305898945,
+          &quot;tokens_per_second&quot;: 26.233450280179206,
+          &quot;trained_tokens&quot;: 554,
+          &quot;peak_memory&quot;: 2.733944944
+        },
+        &quot;microstep&quot;: 32
+      }
+    ],
+    &quot;measurement_sources&quot;: [
+      {
+        &quot;path&quot;: &quot;collector-source/training.py&quot;,
+        &quot;sha256&quot;: &quot;645378bc7f93c42f3ef3ed36e0cc84d0ef6f754148cacacb2f72d398d98683f2&quot;
+      },
+      {
+        &quot;path&quot;: &quot;collector-source/measure.py&quot;,
+        &quot;sha256&quot;: &quot;bc0a8d1dd9542332c4d3bfce718ed61cec60906eb55fb078f0556639ea0d1009&quot;
+      },
+      {
+        &quot;path&quot;: &quot;collector-source/benchmark.py&quot;,
+        &quot;sha256&quot;: &quot;b1d3ff902371b33d50428011f0426d675067b0fc67b4d458621c2cb0d377e881&quot;
+      },
+      {
+        &quot;path&quot;: &quot;collector-source/lineage.py&quot;,
+        &quot;sha256&quot;: &quot;9b7f3ef3eb53753abdcb3aaa7bf7cb67d8092615786e81fe0d0a2e199c05c450&quot;
+      }
+    ],
+    &quot;measurement&quot;: &quot;whole run resources include model load, preflight, training and validation; native training tokens/s counts supervised tokens and excludes validation; MLX GB are decimal, not RSS&quot;,
+    &quot;load_seconds&quot;: 1.5192167090135626,
+    &quot;preflight&quot;: {
+      &quot;maximum_tokens&quot;: 926,
+      &quot;mask_prefix_matches&quot;: true
+    },
+    &quot;trainable_parameters&quot;: 327680,
+    &quot;training_wall_seconds&quot;: 47.46339808299672,
+    &quot;mlx_peak_allocated_bytes&quot;: 2733944944,
+    &quot;microsteps&quot;: 32,
+    &quot;optimizer_updates&quot;: 4,
+    &quot;adapter&quot;: {
+      &quot;root&quot;: &quot;/Users/syz/.local/share/edge-ai/workflow-20261023/train32/adapter&quot;,
+      &quot;total_bytes&quot;: 2629515,
+      &quot;files&quot;: [
+        {
+          &quot;name&quot;: &quot;0000032_adapters.safetensors&quot;,
+          &quot;bytes&quot;: 1314143,
+          &quot;sha256&quot;: &quot;2d5c17de24402e1257a7084b7a429363bf2e02633472a464a9aef431a454d9b8&quot;
+        },
+        {
+          &quot;name&quot;: &quot;adapter_config.json&quot;,
+          &quot;bytes&quot;: 1229,
+          &quot;sha256&quot;: &quot;85a0df318bcbc17aca71eb4552b9d8138a903e71c89a54de9072e8e95eca10fa&quot;
+        },
+        {
+          &quot;name&quot;: &quot;adapters.safetensors&quot;,
+          &quot;bytes&quot;: 1314143,
+          &quot;sha256&quot;: &quot;2d5c17de24402e1257a7084b7a429363bf2e02633472a464a9aef431a454d9b8&quot;
+        }
+      ]
+    },
+    &quot;resources&quot;: {
+      &quot;scope&quot;: &quot;declared process and recursive children&quot;,
+      &quot;pid&quot;: 56968,
+      &quot;sampling_interval_seconds&quot;: 0.2,
+      &quot;sample_count&quot;: 229,
+      &quot;wall_seconds&quot;: 49.300629874982405,
+      &quot;cpu_seconds&quot;: 12.275801695999998,
+      &quot;host_logical_cpus&quot;: 10,
+      &quot;cpu_capacity_percent&quot;: 2.4899888149764493,
+      &quot;peak_rss_bytes&quot;: 754008064,
+      &quot;peak_pss_bytes&quot;: null,
+      &quot;host_mem_total_bytes&quot;: 17179869184,
+      &quot;minimum_host_mem_available_bytes&quot;: 1867759616,
+      &quot;host_swap_delta_bytes&quot;: 1069481984,
+      &quot;host_swap_in_delta_bytes&quot;: 1944092672,
+      &quot;host_swap_out_delta_bytes&quot;: 7929856,
+      &quot;swap_scope&quot;: &quot;system-wide counters; not model-only&quot;,
+      &quot;limitation&quot;: &quot;sampled peak, not kernel high-water mark; last observed CPU of retired children is retained, so short child lifetimes can remain under-sampled; RSS and accelerator allocations may overlap&quot;
+    },
+    &quot;wall_seconds&quot;: 49.311633666977286,
+    &quot;evidence&quot;: [
+      {
+        &quot;path&quot;: &quot;metrics.jsonl&quot;,
+        &quot;sha256&quot;: &quot;c9997493d1d538640b3b457fa80e1886cdd81c8868671ba627963ecb7e688b2b&quot;
+      },
+      {
+        &quot;path&quot;: &quot;preflight.json&quot;,
+        &quot;sha256&quot;: &quot;57b41d6e96c2e5adad9b469f2efda0cb63bab1d15119d099bff430bf6d30f380&quot;
+      },
+      {
+        &quot;path&quot;: &quot;request.json&quot;,
+        &quot;sha256&quot;: &quot;1a8e211c364eb4d9c9a6d818e57772ba4c85fe08223903c66cef095d94d8d6c3&quot;
+      },
+      {
+        &quot;path&quot;: &quot;resource-samples.json&quot;,
+        &quot;sha256&quot;: &quot;afc7ec403392dbbfb52f056f75304acac8c09ce882e8775db206d704afa84577&quot;
+      },
+      {
+        &quot;path&quot;: &quot;train-config.json&quot;,
+        &quot;sha256&quot;: &quot;73faeb2dd2f2a7f9a9cbd8b5f44d1d8b2b9494a0c96dd4e08bef9ce11cecd835&quot;
+      },
+      {
+        &quot;path&quot;: &quot;train.jsonl&quot;,
+        &quot;sha256&quot;: &quot;00bee5272ebc6c8aeee5c5a4ec138381fe9e30fad244604dc7bf67cb27d18c03&quot;
+      },
+      {
+        &quot;path&quot;: &quot;training.log&quot;,
+        &quot;sha256&quot;: &quot;e151f8653f70e2131c9ec819b87b4949c5584255eba783f9c0c6d11991c7cd40&quot;
+      },
+      {
+        &quot;path&quot;: &quot;valid.jsonl&quot;,
+        &quot;sha256&quot;: &quot;22742916794aaef76c9ea01bf85c769305b074fa8e8d7749bc43509dc6e01c97&quot;
+      }
+    ]
+  }
+]</pre></details></section></main><script>const links=[...document.querySelectorAll(".rail a")];function nav(){let id="summary";for(const a of links){const s=document.querySelector(a.getAttribute("href"));if(s&&s.getBoundingClientRect().top<=150)id=s.id;}for(const a of links)a.classList.toggle("active",a.getAttribute("href")==="#"+id);}addEventListener("scroll",nav,{passive:true});nav();</script></html>

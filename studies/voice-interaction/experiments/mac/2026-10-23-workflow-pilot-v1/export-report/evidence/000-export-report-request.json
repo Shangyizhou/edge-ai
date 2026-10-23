@@ -1,0 +1,39 @@
+{
+  "schema": "edge-ai-export-report/request-v1",
+  "title": "技术试跑模型的合并与量化",
+  "purpose": "验证制品交接；不将技术模型晋升主候选",
+  "request": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/export/request.json",
+  "result": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/export/results.json",
+  "artifacts": {
+    "base": {
+      "label": "原始模型目录",
+      "kind": "directory"
+    },
+    "adapter": {
+      "label": "32微步增量权重目录",
+      "kind": "directory"
+    },
+    "merged": {
+      "label": "合并模型目录",
+      "kind": "directory"
+    },
+    "f16": {
+      "label": "F16 高精度文件",
+      "kind": "file",
+      "format": "GGUF",
+      "precision": "F16"
+    },
+    "q4_k_m": {
+      "label": "Q4 量化文件",
+      "kind": "file",
+      "format": "GGUF",
+      "precision": "Q4_K_M"
+    }
+  },
+  "references": [
+    {
+      "label": "技术候选的使用范围",
+      "path": "/Users/syz/code/edge-ai/studies/voice-interaction/experiments/mac/2026-10-23-workflow-pilot-v1/decision-before-export.json"
+    }
+  ]
+}

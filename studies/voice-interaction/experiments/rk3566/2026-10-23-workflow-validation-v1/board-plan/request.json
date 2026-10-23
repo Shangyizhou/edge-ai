@@ -1,0 +1,34 @@
+{
+  "schema": "edge-ai-evaluation-plan/request-v1",
+  "profile": "native-tool-persona-v1",
+  "purpose": "development",
+  "question": "转换和端侧技术交接12例；开发回归，不是最终验收",
+  "suite_ref": "/home/orangepi/.local/share/edge-ai/workflow-20261023/board-subset12-suite.json",
+  "review_status": "accepted",
+  "learning_groups": [
+    "train_action_frame0",
+    "train_action_frame1",
+    "train_action_frame2",
+    "train_action_frame3",
+    "train_persona_family0",
+    "train_persona_family1",
+    "train_persona_family2",
+    "train_chat_family",
+    "valid_action_frame0",
+    "valid_action_frame1",
+    "valid_persona_family0",
+    "valid_chat_family"
+  ],
+  "scorer": {
+    "version": "qwen-lifecycle-native-v1",
+    "rules": "native/JSON/Schema/Registry分层、精确工具参数、人设关键词仅诊断、普通聊天无调用"
+  },
+  "measurement": {
+    "boundary": "request through pure intake; no tool execution",
+    "resources": "Linux PSS, actual model process tree /4 logical cores",
+    "cache": "llama cache_prompt true; cold first separately"
+  },
+  "budget": {
+    "total_seconds": 600
+  }
+}
