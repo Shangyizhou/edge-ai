@@ -1,8 +1,6 @@
 # Task/data workflow project adapters
 
-Reusable capabilities live in personal-skills and are installed under
-`~/.codex/skills/edge-ai-*`. This project owns task recipes, actual model
-calls and experiment evidence. No new Skill is added.
+New Qwen/ASR tests use the repository-owned [benchmark workflow](../edge_benchmark/WORKFLOW.md). Installed Skills are no longer required. This directory retains data utilities, existing execution adapters and historical contracts.
 
 - `pilot_data`: a machine-specific Qwen synthetic pilot recipe, requiring
   fresh `--assets` and `--evidence` directories. It binds the frozen nine
@@ -21,17 +19,7 @@ calls and experiment evidence. No new Skill is added.
 - `collect_asr`: saved-event inference-window aggregation, excluding
   loading, first request, warmup and idle. It does not rerun recognition.
 
-Public reusable entry points:
-
-```sh
-python ~/.codex/skills/edge-ai-train/scripts/prepare_data.py REQUEST NEW_DIR
-python ~/.codex/skills/edge-ai-benchmark/scripts/prepare_evaluation.py REQUEST NEW_DIR
-python ~/.codex/skills/edge-ai-prepare/scripts/render_workflow_readiness.py REQUEST CHECKS NEW_DIR
-python ~/.codex/skills/edge-ai-prepare/scripts/check_experiment.py REQUEST NEW_RESULT.json
-python ~/.codex/skills/edge-ai-benchmark/scripts/run_experiment.py REQUEST NEW_DIR --dry-run
-python ~/.codex/skills/edge-ai-benchmark/scripts/run_experiment.py REQUEST NEW_DIR
-python ~/.codex/skills/edge-ai-benchmark/scripts/render_experiment_report.py REQUEST NEW_DIR
-```
+Current public commands are `python -m tools.edge_benchmark plan`, `run`, and `sync`; see the workflow above. Historical frozen requests remain evidence and are not rewritten.
 
 Tool-target data validation needs jsonschema; use the isolated model runtime
 or another explicit environment containing it. Reports and evaluation

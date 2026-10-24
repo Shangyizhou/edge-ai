@@ -1,3 +1,7 @@
+# 统一 Benchmark 入口
+
+Qwen 和 ASR 的新测试使用 [固定代码流程](WORKFLOW.md)：配置 → plan → run → MLflow；无需安装 Skill，新入口默认不生成 HTML。旧接口与以下历史说明保持兼容。
+
 # 当前流程的测量工具
 
 共用执行器、适配器、资源采样和离线校验代码保留。旧模型/YOLO/量化试验配置JSON已[仓库外归档](../../archives/README.md)，当前可执行配置与输入身份以[本轮运行准备](../../studies/voice-interaction/research/2026-10-22-runtime-preparation/README.md)及各个新实验的冻结副本为准。
