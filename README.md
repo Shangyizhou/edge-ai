@@ -29,3 +29,7 @@ GitHub保留代码、清单、摘要与正式报告；大文件和917份工作�
 [模型与证据](studies/voice-interaction/models.md) · [实验记录](studies/voice-interaction/experiments/rk3566/README.md) · [业务适配方案](studies/voice-interaction/research/2026-10-22-qwen-adaptation/README.md) · [推进计划](studies/voice-interaction/plan.md)
 
 <sub>当前结论仅依据本轮 skill 流程；旧资料已[归档](archives/README.md)。配置、日志与哈希保留在仓库，模型权重和录音存放于仓库外。生产代码维护在 ros-robot。</sub>
+
+## 实验管理与固定版本说明
+
+[MLflow 本地工具与记录约定](tools/experiment_tracking/README.md) · [小沫固定版本摘要](studies/voice-interaction/releases/xiaomo-qwen3-0.6b-r1/MODEL_CARD.md)。MLflow保存实验细节，HF保留固定制品/数据引用，版本说明保存选择与限制；HTML为可选导出。私有catalog、样本、绑定与数据库按需恢复，不随代码公开。现有Pages逐文件白名单不变。
