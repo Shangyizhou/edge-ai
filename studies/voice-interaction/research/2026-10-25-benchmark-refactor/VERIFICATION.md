@@ -1,6 +1,6 @@
 # 重构交付与验证
 
-日期：2026-10-25。范围：[工单 #21](https://github.com/Shangyizhou/edge-ai/issues/21)。实现分支 `codex/benchmark-runner`，基于 PR #20 的实验记录工具；本次未推送代码、更新 HF 或更改设备服务。
+日期：2026-10-25。范围：[工单 #21](https://github.com/Shangyizhou/edge-ai/issues/21)。实现分支 `codex/benchmark-runner`，基于 PR #20 的实验记录工具；初次离线交付未推送；后续代码发布以 GitHub PR 为准。未更新 HF 或更改设备服务。
 
 ## 已完成
 
@@ -11,7 +11,7 @@
 - ASR 原生 input/index/transcript/rtf 显式转换为逐例结果；可从中断事件恢复，完成率和 CER 参考覆盖分开。
 - MLflow 参数、任务指标、逐例表、原始文本证据与来源关联；本地先落盘，补同步不重推理，重复同步不增 Run/指标点/表行。
 - 原始执行和证据清单有独立内容身份；同步结果独立写入，不覆盖测量。现有 catalog 身份保持不变，新记录及运行绑定保存在本次执行目录。
-- 新增 Linux CI 配置但本次未推送，故没有远端 CI 通过结论。
+- 新增 Linux CI 配置；本机验证不包含远端 CI，当前状态以 PR checks 为准。
 
 ## 本机已执行的离线验证
 
