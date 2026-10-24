@@ -1,0 +1,26 @@
+name: Standalone benchmark workflow
+on:
+  pull_request:
+    paths:
+      - 'tools/edge_benchmark/**'
+      - 'tools/qwen_lifecycle/**'
+      - 'tools/experiment_tracking/record_execution.py'
+      - 'tools/experiment_tracking/test_record_execution.py'
+      - 'pyproject.toml'
+      - '.github/workflows/benchmark-workflow.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install ruff==0.17.2 jsonschema==4.25.1 -r tools/edge_benchmark/requirements-control.txt
+      - run: python -m unittest discover -s tools/edge_benchmark -p 'test_*.py' -q
+      - run: python -m unittest tools.qwen_lifecycle.test_lifecycle tools.qwen_lifecycle.test_server_lifecycle tools.experiment_tracking.test_record_execution -q
+      - run: ruff format --check tools/edge_benchmark/__main__.py tools/edge_benchmark/execution.py tools/edge_benchmark/experiment.py tools/edge_benchmark/task_adapters.py tools/edge_benchmark/test_experiment.py tools/experiment_tracking/record_execution.py tools/experiment_tracking/test_record_execution.py tools/qwen_lifecycle/benchmark.py tools/qwen_lifecycle/server_lifecycle.py
+      - run: ruff check tools/edge_benchmark/__main__.py tools/edge_benchmark/execution.py tools/edge_benchmark/experiment.py tools/edge_benchmark/task_adapters.py tools/edge_benchmark/test_experiment.py tools/experiment_tracking/record_execution.py tools/experiment_tracking/test_record_execution.py tools/qwen_lifecycle/benchmark.py tools/qwen_lifecycle/server_lifecycle.py

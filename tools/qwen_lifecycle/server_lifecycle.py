@@ -32,7 +32,13 @@ def launcher_handoff(result, benchmark_result_path):
     return handoff
 
 
-def execute(request, output, dependency_probe):
+def execute(
+    request: dict,
+    output: Path,
+    dependency_probe: tuple,
+    render_reports: bool = True,
+) -> dict:
+    """管理自有服务并执行评测；旧入口默认生成报告，新入口可关闭。"""
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / "launcher-request.json", request)
@@ -150,7 +156,7 @@ def execute(request, output, dependency_probe):
                             },
                             {"role": "user", "content": sample["user"]},
                         ],
-                        "tools": suite.get("tools"),
+                        "tools": sample.get("tools", suite.get("tools")),
                         "add_generation_prompt": True,
                         "chat_template_kwargs": {"enable_thinking": False},
                     },
@@ -179,16 +185,18 @@ def execute(request, output, dependency_probe):
                 request["runner"], endpoint=endpoint, monitor_pid=process.pid
             )
             result = run(request, output / "benchmark")
-            (output / "benchmark/report.html").write_text(
-                render([result]), encoding="utf-8"
-            )
+            if render_reports:
+                (output / "benchmark/report.html").write_text(
+                    render([result]), encoding="utf-8"
+                )
             handoff = launcher_handoff(
                 result, output / "benchmark/results.json"
             )
             write_json(output / "results.json", handoff)
-            (output / "report.html").write_text(
-                render([handoff]), encoding="utf-8"
-            )
+            if render_reports:
+                (output / "report.html").write_text(
+                    render([handoff]), encoding="utf-8"
+                )
             return handoff
         except Exception as error:
             write_json(

@@ -1,0 +1,53 @@
+{
+  "schema": "edge-benchmark/request-v1",
+  "name": "asr-native-comparison",
+  "task": "asr_transcription",
+  "protocol_id": "zipformer-paced-100ms-tail3.2-v1",
+  "device": "local",
+  "suite": {
+    "path": "asr-suite.example.json",
+    "sha256": "<reviewed-suite-sha256>"
+  },
+  "budget": {
+    "total_seconds": 1200,
+    "case_timeout_seconds": 120
+  },
+  "candidates": [
+    {
+      "id": "cpu-int8",
+      "model_id": "<verified-cpu-int8-model-id>",
+      "precision": "mixed-INT8",
+      "python": "<model-environment-python>",
+      "request": {
+        "kind": "streaming_asr",
+        "binary": "<matched-asr-stream-probe>",
+        "model": "<matched-model-directory>",
+        "threads": 2,
+        "provider": "cpu",
+        "realtime": true,
+        "chunk_ms": 100,
+        "tail_seconds": 3.2,
+        "endpoint_silence": 1.2,
+        "idle_seconds": 0
+      }
+    },
+    {
+      "id": "npu",
+      "model_id": "<verified-npu-model-id>",
+      "precision": "<compiled-rknn-precision>",
+      "python": "<model-environment-python>",
+      "request": {
+        "kind": "streaming_asr",
+        "binary": "<matched-asr-stream-probe>",
+        "model": "<matched-model-directory>",
+        "threads": 1,
+        "provider": "rknn",
+        "realtime": true,
+        "chunk_ms": 100,
+        "tail_seconds": 3.2,
+        "endpoint_silence": 1.2,
+        "idle_seconds": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "edge-benchmark/request-v1",
+  "name": "qwen-f16-q4",
+  "task": "qwen_tool_calls",
+  "protocol_id": "qwen-native-regression-v1",
+  "device": "local",
+  "suite": {
+    "path": "qwen-suite.example.json",
+    "sha256": "<reviewed-suite-sha256>"
+  },
+  "budget": {
+    "total_seconds": 1800,
+    "case_timeout_seconds": 180
+  },
+  "candidates": [
+    {
+      "id": "f16",
+      "model_id": "<catalog-model-id-F16>",
+      "precision": "F16",
+      "python": "<model-environment-python>",
+      "request": {
+        "candidate": {
+          "model_path": "<local-F16-gguf>",
+          "model": "xiaomo-qwen3-0.6b",
+          "runtime_version": "<llama-cpp-commit>",
+          "backend": "<Metal-or-CPU>",
+          "precision": "F16"
+        },
+        "runner": {
+          "kind": "llama-http",
+          "network": "direct"
+        },
+        "server": {
+          "binary": "<llama-server-path>",
+          "argv": [
+            "-t",
+            "2",
+            "-c",
+            "2048",
+            "--jinja"
+          ],
+          "port": 18084
+        },
+        "generation": {
+          "temperature": 0,
+          "max_tokens": 256,
+          "context_tokens": 2048,
+          "cache_prompt": false
+        }
+      }
+    },
+    {
+      "id": "q4_k_m",
+      "model_id": "<catalog-model-id-Q4_K_M>",
+      "precision": "Q4_K_M",
+      "python": "<model-environment-python>",
+      "request": {
+        "candidate": {
+          "model_path": "<local-Q4_K_M-gguf>",
+          "model": "xiaomo-qwen3-0.6b",
+          "runtime_version": "<llama-cpp-commit>",
+          "backend": "<Metal-or-CPU>",
+          "precision": "Q4_K_M"
+        },
+        "runner": {
+          "kind": "llama-http",
+          "network": "direct"
+        },
+        "server": {
+          "binary": "<llama-server-path>",
+          "argv": [
+            "-t",
+            "2",
+            "-c",
+            "2048",
+            "--jinja"
+          ],
+          "port": 18084
+        },
+        "generation": {
+          "temperature": 0,
+          "max_tokens": 256,
+          "context_tokens": 2048,
+          "cache_prompt": false
+        }
+      }
+    }
+  ]
+}

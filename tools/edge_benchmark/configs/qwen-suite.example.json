@@ -1,0 +1,40 @@
+{
+  "system": "你是小沫。只在用户明确要求且工具可用时调用工具。",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "enable_tracking",
+        "description": "开启跟随",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "samples": [
+    {
+      "id": "follow-on",
+      "user": "小沫，跟着我。",
+      "expected": {
+        "kind": "tool",
+        "calls": [
+          {
+            "name": "enable_tracking",
+            "arguments": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "follow-unavailable",
+      "user": "小沫，跟着我。",
+      "tools": [],
+      "expected": {
+        "kind": "chat"
+      }
+    }
+  ]
+}
